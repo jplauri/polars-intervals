@@ -5,6 +5,7 @@ build-backend = "maturin"
 [project]
 name = "polars-intervals"
 requires-python = ">=3.12"
+dependencies = ["polars>=1.44.1,<1.45"]
 license-files = ["LICENSE"]
 dynamic = ["version"]
 

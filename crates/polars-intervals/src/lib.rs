@@ -1,13 +1,22 @@
 //! Interval algorithms for Rust Polars, backed by `intervals-core`.
 //!
 //! [`overlap_count`] adapts integer [`Series`] to the Polars-independent core.
-//! The Python package currently loads an empty native module; no interval
-//! functions or expression plugin entrypoints are exposed to Python yet.
+//! The Python package exposes the same operation as a Polars expression plugin.
 
 use polars::prelude::*;
 
 #[pyo3::pymodule]
 mod _internal {}
+
+#[pyo3_polars::derive::polars_expr(output_type = UInt64)]
+fn overlap_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
+    polars_ensure!(
+        inputs.len() == 2,
+        InvalidOperation: "overlap_count requires exactly two inputs, got {}",
+        inputs.len()
+    );
+    overlap_count(&inputs[0], &inputs[1])
+}
 
 /// Counts other overlapping intervals in the supplied start and end columns.
 ///
