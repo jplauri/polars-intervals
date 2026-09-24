@@ -49,3 +49,6 @@ development group), and builds the Rust plugin through maturin. The package is
 installed in editable mode: Python edits are available immediately, and changes
 to either Rust crate trigger a rebuild on the next `uv sync` or `uv run`.
 Commit `uv.lock` when updating dependencies.
+
+See [benchmarks/README.md](benchmarks/README.md) for reproducible overlap-counting
+benchmarks against a Polars inequality self-join, separate from the test suite.
