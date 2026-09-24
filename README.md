@@ -6,7 +6,7 @@ This project is early-stage. The core `overlap_counts` algorithm counts other
 overlapping half-open intervals for each input row. Rust Polars users can call
 `polars_intervals::overlap_count(&starts, &ends)` with matching non-null integer
 Series (signed or unsigned, 8–64 bits) to obtain `UInt64` counts in input order.
-Python bindings are not yet available.
+The Python package is a scaffold; `overlap_count` is not exposed in Python yet.
 
 ## Architecture
 

@@ -1,0 +1,14 @@
+[build-system]
+requires = ["maturin>=1.9.4,<2"]
+build-backend = "maturin"
+
+[project]
+name = "polars-intervals"
+requires-python = ">=3.10"
+license-files = ["LICENSE"]
+dynamic = ["version"]
+
+[tool.maturin]
+manifest-path = "crates/polars-intervals/Cargo.toml"
+python-source = "python"
+module-name = "polars_intervals._internal"
