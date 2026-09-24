@@ -1,9 +1,9 @@
 """Test the installed Rust plugin from the repository root:
 
-    python -m pip install ".[test]"
-    python -I -m pytest
+    uv sync --locked
+    uv run --locked pytest
 
-Use a Python 3.12+ virtual environment with a Rust toolchain available.
+Requires uv and a current stable Rust toolchain.
 """
 
 import polars as pl

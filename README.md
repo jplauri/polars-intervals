@@ -33,3 +33,19 @@ input collection (or each group with `.over(...)`).
   The crate has no dependencies and is imported in Rust as `intervals_core`.
 - `crates/polars-intervals` adapts Polars Series to `intervals-core`.
   Its expression plugin powers the thin `python/polars_intervals` wrapper.
+
+## Development
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and a current
+stable Rust toolchain, then run from the repository root:
+
+```sh
+uv sync --locked
+uv run --locked pytest
+```
+
+Uv creates `.venv`, installs the locked dependencies (including pytest from the
+development group), and builds the Rust plugin through maturin. The package is
+installed in editable mode: Python edits are available immediately, and changes
+to either Rust crate trigger a rebuild on the next `uv sync` or `uv run`.
+Commit `uv.lock` when updating dependencies.

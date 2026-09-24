@@ -1,3 +1,6 @@
 /target/
+/.venv/
+/python/polars_intervals/*.pyd
+/python/polars_intervals/*.so
 __pycache__/
 .pytest_cache/
