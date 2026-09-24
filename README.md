@@ -9,11 +9,13 @@ change; `overlap_count` is currently the only public Python operation.
 
 ## Installation
 
-For the current package, build from this repository. You need **Python 3.12+**,
-[uv](https://docs.astral.sh/uv/getting-started/installation/), and a current stable
-[Rust toolchain](https://www.rust-lang.org/tools/install) with your platform's
-native linker/build tools. The Python package requires **Polars >=1.44.1,<1.45**;
-uv installs the compatible version from `uv.lock`.
+For the current package, build from this repository using
+[uv](https://docs.astral.sh/uv/getting-started/installation/) and
+[Rust installed through rustup](https://www.rust-lang.org/tools/install), with
+your platform's native linker/build tools. Supported Python and Polars versions
+are declared in [pyproject.toml](https://github.com/jplauri/polars-intervals/blob/master/pyproject.toml);
+uv installs compatible versions. Rustup selects the compiler from
+`rust-toolchain.toml`.
 
 ```sh
 git clone https://github.com/jplauri/polars-intervals.git
@@ -26,8 +28,7 @@ This creates `.venv` and builds the Rust plugin through maturin. Run your script
 with `uv run --locked python your_script.py`. The distribution is named
 `polars-intervals`; the import is `polars_intervals`.
 
-To use a local checkout from another uv-managed project, run this in that project
-(which must also use Python 3.12+):
+To use a local checkout from another uv-managed project, run this in that project:
 
 ```sh
 uv add /path/to/polars-intervals
@@ -117,30 +118,33 @@ uv run --locked ruff format --check .
 uv run --locked pytest --doctest-modules python/polars_intervals tests
 ```
 
-Ruff is pinned in the development dependencies and uses its defaults with a
-100-character line length. Run `uv run --locked ruff format .` to apply formatting.
-CI runs these checks, builds the documentation, and tests the compiled plugin
-on Python 3.12, 3.13, and 3.14. Benchmarks remain separate from the tests.
+Run `uv run --locked ruff format .` to apply formatting.
 
-Rust checks are `cargo fmt --check`, `cargo test --workspace`, and
-`cargo clippy --workspace --all-targets -- -D warnings`.
+Rust checks are `cargo fmt --check`, `cargo test --workspace --locked`, and
+`cargo clippy --workspace --all-targets --locked -- -D warnings`.
 
-The checkout is installed in editable mode: Python edits are available
-immediately, and edits to either Rust crate trigger a rebuild on the next
-`uv sync` or `uv run`.
-Commit `uv.lock` when updating dependencies.
+Rust development and CI use the stable compiler pinned in
+`rust-toolchain.toml`. Older compilers are untested; no separate minimum supported
+Rust version (MSRV) is promised. Compiler updates should pass the Rust and compiled
+Python plugin checks before merging.
 
-The documentation uses Material for MkDocs. Its home page includes this README;
-the API reference is generated from the typed `overlap_count` signature and its
-Google-style docstring. Edit the function's docstring to update parameters,
-returns, errors, and runnable examples. Preview or build locally with:
+Check the public Rust documentation with
+`cargo doc --workspace --no-deps --locked` and `RUSTDOCFLAGS="-D warnings"` in the
+environment. The generated Rust API reference is written to `target/doc/`.
+
+The checkout is installed in editable mode, so Python edits are available
+immediately. Run `uv sync --locked` after changing Rust code to rebuild the plugin.
+Commit the lockfiles when updating dependencies.
+
+The documentation includes this README and an API reference generated from the
+`overlap_count` docstring. Edit the function's docstring to update its API
+documentation. Preview or build locally with:
 
 ```sh
 uv run --locked --isolated --only-group docs mkdocs serve
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
-These commands install only the docs tools in an isolated environment and read
-the Python source without importing the compiled plugin. The generated site is
-written to `target/docs/`. Check the API examples against the installed plugin
+Building the docs does not require compiling the Rust plugin. The generated site
+is written to `target/docs/`. Check the API examples against the installed plugin
 with `uv run --locked pytest --doctest-modules python/polars_intervals`.

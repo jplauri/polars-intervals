@@ -6,7 +6,8 @@ dependencies and Python's standard library; `pytest` does not run benchmarks.
 
 ## Reproduce
 
-From the repository root, with uv, Python 3.12+, and a current stable Rust toolchain:
+Follow the [installation prerequisites](../README.md#installation), then run from
+the repository root:
 
 ```sh
 uv sync --locked --reinstall-package polars-intervals --config-setting "build-args=--profile release"
@@ -21,15 +22,15 @@ and build flags when comparing revisions. Do not use a debug plugin. Record
 `rustc --version`, `uv --version`, and any custom Rust build flags alongside
 published results.
 
-Defaults are 100, 1,000, and 3,000 rows for each scenario, seed 42, two warmup
-iterations, and seven measured iterations per method. To change them:
+The command-line defaults are defined in [overlap_count.py](overlap_count.py).
+To choose dataset sizes and measurement settings explicitly:
 
 ```sh
 uv run --no-sync python benchmarks/overlap_count.py --sizes 100 500 2000 --seed 42 --warmups 3 --repeats 10
 ```
 
 Use `--scenarios sparse` or `--scenarios dense` to run one scenario. The console
-shows median milliseconds; `target/benchmarks/overlap-count.json` records every
+shows median milliseconds and the output path. The JSON report records every
 sample, median/min/max, actual overlap density, matching join rows, arguments,
 Git revision/dirty state, Python/package versions, platform, CPU description,
 and Polars thread count. Use `--output PATH` to retain separate runs. Results are

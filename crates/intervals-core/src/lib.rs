@@ -3,6 +3,8 @@
 //! [`overlap_counts`] counts overlaps between half-open intervals without
 //! depending on Polars or any particular endpoint type.
 
+#![forbid(unsafe_code)]
+
 use std::fmt;
 
 /// Invalid input to an interval algorithm.
