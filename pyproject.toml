@@ -11,6 +11,7 @@ dynamic = ["version"]
 
 [dependency-groups]
 dev = ["pytest>=8"]
+docs = ["mkdocs-material>=9.7,<10", "mkdocstrings[python]>=1,<2"]
 
 [tool.maturin]
 manifest-path = "crates/polars-intervals/Cargo.toml"

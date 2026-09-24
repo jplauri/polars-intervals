@@ -1,0 +1,40 @@
+site_name: polars-intervals
+site_description: Fast interval algorithms for Polars, implemented in Rust
+repo_url: https://github.com/jplauri/polars-intervals
+site_dir: target/docs
+watch: [README.md, python]
+theme:
+  name: material
+  features:
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+nav:
+  - Getting started: index.md
+  - API reference: api.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [python]
+          options:
+            allow_inspection: false
+            docstring_style: google
+            docstring_section_style: table
+            show_root_heading: true
+            show_source: false
+            separate_signature: true
+            show_signature_annotations: true
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.snippets:
+      check_paths: true
