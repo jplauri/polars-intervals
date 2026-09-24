@@ -120,7 +120,7 @@ uv run --locked pytest --doctest-modules python/polars_intervals tests
 Ruff is pinned in the development dependencies and uses its defaults with a
 100-character line length. Run `uv run --locked ruff format .` to apply formatting.
 CI runs these checks, builds the documentation, and tests the compiled plugin
-on Python 3.12 and 3.14. Benchmarks remain separate from the tests.
+on Python 3.12, 3.13, and 3.14. Benchmarks remain separate from the tests.
 
 Rust checks are `cargo fmt --check`, `cargo test --workspace`, and
 `cargo clippy --workspace --all-targets -- -D warnings`.
