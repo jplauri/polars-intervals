@@ -6,8 +6,9 @@ dependencies and Python's standard library; `pytest` does not run benchmarks.
 
 ## Reproduce
 
-Follow the [installation prerequisites](../README.md#installation), then run from
-the repository root:
+Follow the
+[source installation prerequisites](../README.md#source-and-development-installation),
+then run from the repository root:
 
 ```sh
 uv sync --locked --reinstall-package polars-intervals --config-setting "build-args=--profile release"
