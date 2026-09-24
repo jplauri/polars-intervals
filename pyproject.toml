@@ -10,7 +10,7 @@ license-files = ["LICENSE"]
 dynamic = ["version"]
 
 [dependency-groups]
-dev = ["pytest>=8"]
+dev = ["pytest==9.1.1", "ruff==0.16.8"]
 docs = ["mkdocs-material>=9.7,<10", "mkdocstrings[python]>=1,<2"]
 
 [tool.maturin]
@@ -31,3 +31,6 @@ cache-keys = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["--import-mode=importlib"]
+
+[tool.ruff]
+line-length = 100

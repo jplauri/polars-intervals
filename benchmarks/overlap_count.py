@@ -1,21 +1,20 @@
 """Standalone benchmark; see benchmarks/README.md for methodology and usage."""
 
 import argparse
-from datetime import datetime, timezone
-from importlib.metadata import version
 import json
 import os
-from pathlib import Path
 import platform
 import random
-from statistics import median
 import subprocess
+from datetime import UTC, datetime
+from importlib.metadata import version
+from pathlib import Path
+from statistics import median
 from time import perf_counter_ns
 
 import polars as pl
-from polars.testing import assert_frame_equal
-
 import polars_intervals as pi
+from polars.testing import assert_frame_equal
 
 
 def plugin_query(frame: pl.DataFrame) -> pl.LazyFrame:
@@ -52,9 +51,7 @@ def make_frame(scenario: str, size: int, seed: int) -> pl.DataFrame:
     max_length = 8 if scenario == "sparse" else 1000
     intervals = [(start, start + rng.randint(0, max_length)) for start in starts]
     rng.shuffle(intervals)
-    return pl.DataFrame(
-        intervals, schema={"start": pl.Int64, "end": pl.Int64}, orient="row"
-    )
+    return pl.DataFrame(intervals, schema={"start": pl.Int64, "end": pl.Int64}, orient="row")
 
 
 def check_semantics() -> None:
@@ -93,14 +90,11 @@ def measure(frame: pl.DataFrame, warmups: int, repeats: int) -> dict:
                 samples[name].append(elapsed)
 
     directed_overlaps = int(expected["count"].sum())
-    nonempty = (
-        frame.lazy().select((pl.col("start") < pl.col("end")).sum()).collect().item()
-    )
+    nonempty = frame.lazy().select((pl.col("start") < pl.col("end")).sum()).collect().item()
     return {
         "overlapping_pairs": directed_overlaps // 2,
         "overlap_density": (
-            directed_overlaps / (frame.height * (frame.height - 1))
-            if frame.height > 1 else 0.0
+            directed_overlaps / (frame.height * (frame.height - 1)) if frame.height > 1 else 0.0
         ),
         "join_match_rows_including_self": directed_overlaps + nonempty,
         "empty_intervals": frame.height - nonempty,
@@ -120,15 +114,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sizes", type=int, nargs="+", default=[100, 1000, 3000])
     parser.add_argument(
-        "--scenarios", nargs="+", choices=["sparse", "dense"],
+        "--scenarios",
+        nargs="+",
+        choices=["sparse", "dense"],
         default=["sparse", "dense"],
     )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--warmups", type=int, default=2)
     parser.add_argument("--repeats", type=int, default=7)
-    parser.add_argument(
-        "--output", type=Path, default=Path("target/benchmarks/overlap-count.json")
-    )
+    parser.add_argument("--output", type=Path, default=Path("target/benchmarks/overlap-count.json"))
     args = parser.parse_args()
     if min(args.sizes) < 0 or args.warmups < 0 or args.repeats < 1:
         parser.error("sizes and warmups must be non-negative; repeats must be positive")
@@ -136,7 +130,7 @@ def main() -> None:
     repo = Path(__file__).resolve().parents[1]
     report = {
         "environment": {
-            "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+            "timestamp_utc": datetime.now(UTC).isoformat(),
             "git_commit": subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], cwd=repo, text=True
             ).strip(),
@@ -154,18 +148,14 @@ def main() -> None:
             "polars_threads": pl.thread_pool_size(),
             "engine": "in-memory",
         },
-        "configuration": {
-            key: value for key, value in vars(args).items() if key != "output"
-        },
+        "configuration": {key: value for key, value in vars(args).items() if key != "output"},
         "results": [],
     }
     check_semantics()
     print("scenario  rows     overlap pairs   plugin median ms   join median ms", flush=True)
     for scenario in args.scenarios:
         for size in args.sizes:
-            result = measure(
-                make_frame(scenario, size, args.seed), args.warmups, args.repeats
-            )
+            result = measure(make_frame(scenario, size, args.seed), args.warmups, args.repeats)
             result.update(scenario=scenario, rows=size)
             report["results"].append(result)
             timings = result["timings"]
