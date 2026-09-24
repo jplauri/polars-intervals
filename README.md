@@ -10,9 +10,11 @@ change; `overlap_count` is currently the only public Python operation.
 ## Installation
 
 For the current package, build from this repository. You need **Python 3.12+**,
-[uv](https://docs.astral.sh/uv/getting-started/installation/), and a current stable
-[Rust toolchain](https://www.rust-lang.org/tools/install) with your platform's
-native linker/build tools. The Python package requires **Polars >=1.44.1,<1.45**;
+[uv](https://docs.astral.sh/uv/getting-started/installation/), and
+[Rust installed through rustup](https://www.rust-lang.org/tools/install) with
+your platform's native linker/build tools. Rustup selects the compiler pinned in
+`rust-toolchain.toml` for this checkout.
+The Python package requires **Polars >=1.44.1,<1.45**;
 uv installs the compatible version from `uv.lock`.
 
 ```sh
@@ -112,12 +114,25 @@ for the comparison and its limits.
 ## Development and documentation
 
 After `uv sync --locked`, run `uv run --locked pytest` for Python integration
-tests. Rust checks are `cargo fmt --check`, `cargo test --workspace`, and
-`cargo clippy --workspace --all-targets -- -D warnings`.
+tests. Rust checks are `cargo fmt --check`, `cargo test --workspace --locked`, and
+`cargo clippy --workspace --all-targets --locked -- -D warnings`.
+
+Rust development and CI use **1.98.1**, pinned with rustfmt and Clippy in
+`rust-toolchain.toml`. This is the tested compiler; older versions are currently
+untested, and no separate minimum supported Rust version (MSRV) is promised.
+Update the pin in a PR to a newer stable release and run the Rust and compiled
+Python plugin checks before merging. Commit `Cargo.lock` when Rust dependencies
+change; CI uses `--locked` to reject uncommitted dependency resolution changes.
+The independent core forbids unsafe Rust.
+
+CI also checks the public Rust documentation with
+`cargo doc --workspace --no-deps --locked` and `RUSTDOCFLAGS="-D warnings"` in the
+environment. This catches documentation warnings, including broken intra-doc
+links; the generated Rust API reference is written to `target/doc/`.
 
 The checkout is installed in editable mode: Python edits are available
-immediately, and edits to either Rust crate trigger a rebuild on the next
-`uv sync` or `uv run`.
+immediately, and edits to either Rust crate or the compiler pin trigger a rebuild
+on the next `uv sync` or `uv run`.
 Commit `uv.lock` when updating dependencies.
 
 The documentation uses Material for MkDocs. Its home page includes this README;
