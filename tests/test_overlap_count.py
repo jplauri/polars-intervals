@@ -1,12 +1,62 @@
+"""Test the installed Rust plugin from the repository root:
+
+    python -m pip install .
+    python -B -I -m unittest discover -s tests -v
+
+Use a Python 3.12+ virtual environment with a Rust toolchain available.
+"""
+
 import unittest
 
 import polars as pl
-from polars.testing import assert_series_equal
+from polars.testing import assert_frame_equal, assert_series_equal
 
 import polars_intervals as pi
 
 
 class OverlapCountTests(unittest.TestCase):
+    def test_interval_semantics_in_select_and_with_columns(self):
+        for name, starts, ends, counts in [
+            ("empty_input", [], [], []),
+            ("single_interval", [1], [4], [0]),
+            ("basic_overlaps", [5, 1, 3, 2], [7, 4, 6, 3], [1, 2, 2, 1]),
+            ("disjoint", [8, 1, 4], [9, 2, 6], [0, 0, 0]),
+            ("touching", [3, 1, 5], [5, 3, 7], [0, 0, 0]),
+            ("nested", [2, 0, 1, 6], [3, 10, 5, 9], [2, 3, 2, 1]),
+            ("duplicates", [1, 1, 1], [4, 4, 4], [2, 2, 2]),
+            ("empty_intervals", [1, 1, 4], [1, 1, 4], [0, 0, 0]),
+            (
+                "empty_intervals_inside_and_at_boundaries",
+                [2, 0, 4, 0, 1],
+                [2, 4, 4, 0, 3],
+                [0, 1, 0, 0, 1],
+            ),
+        ]:
+            frame = pl.DataFrame(
+                {"start": starts, "end": ends},
+                schema={"start": pl.Int64, "end": pl.Int64},
+            ).with_row_index("row")
+            expected = frame.with_columns(pl.Series("count", counts, dtype=pl.UInt64))
+            expression = pi.overlap_count("start", "end").alias("count")
+
+            with self.subTest(case=name, context="select"):
+                assert_frame_equal(
+                    frame.select("row", expression), expected.select("row", "count")
+                )
+            with self.subTest(case=name, context="with_columns"):
+                assert_frame_equal(frame.with_columns(expression), expected)
+
+    def test_invalid_interval_reports_original_row_in_select_and_with_columns(self):
+        frame = pl.DataFrame({"start": [2, 0, 5, 6], "end": [2, 1, 4, 8]})
+        expression = pi.overlap_count("start", "end")
+
+        with self.subTest(context="select"):
+            with self.assertRaisesRegex(pl.exceptions.ComputeError, "index 2"):
+                frame.select(expression)
+        with self.subTest(context="with_columns"):
+            with self.assertRaisesRegex(pl.exceptions.ComputeError, "index 2"):
+                frame.with_columns(expression)
+
     def test_column_names_return_an_expression_with_half_open_counts(self):
         frame = pl.DataFrame({"start": [1, 3, 2, 2], "end": [3, 5, 4, 2]})
         expression = pi.overlap_count("start", "end")
