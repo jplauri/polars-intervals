@@ -1,3 +1,3 @@
 [workspace]
-members = ["crates/intervals-core"]
+members = ["crates/intervals-core", "crates/polars-intervals"]
 resolver = "3"
