@@ -40,9 +40,7 @@ import polars as pl
 import polars_intervals as pi
 
 df = pl.DataFrame({"start": [1, 3, 2, 2], "end": [3, 5, 4, 2]})
-result = df.lazy().with_columns(
-    pi.overlap_count("start", "end").alias("overlaps")
-).collect()
+result = df.lazy().with_columns(pi.overlap_count("start", "end").alias("overlaps")).collect()
 print(result["overlaps"].to_list())
 # [1, 1, 2, 0]
 ```
@@ -111,8 +109,20 @@ for the comparison and its limits.
 
 ## Development and documentation
 
-After `uv sync --locked`, run `uv run --locked pytest` for Python integration
-tests. Rust checks are `cargo fmt --check`, `cargo test --workspace`, and
+After `uv sync --locked`, run the Python checks:
+
+```sh
+uv run --locked ruff check .
+uv run --locked ruff format --check .
+uv run --locked pytest --doctest-modules python/polars_intervals tests
+```
+
+Ruff is pinned in the development dependencies and uses its defaults with a
+100-character line length. Run `uv run --locked ruff format .` to apply formatting.
+CI runs these checks, builds the documentation, and tests the compiled plugin
+on Python 3.12, 3.13, and 3.14. Benchmarks remain separate from the tests.
+
+Rust checks are `cargo fmt --check`, `cargo test --workspace`, and
 `cargo clippy --workspace --all-targets -- -D warnings`.
 
 The checkout is installed in editable mode: Python edits are available

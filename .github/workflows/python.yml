@@ -1,0 +1,43 @@
+name: Python checks
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: "3.14"
+          enable-cache: false
+      - name: Check Python lint
+        run: uv run --locked --only-group dev ruff check .
+      - name: Check Python formatting
+        run: uv run --locked --only-group dev ruff format --check .
+      - name: Build documentation
+        run: uv run --locked --only-group docs mkdocs build --strict
+
+  tests:
+    name: Python ${{ matrix.python-version }} tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: false
+      - name: Install Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Install project
+        run: uv sync --locked
+      - name: Run Python tests and API examples
+        run: uv run --locked pytest --doctest-modules python/polars_intervals tests

@@ -7,10 +7,9 @@ Requires uv and a current stable Rust toolchain.
 """
 
 import polars as pl
+import polars_intervals as pi
 import pytest
 from polars.testing import assert_frame_equal, assert_series_equal
-
-import polars_intervals as pi
 
 
 @pytest.mark.parametrize("context", ["select", "with_columns"])
@@ -66,9 +65,7 @@ def test_column_names_return_an_expression_with_half_open_counts():
     expression = pi.overlap_count("start", "end")
     assert isinstance(expression, pl.Expr)
     result = frame.lazy().select(expression.alias("count")).collect()
-    assert_series_equal(
-        result["count"], pl.Series("count", [1, 1, 2, 0], dtype=pl.UInt64)
-    )
+    assert_series_equal(result["count"], pl.Series("count", [1, 1, 2, 0], dtype=pl.UInt64))
 
 
 @pytest.mark.parametrize(
@@ -81,15 +78,9 @@ def test_column_names_return_an_expression_with_half_open_counts():
 )
 def test_expressions_and_mixed_arguments_preserve_row_order(start, end):
     frame = pl.DataFrame({"start": [4, 1, 3, 2, 2], "end": [8, 3, 5, 4, 2]})
-    result = (
-        frame.lazy()
-        .with_columns(pi.overlap_count(start, end).alias("count"))
-        .collect()
-    )
+    result = frame.lazy().with_columns(pi.overlap_count(start, end).alias("count")).collect()
     assert result["start"].to_list() == [4, 1, 3, 2, 2]
-    assert_series_equal(
-        result["count"], pl.Series("count", [1, 1, 2, 2, 0], dtype=pl.UInt64)
-    )
+    assert_series_equal(result["count"], pl.Series("count", [1, 1, 2, 2, 0], dtype=pl.UInt64))
 
 
 @pytest.mark.parametrize(
@@ -102,14 +93,8 @@ def test_all_supported_integer_dtypes(dtype):
         {"start": [1, 2, 2, 3, 6], "end": [9, 5, 5, 3, 7]},
         schema={"start": dtype, "end": dtype},
     )
-    result = (
-        frame.lazy()
-        .select(pi.overlap_count("start", "end").alias("count"))
-        .collect()
-    )
-    assert_series_equal(
-        result["count"], pl.Series("count", [3, 2, 2, 0, 1], dtype=pl.UInt64)
-    )
+    result = frame.lazy().select(pi.overlap_count("start", "end").alias("count")).collect()
+    assert_series_equal(result["count"], pl.Series("count", [3, 2, 2, 0, 1], dtype=pl.UInt64))
 
 
 @pytest.mark.parametrize(
@@ -128,9 +113,7 @@ def test_empty_single_and_touching_collections(starts, ends, counts):
     )
     query = frame.lazy().select(pi.overlap_count("start", "end").alias("count"))
     assert query.collect_schema()["count"] == pl.UInt64
-    assert_series_equal(
-        query.collect()["count"], pl.Series("count", counts, dtype=pl.UInt64)
-    )
+    assert_series_equal(query.collect()["count"], pl.Series("count", counts, dtype=pl.UInt64))
 
 
 @pytest.mark.parametrize("engine", ["auto", "streaming"])
@@ -171,10 +154,7 @@ def test_window_and_group_by_count_within_each_group():
     window = frame.lazy().with_columns(expression.over("group").alias("count"))
     assert window.collect()["count"].to_list() == [1, 0, 1, 0]
     grouped = (
-        frame.lazy()
-        .group_by("group", maintain_order=True)
-        .agg(expression.alias("count"))
-        .collect()
+        frame.lazy().group_by("group", maintain_order=True).agg(expression.alias("count")).collect()
     )
     assert grouped["count"].to_list() == [[1, 1], [0, 0]]
 
@@ -182,12 +162,8 @@ def test_window_and_group_by_count_within_each_group():
 @pytest.mark.parametrize(
     "starts, ends, message",
     [
-        pytest.param(
-            pl.Series([1, None]), pl.Series([3, 4]), "null endpoints", id="null_start"
-        ),
-        pytest.param(
-            pl.Series([1, 2]), pl.Series([3, None]), "null endpoints", id="null_end"
-        ),
+        pytest.param(pl.Series([1, None]), pl.Series([3, 4]), "null endpoints", id="null_start"),
+        pytest.param(pl.Series([1, 2]), pl.Series([3, None]), "null endpoints", id="null_end"),
         pytest.param(
             pl.Series([None], dtype=pl.Int64),
             pl.Series([None], dtype=pl.Int64),
