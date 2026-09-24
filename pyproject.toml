@@ -9,7 +9,14 @@ dependencies = ["polars>=1.44.1,<1.45"]
 license-files = ["LICENSE"]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
 [tool.maturin]
 manifest-path = "crates/polars-intervals/Cargo.toml"
 python-source = "python"
 module-name = "polars_intervals._internal"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]
