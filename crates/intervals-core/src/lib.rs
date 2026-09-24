@@ -103,6 +103,14 @@ where
 #[cfg(test)]
 mod tests {
     use super::{IntervalError, overlap_counts};
+    use proptest::prelude::*;
+
+    fn valid_intervals() -> impl Strategy<Value = (Vec<i32>, Vec<i32>)> {
+        // Shrink collection size, starts, and lengths using built-in strategies.
+        // Nonnegative lengths keep intervals valid, including during shrinking.
+        let interval = (-8i32..=8, 0i32..=8).prop_map(|(start, length)| (start, start + length));
+        prop::collection::vec(interval, 0..=30).prop_map(|intervals| intervals.into_iter().unzip())
+    }
 
     fn naive_overlap_counts(starts: &[i32], ends: &[i32]) -> Vec<usize> {
         let mut counts = vec![0; starts.len()];
@@ -124,6 +132,61 @@ mod tests {
     fn assert_counts(starts: &[i32], ends: &[i32], expected: &[usize]) {
         assert_eq!(naive_overlap_counts(starts, ends), expected);
         assert_eq!(overlap_counts(starts, ends).unwrap(), expected);
+    }
+
+    proptest! {
+        #[test]
+        fn prop_matches_naive((starts, ends) in valid_intervals()) {
+            prop_assert_eq!(
+                overlap_counts(&starts, &ends).unwrap(),
+                naive_overlap_counts(&starts, &ends)
+            );
+        }
+
+        #[test]
+        fn prop_preserves_output_length((starts, ends) in valid_intervals()) {
+            let counts = overlap_counts(&starts, &ends).unwrap();
+            prop_assert_eq!(counts.len(), starts.len());
+        }
+
+        #[test]
+        fn prop_counts_are_bounded((starts, ends) in valid_intervals()) {
+            let counts = overlap_counts(&starts, &ends).unwrap();
+            for count in counts {
+                // usize is nonnegative; a strict bound avoids n - 1 for n == 0.
+                prop_assert!(count < starts.len());
+            }
+        }
+
+        #[test]
+        fn prop_empty_intervals_have_zero_count((starts, ends) in valid_intervals()) {
+            let counts = overlap_counts(&starts, &ends).unwrap();
+            for ((start, end), count) in starts.iter().zip(&ends).zip(counts) {
+                if start == end {
+                    prop_assert_eq!(count, 0);
+                }
+            }
+        }
+
+        #[test]
+        fn prop_total_count_is_even((starts, ends) in valid_intervals()) {
+            let counts = overlap_counts(&starts, &ends).unwrap();
+            prop_assert_eq!(counts.iter().sum::<usize>() % 2, 0);
+        }
+
+        #[test]
+        fn prop_translation_preserves_counts(
+            (starts, ends) in valid_intervals(),
+            delta in -100i32..=100,
+        ) {
+            // Endpoints are in [-8, 16], so shifted values stay in [-108, 116].
+            let shifted_starts: Vec<_> = starts.iter().map(|&start| start + delta).collect();
+            let shifted_ends: Vec<_> = ends.iter().map(|&end| end + delta).collect();
+            prop_assert_eq!(
+                overlap_counts(&shifted_starts, &shifted_ends).unwrap(),
+                overlap_counts(&starts, &ends).unwrap()
+            );
+        }
     }
 
     #[test]
