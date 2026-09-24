@@ -10,4 +10,5 @@ intervals for each input row.
 
 - `crates/intervals-core` contains Polars-independent interval algorithms.
   The crate has no dependencies and is imported in Rust as `intervals_core`.
-- A later crate will provide Polars integration using `intervals-core`.
+- `crates/polars-intervals` is the Polars expression-plugin scaffold.
+  It depends on `intervals-core` and does not expose plugin functions yet.

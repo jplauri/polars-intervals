@@ -1,0 +1,13 @@
+[package]
+name = "polars-intervals"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+intervals-core = { path = "../intervals-core" }
+polars = { version = "0.55.2", default-features = false }
+pyo3-polars = { version = "0.28", default-features = false, features = ["derive"] }
