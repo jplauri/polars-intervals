@@ -78,6 +78,45 @@ def native_query(
     return frame.lazy().select(count.over("group") if grouped else count)
 
 
+def native_asof_query(frame: pl.DataFrame, grouped: bool = False) -> pl.LazyFrame:
+    """Sorted as-of joins replace binary searches with linear merge scans."""
+    rows = frame.lazy().with_row_index("row")
+    valid = rows.filter(pl.col("start") < pl.col("end"))
+    by = ["group"] if grouped else []
+    position = pl.int_range(1, pl.len() + 1, dtype=pl.UInt64)
+    if grouped:
+        position = position.over("group")
+    starts = (
+        valid.select(*by, bound_start="start")
+        .sort([*by, "bound_start"])
+        .with_columns(started=position)
+    )
+    ends = valid.select(*by, bound_end="end").sort([*by, "bound_end"]).with_columns(ended=position)
+    return (
+        rows.sort([*by, "start"])
+        .join_asof(
+            ends,
+            left_on="start",
+            right_on="bound_end",
+            by=by or None,
+            strategy="backward",
+            check_sortedness=not grouped,
+        )
+        .sort([*by, "end"])
+        .join_asof(
+            starts,
+            left_on="end",
+            right_on="bound_start",
+            by=by or None,
+            strategy="backward",
+            allow_exact_matches=False,
+            check_sortedness=not grouped,
+        )
+        .sort("row")
+        .select(native_count(pl.col("started").fill_null(0), pl.col("ended").fill_null(0)))
+    )
+
+
 def native_sweep_query(frame: pl.DataFrame, grouped: bool = False) -> pl.LazyFrame:
     """A second algorithmic baseline: sorted endpoint events and prefix counts."""
     rows = frame.lazy().with_row_index("row")
@@ -157,6 +196,7 @@ def queries_for(
         "plugin": plugin_query(frame, grouped),
         "native_expr": native_query(frame, grouped),
         "native_parallel": native_query(frame, grouped, parallel=True),
+        "native_asof": native_asof_query(frame, grouped),
         "native_sweep": native_sweep_query(frame, grouped),
         "inequality_join": join_query(frame, grouped),
     }
