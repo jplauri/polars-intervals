@@ -122,6 +122,10 @@ def release():
     print(f"Verified final release {tag} from CI-passing master commit {sha}.")
 
 
+def normalized_text(data):
+    return data.decode("utf-8").replace("\r\n", "\n")
+
+
 def check_metadata(data, version):
     metadata = BytesParser().parsebytes(data)
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
@@ -130,10 +134,11 @@ def check_metadata(data, version):
         "Version": version,
         "Requires-Python": project["requires-python"],
         "License-Expression": project["license"],
-        "Description-Content-Type": "text/markdown",
     }.items():
         require(metadata[field] == expected, f"Incorrect distribution metadata: {field}.")
-    description = metadata.get_payload(decode=True).decode("utf-8").replace("\r\n", "\n")
+    media_type = metadata.get("Description-Content-Type", "").split(";", 1)[0].strip().lower()
+    require(media_type == "text/markdown", "Distribution description must be Markdown.")
+    description = normalized_text(metadata.get_payload(decode=True))
     require(
         description.strip() == (ROOT / "README.md").read_text(encoding="utf-8").strip(),
         "Distribution README differs from the release checkout.",
@@ -178,7 +183,9 @@ def artifacts(directory):
             check_metadata(archive.read(metadata), version)
             license_path = f"polars_intervals-{version}.dist-info/licenses/LICENSE"
             require(
-                archive.read(license_path) == (ROOT / "LICENSE").read_bytes(), "License mismatch."
+                normalized_text(archive.read(license_path))
+                == (ROOT / "LICENSE").read_text(encoding="utf-8"),
+                "License mismatch.",
             )
     require(actual == expected, f"Incorrect wheel coverage; missing {expected - actual}.")
     sdist = sdists[0]
@@ -188,7 +195,8 @@ def artifacts(directory):
         for name in ("rust-toolchain.toml", "Cargo.lock", "LICENSE"):
             member = archive.extractfile(prefix + name)
             require(
-                member is not None and member.read() == (ROOT / name).read_bytes(),
+                member is not None
+                and normalized_text(member.read()) == (ROOT / name).read_text(encoding="utf-8"),
                 f"Source archive must preserve {name}.",
             )
         check_metadata(archive.extractfile(prefix + "PKG-INFO").read(), version)

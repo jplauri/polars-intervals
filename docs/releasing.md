@@ -44,7 +44,7 @@ its artifact verification passes.
 1. Prepare the version and release notes in a reviewed PR. For `v0.1.0`, both
    `crates/polars-intervals/Cargo.toml` and `crates/intervals-core/Cargo.toml` declare
    `0.1.0`. The Python package version comes from the former manifest. For future
-   releases, update crate versions deliberately and keep them compatible; the
+   releases, update both crates deliberately to the same release version; the
    workflow does not bump versions.
 2. Run the [development checks](https://github.com/jplauri/polars-intervals#development-and-documentation)
    and `uv lock --check`. Preserve the locked Rust checks and strict Rust

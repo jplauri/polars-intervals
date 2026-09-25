@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -174,3 +175,41 @@ def test_artifacts_requires_complete_wheel_matrix(tmp_path, monkeypatch):
     monkeypatch.setattr(checks, "versions", lambda: {"version": "1.2.3"})
     with pytest.raises(SystemExit, match="all 15 CPython/platform wheels"):
         checks.artifacts(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("content_type", "readme_matches", "error"),
+    [
+        ("text/markdown", True, None),
+        ("text/markdown; charset=UTF-8; variant=GFM", True, None),
+        ("text/plain", True, "description must be Markdown"),
+        ("text/markdown; charset=UTF-8; variant=GFM", False, "README differs"),
+    ],
+)
+def test_metadata_markdown_type_and_readme(content_type, readme_matches, error):
+    project = tomllib.loads((checks.ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
+    description = (checks.ROOT / "README.md").read_text(encoding="utf-8")
+    if not readme_matches:
+        description += "\nAltered description.\n"
+    headers = {
+        "Metadata-Version": "2.4",
+        "Name": project["name"],
+        "Version": "1.2.3",
+        "Requires-Python": project["requires-python"],
+        "License-Expression": project["license"],
+        "Description-Content-Type": content_type,
+    }
+    data = "\n".join(f"{key}: {value}" for key, value in headers.items()) + "\n\n" + description
+    if error:
+        with pytest.raises(SystemExit, match=error):
+            checks.check_metadata(data.encode("utf-8"), "1.2.3")
+    else:
+        checks.check_metadata(data.encode("utf-8"), "1.2.3")
+
+
+def test_normalized_text_preserves_content():
+    text = "Copyright ©\nPermission granted.\n"
+    normalized = checks.normalized_text(text.encode("utf-8"))
+    assert checks.normalized_text(text.replace("\n", "\r\n").encode("utf-8")) == normalized
+    assert checks.normalized_text(text.replace("granted", "denied").encode("utf-8")) != normalized
+    assert checks.normalized_text((text + " ").encode("utf-8")) != normalized
