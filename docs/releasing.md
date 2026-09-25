@@ -41,12 +41,12 @@ its artifact verification passes.
 
 ## Publish a version
 
-1. Prepare the version and release notes in a reviewed PR. For `v0.1.0`, both
-   `crates/polars-intervals/Cargo.toml` and `crates/intervals-core/Cargo.toml` declare
-   `0.1.0`. The Python package version comes from the former manifest. For future
-   releases, update both crates deliberately to the same release version; the
-   workflow does not bump versions.
-2. Run the [development checks](https://github.com/jplauri/polars-intervals#development-and-documentation)
+1. Prepare the version and [release notes](changelog.md) in a reviewed PR.
+   Update `crates/polars-intervals/Cargo.toml` and
+   `crates/intervals-core/Cargo.toml` to the same release version. The Python
+   package version comes from the former manifest; the workflow does not bump
+   versions. Describe user-visible changes, installation, and compatibility.
+2. Run the [development checks](contributing.md#checks)
    and `uv lock --check`. Preserve the locked Rust checks and strict Rust
    documentation check, as well as the Python and strict MkDocs checks. Merge the
    reviewed changes, require normal CI to pass on the final `master` commit, and
@@ -68,7 +68,7 @@ process itself.
 
 ## Verify the PyPI installation
 
-After the first release, run this outside the repository using a supported Python
+After publishing, run this outside the repository using a supported Python
 version. It creates an isolated environment and verifies actual overlap counts:
 
 ```sh
@@ -76,21 +76,3 @@ uv run --isolated --no-project --with polars-intervals==0.1.0 python -c "import 
 ```
 
 Use the newly published version in place of `0.1.0` for subsequent releases.
-
-## Suggested v0.1.0 release notes
-
-- Initial public release with one Python operation, `overlap_count`, implemented
-  as a Rust Polars expression plugin. It works with eager and lazy frames and
-  within groups, preserving input row order.
-- Counts other overlapping half-open intervals. Empty intervals receive zero;
-  duplicate non-empty intervals count each other. Endpoints must have matching,
-  non-null signed or unsigned 8-, 16-, 32-, or 64-bit integer dtypes; see the
-  [API reference](api.md).
-- Includes a Polars-independent Rust core. The project is early-stage, and its
-  API and supported Polars versions may change.
-
-The existing tests exercise the documented semantics and input errors. Python
-and Polars version requirements are declared in
-[pyproject.toml](https://github.com/jplauri/polars-intervals/blob/master/pyproject.toml).
-Describe platform support in the release only after the corresponding artifact
-checks pass; a configured build matrix is not a completed validation result.
