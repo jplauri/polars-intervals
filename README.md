@@ -22,9 +22,6 @@ Or install with pip in your Python environment:
 pip install polars-intervals
 ```
 
-The first PyPI release is being prepared. For now, use the
-[source installation](#source-and-development-installation) below.
-
 The distribution is named `polars-intervals`; the import is `polars_intervals`.
 Supported Python and Polars versions are declared in
 [pyproject.toml](https://github.com/jplauri/polars-intervals/blob/master/pyproject.toml).
@@ -166,3 +163,6 @@ uv run --locked --isolated --only-group docs mkdocs build --strict
 Building the docs does not require compiling the Rust plugin. The generated site
 is written to `target/docs/`. Check the API examples against the installed plugin
 with `uv run --locked pytest --doctest-modules python/polars_intervals`.
+
+Maintainers can follow the [release guide](https://github.com/jplauri/polars-intervals/blob/master/docs/releasing.md)
+to prepare and publish a version.

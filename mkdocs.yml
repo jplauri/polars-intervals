@@ -19,6 +19,7 @@ theme:
 nav:
   - Getting started: index.md
   - API reference: api.md
+  - Releasing: releasing.md
 plugins:
   - search
   - mkdocstrings:
