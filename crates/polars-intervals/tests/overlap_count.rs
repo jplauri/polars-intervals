@@ -44,6 +44,7 @@ fn all_supported_integer_types_match_core() {
             .unwrap();
         let ends = Series::new("ends".into(), raw_ends).cast(&dtype).unwrap();
         assert_counts(&starts, &ends, &expected);
+        assert_counts(&starts.slice(1, 4), &ends.slice(1, 4), &[2, 2, 2, 0]);
         assert_counts(&starts.slice(0, 0), &ends.slice(0, 0), &[]);
     }
 }
@@ -63,7 +64,11 @@ fn preserves_order_across_different_chunk_boundaries_and_slices() {
     let ends = ends.slice(1, 7);
     assert_eq!(starts.n_chunks(), 2);
     assert_eq!(ends.n_chunks(), 3);
-    assert_counts(&starts, &ends, &[1, 3, 2, 2, 0, 0, 0]);
+    for starts in [&starts, &starts.rechunk()] {
+        for ends in [&ends, &ends.rechunk()] {
+            assert_counts(starts, ends, &[1, 3, 2, 2, 0, 0, 0]);
+        }
+    }
 }
 
 #[test]

@@ -43,7 +43,7 @@ impl std::error::Error for IntervalError {}
 /// a count of zero. Each row excludes itself, but duplicate non-empty intervals
 /// are separate rows and count each other.
 ///
-/// Uses independently sorted non-empty starts and ends with binary searches,
+/// Sorts non-empty starts and ends, then sweeps both endpoint streams,
 /// taking `O(n log n)` time and `O(n)` additional space for `n` intervals.
 ///
 /// # Errors
@@ -79,27 +79,29 @@ where
             return Err(IntervalError::InvalidInterval { index });
         }
         if start < end {
-            sorted_starts.push(start);
-            sorted_ends.push(end);
+            sorted_starts.push((start, index));
+            sorted_ends.push((end, index));
         }
     }
-    sorted_starts.sort_unstable();
-    sorted_ends.sort_unstable();
+    sorted_starts.sort_unstable_by_key(|&(value, _)| value);
+    sorted_ends.sort_unstable_by_key(|&(value, _)| value);
 
-    Ok(starts
-        .iter()
-        .zip(ends)
-        .map(|(&start, &end)| {
-            if start == end {
-                return 0;
-            }
-            let started = sorted_starts.partition_point(|&other_start| other_start < end);
-            let ended = sorted_ends.partition_point(|&other_end| other_end <= start);
-            // Ended intervals are a subset of started intervals; the remainder
-            // includes this non-empty interval itself.
-            started - ended - 1
-        })
-        .collect())
+    let mut counts = vec![0; starts.len()];
+    let (mut started, mut ended) = (0, 0);
+    while ended < sorted_ends.len() {
+        // Process ends before starts at equal coordinates: touching is not overlap.
+        if started < sorted_starts.len() && sorted_starts[started].0 < sorted_ends[ended].0 {
+            counts[sorted_starts[started].1] = ended;
+            started += 1;
+        } else {
+            let index = sorted_ends[ended].1;
+            // At its start, save how many intervals had already ended. At its
+            // end, subtract that count and this interval from all starts seen.
+            counts[index] = started - counts[index] - 1;
+            ended += 1;
+        }
+    }
+    Ok(counts)
 }
 
 #[cfg(test)]

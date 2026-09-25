@@ -4,6 +4,7 @@
 //! The Python package exposes the same operation as a Polars expression plugin.
 
 use polars::prelude::*;
+use std::borrow::Cow;
 
 #[pyo3::pymodule]
 mod _internal {}
@@ -87,9 +88,15 @@ where
         starts.null_count() == 0 && ends.null_count() == 0,
         ComputeError: "overlap_count does not support null endpoints"
     );
-    // With nulls rejected, these iterators safely traverse all chunks.
-    let starts: Vec<_> = starts.into_no_null_iter().collect();
-    let ends: Vec<_> = ends.into_no_null_iter().collect();
+    // Borrow contiguous inputs; only materialize columns spanning multiple chunks.
+    let starts = starts
+        .cont_slice()
+        .map(Cow::Borrowed)
+        .unwrap_or_else(|_| Cow::Owned(starts.into_no_null_iter().collect()));
+    let ends = ends
+        .cont_slice()
+        .map(Cow::Borrowed)
+        .unwrap_or_else(|_| Cow::Owned(ends.into_no_null_iter().collect()));
     let counts = intervals_core::overlap_counts(&starts, &ends)
         .map_err(|error| polars_err!(ComputeError: "{error}"))?;
     let counts: Vec<u64> = counts.into_iter().map(|count| count as u64).collect();
