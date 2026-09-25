@@ -48,6 +48,10 @@ Branch pushes are checked through their pull request. Pushes to `master` always
 run full Python and Rust checks, as required by the release guard. Manual release
 rehearsals and published releases always build and verify every distribution.
 
+Updating a pull request cancels its older CI runs. Python and Rust checks cache
+compiled dependencies; wheel builds use sccache. The first run populates these
+caches. A manual release rehearsal on `master` seeds wheel caches for future PRs.
+
 Rust development and CI use the stable compiler pinned in `rust-toolchain.toml`.
 Older compilers are untested; no separate minimum supported Rust version is
 promised. Compiler updates should pass the Rust and compiled Python plugin checks.

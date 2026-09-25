@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -49,6 +53,10 @@ jobs:
       - name: Install Rust
         if: needs.quality.outputs.build_required == 'true'
         run: rustup toolchain install
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        if: needs.quality.outputs.build_required == 'true'
+        with:
+          key: python-${{ matrix.python-version }}
       - name: Install project
         if: needs.quality.outputs.build_required == 'true'
         run: uv sync --locked
