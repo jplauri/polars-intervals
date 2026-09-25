@@ -1,8 +1,8 @@
 site_name: polars-intervals
-site_description: Fast interval algorithms for Polars, implemented in Rust
+site_description: Count overlapping intervals in Polars
 repo_url: https://github.com/jplauri/polars-intervals
 site_dir: target/docs
-watch: [README.md, python]
+watch: [CONTRIBUTING.md, benchmarks/README.md, python]
 theme:
   name: material
   features:
@@ -18,8 +18,13 @@ theme:
         name: Switch to light mode
 nav:
   - Getting started: index.md
+  - Usage: usage.md
   - API reference: api.md
-  - Releasing: releasing.md
+  - Benchmarks: benchmarks.md
+  - Release notes: changelog.md
+  - Development:
+      - Contributing: contributing.md
+      - Releasing: releasing.md
 plugins:
   - search
   - mkdocstrings:

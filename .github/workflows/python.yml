@@ -1,15 +1,29 @@
 name: Python checks
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   quality:
     runs-on: ubuntu-latest
+    outputs:
+      build_required: ${{ steps.changes.outputs.build_required }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Check changed files
+        id: changes
+        run: python .github/scripts/ci_changes.py
       - uses: astral-sh/setup-uv@v10.2.0
         with:
           python-version: "3.14"
@@ -23,19 +37,32 @@ jobs:
 
   tests:
     name: Python ${{ matrix.python-version }} tests
+    needs: quality
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v7
+        if: needs.quality.outputs.build_required == 'true'
       - uses: astral-sh/setup-uv@v10.2.0
+        if: needs.quality.outputs.build_required == 'true'
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: false
       - name: Install Rust
+        if: needs.quality.outputs.build_required == 'true'
         run: rustup toolchain install
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        if: needs.quality.outputs.build_required == 'true'
+        with:
+          key: python-${{ matrix.python-version }}
       - name: Install project
+        if: needs.quality.outputs.build_required == 'true'
         run: uv sync --locked
       - name: Run Python tests and API examples
+        if: needs.quality.outputs.build_required == 'true'
         run: uv run --locked pytest --doctest-modules python/polars_intervals tests
+      - name: Documentation-only change
+        if: needs.quality.outputs.build_required == 'false'
+        run: echo "Native tests skipped; lint and documentation checks passed."

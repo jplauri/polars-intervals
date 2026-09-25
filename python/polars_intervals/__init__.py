@@ -18,10 +18,7 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
 
     Args:
         start: Column name or expression producing interval starts.
-        end: Column name or expression producing interval ends. Both inputs
-            must have equal lengths and the same dtype: `Int8`, `Int16`,
-            `Int32`, `Int64`, `UInt8`, `UInt16`, `UInt32`, or `UInt64`.
-            No casting or scalar broadcasting is performed.
+        end: Column name or expression producing interval ends.
 
     Returns:
         pl.Expr: Non-null `UInt64` counts, one per row in input order. Use
@@ -36,9 +33,19 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
             index. Null rows are not skipped or filled.
 
     Notes:
+        Both inputs must have equal lengths and the same dtype: `Int8`,
+        `Int16`, `Int32`, `Int64`, `UInt8`, `UInt16`, `UInt32`, or `UInt64`.
+        No casting or scalar broadcasting is performed. Date, datetime,
+        floating-point, and other non-integer dtypes are unsupported.
+
         Counts use the whole input collection, or each group when used with
-        `.over(...)` or `group_by`. The Rust algorithm takes O(n log n) time
-        and O(n) additional space, without materializing overlapping pairs.
+        `.over(...)` or `group_by`. Filtering before this expression changes
+        which intervals are compared; filtering afterwards only removes
+        rows from the result.
+
+        The Rust algorithm takes O(n log n) time and O(n) additional space,
+        without materializing overlapping pairs. It needs the full input
+        collection even when the query uses the streaming engine.
 
     Examples:
         Column names in a lazy query:
@@ -53,6 +60,19 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
         [1, 1, 2, 0]
         >>> result.schema["overlaps"]
         UInt64
+
+        Count within groups while keeping the original rows:
+
+        >>> grouped = pl.DataFrame({
+        ...     "group": ["a", "b", "a", "b"],
+        ...     "start": [1, 1, 2, 5],
+        ...     "end": [4, 4, 3, 6],
+        ... })
+        >>> result = grouped.lazy().with_columns(
+        ...     pi.overlap_count("start", "end").over("group").alias("overlaps")
+        ... ).collect()
+        >>> result["overlaps"].to_list()
+        [1, 0, 1, 0]
 
         Expressions in an eager `select`:
 

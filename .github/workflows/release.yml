@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 defaults:
   run:
     shell: bash
@@ -21,12 +25,17 @@ jobs:
     name: Check release configuration
     runs-on: ubuntu-24.04
     outputs:
+      build_required: ${{ steps.changes.outputs.build_required }}
       rust_toolchain: ${{ steps.versions.outputs.rust_toolchain }}
       version: ${{ steps.versions.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Check changed files
+        id: changes
+        run: python .github/scripts/ci_changes.py
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           python-version: "3.12"
@@ -34,12 +43,13 @@ jobs:
       - name: Check package versions and compiler policy
         id: versions
         run: uv run --locked --only-group dev python .github/scripts/release_checks.py versions
-      - name: Test release checks
-        run: uv run --locked --only-group dev pytest .github/scripts/test_release_checks.py
+      - name: Test CI and release checks
+        run: uv run --locked --only-group dev pytest .github/scripts/test_*.py
 
   wheels:
     name: Wheel (${{ matrix.platform.name }}, Python ${{ matrix.python }})
     needs: prepare
+    if: needs.prepare.outputs.build_required == 'true'
     runs-on: ${{ matrix.platform.runner }}
     strategy:
       fail-fast: false
@@ -87,6 +97,7 @@ jobs:
       - name: Build release wheel
         uses: PyO3/maturin-action@e83996d129638aa358a18fbd1dfb82f0b0fb5d3b # v1.51.0
         with:
+          sccache: true
           maturin-version: v1.15.0
           rust-toolchain: ${{ needs.prepare.outputs.rust_toolchain }}
           target: ${{ matrix.platform.target }}
@@ -120,6 +131,7 @@ jobs:
   sdist:
     name: Build and install source distribution
     needs: prepare
+    if: needs.prepare.outputs.build_required == 'true'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
