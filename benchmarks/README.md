@@ -2,7 +2,7 @@
 
 ## Setup
 
-Follow the [source build prerequisites](../CONTRIBUTING.md#build-from-source),
+Follow the [source build prerequisites](https://github.com/jplauri/polars-intervals/blob/master/CONTRIBUTING.md#build-from-source),
 then build the plugin in release mode from the repository root:
 
 ```sh
@@ -37,7 +37,7 @@ pass `--compare-plugin PATH` to time both binaries in the same run.
 
 ## overlap_count
 
-[Benchmark script](overlap_count.py):
+[Benchmark script](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/overlap_count.py):
 the plugin versus two native `sort + search_sorted` layouts, sorted `join_asof`
 scans, an endpoint sweep, and a `join_where` self-join. Native baselines assume
 valid, non-null inputs; the plugin also validates them. All preserve empty-interval
@@ -79,11 +79,12 @@ of the four native counting formulations, independently for each case:
 - **Join limit:** skip above 2M candidate rows to bound pair materialization.
   Grouped joins count equality-join candidates before overlap filtering.
 
-[Main](results/sweep-windows.json), [second-seed](results/sweep-repeat-windows.json),
-and [one-thread](results/sweep-one-thread-windows.json) reports contain raw samples,
+[Main](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/sweep-windows.json),
+[second-seed](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/sweep-repeat-windows.json),
+and [one-thread](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/sweep-one-thread-windows.json) reports contain raw samples,
 binary hashes, and settings. The main run also compares the binary-search plugin
 from `925033f`. Earlier join-only measurements remain in the
-[original report](results/v0.1.0-windows.json).
+[original report](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/v0.1.0-windows.json).
 
 ## Adding a benchmark
 
