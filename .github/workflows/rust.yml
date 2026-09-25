@@ -1,6 +1,9 @@
 name: Rust checks
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
 
 permissions:
   contents: read
@@ -10,15 +13,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Check changed files
+        id: changes
+        run: python .github/scripts/ci_changes.py
       - name: Install Rust
+        if: steps.changes.outputs.build_required == 'true'
         run: rustup toolchain install
       - name: Check formatting
+        if: steps.changes.outputs.build_required == 'true'
         run: cargo fmt --check
       - name: Run tests
+        if: steps.changes.outputs.build_required == 'true'
         run: cargo test --workspace --locked
       - name: Run Clippy
+        if: steps.changes.outputs.build_required == 'true'
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - name: Check Rust documentation
+        if: steps.changes.outputs.build_required == 'true'
         env:
           RUSTDOCFLAGS: -D warnings
         run: cargo doc --workspace --no-deps --locked

@@ -2,8 +2,10 @@
 
 Releases are deliberate maintainer actions. The
 [Release workflow](https://github.com/jplauri/polars-intervals/blob/master/.github/workflows/release.yml)
-builds and verifies distributions on pull requests and manual runs without
-publishing. Publishing a non-prerelease GitHub release also builds and verifies
+builds and verifies distributions on pull requests that change code or build
+inputs, and on every manual run, without publishing. Documentation-only pull
+requests run the configuration and CI helper checks without building distributions.
+Publishing a non-prerelease GitHub release also builds and verifies
 the distributions, then publishes those same artifacts to PyPI through OIDC.
 
 ## One-time setup

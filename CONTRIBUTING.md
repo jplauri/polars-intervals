@@ -29,7 +29,7 @@ in that project.
 uv run --locked ruff check .
 uv run --locked ruff format --check .
 uv run --locked pytest --doctest-modules python/polars_intervals tests
-uv run --locked --only-group dev pytest .github/scripts/test_release_checks.py
+uv run --locked --only-group dev pytest .github/scripts/test_*.py
 uv lock --check
 cargo fmt --check
 cargo test --workspace --locked
@@ -37,6 +37,16 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 ```
 
 Use `uv run --locked ruff format .` to format Python code.
+
+Pull requests that change only `README.md`, `CONTRIBUTING.md`, `mkdocs.yml`,
+`docs/`, `benchmarks/README.md`, or `benchmarks/results/` run lint, formatting,
+documentation, and CI helper checks without compiling Rust or building wheels.
+Python docstrings, package metadata, dependencies, workflow changes, and all other
+paths trigger full checks. Required Python and Rust checks still report a result.
+
+Branch pushes are checked through their pull request. Pushes to `master` always
+run full Python and Rust checks, as required by the release guard. Manual release
+rehearsals and published releases always build and verify every distribution.
 
 Rust development and CI use the stable compiler pinned in `rust-toolchain.toml`.
 Older compilers are untested; no separate minimum supported Rust version is
