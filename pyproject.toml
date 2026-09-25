@@ -4,10 +4,29 @@ build-backend = "maturin"
 
 [project]
 name = "polars-intervals"
+description = "Fast interval algorithms for Polars, implemented in Rust"
+readme = "README.md"
 requires-python = ">=3.12"
 dependencies = ["polars>=1.44.1,<1.45"]
+license = "MIT"
 license-files = ["LICENSE"]
+keywords = ["polars", "intervals", "overlap", "rust"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Rust",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dynamic = ["version"]
+
+[project.urls]
+Repository = "https://github.com/jplauri/polars-intervals"
+Issues = "https://github.com/jplauri/polars-intervals/issues"
 
 [dependency-groups]
 dev = ["pytest==9.1.1", "ruff==0.16.8"]

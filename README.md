@@ -9,12 +9,31 @@ change; `overlap_count` is currently the only public Python operation.
 
 ## Installation
 
-For the current package, build from this repository using
-[uv](https://docs.astral.sh/uv/getting-started/installation/) and
-[Rust installed through rustup](https://www.rust-lang.org/tools/install), with
-your platform's native linker/build tools. Supported Python and Polars versions
-are declared in [pyproject.toml](https://github.com/jplauri/polars-intervals/blob/master/pyproject.toml);
-uv installs compatible versions. Rustup selects the compiler from
+To install a released version in a [uv](https://docs.astral.sh/uv/getting-started/installation/)-managed
+project:
+
+```sh
+uv add polars-intervals
+```
+
+Or install with pip in your Python environment:
+
+```sh
+pip install polars-intervals
+```
+
+The first PyPI release is being prepared. For now, use the
+[source installation](#source-and-development-installation) below.
+
+The distribution is named `polars-intervals`; the import is `polars_intervals`.
+Supported Python and Polars versions are declared in
+[pyproject.toml](https://github.com/jplauri/polars-intervals/blob/master/pyproject.toml).
+
+## Source and development installation
+
+Building from source requires uv and
+[Rust installed through rustup](https://www.rust-lang.org/tools/install), plus
+your platform's native linker/build tools. Rustup selects the compiler from
 `rust-toolchain.toml`.
 
 ```sh
@@ -25,8 +44,7 @@ uv run --locked python -c "import polars_intervals as pi; print(pi.overlap_count
 ```
 
 This creates `.venv` and builds the Rust plugin through maturin. Run your scripts
-with `uv run --locked python your_script.py`. The distribution is named
-`polars-intervals`; the import is `polars_intervals`.
+with `uv run --locked python your_script.py`.
 
 To use a local checkout from another uv-managed project, run this in that project:
 
