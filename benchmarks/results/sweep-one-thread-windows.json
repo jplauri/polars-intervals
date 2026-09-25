@@ -1,0 +1,1604 @@
+{
+  "environment": {
+    "timestamp_utc": "2026-09-25T19:44:29.350291+00:00",
+    "git_commit": "d23dc6e12222a57419169c0e420d1dc3d8b13f35",
+    "git_dirty": true,
+    "python": "3.14.0",
+    "polars": "1.44.2",
+    "polars_intervals": "0.1.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+    "logical_cpus": 24,
+    "polars_threads": 1,
+    "engine": "in-memory",
+    "script_sha256": "27b2bae66f960bbe8908ebded7563bc0eca40df682a379f37b8344a89a044287",
+    "plugin_binary_sha256": {
+      "_internal.cp314-win_amd64.pyd": "cfbc63384d305585a7e22ef57a1e67509d83442e5ffff78532d43a7fbfa76d98"
+    },
+    "reference_plugin_binary_sha256": null,
+    "core_source_sha256": "8c727c3ca58cce4fee60556ea0ed3d84d5b142e10f4e1d597fb61c8fff61946a",
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "rustflags": ""
+  },
+  "configuration": {
+    "sizes": [
+      100000,
+      1000000
+    ],
+    "scenarios": [
+      "sparse",
+      "dense"
+    ],
+    "seed": 42,
+    "compare_plugin": null,
+    "groups": [
+      1,
+      100
+    ],
+    "orders": [
+      "shuffled",
+      "start_sorted"
+    ],
+    "dtypes": [
+      "int64"
+    ],
+    "max_join_rows": 0,
+    "memory": false,
+    "warmups": 3,
+    "repeats": 9
+  },
+  "results": [
+    {
+      "overlapping_pairs": 39566,
+      "overlap_density": 7.913279132791327e-06,
+      "join_match_rows_including_self": 168049,
+      "join_candidate_rows": 168049,
+      "empty_intervals": 11083,
+      "skipped": {
+        "inequality_join": "168049 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 5.0048,
+          "min_ms": 4.7277,
+          "max_ms": 5.2982,
+          "samples_ms": [
+            5.0452,
+            5.2982,
+            5.1632,
+            5.0048,
+            4.8547,
+            4.8821,
+            4.7277,
+            4.8322,
+            5.0914
+          ]
+        },
+        "native_expr": {
+          "median_ms": 20.2504,
+          "min_ms": 19.9311,
+          "max_ms": 21.3719,
+          "samples_ms": [
+            19.9311,
+            21.0617,
+            21.3719,
+            20.6578,
+            20.248,
+            20.1391,
+            20.0648,
+            20.2504,
+            20.3401
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 20.4818,
+          "min_ms": 20.1321,
+          "max_ms": 21.3585,
+          "samples_ms": [
+            20.1338,
+            20.2049,
+            20.9353,
+            21.1271,
+            20.1321,
+            20.4818,
+            20.6825,
+            20.21,
+            21.3585
+          ]
+        },
+        "native_asof": {
+          "median_ms": 14.2241,
+          "min_ms": 13.6223,
+          "max_ms": 15.896,
+          "samples_ms": [
+            14.9263,
+            14.2241,
+            15.1294,
+            15.896,
+            13.6223,
+            14.1027,
+            14.78,
+            13.6322,
+            14.1436
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 28.7173,
+          "min_ms": 27.2764,
+          "max_ms": 33.7418,
+          "samples_ms": [
+            33.5705,
+            28.8207,
+            31.8372,
+            28.7173,
+            27.4213,
+            33.7418,
+            27.5458,
+            27.2764,
+            28.282
+          ]
+        }
+      },
+      "scenario": "sparse",
+      "rows": 100000,
+      "groups": 1,
+      "order": "shuffled",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 39566,
+      "overlap_density": 7.913279132791327e-06,
+      "join_match_rows_including_self": 168049,
+      "join_candidate_rows": 168049,
+      "empty_intervals": 11083,
+      "skipped": {
+        "inequality_join": "168049 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 2.7744,
+          "min_ms": 2.6971,
+          "max_ms": 3.0588,
+          "samples_ms": [
+            2.7647,
+            2.9986,
+            2.8586,
+            3.0588,
+            2.7617,
+            2.8079,
+            2.6971,
+            2.7744,
+            2.7708
+          ]
+        },
+        "native_expr": {
+          "median_ms": 8.3782,
+          "min_ms": 8.163,
+          "max_ms": 8.5468,
+          "samples_ms": [
+            8.3782,
+            8.426,
+            8.5248,
+            8.5468,
+            8.2733,
+            8.1711,
+            8.4727,
+            8.163,
+            8.3549
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 8.591,
+          "min_ms": 8.3277,
+          "max_ms": 10.9082,
+          "samples_ms": [
+            8.4076,
+            8.5723,
+            8.591,
+            8.7061,
+            9.2267,
+            8.3277,
+            9.2041,
+            8.4141,
+            10.9082
+          ]
+        },
+        "native_asof": {
+          "median_ms": 8.1713,
+          "min_ms": 7.86,
+          "max_ms": 8.8326,
+          "samples_ms": [
+            7.86,
+            7.9992,
+            8.3737,
+            8.3798,
+            8.5362,
+            8.0194,
+            8.1713,
+            7.8626,
+            8.8326
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 25.7848,
+          "min_ms": 24.6767,
+          "max_ms": 30.8504,
+          "samples_ms": [
+            24.7772,
+            26.8288,
+            30.8504,
+            25.4178,
+            25.8567,
+            24.6767,
+            25.7848,
+            30.5939,
+            24.9678
+          ]
+        }
+      },
+      "scenario": "sparse",
+      "rows": 100000,
+      "groups": 1,
+      "order": "start_sorted",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 39496,
+      "overlap_density": 7.899278992789928e-06,
+      "join_match_rows_including_self": 167909,
+      "join_candidate_rows": 79072005,
+      "empty_intervals": 11083,
+      "skipped": {
+        "inequality_join": "79072005 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 5.8316,
+          "min_ms": 5.146,
+          "max_ms": 6.4652,
+          "samples_ms": [
+            6.4345,
+            6.4652,
+            5.5825,
+            6.069,
+            5.5849,
+            5.7251,
+            5.146,
+            5.8827,
+            5.8316
+          ]
+        },
+        "native_expr": {
+          "median_ms": 15.6051,
+          "min_ms": 15.5412,
+          "max_ms": 17.1001,
+          "samples_ms": [
+            17.1001,
+            16.5292,
+            16.3108,
+            15.5412,
+            15.6051,
+            15.6027,
+            15.9159,
+            15.5559,
+            15.5681
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 15.8228,
+          "min_ms": 15.6154,
+          "max_ms": 18.1662,
+          "samples_ms": [
+            17.4033,
+            16.2898,
+            16.5349,
+            15.8228,
+            15.6428,
+            15.6154,
+            15.6268,
+            15.7309,
+            18.1662
+          ]
+        },
+        "native_asof": {
+          "median_ms": 54.9384,
+          "min_ms": 53.4526,
+          "max_ms": 59.5459,
+          "samples_ms": [
+            56.3761,
+            57.104,
+            59.5459,
+            54.5877,
+            54.576,
+            54.4462,
+            53.4526,
+            54.9384,
+            55.559
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 46.8638,
+          "min_ms": 43.8567,
+          "max_ms": 51.11,
+          "samples_ms": [
+            51.11,
+            47.3486,
+            46.6089,
+            45.3354,
+            48.4668,
+            43.8567,
+            45.6735,
+            46.8638,
+            48.9285
+          ]
+        }
+      },
+      "scenario": "sparse",
+      "rows": 100000,
+      "groups": 100,
+      "order": "shuffled",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 39496,
+      "overlap_density": 7.899278992789928e-06,
+      "join_match_rows_including_self": 167909,
+      "join_candidate_rows": 79072005,
+      "empty_intervals": 11083,
+      "skipped": {
+        "inequality_join": "79072005 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 4.1381,
+          "min_ms": 3.605,
+          "max_ms": 4.8822,
+          "samples_ms": [
+            3.605,
+            3.9566,
+            3.8523,
+            4.0277,
+            4.1381,
+            4.3207,
+            4.8822,
+            4.7299,
+            4.4336
+          ]
+        },
+        "native_expr": {
+          "median_ms": 10.7251,
+          "min_ms": 10.4843,
+          "max_ms": 11.6811,
+          "samples_ms": [
+            10.7251,
+            10.5083,
+            10.6887,
+            10.4843,
+            11.6811,
+            11.4605,
+            11.2786,
+            11.4115,
+            10.5957
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 11.2228,
+          "min_ms": 10.4401,
+          "max_ms": 11.7323,
+          "samples_ms": [
+            10.69,
+            10.6224,
+            11.7323,
+            10.4401,
+            11.6984,
+            11.5972,
+            11.2228,
+            11.7148,
+            10.6834
+          ]
+        },
+        "native_asof": {
+          "median_ms": 55.5157,
+          "min_ms": 53.1213,
+          "max_ms": 60.8537,
+          "samples_ms": [
+            53.8362,
+            53.8091,
+            55.5157,
+            53.1213,
+            60.8537,
+            56.3455,
+            56.0182,
+            55.7982,
+            53.3093
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 47.1763,
+          "min_ms": 43.1693,
+          "max_ms": 54.3641,
+          "samples_ms": [
+            43.1693,
+            45.4284,
+            43.6503,
+            44.1996,
+            48.773,
+            54.3641,
+            49.4754,
+            47.1763,
+            47.3022
+          ]
+        }
+      },
+      "scenario": "sparse",
+      "rows": 100000,
+      "groups": 100,
+      "order": "start_sorted",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 394860,
+      "overlap_density": 7.897207897207897e-07,
+      "join_match_rows_including_self": 1678525,
+      "join_candidate_rows": 1678525,
+      "empty_intervals": 111195,
+      "skipped": {
+        "inequality_join": "1678525 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 60.8892,
+          "min_ms": 58.1581,
+          "max_ms": 68.7777,
+          "samples_ms": [
+            58.7261,
+            68.7777,
+            59.0658,
+            62.4996,
+            61.7133,
+            58.1581,
+            58.2417,
+            60.8892,
+            61.7148
+          ]
+        },
+        "native_expr": {
+          "median_ms": 288.0588,
+          "min_ms": 280.8905,
+          "max_ms": 309.185,
+          "samples_ms": [
+            288.0588,
+            287.707,
+            309.185,
+            288.0099,
+            280.8905,
+            286.8447,
+            288.2538,
+            308.3898,
+            305.9317
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 286.854,
+          "min_ms": 282.234,
+          "max_ms": 313.7838,
+          "samples_ms": [
+            284.336,
+            286.854,
+            292.4937,
+            289.4583,
+            282.234,
+            284.9217,
+            313.7838,
+            286.1542,
+            289.6214
+          ]
+        },
+        "native_asof": {
+          "median_ms": 184.6642,
+          "min_ms": 180.1133,
+          "max_ms": 207.1655,
+          "samples_ms": [
+            181.0633,
+            180.1133,
+            187.4544,
+            207.1655,
+            204.484,
+            186.2328,
+            181.9343,
+            184.6642,
+            181.0809
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 486.5301,
+          "min_ms": 460.0274,
+          "max_ms": 501.7938,
+          "samples_ms": [
+            495.6568,
+            501.7938,
+            471.2312,
+            489.7216,
+            460.0274,
+            486.5301,
+            481.9647,
+            489.3559,
+            472.4745
+          ]
+        }
+      },
+      "scenario": "sparse",
+      "rows": 1000000,
+      "groups": 1,
+      "order": "shuffled",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 394860,
+      "overlap_density": 7.897207897207897e-07,
+      "join_match_rows_including_self": 1678525,
+      "join_candidate_rows": 1678525,
+      "empty_intervals": 111195,
+      "skipped": {
+        "inequality_join": "1678525 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 31.067,
+          "min_ms": 30.5146,
+          "max_ms": 32.4228,
+          "samples_ms": [
+            30.5146,
+            32.4228,
+            31.0784,
+            31.4983,
+            30.736,
+            31.4659,
+            30.6939,
+            30.7552,
+            31.067
+          ]
+        },
+        "native_expr": {
+          "median_ms": 93.3,
+          "min_ms": 92.4147,
+          "max_ms": 96.2204,
+          "samples_ms": [
+            96.2204,
+            93.2999,
+            93.3,
+            93.8345,
+            94.6453,
+            93.092,
+            94.6801,
+            92.958,
+            92.4147
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 94.6341,
+          "min_ms": 93.2579,
+          "max_ms": 121.4698,
+          "samples_ms": [
+            93.8851,
+            118.4935,
+            94.6341,
+            94.268,
+            95.5043,
+            121.4698,
+            93.6503,
+            93.2579,
+            95.0821
+          ]
+        },
+        "native_asof": {
+          "median_ms": 102.6839,
+          "min_ms": 101.5574,
+          "max_ms": 124.3382,
+          "samples_ms": [
+            101.8073,
+            104.8367,
+            124.3382,
+            104.5478,
+            102.2834,
+            104.7569,
+            102.6839,
+            101.9363,
+            101.5574
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 411.6376,
+          "min_ms": 382.2603,
+          "max_ms": 445.8932,
+          "samples_ms": [
+            382.2603,
+            409.1858,
+            411.6376,
+            430.6824,
+            383.7096,
+            414.0226,
+            433.9142,
+            396.8827,
+            445.8932
+          ]
+        }
+      },
+      "scenario": "sparse",
+      "rows": 1000000,
+      "groups": 1,
+      "order": "start_sorted",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 394586,
+      "overlap_density": 7.891727891727892e-07,
+      "join_match_rows_including_self": 1677977,
+      "join_candidate_rows": 7899841691,
+      "empty_intervals": 111195,
+      "skipped": {
+        "inequality_join": "7899841691 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 57.3372,
+          "min_ms": 56.54,
+          "max_ms": 59.5754,
+          "samples_ms": [
+            58.0454,
+            59.5754,
+            56.5839,
+            57.6946,
+            58.2899,
+            57.2947,
+            56.8228,
+            56.54,
+            57.3372
+          ]
+        },
+        "native_expr": {
+          "median_ms": 203.3332,
+          "min_ms": 202.049,
+          "max_ms": 210.2353,
+          "samples_ms": [
+            208.5531,
+            203.3332,
+            202.049,
+            202.2658,
+            205.7581,
+            208.0247,
+            210.2353,
+            202.7581,
+            203.2458
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 203.3997,
+          "min_ms": 201.1934,
+          "max_ms": 206.3341,
+          "samples_ms": [
+            201.451,
+            203.3997,
+            204.1143,
+            204.1907,
+            206.3341,
+            201.1934,
+            202.4088,
+            205.8235,
+            202.0062
+          ]
+        },
+        "native_asof": {
+          "median_ms": 811.7553,
+          "min_ms": 788.9141,
+          "max_ms": 830.4286,
+          "samples_ms": [
+            811.7553,
+            797.5355,
+            806.855,
+            823.769,
+            810.3442,
+            830.4286,
+            788.9141,
+            817.0827,
+            827.9957
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 954.7731,
+          "min_ms": 927.069,
+          "max_ms": 992.1234,
+          "samples_ms": [
+            954.7731,
+            992.1234,
+            956.0269,
+            949.1523,
+            941.631,
+            927.069,
+            965.2345,
+            960.2588,
+            954.6505
+          ]
+        }
+      },
+      "scenario": "sparse",
+      "rows": 1000000,
+      "groups": 100,
+      "order": "shuffled",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 394586,
+      "overlap_density": 7.891727891727892e-07,
+      "join_match_rows_including_self": 1677977,
+      "join_candidate_rows": 7899841691,
+      "empty_intervals": 111195,
+      "skipped": {
+        "inequality_join": "7899841691 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 38.4561,
+          "min_ms": 36.6806,
+          "max_ms": 39.6854,
+          "samples_ms": [
+            38.1286,
+            39.6854,
+            38.4561,
+            39.3317,
+            38.4866,
+            37.547,
+            37.3265,
+            39.0061,
+            36.6806
+          ]
+        },
+        "native_expr": {
+          "median_ms": 121.9393,
+          "min_ms": 119.5038,
+          "max_ms": 146.0198,
+          "samples_ms": [
+            126.6372,
+            121.4674,
+            120.2365,
+            121.9393,
+            122.9981,
+            120.4737,
+            146.0198,
+            119.5038,
+            130.7009
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 121.9486,
+          "min_ms": 116.9692,
+          "max_ms": 141.0937,
+          "samples_ms": [
+            131.8129,
+            122.2827,
+            118.6429,
+            120.2634,
+            121.9486,
+            119.5854,
+            126.9627,
+            116.9692,
+            141.0937
+          ]
+        },
+        "native_asof": {
+          "median_ms": 773.7994,
+          "min_ms": 747.3045,
+          "max_ms": 793.6422,
+          "samples_ms": [
+            747.3045,
+            759.6296,
+            793.6422,
+            789.2286,
+            777.6671,
+            778.4378,
+            759.496,
+            748.3954,
+            773.7994
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 942.5659,
+          "min_ms": 913.6421,
+          "max_ms": 968.0451,
+          "samples_ms": [
+            968.0451,
+            948.308,
+            924.8745,
+            921.9125,
+            949.5067,
+            939.9722,
+            942.5659,
+            959.3651,
+            913.6421
+          ]
+        }
+      },
+      "scenario": "sparse",
+      "rows": 1000000,
+      "groups": 100,
+      "order": "start_sorted",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 3330853039,
+      "overlap_density": 0.6661772695726957,
+      "join_match_rows_including_self": 6661805995,
+      "join_candidate_rows": 6661805995,
+      "empty_intervals": 83,
+      "skipped": {
+        "inequality_join": "6661805995 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 3.1616,
+          "min_ms": 3.0311,
+          "max_ms": 3.3711,
+          "samples_ms": [
+            3.1167,
+            3.0679,
+            3.0397,
+            3.1616,
+            3.294,
+            3.3657,
+            3.1771,
+            3.3711,
+            3.0311
+          ]
+        },
+        "native_expr": {
+          "median_ms": 13.6023,
+          "min_ms": 13.0335,
+          "max_ms": 14.1673,
+          "samples_ms": [
+            13.2492,
+            13.7522,
+            13.0335,
+            13.1239,
+            14.1673,
+            13.6023,
+            13.6302,
+            13.5695,
+            13.7085
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 13.5945,
+          "min_ms": 13.2881,
+          "max_ms": 14.016,
+          "samples_ms": [
+            13.325,
+            13.5678,
+            13.5598,
+            13.2881,
+            13.9855,
+            13.9412,
+            13.9903,
+            14.016,
+            13.5945
+          ]
+        },
+        "native_asof": {
+          "median_ms": 10.4919,
+          "min_ms": 9.9831,
+          "max_ms": 12.5984,
+          "samples_ms": [
+            10.4554,
+            10.3586,
+            10.3742,
+            10.4919,
+            11.6104,
+            10.9393,
+            11.5879,
+            12.5984,
+            9.9831
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 25.776,
+          "min_ms": 24.8796,
+          "max_ms": 32.2081,
+          "samples_ms": [
+            25.6678,
+            26.725,
+            24.8796,
+            26.2617,
+            25.776,
+            27.791,
+            32.2081,
+            25.6821,
+            25.5864
+          ]
+        }
+      },
+      "scenario": "dense",
+      "rows": 100000,
+      "groups": 1,
+      "order": "shuffled",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 3330853039,
+      "overlap_density": 0.6661772695726957,
+      "join_match_rows_including_self": 6661805995,
+      "join_candidate_rows": 6661805995,
+      "empty_intervals": 83,
+      "skipped": {
+        "inequality_join": "6661805995 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 2.4576,
+          "min_ms": 2.0778,
+          "max_ms": 2.6802,
+          "samples_ms": [
+            2.3901,
+            2.5525,
+            2.6802,
+            2.4576,
+            2.5642,
+            2.3751,
+            2.0778,
+            2.5176,
+            2.3703
+          ]
+        },
+        "native_expr": {
+          "median_ms": 7.4573,
+          "min_ms": 6.9387,
+          "max_ms": 8.5307,
+          "samples_ms": [
+            7.1873,
+            7.7806,
+            8.3554,
+            8.5307,
+            7.4573,
+            7.7933,
+            7.0174,
+            6.9387,
+            7.0193
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 7.79,
+          "min_ms": 7.05,
+          "max_ms": 8.6049,
+          "samples_ms": [
+            7.79,
+            8.0173,
+            7.8634,
+            7.7061,
+            8.6049,
+            7.8138,
+            7.4929,
+            7.05,
+            7.7799
+          ]
+        },
+        "native_asof": {
+          "median_ms": 8.9835,
+          "min_ms": 7.4186,
+          "max_ms": 9.5445,
+          "samples_ms": [
+            9.2018,
+            8.3729,
+            9.5445,
+            9.5211,
+            9.2948,
+            7.7496,
+            8.9835,
+            7.4186,
+            7.586
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 28.112,
+          "min_ms": 24.6282,
+          "max_ms": 30.7825,
+          "samples_ms": [
+            30.7825,
+            29.8625,
+            28.3392,
+            28.112,
+            30.7824,
+            26.6795,
+            24.6502,
+            24.6282,
+            25.0122
+          ]
+        }
+      },
+      "scenario": "dense",
+      "rows": 100000,
+      "groups": 1,
+      "order": "start_sorted",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 33274508,
+      "overlap_density": 0.006654968149681497,
+      "join_match_rows_including_self": 66648933,
+      "join_candidate_rows": 99834147,
+      "empty_intervals": 83,
+      "skipped": {
+        "inequality_join": "99834147 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 6.3258,
+          "min_ms": 5.9776,
+          "max_ms": 6.8076,
+          "samples_ms": [
+            5.9776,
+            6.361,
+            6.8076,
+            6.3545,
+            6.791,
+            6.1274,
+            5.9785,
+            6.2536,
+            6.3258
+          ]
+        },
+        "native_expr": {
+          "median_ms": 13.8811,
+          "min_ms": 13.1461,
+          "max_ms": 14.8574,
+          "samples_ms": [
+            13.8811,
+            13.388,
+            13.3102,
+            13.3307,
+            14.1433,
+            14.8574,
+            14.1199,
+            13.8833,
+            13.1461
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 13.9127,
+          "min_ms": 13.0252,
+          "max_ms": 20.9324,
+          "samples_ms": [
+            14.2587,
+            13.2899,
+            13.0252,
+            13.7623,
+            20.9324,
+            14.3265,
+            13.9891,
+            13.1012,
+            13.9127
+          ]
+        },
+        "native_asof": {
+          "median_ms": 61.191,
+          "min_ms": 60.1038,
+          "max_ms": 63.9983,
+          "samples_ms": [
+            60.5727,
+            60.9311,
+            62.8786,
+            61.191,
+            63.9983,
+            63.2318,
+            62.2364,
+            60.3678,
+            60.1038
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 46.6991,
+          "min_ms": 44.0389,
+          "max_ms": 53.6538,
+          "samples_ms": [
+            45.8399,
+            44.0389,
+            53.6538,
+            46.6991,
+            51.9732,
+            52.9994,
+            47.0979,
+            45.3337,
+            46.2312
+          ]
+        }
+      },
+      "scenario": "dense",
+      "rows": 100000,
+      "groups": 100,
+      "order": "shuffled",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 33274508,
+      "overlap_density": 0.006654968149681497,
+      "join_match_rows_including_self": 66648933,
+      "join_candidate_rows": 99834147,
+      "empty_intervals": 83,
+      "skipped": {
+        "inequality_join": "99834147 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 4.7367,
+          "min_ms": 4.4589,
+          "max_ms": 5.0629,
+          "samples_ms": [
+            4.8576,
+            4.7367,
+            4.5618,
+            5.0629,
+            4.4589,
+            4.9951,
+            4.8849,
+            4.7118,
+            4.5207
+          ]
+        },
+        "native_expr": {
+          "median_ms": 10.5421,
+          "min_ms": 9.8784,
+          "max_ms": 11.3789,
+          "samples_ms": [
+            10.8346,
+            9.9009,
+            10.898,
+            10.533,
+            10.5421,
+            11.3789,
+            10.9417,
+            9.8784,
+            10.0334
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 10.508,
+          "min_ms": 9.8058,
+          "max_ms": 11.4166,
+          "samples_ms": [
+            10.4426,
+            10.0725,
+            9.8058,
+            11.0792,
+            10.508,
+            10.5562,
+            11.4166,
+            10.7818,
+            9.8964
+          ]
+        },
+        "native_asof": {
+          "median_ms": 61.7881,
+          "min_ms": 59.9879,
+          "max_ms": 69.2669,
+          "samples_ms": [
+            62.7121,
+            60.4668,
+            60.5615,
+            61.7881,
+            61.2863,
+            69.2669,
+            63.657,
+            62.4322,
+            59.9879
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 47.5833,
+          "min_ms": 45.0484,
+          "max_ms": 56.5006,
+          "samples_ms": [
+            49.5421,
+            46.4658,
+            45.8082,
+            48.8714,
+            47.5833,
+            50.4026,
+            56.5006,
+            47.4731,
+            45.0484
+          ]
+        }
+      },
+      "scenario": "dense",
+      "rows": 100000,
+      "groups": 100,
+      "order": "start_sorted",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 332519822400,
+      "overlap_density": 0.6650403098403098,
+      "join_match_rows_including_self": 665040643828,
+      "join_candidate_rows": 665040643828,
+      "empty_intervals": 972,
+      "skipped": {
+        "inequality_join": "665040643828 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 34.9947,
+          "min_ms": 33.723,
+          "max_ms": 36.2593,
+          "samples_ms": [
+            33.723,
+            35.9471,
+            34.9947,
+            35.8348,
+            34.072,
+            35.8109,
+            34.6181,
+            34.6127,
+            36.2593
+          ]
+        },
+        "native_expr": {
+          "median_ms": 188.5137,
+          "min_ms": 184.6864,
+          "max_ms": 208.656,
+          "samples_ms": [
+            191.9488,
+            207.1736,
+            188.5137,
+            186.0157,
+            208.656,
+            185.4518,
+            187.3928,
+            207.2967,
+            184.6864
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 188.6929,
+          "min_ms": 185.5431,
+          "max_ms": 193.7669,
+          "samples_ms": [
+            193.7669,
+            187.6984,
+            188.6929,
+            188.4643,
+            191.8146,
+            185.5431,
+            190.2908,
+            187.0125,
+            191.6293
+          ]
+        },
+        "native_asof": {
+          "median_ms": 147.7977,
+          "min_ms": 142.8744,
+          "max_ms": 175.6943,
+          "samples_ms": [
+            150.6274,
+            146.2663,
+            152.6189,
+            147.7977,
+            144.8532,
+            148.0927,
+            175.6943,
+            147.731,
+            142.8744
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 473.7671,
+          "min_ms": 445.3903,
+          "max_ms": 495.8077,
+          "samples_ms": [
+            455.1253,
+            445.3903,
+            475.7676,
+            473.7671,
+            478.9855,
+            467.6909,
+            484.8742,
+            468.1084,
+            495.8077
+          ]
+        }
+      },
+      "scenario": "dense",
+      "rows": 1000000,
+      "groups": 1,
+      "order": "shuffled",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 332519822400,
+      "overlap_density": 0.6650403098403098,
+      "join_match_rows_including_self": 665040643828,
+      "join_candidate_rows": 665040643828,
+      "empty_intervals": 972,
+      "skipped": {
+        "inequality_join": "665040643828 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 23.761,
+          "min_ms": 23.1514,
+          "max_ms": 25.6454,
+          "samples_ms": [
+            23.761,
+            25.6454,
+            23.8406,
+            24.8075,
+            23.6689,
+            24.4236,
+            23.1514,
+            23.3052,
+            23.4641
+          ]
+        },
+        "native_expr": {
+          "median_ms": 87.3349,
+          "min_ms": 86.3885,
+          "max_ms": 88.3985,
+          "samples_ms": [
+            87.7815,
+            87.8961,
+            86.614,
+            86.7775,
+            87.3469,
+            86.3885,
+            87.3349,
+            88.3985,
+            87.1461
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 89.7645,
+          "min_ms": 88.3618,
+          "max_ms": 116.6837,
+          "samples_ms": [
+            91.5431,
+            91.9716,
+            89.7645,
+            88.3618,
+            88.5766,
+            89.0322,
+            89.4506,
+            93.6797,
+            116.6837
+          ]
+        },
+        "native_asof": {
+          "median_ms": 110.9527,
+          "min_ms": 101.2015,
+          "max_ms": 128.6788,
+          "samples_ms": [
+            125.4143,
+            110.9527,
+            104.0737,
+            125.7657,
+            103.1716,
+            128.6788,
+            101.2015,
+            128.5219,
+            108.3094
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 414.7073,
+          "min_ms": 394.2397,
+          "max_ms": 422.8389,
+          "samples_ms": [
+            417.277,
+            405.9783,
+            394.2397,
+            414.9423,
+            422.8389,
+            410.7665,
+            414.7073,
+            415.9605,
+            399.7093
+          ]
+        }
+      },
+      "scenario": "dense",
+      "rows": 1000000,
+      "groups": 1,
+      "order": "start_sorted",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 3324955968,
+      "overlap_density": 0.006649918585918586,
+      "join_match_rows_including_self": 6650910964,
+      "join_candidate_rows": 9980570268,
+      "empty_intervals": 972,
+      "skipped": {
+        "inequality_join": "9980570268 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 56.843,
+          "min_ms": 55.1214,
+          "max_ms": 61.6177,
+          "samples_ms": [
+            55.8219,
+            61.6177,
+            55.8175,
+            56.843,
+            56.8823,
+            55.7235,
+            55.1214,
+            57.7752,
+            58.8194
+          ]
+        },
+        "native_expr": {
+          "median_ms": 170.8938,
+          "min_ms": 165.2664,
+          "max_ms": 173.826,
+          "samples_ms": [
+            171.5219,
+            171.0541,
+            168.5262,
+            167.3726,
+            172.5754,
+            173.826,
+            170.8938,
+            165.2664,
+            169.6374
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 166.2828,
+          "min_ms": 164.8682,
+          "max_ms": 176.3144,
+          "samples_ms": [
+            165.7805,
+            169.7193,
+            164.8682,
+            166.2828,
+            169.7573,
+            166.0561,
+            167.0345,
+            165.738,
+            176.3144
+          ]
+        },
+        "native_asof": {
+          "median_ms": 872.0011,
+          "min_ms": 848.0304,
+          "max_ms": 886.6587,
+          "samples_ms": [
+            872.0011,
+            871.2635,
+            873.8777,
+            880.9311,
+            886.6587,
+            870.8841,
+            848.0304,
+            869.8805,
+            874.9549
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 1027.1565,
+          "min_ms": 1002.2109,
+          "max_ms": 1053.2789,
+          "samples_ms": [
+            1053.2789,
+            1024.2665,
+            1027.6351,
+            1018.888,
+            1035.5166,
+            1018.1785,
+            1035.0819,
+            1002.2109,
+            1027.1565
+          ]
+        }
+      },
+      "scenario": "dense",
+      "rows": 1000000,
+      "groups": 100,
+      "order": "shuffled",
+      "dtype": "int64"
+    },
+    {
+      "overlapping_pairs": 3324955968,
+      "overlap_density": 0.006649918585918586,
+      "join_match_rows_including_self": 6650910964,
+      "join_candidate_rows": 9980570268,
+      "empty_intervals": 972,
+      "skipped": {
+        "inequality_join": "9980570268 candidate rows > limit 0"
+      },
+      "timings": {
+        "plugin": {
+          "median_ms": 42.1896,
+          "min_ms": 41.657,
+          "max_ms": 45.9903,
+          "samples_ms": [
+            43.9564,
+            42.781,
+            42.2763,
+            45.9903,
+            41.784,
+            42.1896,
+            41.87,
+            42.0834,
+            41.657
+          ]
+        },
+        "native_expr": {
+          "median_ms": 118.6313,
+          "min_ms": 116.986,
+          "max_ms": 124.3799,
+          "samples_ms": [
+            124.3799,
+            117.6385,
+            118.6313,
+            118.8543,
+            119.339,
+            117.2311,
+            122.8613,
+            116.986,
+            118.2343
+          ]
+        },
+        "native_parallel": {
+          "median_ms": 118.0128,
+          "min_ms": 114.7868,
+          "max_ms": 126.6997,
+          "samples_ms": [
+            126.6997,
+            118.906,
+            114.7868,
+            118.2082,
+            118.0128,
+            114.891,
+            117.309,
+            117.6965,
+            118.0208
+          ]
+        },
+        "native_asof": {
+          "median_ms": 853.8131,
+          "min_ms": 834.556,
+          "max_ms": 893.7348,
+          "samples_ms": [
+            842.9322,
+            857.9645,
+            841.6188,
+            846.7424,
+            868.4493,
+            893.7348,
+            834.556,
+            853.8131,
+            863.9048
+          ]
+        },
+        "native_sweep": {
+          "median_ms": 1013.9914,
+          "min_ms": 992.367,
+          "max_ms": 1026.9765,
+          "samples_ms": [
+            992.367,
+            1024.6011,
+            995.7692,
+            1025.9904,
+            1002.408,
+            1018.0712,
+            1026.9765,
+            1013.9914,
+            1001.1381
+          ]
+        }
+      },
+      "scenario": "dense",
+      "rows": 1000000,
+      "groups": 100,
+      "order": "start_sorted",
+      "dtype": "int64"
+    }
+  ]
+}
