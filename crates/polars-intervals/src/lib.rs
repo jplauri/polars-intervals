@@ -4,6 +4,7 @@
 //! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
 //! to the core and Python expressions.
 //! [`minimum_cover`] and [`minimum_cost_cover`] select exact continuous target covers.
+//! [`minimum_stabbing_points`] returns one optimal list of discrete hitting points.
 
 use polars::prelude::*;
 use std::borrow::Cow;
@@ -25,6 +26,46 @@ fn count_output(inputs: &[Field]) -> PolarsResult<Field> {
 fn lanes_output(inputs: &[Field]) -> PolarsResult<Field> {
     let [start, _] = input_pair(inputs, "assign_lanes")?;
     Ok(Field::new(start.name().clone(), DataType::UInt32))
+}
+
+fn stabbing_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let [start, _] = input_pair(inputs, "minimum_stabbing_points")?;
+    Ok(Field::new(
+        start.name().clone(),
+        DataType::List(Box::new(start.dtype().clone())),
+    ))
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = stabbing_output)]
+fn minimum_stabbing_points_plugin(inputs: &[Series]) -> PolarsResult<Series> {
+    let [starts, ends] = input_pair(inputs, "minimum_stabbing_points")?;
+    minimum_stabbing_points(starts, ends)
+}
+
+/// Select the minimum number of discrete points hitting every half-open interval.
+///
+/// Returns one non-null list with the exact endpoint logical dtype, including
+/// Date and Datetime unit/timezone metadata. Points are sorted and unique; empty
+/// input returns one empty list. Date predecessors are days; Datetime predecessors
+/// use the column's physical ms/us/ns tick. See [`intervals_core::minimum_stabbing_points`]
+/// for the exchange proof, sorted-input fast path and `O(n log n)` time / `O(n)`
+/// additional space bounds. Contiguous inputs are borrowed; multiple chunks are
+/// collected before invoking the core.
+///
+/// # Errors
+///
+/// Rejects unequal lengths, null endpoints, unsupported or mismatched logical
+/// dtypes, reversed intervals, and empty intervals. Interval errors preserve the
+/// original zero-based row index within the supplied collection.
+pub fn minimum_stabbing_points(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+    let points = evaluate(starts, ends, Algorithm::Stabbing)?;
+    let points = match starts.dtype() {
+        // Restore metadata directly: integer-to-Datetime casts without the
+        // optional timezone feature discard the zone. No time conversion is needed.
+        DataType::Datetime(unit, zone) => points.into_datetime(*unit, zone.clone()),
+        dtype => points.cast(dtype)?,
+    };
+    Ok(Series::new("minimum_stabbing_points".into(), [points]))
 }
 
 fn input_pair<'a, T>(inputs: &'a [T], name: &str) -> PolarsResult<&'a [T; 2]> {
@@ -298,6 +339,7 @@ fn integer_values(values: &Series) -> PolarsResult<Vec<i128>> {
 
 #[derive(Clone, Copy)]
 enum Algorithm<'a> {
+    Stabbing,
     OverlapCount,
     AssignLanes,
     MaxWeight(&'a [i128]),
@@ -309,6 +351,7 @@ enum Algorithm<'a> {
 impl Algorithm<'_> {
     fn name(self) -> &'static str {
         match self {
+            Self::Stabbing => "minimum_stabbing_points",
             Self::OverlapCount => "overlap_count",
             Self::AssignLanes => "assign_lanes",
             Self::MaxWeight(_) => "max_weight_non_overlapping",
@@ -364,7 +407,7 @@ fn evaluate_typed<T>(
 ) -> PolarsResult<Series>
 where
     T: PolarsIntegerType,
-    T::Native: Ord + TryFrom<i128>,
+    T::Native: intervals_core::DiscreteEndpoint + TryFrom<i128>,
 {
     polars_ensure!(
         starts.null_count() == 0 && ends.null_count() == 0,
@@ -378,6 +421,11 @@ where
             .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
     });
     match algorithm {
+        Algorithm::Stabbing => {
+            let points = intervals_core::minimum_stabbing_points(&starts, &ends)
+                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(ChunkedArray::<T>::from_vec(algorithm.name().into(), points).into_series())
+        }
         Algorithm::OverlapCount => {
             let counts = intervals_core::overlap_counts(&starts, &ends)
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;

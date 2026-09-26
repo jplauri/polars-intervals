@@ -5,6 +5,7 @@
 //! [`assign_lanes`] assigns intervals to the minimum number of lanes.
 //! [`max_weight_non_overlapping`] selects an exact maximum-weight schedule.
 //! [`minimum_cover`] and [`minimum_cost_cover`] cover one continuous target exactly.
+//! [`minimum_stabbing_points`] hits every discrete interval with the fewest points.
 
 #![forbid(unsafe_code)]
 
@@ -18,6 +19,8 @@ mod capacity;
 pub use capacity::max_weight_with_capacity;
 mod cover;
 pub use cover::{minimum_cost_cover, minimum_cover};
+mod stabbing;
+pub use stabbing::{DiscreteEndpoint, minimum_stabbing_points};
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,6 +29,8 @@ pub enum IntervalError {
     LengthMismatch { starts_len: usize, ends_len: usize },
     /// An interval's start exceeds its end, at the given zero-based row index.
     InvalidInterval { index: usize },
+    /// An empty interval cannot contain a stabbing point.
+    EmptyInterval { index: usize },
     /// More than `u32::MAX + 1` lanes are required.
     TooManyLanes,
     /// The weight slice does not contain one value per interval.
@@ -62,6 +67,9 @@ impl fmt::Display for IntervalError {
             ),
             Self::InvalidInterval { index } => {
                 write!(f, "interval at index {index} has start greater than end")
+            }
+            Self::EmptyInterval { index } => {
+                write!(f, "cannot stab empty interval at index {index}")
             }
             Self::TooManyLanes => write!(f, "lane IDs exceed the UInt32 range"),
             Self::WeightLengthMismatch {

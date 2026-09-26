@@ -12,8 +12,60 @@ __all__ = [
     "max_weight_with_capacity",
     "minimum_cost_cover",
     "minimum_cover",
+    "minimum_stabbing_points",
     "overlap_count",
 ]
+
+
+def minimum_stabbing_points(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
+    """Select the minimum number of discrete points that hit every half-open interval.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+
+    Returns:
+        pl.Expr: One list of globally optimal, sorted, unique coordinates, with dtype
+            List(endpoint dtype). Identical geometry gives deterministic output.
+            Empty input returns one empty list.
+
+    Raises:
+        polars.exceptions.PolarsError: For null endpoints, unequal lengths, unsupported
+            or mismatched dtypes, reversed intervals, or any empty interval. Empty
+            intervals raise ``cannot stab empty interval at index N`` with the original
+            zero-based row index within the collection (or group).
+
+    Notes:
+        Intervals are half-open [start, end): end is excluded. Greedy selection uses
+        the exact predecessor of the earliest uncovered end, never end itself.
+        Endpoints support matching Int8/16/32/64, UInt8/16/32/64, Date, and Datetime.
+        Date uses one day; Datetime uses one physical ms/us/ns tick and preserves
+        timezone metadata. No floating-point or epsilon arithmetic is used.
+
+        Each select or group is solved independently. Group aggregation returns one
+        list per group; a window broadcasts that list to each row in the group.
+        Sorting and scanning take O(n log n) time and O(n) additional space.
+        Already nondecreasing ends use O(n) time and only output space.
+        For intervals, the minimum stabbing number equals the maximum number of
+        pairwise disjoint intervals.
+
+    Examples:
+        >>> df = pl.DataFrame({"start": [0, 2, 5], "end": [4, 6, 9]})
+        >>> df.select(minimum_stabbing_points("start", "end")).to_series().to_list()
+        [[3, 8]]
+        >>> grouped = df.with_columns(pl.Series("group", ["a", "a", "b"]))
+        >>> grouped.group_by("group", maintain_order=True).agg(
+        ...     minimum_stabbing_points("start", "end").alias("points")
+        ... ).to_dict(as_series=False)
+        {'group': ['a', 'b'], 'points': [[3], [8]]}
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="minimum_stabbing_points_plugin",
+        args=[start, end],
+        is_elementwise=False,
+        returns_scalar=True,
+    )
 
 
 def _target(value: int | date | datetime | pl.Series) -> dict:

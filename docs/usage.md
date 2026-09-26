@@ -1,5 +1,80 @@
 # Usage
 
+## Minimum stabbing points
+
+Select the minimum number of discrete points that hit every half-open interval.
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 2, 5], "end": [4, 6, 9]})
+result = df.select(pi.minimum_stabbing_points("start", "end").alias("points"))
+assert result["points"].to_list() == [[3, 8]]
+assert result.schema["points"] == pl.List(pl.Int64)
+```
+
+For `[0,4)`, `[2,6)`, `[5,9)`, the earliest end is 4. Choose **3**, which hits
+the first two intervals. The next uncovered interval is `[5,9)`, so choose **8**.
+The result is `[3,8]`. Selecting 4 would fail to hit `[0,4)` because the end is
+excluded. Similarly, `[0,2)` and `[2,4)` need two points, `[1,3]`.
+
+Endpoints must be discrete: matching Int8/16/32/64, UInt8/16/32/64, Date, or
+Datetime columns. The exact predecessor of `end` is one integer tick, one day
+for Date, or one physical millisecond/microsecond/nanosecond for Datetime.
+`[2026-01-01,2026-01-05)` chooses January 4. Datetime unit and timezone metadata
+are preserved in `List(Datetime(unit, timezone))`; nanosecond columns subtract
+one nanosecond. No floating point, epsilon arithmetic or coercion is involved.
+
+The result is globally optimal, sorted, unique and deterministic for identical
+geometry, including permutations and duplicates. Empty input returns one empty
+list with the correct inner dtype. **Any empty interval `[x,x)` makes the problem
+infeasible**, because it contains no point. The error is
+`cannot stab empty interval at index N`. Validation happens before sorting, so
+`N` is the original zero-based position within the supplied collection/group.
+Nulls, reversed intervals, mismatched dtypes and unequal lengths are rejected.
+
+```python
+grouped = df.with_columns(pl.Series("group", ["a", "a", "b"]))
+result = grouped.group_by("group").agg(pi.minimum_stabbing_points("start", "end").alias("points"))
+# a -> [3], b -> [8], each with dtype List(Int64)
+```
+
+Eager and lazy select return one list. Grouped aggregation independently solves
+each group and returns one list per group. `.over("group")` broadcasts the
+group's list to its rows. All input chunks belong to the same collection.
+Filtering before aggregation changes the problem being solved.
+
+### Why the greedy algorithm is exact
+
+Sort by increasing end and consider the earliest-ending uncovered interval.
+Every feasible solution must put a point `q` in that interval. Move it rightward
+to `predecessor(end)`. Any later-ending interval that contained `q` still contains
+the moved point: its start is at most `q`, and its end is at least this earliest
+end. An optimal solution therefore exists containing the greedy point. Remove
+the intervals it hits and repeat the argument on those remaining.
+
+The triggering intervals are pairwise disjoint, and any stabbing set needs at
+least one point for each of them. This also proves the interval identity:
+
+```text
+minimum stabbing number = maximum number of pairwise disjoint intervals
+```
+
+The implementation uses Rust's unstable comparison sort on packed `(start,end)`
+records, followed by a linear scan. It validates all rows and detects already
+nondecreasing ends before allocating records. Total time is `O(n log n)` and
+additional space is `O(n + k)` including `k` output points. End-sorted input takes
+`O(n)` time and `O(k)` output space. The Polars adapter borrows contiguous columns
+and collects multiple chunks when needed. See [benchmark evidence](stabbing-benchmarks.md).
+
+Rust exposes `intervals_core::minimum_stabbing_points(&starts, &ends) ->
+Result<Vec<T>, IntervalError>` for `T: DiscreteEndpoint`, and
+`polars_intervals::minimum_stabbing_points(&starts, &ends) -> PolarsResult<Series>`
+for Polars Series (one list). `DiscreteEndpoint` only requires `Ord + Copy` and
+`predecessor() -> Option<Self>`; integer primitive implementations use checked
+subtraction. The core has no Polars, Arrow, Python or temporal dependencies.
+
 ## Cover one continuous target
 
 `minimum_cover` selects the fewest intervals whose union continuously covers a

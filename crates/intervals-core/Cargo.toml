@@ -22,3 +22,7 @@ harness = false
 [[bench]]
 name = "covering"
 harness = false
+
+[[bench]]
+name = "minimum_stabbing_points"
+harness = false

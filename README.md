@@ -1,7 +1,7 @@
 # polars-intervals
 
 Count overlaps, assign optimal interval lanes, select maximum-weight schedules,
-and cover targets exactly in Polars, without building a conflict graph or a table
+cover targets exactly, and find minimum stabbing points in Polars, without building a conflict graph or a table
 of overlapping pairs.
 
 [Usage](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md) ·
@@ -17,6 +17,26 @@ pip install polars-intervals
 Or with uv: `uv add polars-intervals`.
 
 Requires Python 3.12+ and Polars `>=1.44.1,<1.45`.
+
+## Hit every interval with the fewest points
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 2, 5], "end": [4, 6, 9]})
+result = df.select(pi.minimum_stabbing_points("start", "end").alias("points"))
+assert result["points"].to_list() == [[3, 8]]
+```
+
+`minimum_stabbing_points` returns one sorted, unique list of globally optimal
+coordinates, with dtype `List(endpoint_dtype)`. Use `group_by(...).agg(...)` for
+one independent list per group. Half-open intervals exclude `end`, so greedy
+selection uses its exact predecessor: one integer tick, one Date day, or one
+Datetime ms/us/ns tick. Any empty interval is infeasible and raises an error;
+empty input returns `[[]]`. Time is `O(n log n)`, or `O(n)` for nondecreasing ends.
+See [semantics and proof](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#minimum-stabbing-points)
+and [candidate benchmarks](https://github.com/jplauri/polars-intervals/blob/master/docs/stabbing-benchmarks.md).
 
 ## Cover a target interval
 
@@ -148,7 +168,7 @@ for reproducible candidate benchmarks and the production choice.
 
 ## Date and Datetime intervals
 
-All three operations accept Date and Datetime endpoints.
+All operations accept Date and Datetime endpoints.
 
 ```python
 from datetime import datetime

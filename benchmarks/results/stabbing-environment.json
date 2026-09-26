@@ -1,0 +1,153 @@
+{
+  "date_utc": "2026-09-26T17:30:37.504587+00:00",
+  "base_commit": "1f2717158de8631f8f75a9894ad3e80bc43d7bb1",
+  "working_tree": "Feature changes are uncommitted; source hashes identify measured implementation.",
+  "rust": [
+    "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "binary: rustc",
+    "commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985",
+    "commit-date: 2026-09-01",
+    "host: x86_64-pc-windows-msvc",
+    "release: 1.98.1",
+    "LLVM version: 22.1.8"
+  ],
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "uv": "uv 0.11.3 (45da18ac3 2026-04-01 x86_64-pc-windows-msvc)",
+  "python": "3.14.0",
+  "polars": "1.44.2",
+  "polars_threads": 24,
+  "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+  "physical_cores": 12,
+  "logical_processors": 24,
+  "os": "Microsoft Windows 11 Home",
+  "os_version": "10.0.26200",
+  "usable_ram_kib": 33475628,
+  "profile": "Cargo bench optimized; uv/maturin release wheel. Final core and native timing runs sequential, without concurrent compilation/tests.",
+  "seed": 20260926,
+  "sizes": [
+    1000,
+    10000,
+    100000,
+    1000000,
+    3000000
+  ],
+  "warmups": 1,
+  "timed_repeats": 3,
+  "core_samples": 2700,
+  "core_workloads": 225,
+  "core_candidate_workload_combinations": 900,
+  "native_samples": 270,
+  "native_workloads": 90,
+  "core_command": "cargo bench -p intervals-core --bench minimum_stabbing_points --locked",
+  "native_command": "external-release-env/python -I benchmarks/stabbing_temporal.py (external cwd)",
+  "summary_command": "python benchmarks/stabbing_summary.py",
+  "candidates": {
+    "A": "packed unstable end sort",
+    "B": "indirect index sort",
+    "C": "sorted-end detection plus A",
+    "production": "public core without phase clocks"
+  },
+  "families": [
+    "common",
+    "dense",
+    "disjoint",
+    "equal_ends",
+    "equal_starts",
+    "identical",
+    "nested",
+    "sparse",
+    "staircase",
+    "touching",
+    "unit",
+    "wide"
+  ],
+  "orders": [
+    "sorted",
+    "reverse",
+    "shuffled"
+  ],
+  "native_dtypes": [
+    "Date",
+    "Datetime(time_unit='us', time_zone=None)",
+    "Int64"
+  ],
+  "allocation_metric": "Separate untimed invocation; peak live requested heap bytes and allocation/reallocation count, excluding inputs, oracle work, stack, allocator overhead and RSS.",
+  "phase_metric": "Validation, preprocessing (including sorted detection), sort and scan, in nanoseconds. Total includes temporary destruction but not output destruction. Production phase fields blank.",
+  "validation": {
+    "rust_tests_and_doctests": 125,
+    "python_tests_and_doctests": 1295,
+    "release_wheel_external_tests_and_doctests": 1295,
+    "ci_release_helper_tests": 49,
+    "core_named_tests": 16,
+    "core_proptest_tests": 7,
+    "proptest_cases_per_test": 512,
+    "small_benchmark_oracle_cases": 256,
+    "cargo_fmt": "passed",
+    "cargo_clippy_all_targets_deny_warnings": "passed",
+    "rustdoc_deny_warnings": "passed",
+    "uv_lock": "passed",
+    "ruff_check_and_format": "passed",
+    "mkdocs_strict": "passed",
+    "local_wheel_and_sdist_metadata": "passed",
+    "twine_strict": "passed"
+  },
+  "source_sha256": {
+    "Cargo.lock": "3a22e32e855b68bc423c01a23542e73f4cb92f6206187141b1a5aecfb2e9ace9",
+    "uv.lock": "de1a426ddd8f8cc68031d26bd63f844d3b60a5f7158fe394723190aae7b4b86a",
+    "rust-toolchain.toml": "86810d0ace88a635a96ed7a8d7d432afa6950c0c0b99f78f6e905ed9616a9882",
+    "crates/intervals-core/src/stabbing.rs": "3c6e43e0872b1fb8df1396bfac99d6c568783a644b309926c6dad410b20d5999",
+    "crates/intervals-core/src/lib.rs": "13280704495d590c35122b42d9f21f3d515535add5e06ecba916c9c9fa123761",
+    "crates/intervals-core/benches/minimum_stabbing_points.rs": "899c57c8009c27392081bf4d7169c6f16ab87342f8878d13d0d1e7afde08773e",
+    "crates/intervals-core/benches/support/stabbing.rs": "7ac55c8c1e4acb0b9ebdde8825c6444e3c7358a10e54e1f4fa473d20df1aff43",
+    "crates/intervals-core/benches/support/allocations.rs": "ba1da9a191823c6d4094b94fa9490a4322812a8e089a6edc09c322df558eda1c",
+    "crates/intervals-core/tests/minimum_stabbing_points.rs": "01f720ead5fbac563f4592ed9e139d9d1d336925b072148ec9b452094029403b",
+    "crates/intervals-core/tests/support/stabbing.rs": "c856c5713a37ba34160ffd442d905be4417a62b437a90bb2384ea9123376d845",
+    "crates/polars-intervals/src/lib.rs": "a2faeb60d264a67b1f395f5e55b5946a1ce289474469edfad416005b5a94945e",
+    "crates/polars-intervals/tests/minimum_stabbing_points.rs": "05d9b0b22556f8f24ef4fef635d9440bfde860663228e045b674b321fa7205c2",
+    "python/polars_intervals/__init__.py": "6728e71a9c28dbcc7ff9eea3d4636d6618287404d2385e4d8d1a640fbff946e4",
+    "tests/test_minimum_stabbing_points.py": "56e5a5fffc0a6b7383f7f4ce9bac2df43385cbb74fad565a795b4885da14a5e5",
+    "benchmarks/stabbing_temporal.py": "72668f9aa1d672bca49b859ee7a20f17dd7c92abe4de5de3b69302d0d2173946",
+    "benchmarks/stabbing_summary.py": "30773bf5f0c6069f8e4187d102bde0a78972d0473c1a41039e536b60f4b43fc6"
+  },
+  "result_sha256": {
+    "benchmarks/results/stabbing-windows.csv": "f76f4d551754acb4eea146186a5e42549ba6fc345dfd8d5fcdc8e32e3160bcdd",
+    "benchmarks/results/stabbing-temporal-windows.csv": "ca64b27390b361e9dff95671e4d834f575e26b0d76e6d7bd07c0e5432f809ffe"
+  },
+  "artifact_sha256": {
+    "target/stabbing-dist/.gitignore": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+    "target/stabbing-dist/polars_intervals-0.1.0-cp314-cp314-win_amd64.whl": "8bc5689a6291da4ea704215f114dc3a336e6ca4f461fdd6f6132ed627da27185",
+    "target/stabbing-dist/polars_intervals-0.1.0.tar.gz": "a319b204fdfba697b87ffea5e8adfbbc9e7532ae3469c8fc69b0465096b9bdee"
+  },
+  "limitations": [
+    "One Windows x86-64 host; synthetic data and three repeats, not cross-platform speed guarantees.",
+    "Core allocation counts are not native-plugin peak RSS.",
+    "Local release validation covers CPython 3.14 Windows; the full 15-wheel matrix and sdist installation remain CI checks.",
+    "Temporal i64 kernels share integer implementation; all units/timezones verified separately in correctness tests."
+  ],
+  "cleanup_verification": {
+    "date_utc": "2026-09-26T17:41:17.977089+00:00",
+    "scope": "Store benchmark allocation statistics alongside each method instead of a BTreeMap; remove duplicate endpoint materialization and redundant physical conversion in tests.",
+    "production_and_candidates": "Unchanged; source hashes match the original measured sources.",
+    "historical_results": "Original raw results and source hashes retained. Updated benchmark-driver and test hashes recorded separately below.",
+    "source_sha256": {
+      "crates/intervals-core/benches/minimum_stabbing_points.rs": "9759c70686228de3a9795baa7c63a81ef364524302d37b85c1a76c0ee9f7b585",
+      "crates/intervals-core/tests/minimum_stabbing_points.rs": "cbda449f3007ec66c434dd1721bb7014be85a6ae53da1ac5b2036215687b8627",
+      "crates/polars-intervals/tests/minimum_stabbing_points.rs": "c4916d1eb379c94b00206bd51516204e5d098858e4c9e2a3e58d946a10c79a9b"
+    },
+    "release_smoke": {
+      "max_rows": 1000,
+      "samples": 540,
+      "workloads": 45,
+      "verification": "Every candidate checked against coverage and packing; keys, point counts, peak bytes and allocation counts exactly match the historical 1K results. Smoke timings are not performance evidence.",
+      "sha256": "c5ddd0876212116792650510aaa98a8f7c466d9896ffbec84cddf4faba3d4d42"
+    },
+    "checks": {
+      "rust_tests_and_doctests": 125,
+      "python_tests_and_doctests": 1295,
+      "cargo_fmt": "passed",
+      "clippy_all_targets_deny_warnings": "passed",
+      "ruff_check_and_format": "passed",
+      "uv_lock": "passed"
+    }
+  }
+}

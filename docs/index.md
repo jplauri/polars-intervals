@@ -1,8 +1,9 @@
 # Getting started
 
 polars-intervals counts overlaps, assigns optimal lanes, selects maximum-weight
-schedules, and finds exact target covers in Polars. Each operation returns one
-value per row and works with eager and lazy queries.
+schedules, finds exact target covers, and selects minimum stabbing points in
+Polars. Stabbing returns one list per collection or group; the other operations
+return one value per row. All work with eager and lazy queries.
 
 ## Install
 
