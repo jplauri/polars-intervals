@@ -56,37 +56,30 @@ where
     if capacity == 1 {
         return max_weight_non_overlapping(starts, ends, weights);
     }
-    let mut prepared = prepare(starts, ends, weights, capacity)?;
-    if concurrency(&prepared.rows) <= capacity {
-        for row in &prepared.rows {
-            prepared.mask[row.index] = true;
+    let Prepared { rows, mut mask } = prepare(starts, ends, weights, capacity)?;
+    if concurrency(&rows) <= capacity {
+        for row in &rows {
+            mask[row.index] = true;
         }
     } else {
-        let ranges = components(&prepared.rows);
+        let ranges = components(&rows);
         // Release measurements justify threads only beyond this amount of flow
         // work. Bound workers, and keep small/one-component instances serial.
-        let workers = if ranges.len() >= 8 && prepared.rows.len().saturating_mul(capacity) >= 64_000
-        {
+        let workers = if ranges.len() >= 8 && rows.len().saturating_mul(capacity) >= 64_000 {
             std::thread::available_parallelism().map_or(1, |n| n.get().min(8))
         } else {
             1
         };
         if workers > 1 {
-            solve_parallel(
-                &prepared.rows,
-                &ranges,
-                capacity,
-                &mut prepared.mask,
-                workers,
-            )?;
+            solve_parallel(&rows, &ranges, capacity, &mut mask, workers)?;
         } else {
             for component in ranges {
-                solve_component(&prepared.rows[component], capacity, &mut prepared.mask)?;
+                solve_component(&rows[component], capacity, &mut mask)?;
             }
         }
     }
-    check_objective(weights, &prepared.mask)?;
-    Ok(prepared.mask)
+    check_objective(weights, &mask)?;
+    Ok(mask)
 }
 
 fn solve_component<T: Ord + Copy>(
@@ -113,7 +106,7 @@ pub(crate) fn solve_parallel<T: Ord + Copy + Sync>(
     mask: &mut [bool],
     workers: usize,
 ) -> Result<(), IntervalError> {
-    let selected = std::thread::scope(|scope| {
+    std::thread::scope(|scope| {
         let handles: Vec<_> = ranges
             .chunks(ranges.len().div_ceil(workers))
             .map(|batch| {
@@ -142,17 +135,13 @@ pub(crate) fn solve_parallel<T: Ord + Copy + Sync>(
                 })
             })
             .collect();
-        handles
-            .into_iter()
-            .map(|h| h.join().expect("capacity worker panicked"))
-            .collect::<Result<Vec<_>, IntervalError>>()
-    })?;
-    for batch in selected {
-        for i in batch {
-            mask[i] = true;
+        for handle in handles {
+            for index in handle.join().expect("capacity worker panicked")? {
+                mask[index] = true;
+            }
         }
-    }
-    Ok(())
+        Ok(())
+    })
 }
 
 // These internals are also compiled directly into the private benchmark target.
@@ -260,7 +249,6 @@ fn add(a: i128, b: i128) -> Result<i128, IntervalError> {
     a.checked_add(b).ok_or(IntervalError::WeightOverflow)
 }
 
-#[derive(Clone)]
 struct Edge {
     to: usize,
     capacity: usize,
@@ -273,7 +261,8 @@ pub(crate) struct Network {
     edges: Vec<Edge>,
     offsets: Vec<usize>,
     adjacent: Vec<usize>,
-    intervals: Vec<usize>,
+    // Interval edge pairs follow timeline pairs, in input-row order.
+    interval_start: usize,
 }
 
 impl Network {
@@ -290,7 +279,7 @@ impl Network {
             edges: Vec::with_capacity(2 * (n - 1 + rows.len())),
             offsets: vec![0; n + 1],
             adjacent: Vec::new(),
-            intervals: Vec::with_capacity(rows.len()),
+            interval_start: 2 * (n - 1),
         };
         for v in 0..n - 1 {
             net.add_edge(v, v + 1, capacity, 0);
@@ -298,7 +287,6 @@ impl Network {
         for row in rows {
             let from = endpoints.binary_search(&row.start).unwrap();
             let to = endpoints.binary_search(&row.end).unwrap();
-            net.intervals.push(net.edges.len());
             net.add_edge(from, to, 1, -row.weight);
         }
         for i in 1..=n {
@@ -408,8 +396,11 @@ impl Network {
     }
 
     pub(crate) fn reconstruct<T>(&self, rows: &[Row<T>], mask: &mut [bool]) {
-        for (row, &edge) in rows.iter().zip(&self.intervals) {
-            mask[row.index] = self.edges[edge].capacity == 0;
+        for (row, edge) in rows
+            .iter()
+            .zip(self.edges[self.interval_start..].iter().step_by(2))
+        {
+            mask[row.index] = edge.capacity == 0;
         }
     }
 }
@@ -452,8 +443,12 @@ mod tests {
         let mut mask = vec![false; s.len()];
         net.reconstruct(&prepared.rows, &mut mask);
         assert_eq!(cost, -check_objective(w, &mask).unwrap());
-        for (row, &edge) in prepared.rows.iter().zip(&net.intervals) {
-            assert_eq!(mask[row.index], net.edges[edge ^ 1].capacity == 1);
+        for (row, [_, reverse]) in prepared
+            .rows
+            .iter()
+            .zip(net.edges[net.interval_start..].as_chunks::<2>().0)
+        {
+            assert_eq!(mask[row.index], reverse.capacity == 1);
         }
         let mut again = Network::new(&prepared.rows, k);
         again.solve(k).unwrap();

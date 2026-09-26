@@ -41,6 +41,20 @@ The existing capacity-1 scheduler remains unchanged.
 
 ## Measurements on this machine
 
+The tables and raw results below record commit `29d75ee`. A subsequent cleanup
+replaces the per-interval edge-index vector with one offset into the already
+contiguous edge buffer, removing one allocation and one `usize` per interval
+in each network. Worker results are also folded directly into the output mask.
+The algorithms, fast paths, and candidate-selection decision are unchanged.
+
+The cleanup reran 330 workloads before and after: component cases through 1M
+rows and dense cases at 1K, with three timed samples per candidate. All objectives
+matched. On the 1M positive shuffled component case at k=2, production allocation events
+fell from 437,664 to 406,414; whole-flow peak requested bytes fell by 8,000,000.
+Timing variation also affected the unchanged generic engine, so no speedup is
+claimed. [Cleanup samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-cleanup-windows.csv)
+and the environment file record these comparisons separately.
+
 Windows 11, Ryzen 9 3900X (12 cores / 24 logical processors), about 32 GiB RAM,
 Rust 1.98.1 / LLVM 22.1.8, optimized Cargo bench profile. Values below are medians
 of three timed samples, in milliseconds. These are observed tradeoffs, not

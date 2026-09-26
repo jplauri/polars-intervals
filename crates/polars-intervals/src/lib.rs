@@ -1,7 +1,8 @@
 //! Interval algorithms for Rust Polars, backed by `intervals-core`.
 //!
-//! [`overlap_count`], [`assign_lanes`] and [`max_weight_non_overlapping`] adapt
-//! integer, Date, and Datetime [`Series`] to the core and Python expressions.
+//! [`overlap_count`], [`assign_lanes`], [`max_weight_non_overlapping`] and
+//! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
+//! to the core and Python expressions.
 
 use polars::prelude::*;
 use std::borrow::Cow;

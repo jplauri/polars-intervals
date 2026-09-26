@@ -104,5 +104,28 @@
   "seeds": {
     "weights": 42,
     "shuffle_and_method_order": 73
+  },
+  "cleanup_measurement": {
+    "date": "2026-09-26T16:57:54.622058+03:00",
+    "baseline_commit": "29d75ee4fdcbfe32d1e89559bc3b5ee53ea691c6",
+    "after_solver_sha256": "B33124EEDAF3771EB5965EEB78A1EF4FBF7226C9C869EDA74A75C303CA427478",
+    "raw_results": "capacity-cleanup-windows.csv",
+    "workloads_per_revision": 330,
+    "timed_samples_per_revision": 6048,
+    "samples": 3,
+    "benchmark": "unchanged max_weight_with_capacity target, saved baseline executable and rebuilt executable",
+    "runs": [
+      {
+        "CAPACITY_BENCH_FAMILY": "components",
+        "CAPACITY_BENCH_MAX_N": 1000000
+      },
+      {
+        "CAPACITY_BENCH_FAMILY": "dense",
+        "CAPACITY_BENCH_MAX_N": 1000
+      }
+    ],
+    "order": "components before/after, then dense before/after; no concurrent builds or tests",
+    "validation": "all exact candidates feasible and equal in objective; every before/after objective matched",
+    "timing_note": "Substantial run-to-run variation also affected the unchanged generic engine; no speedup is claimed."
   }
 }
