@@ -1,6 +1,7 @@
 {
   "date": "2026-09-26",
   "base_commit": "f1ee0e680f4e3af18a2b5cae5f72ee96cbdad6f7",
+  "source_commit": "78864e24bb52f47111b3e0484d9e2b48a005c529",
   "rust": "1.98.1 (48a229cea 2026-09-01)",
   "llvm": "22.1.8",
   "target": "x86_64-pc-windows-msvc",

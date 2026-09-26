@@ -16,8 +16,8 @@ pub struct Measurement {
 
 pub type Candidate = fn(&[i64], &[i64], &[i64]) -> Result<Measurement, IntervalError>;
 pub const CANDIDATES: [(&str, Candidate); 3] = [
-    ("A_binary", binary),
-    ("B_two_orders", two_orders),
+    ("A_binary", ordered::<false>),
+    ("B_two_orders", ordered::<true>),
     ("C_events", events),
 ];
 
@@ -67,14 +67,6 @@ fn add(a: i128, b: i128) -> Result<i128, IntervalError> {
 
 fn bytes<T>(v: &Vec<T>) -> usize {
     v.capacity() * size_of::<T>()
-}
-
-pub fn binary(s: &[i64], e: &[i64], w: &[i64]) -> Result<Measurement, IntervalError> {
-    ordered::<false>(s, e, w)
-}
-
-pub fn two_orders(s: &[i64], e: &[i64], w: &[i64]) -> Result<Measurement, IntervalError> {
-    ordered::<true>(s, e, w)
 }
 
 fn ordered<const SWEEP: bool>(
