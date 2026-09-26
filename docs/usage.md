@@ -1,5 +1,78 @@
 # Usage
 
+## Cover one continuous target
+
+`minimum_cover` selects the fewest intervals whose union continuously covers a
+target. It is an exact global optimization. The furthest-reaching greedy choice
+selects `[0,6)` followed by `[6,10)` here:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 0, 4, 6, 7], "end": [4, 6, 7, 10, 10]})
+df.filter(pi.minimum_cover("start", "end", target_start=0, target_end=10))
+```
+
+Choosing `[0,4)` first can require three intervals. The greedy rule compares
+every eligible interval and takes the one reaching furthest right.
+
+`minimum_cost_cover` instead minimizes total cost, then uses fewer intervals
+among covers with the same cost:
+
+```python
+df = pl.DataFrame({"start": [0, 0, 5], "end": [10, 5, 10], "cost": [100, 10, 10]})
+df.filter(
+    pi.minimum_cost_cover(
+        "start",
+        "end",
+        cost="cost",
+        target_start=0,
+        target_end=10,
+    )
+)
+# Selects [0,5) and [5,10): cost 20 instead of the single interval costing 100.
+```
+
+Both targets and intervals are half-open. Touching intervals chain perfectly;
+empty intervals never help. Intervals extending outside the target are allowed.
+An empty target selects nothing. Reversed targets/intervals and null endpoints
+are errors, even for empty targets. An infeasible non-empty target raises
+`target interval cannot be covered by the supplied intervals`.
+
+Costs accept nonnegative Int8/16/32/64 and UInt8/16/32/64, without nulls, floats,
+Decimal or implicit casts. Totals use exact checked `i128` arithmetic. Core
+inputs can exercise the full accumulator range; overflow is reported if the
+minimum feasible cost cannot be represented. Ties are deterministic for
+identical input, but a particular tied mask is not a stable API promise.
+
+Targets are scalar configuration. Python integers must fit the endpoint dtype.
+Python dates require Date columns; Python datetimes require Datetime with
+microsecond units and identical timezone metadata. For explicit units and full
+nanosecond precision, pass a **one-element typed Series** for each scalar:
+
+```python
+target_start = pl.Series([0], dtype=pl.Int64).cast(pl.Datetime("ns", "UTC"))
+target_end = pl.Series([100], dtype=pl.Int64).cast(pl.Datetime("ns", "UTC"))
+```
+
+Typed targets must match exactly, including integer width, Datetime unit and
+timezone. Date/Datetime, different units, incompatible timezones and lossy
+numeric conversions are rejected. Target values are not broadcast into columns.
+Python datetimes accept naive, UTC, or named timezone metadata; fixed-offset or
+custom timezone objects require an explicitly typed Series to avoid implicit
+timezone normalization by the scalar constructor.
+
+Use the expressions in eager `select`, lazy `with_columns`, or direct `filter`.
+`.over("group")` solves each group independently against the same target scalars;
+one infeasible group raises an error. All chunks form one instance. Filtering
+before selection changes the available intervals.
+
+Both algorithms take `O(n log n)` time and `O(n)` additional space. The unweighted
+solver sorts packed candidates and sweeps linearly; the weighted solver uses
+frontier dynamic programming with a reversed Fenwick suffix-min tree and
+backpointers. See the [candidate benchmark comparison](covering-benchmarks.md).
+
 `overlap_count`, `assign_lanes`, and `max_weight_non_overlapping` accept column names or Polars expressions.
 Use them in `select` or `with_columns` on eager or lazy frames. The examples
 below use lazy queries.

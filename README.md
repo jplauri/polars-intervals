@@ -1,7 +1,8 @@
 # polars-intervals
 
-Count overlaps, assign optimal interval lanes, and select maximum-weight schedules
-in Polars, without building a conflict graph or a table of overlapping pairs.
+Count overlaps, assign optimal interval lanes, select maximum-weight schedules,
+and cover targets exactly in Polars, without building a conflict graph or a table
+of overlapping pairs.
 
 [Usage](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md) ·
 [Benchmarks](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md) ·
@@ -16,6 +17,38 @@ pip install polars-intervals
 Or with uv: `uv add polars-intervals`.
 
 Requires Python 3.12+ and Polars `>=1.44.1,<1.45`.
+
+## Cover a target interval
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 0, 5], "end": [10, 5, 10], "cost": [100, 10, 10]})
+fewest = df.filter(pi.minimum_cover("start", "end", target_start=0, target_end=10))
+cheapest = df.filter(
+    pi.minimum_cost_cover(
+        "start",
+        "end",
+        cost="cost",
+        target_start=0,
+        target_end=10,
+    )
+)
+# fewest: one interval costing 100; cheapest: two intervals costing 20.
+```
+
+Both methods exactly cover one continuous half-open target. Touching intervals
+chain; empty intervals never help. Empty targets select nothing, and infeasible
+targets raise an error. Costs must be nonnegative integers; equal-cost covers
+use the fewest intervals. Both return Boolean expressions in original row order,
+support `.over("group")`, and take `O(n log n)` time / `O(n)` space.
+
+Targets are scalar configuration with exact dtype compatibility. Python dates
+require Date; Python datetimes require microsecond Datetime with matching timezone.
+Use one-element typed Series for other Datetime units and nanosecond precision.
+See [target rules and examples](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#cover-one-continuous-target)
+and [release benchmark comparisons](https://github.com/jplauri/polars-intervals/blob/master/docs/covering-benchmarks.md).
 
 ## Count overlaps
 

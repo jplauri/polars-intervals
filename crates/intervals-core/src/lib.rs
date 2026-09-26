@@ -4,6 +4,7 @@
 //! depending on Polars or any particular endpoint type.
 //! [`assign_lanes`] assigns intervals to the minimum number of lanes.
 //! [`max_weight_non_overlapping`] selects an exact maximum-weight schedule.
+//! [`minimum_cover`] and [`minimum_cost_cover`] cover one continuous target exactly.
 
 #![forbid(unsafe_code)]
 
@@ -15,6 +16,8 @@ mod weighted;
 pub use weighted::max_weight_non_overlapping;
 mod capacity;
 pub use capacity::max_weight_with_capacity;
+mod cover;
+pub use cover::{minimum_cost_cover, minimum_cover};
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,6 +35,19 @@ pub enum IntervalError {
     },
     /// The optimal objective exceeds the `i128` accumulator range.
     WeightOverflow,
+    /// The target starts after it ends.
+    InvalidTarget,
+    /// No subset continuously covers the target.
+    InfeasibleCover,
+    /// There must be one cost per input interval.
+    CostLengthMismatch {
+        intervals_len: usize,
+        costs_len: usize,
+    },
+    /// Negative costs are unsupported, including on irrelevant intervals.
+    NegativeCost { index: usize },
+    /// Every feasible cover costs more than `i128::MAX`.
+    CostOverflow,
 }
 
 impl fmt::Display for IntervalError {
@@ -56,6 +72,25 @@ impl fmt::Display for IntervalError {
                 "interval and weight lengths differ: {intervals_len} intervals, {weights_len} weights"
             ),
             Self::WeightOverflow => write!(f, "maximum weight exceeds the i128 accumulator range"),
+            Self::InvalidTarget => write!(f, "target start is greater than target end"),
+            Self::InfeasibleCover => write!(
+                f,
+                "target interval cannot be covered by the supplied intervals"
+            ),
+            Self::CostLengthMismatch {
+                intervals_len,
+                costs_len,
+            } => write!(
+                f,
+                "interval and cost lengths differ: {intervals_len} intervals, {costs_len} costs"
+            ),
+            Self::NegativeCost { index } => write!(
+                f,
+                "cost at index {index} is negative; costs must be nonnegative"
+            ),
+            Self::CostOverflow => {
+                write!(f, "minimum cover cost exceeds the i128 accumulator range")
+            }
         }
     }
 }

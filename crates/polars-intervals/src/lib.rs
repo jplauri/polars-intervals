@@ -3,9 +3,13 @@
 //! [`overlap_count`], [`assign_lanes`], [`max_weight_non_overlapping`] and
 //! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
 //! to the core and Python expressions.
+//! [`minimum_cover`] and [`minimum_cost_cover`] select exact continuous target covers.
 
 use polars::prelude::*;
 use std::borrow::Cow;
+
+mod cover;
+pub use cover::{minimum_cost_cover, minimum_cover};
 
 #[pyo3::pymodule]
 mod _internal {}
@@ -14,31 +18,31 @@ mod _internal {}
 // The constant output_type form can abort at the FFI boundary for a dtype whose
 // optional Polars feature is disabled, before our validation runs.
 fn count_output(inputs: &[Field]) -> PolarsResult<Field> {
-    let [start, _] = input_pair(inputs, Algorithm::OverlapCount)?;
+    let [start, _] = input_pair(inputs, "overlap_count")?;
     Ok(Field::new(start.name().clone(), DataType::UInt64))
 }
 
 fn lanes_output(inputs: &[Field]) -> PolarsResult<Field> {
-    let [start, _] = input_pair(inputs, Algorithm::AssignLanes)?;
+    let [start, _] = input_pair(inputs, "assign_lanes")?;
     Ok(Field::new(start.name().clone(), DataType::UInt32))
 }
 
-fn input_pair<'a, T>(inputs: &'a [T], algorithm: Algorithm<'_>) -> PolarsResult<&'a [T; 2]> {
+fn input_pair<'a, T>(inputs: &'a [T], name: &str) -> PolarsResult<&'a [T; 2]> {
     inputs.try_into().map_err(|_| {
         polars_err!(InvalidOperation: "{} requires exactly two inputs, got {}",
-            algorithm.name(), inputs.len())
+            name, inputs.len())
     })
 }
 
 #[pyo3_polars::derive::polars_expr(output_type_func = count_output)]
 fn overlap_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
-    let [starts, ends] = input_pair(inputs, Algorithm::OverlapCount)?;
+    let [starts, ends] = input_pair(inputs, "overlap_count")?;
     overlap_count(starts, ends)
 }
 
 #[pyo3_polars::derive::polars_expr(output_type_func = lanes_output)]
 fn assign_lanes_plugin(inputs: &[Series]) -> PolarsResult<Series> {
-    let [starts, ends] = input_pair(inputs, Algorithm::AssignLanes)?;
+    let [starts, ends] = input_pair(inputs, "assign_lanes")?;
     assign_lanes(starts, ends)
 }
 
@@ -63,11 +67,15 @@ fn weighted_field(inputs: &[Field], name: &str) -> PolarsResult<Field> {
 }
 
 fn validate_weight_dtype(dtype: &DataType, name: &str) -> PolarsResult<()> {
+    validate_integer_dtype(dtype, name, "weight")
+}
+
+fn validate_integer_dtype(dtype: &DataType, name: &str, role: &str) -> PolarsResult<()> {
     polars_ensure!(matches!(dtype,
         DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
         DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64),
         InvalidOperation:
-        "{} requires an 8-, 16-, 32-, or 64-bit integer weight dtype, got {}", name, dtype);
+        "{} requires an 8-, 16-, 32-, or 64-bit integer {} dtype, got {}", name, role, dtype);
     Ok(())
 }
 
@@ -255,18 +263,27 @@ fn evaluate_weighted(
         name, starts.len(), weights.len());
     polars_ensure!(weights.null_count() == 0, ComputeError:
         "{} does not support null weights", name);
+    let weights = integer_values(weights)?;
+    let algorithm = match capacity {
+        Some(capacity) => Algorithm::Capacity(&weights, capacity),
+        None => Algorithm::MaxWeight(&weights),
+    };
+    evaluate(starts, ends, algorithm)
+}
+
+fn integer_values(values: &Series) -> PolarsResult<Vec<i128>> {
     // Normalize only the accumulator representation, avoiding 8 x 8 endpoint /
-    // weight monomorphizations. No Polars cast or loss of integer precision.
+    // weight/cost monomorphizations. No Polars cast or loss of integer precision.
     macro_rules! widen {
         ($accessor:ident) => {
-            weights
+            values
                 .$accessor()?
                 .into_no_null_iter()
                 .map(i128::from)
                 .collect::<Vec<_>>()
         };
     }
-    let weights = match weights.dtype() {
+    Ok(match values.dtype() {
         DataType::Int8 => widen!(i8),
         DataType::Int16 => widen!(i16),
         DataType::Int32 => widen!(i32),
@@ -275,13 +292,8 @@ fn evaluate_weighted(
         DataType::UInt16 => widen!(u16),
         DataType::UInt32 => widen!(u32),
         DataType::UInt64 => widen!(u64),
-        _ => unreachable!("weight dtype was validated above"),
-    };
-    let algorithm = match capacity {
-        Some(capacity) => Algorithm::Capacity(&weights, capacity),
-        None => Algorithm::MaxWeight(&weights),
-    };
-    evaluate(starts, ends, algorithm)
+        _ => unreachable!("integer dtype was validated by the caller"),
+    })
 }
 
 #[derive(Clone, Copy)]
@@ -290,6 +302,8 @@ enum Algorithm<'a> {
     AssignLanes,
     MaxWeight(&'a [i128]),
     Capacity(&'a [i128], usize),
+    Cover(i128, i128),
+    CostCover(&'a [i128], i128, i128),
 }
 
 impl Algorithm<'_> {
@@ -299,6 +313,8 @@ impl Algorithm<'_> {
             Self::AssignLanes => "assign_lanes",
             Self::MaxWeight(_) => "max_weight_non_overlapping",
             Self::Capacity(_, _) => "max_weight_with_capacity",
+            Self::Cover(_, _) => "minimum_cover",
+            Self::CostCover(_, _, _) => "minimum_cost_cover",
         }
     }
 }
@@ -348,7 +364,7 @@ fn evaluate_typed<T>(
 ) -> PolarsResult<Series>
 where
     T: PolarsIntegerType,
-    T::Native: Ord,
+    T::Native: Ord + TryFrom<i128>,
 {
     polars_ensure!(
         starts.null_count() == 0 && ends.null_count() == 0,
@@ -381,6 +397,21 @@ where
         Algorithm::Capacity(weights, capacity) => {
             let mask = intervals_core::max_weight_with_capacity(&starts, &ends, weights, capacity)
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(Series::new(algorithm.name().into(), mask))
+        }
+        Algorithm::Cover(left, right) | Algorithm::CostCover(_, left, right) => {
+            let convert = |value| {
+                T::Native::try_from(value).map_err(|_|
+                polars_err!(InvalidOperation: "target value is outside the endpoint dtype range"))
+            };
+            let (left, right) = (convert(left)?, convert(right)?);
+            let result = match algorithm {
+                Algorithm::CostCover(costs, _, _) => {
+                    intervals_core::minimum_cost_cover(&starts, &ends, costs, left, right)
+                }
+                _ => intervals_core::minimum_cover(&starts, &ends, left, right),
+            };
+            let mask = result.map_err(|error| polars_err!(ComputeError: "{error}"))?;
             Ok(Series::new(algorithm.name().into(), mask))
         }
     }

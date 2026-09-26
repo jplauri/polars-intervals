@@ -98,10 +98,17 @@ The core lane comparison needs no Polars build:
 ```sh
 cargo bench -p intervals-core --bench assign_lanes --locked
 cargo bench -p intervals-core --bench max_weight_non_overlapping --locked
+cargo bench -p intervals-core --bench covering --locked
 ```
 
 It validates all candidates before timing. See the
 [methodology and results](https://github.com/jplauri/polars-intervals/blob/master/docs/assign-lanes-benchmarks.md).
+
+Exact covering is exposed as `minimum_cover` and `minimum_cost_cover` in each
+layer. Rust Polars takes `&Scalar` target endpoints with exactly matching dtypes;
+the independent core takes two scalar values of its generic endpoint type.
+The [covering comparison](https://github.com/jplauri/polars-intervals/blob/master/docs/covering-benchmarks.md)
+records candidate selection, phase timings, and memory measurements.
 
 For publishing instructions, see the
 [release guide](https://github.com/jplauri/polars-intervals/blob/master/docs/releasing.md).

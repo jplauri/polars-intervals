@@ -1,0 +1,1537 @@
+family,order,dtype,n,method,sample,total_ns,selected
+chain,sorted,Int32,1000,minimum_cover,0,177800,1000
+chain,sorted,Int32,1000,minimum_cover,1,276200,1000
+chain,sorted,Int32,1000,minimum_cover,2,266200,1000
+chain,sorted,Int32,1000,minimum_cost_cover,0,229900,1000
+chain,sorted,Int32,1000,minimum_cost_cover,1,251200,1000
+chain,sorted,Int32,1000,minimum_cost_cover,2,265500,1000
+chain,sorted,Int64,1000,minimum_cover,0,207600,1000
+chain,sorted,Int64,1000,minimum_cover,1,170100,1000
+chain,sorted,Int64,1000,minimum_cover,2,133000,1000
+chain,sorted,Int64,1000,minimum_cost_cover,0,292500,1000
+chain,sorted,Int64,1000,minimum_cost_cover,1,254400,1000
+chain,sorted,Int64,1000,minimum_cost_cover,2,226200,1000
+chain,sorted,UInt64,1000,minimum_cover,0,185600,1000
+chain,sorted,UInt64,1000,minimum_cover,1,142700,1000
+chain,sorted,UInt64,1000,minimum_cover,2,119100,1000
+chain,sorted,UInt64,1000,minimum_cost_cover,0,209000,1000
+chain,sorted,UInt64,1000,minimum_cost_cover,1,235200,1000
+chain,sorted,UInt64,1000,minimum_cost_cover,2,248100,1000
+chain,sorted,Date,1000,minimum_cover,0,153300,1000
+chain,sorted,Date,1000,minimum_cover,1,155000,1000
+chain,sorted,Date,1000,minimum_cover,2,152700,1000
+chain,sorted,Date,1000,minimum_cost_cover,0,311400,1000
+chain,sorted,Date,1000,minimum_cost_cover,1,235600,1000
+chain,sorted,Date,1000,minimum_cost_cover,2,244400,1000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,0,170600,1000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,1,172300,1000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,2,152100,1000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,0,270100,1000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,1,267100,1000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,2,262300,1000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,0,163000,1000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,1,158700,1000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,2,134900,1000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,0,252300,1000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,1,225100,1000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,2,248100,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,0,150300,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,1,169300,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,2,141100,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,0,238400,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,1,227800,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,2,244200,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,0,173000,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,1,163800,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,2,140800,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,0,245200,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,1,251200,1000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,2,232000,1000
+chain,shuffled,Int32,1000,minimum_cover,0,162800,1000
+chain,shuffled,Int32,1000,minimum_cover,1,136500,1000
+chain,shuffled,Int32,1000,minimum_cover,2,126800,1000
+chain,shuffled,Int32,1000,minimum_cost_cover,0,243700,1000
+chain,shuffled,Int32,1000,minimum_cost_cover,1,227900,1000
+chain,shuffled,Int32,1000,minimum_cost_cover,2,239300,1000
+chain,shuffled,Int64,1000,minimum_cover,0,168400,1000
+chain,shuffled,Int64,1000,minimum_cover,1,169900,1000
+chain,shuffled,Int64,1000,minimum_cover,2,167200,1000
+chain,shuffled,Int64,1000,minimum_cost_cover,0,255600,1000
+chain,shuffled,Int64,1000,minimum_cost_cover,1,193800,1000
+chain,shuffled,Int64,1000,minimum_cost_cover,2,218400,1000
+chain,shuffled,UInt64,1000,minimum_cover,0,179600,1000
+chain,shuffled,UInt64,1000,minimum_cover,1,159700,1000
+chain,shuffled,UInt64,1000,minimum_cover,2,140000,1000
+chain,shuffled,UInt64,1000,minimum_cost_cover,0,230300,1000
+chain,shuffled,UInt64,1000,minimum_cost_cover,1,259000,1000
+chain,shuffled,UInt64,1000,minimum_cost_cover,2,218000,1000
+chain,shuffled,Date,1000,minimum_cover,0,184200,1000
+chain,shuffled,Date,1000,minimum_cover,1,149000,1000
+chain,shuffled,Date,1000,minimum_cover,2,128200,1000
+chain,shuffled,Date,1000,minimum_cost_cover,0,250600,1000
+chain,shuffled,Date,1000,minimum_cost_cover,1,254600,1000
+chain,shuffled,Date,1000,minimum_cost_cover,2,236000,1000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,0,187200,1000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,1,153600,1000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,2,136000,1000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,0,251000,1000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,1,218100,1000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,2,200400,1000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,0,160200,1000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,1,149500,1000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,2,163000,1000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,0,217400,1000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,1,253200,1000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,2,243700,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,0,178100,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,1,155800,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,2,140300,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,0,247600,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,1,268700,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,2,262400,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,0,190400,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,1,197900,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,2,177900,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,0,242500,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,1,216000,1000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,2,210300,1000
+dense,sorted,Int32,1000,minimum_cover,0,134500,2
+dense,sorted,Int32,1000,minimum_cover,1,122100,2
+dense,sorted,Int32,1000,minimum_cover,2,117300,2
+dense,sorted,Int32,1000,minimum_cost_cover,0,223900,3
+dense,sorted,Int32,1000,minimum_cost_cover,1,216100,3
+dense,sorted,Int32,1000,minimum_cost_cover,2,195500,3
+dense,sorted,Int64,1000,minimum_cover,0,132100,2
+dense,sorted,Int64,1000,minimum_cover,1,122400,2
+dense,sorted,Int64,1000,minimum_cover,2,117900,2
+dense,sorted,Int64,1000,minimum_cost_cover,0,233800,3
+dense,sorted,Int64,1000,minimum_cost_cover,1,183400,3
+dense,sorted,Int64,1000,minimum_cost_cover,2,207700,3
+dense,sorted,UInt64,1000,minimum_cover,0,141500,2
+dense,sorted,UInt64,1000,minimum_cover,1,144800,2
+dense,sorted,UInt64,1000,minimum_cover,2,149300,2
+dense,sorted,UInt64,1000,minimum_cost_cover,0,237000,3
+dense,sorted,UInt64,1000,minimum_cost_cover,1,258900,3
+dense,sorted,UInt64,1000,minimum_cost_cover,2,214800,3
+dense,sorted,Date,1000,minimum_cover,0,132600,2
+dense,sorted,Date,1000,minimum_cover,1,119600,2
+dense,sorted,Date,1000,minimum_cover,2,116800,2
+dense,sorted,Date,1000,minimum_cost_cover,0,225600,3
+dense,sorted,Date,1000,minimum_cost_cover,1,206200,3
+dense,sorted,Date,1000,minimum_cost_cover,2,191500,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,0,136700,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,1,125900,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,2,120500,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,0,207400,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,1,248200,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,2,234800,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,0,151900,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,1,141700,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,2,122800,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,0,233500,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,1,233600,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,2,237900,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,0,161500,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,1,137700,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,2,122700,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,0,235200,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,1,227100,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,2,263100,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,0,137000,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,1,125400,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,2,132200,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,0,271000,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,1,236200,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,2,243100,3
+dense,shuffled,Int32,1000,minimum_cover,0,168800,2
+dense,shuffled,Int32,1000,minimum_cover,1,145700,2
+dense,shuffled,Int32,1000,minimum_cover,2,130700,2
+dense,shuffled,Int32,1000,minimum_cost_cover,0,301500,3
+dense,shuffled,Int32,1000,minimum_cost_cover,1,284200,3
+dense,shuffled,Int32,1000,minimum_cost_cover,2,280100,3
+dense,shuffled,Int64,1000,minimum_cover,0,196800,2
+dense,shuffled,Int64,1000,minimum_cover,1,164700,2
+dense,shuffled,Int64,1000,minimum_cover,2,143200,2
+dense,shuffled,Int64,1000,minimum_cost_cover,0,241100,3
+dense,shuffled,Int64,1000,minimum_cost_cover,1,236900,3
+dense,shuffled,Int64,1000,minimum_cost_cover,2,206500,3
+dense,shuffled,UInt64,1000,minimum_cover,0,165900,2
+dense,shuffled,UInt64,1000,minimum_cover,1,173000,2
+dense,shuffled,UInt64,1000,minimum_cover,2,135200,2
+dense,shuffled,UInt64,1000,minimum_cost_cover,0,263300,3
+dense,shuffled,UInt64,1000,minimum_cost_cover,1,294700,3
+dense,shuffled,UInt64,1000,minimum_cost_cover,2,246300,3
+dense,shuffled,Date,1000,minimum_cover,0,165700,2
+dense,shuffled,Date,1000,minimum_cover,1,173000,2
+dense,shuffled,Date,1000,minimum_cover,2,153500,2
+dense,shuffled,Date,1000,minimum_cost_cover,0,262200,3
+dense,shuffled,Date,1000,minimum_cost_cover,1,276800,3
+dense,shuffled,Date,1000,minimum_cost_cover,2,254700,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,0,154500,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,1,145200,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,2,153800,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,0,294500,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,1,267000,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,2,274900,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,0,182700,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,1,160300,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,2,136800,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,0,285100,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,1,252900,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,2,257600,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,0,168700,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,1,155600,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,2,137600,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,0,262300,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,1,253700,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,2,277900,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,0,157900,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,1,139000,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,2,137200,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,0,240500,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,1,219200,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,2,229000,3
+duplicates,sorted,Int32,1000,minimum_cover,0,138800,1
+duplicates,sorted,Int32,1000,minimum_cover,1,119400,1
+duplicates,sorted,Int32,1000,minimum_cover,2,117400,1
+duplicates,sorted,Int32,1000,minimum_cost_cover,0,196700,1
+duplicates,sorted,Int32,1000,minimum_cost_cover,1,146600,1
+duplicates,sorted,Int32,1000,minimum_cost_cover,2,162200,1
+duplicates,sorted,Int64,1000,minimum_cover,0,146100,1
+duplicates,sorted,Int64,1000,minimum_cover,1,122500,1
+duplicates,sorted,Int64,1000,minimum_cover,2,117300,1
+duplicates,sorted,Int64,1000,minimum_cost_cover,0,192700,1
+duplicates,sorted,Int64,1000,minimum_cost_cover,1,166700,1
+duplicates,sorted,Int64,1000,minimum_cost_cover,2,186100,1
+duplicates,sorted,UInt64,1000,minimum_cover,0,136200,1
+duplicates,sorted,UInt64,1000,minimum_cover,1,118900,1
+duplicates,sorted,UInt64,1000,minimum_cover,2,118600,1
+duplicates,sorted,UInt64,1000,minimum_cost_cover,0,183900,1
+duplicates,sorted,UInt64,1000,minimum_cost_cover,1,162300,1
+duplicates,sorted,UInt64,1000,minimum_cost_cover,2,181400,1
+duplicates,sorted,Date,1000,minimum_cover,0,134200,1
+duplicates,sorted,Date,1000,minimum_cover,1,120400,1
+duplicates,sorted,Date,1000,minimum_cover,2,116000,1
+duplicates,sorted,Date,1000,minimum_cost_cover,0,180800,1
+duplicates,sorted,Date,1000,minimum_cost_cover,1,186900,1
+duplicates,sorted,Date,1000,minimum_cost_cover,2,175900,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,0,154100,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,1,142500,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,2,135600,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,0,200500,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,1,145900,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,2,163800,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,0,137700,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,1,123300,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,2,120100,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,0,178700,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,1,161000,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,2,146400,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,0,137900,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,1,137600,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,2,165800,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,0,189300,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,1,184100,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,2,153900,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,0,155100,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,1,135300,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,2,122700,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,0,182000,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,1,209000,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,2,174600,1
+duplicates,shuffled,Int32,1000,minimum_cover,0,135000,1
+duplicates,shuffled,Int32,1000,minimum_cover,1,120300,1
+duplicates,shuffled,Int32,1000,minimum_cover,2,117400,1
+duplicates,shuffled,Int32,1000,minimum_cost_cover,0,167700,1
+duplicates,shuffled,Int32,1000,minimum_cost_cover,1,198300,1
+duplicates,shuffled,Int32,1000,minimum_cost_cover,2,178600,1
+duplicates,shuffled,Int64,1000,minimum_cover,0,133500,1
+duplicates,shuffled,Int64,1000,minimum_cover,1,119700,1
+duplicates,shuffled,Int64,1000,minimum_cover,2,115800,1
+duplicates,shuffled,Int64,1000,minimum_cost_cover,0,176100,1
+duplicates,shuffled,Int64,1000,minimum_cost_cover,1,157900,1
+duplicates,shuffled,Int64,1000,minimum_cost_cover,2,145100,1
+duplicates,shuffled,UInt64,1000,minimum_cover,0,133100,1
+duplicates,shuffled,UInt64,1000,minimum_cover,1,118200,1
+duplicates,shuffled,UInt64,1000,minimum_cover,2,119700,1
+duplicates,shuffled,UInt64,1000,minimum_cost_cover,0,160800,1
+duplicates,shuffled,UInt64,1000,minimum_cost_cover,1,144900,1
+duplicates,shuffled,UInt64,1000,minimum_cost_cover,2,148200,1
+duplicates,shuffled,Date,1000,minimum_cover,0,134600,1
+duplicates,shuffled,Date,1000,minimum_cover,1,118900,1
+duplicates,shuffled,Date,1000,minimum_cover,2,116700,1
+duplicates,shuffled,Date,1000,minimum_cost_cover,0,166400,1
+duplicates,shuffled,Date,1000,minimum_cost_cover,1,180800,1
+duplicates,shuffled,Date,1000,minimum_cost_cover,2,173300,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,0,136900,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,1,124500,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,2,118600,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,0,182700,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,1,164800,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,2,149000,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,0,138100,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,1,120800,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,2,119300,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,0,192400,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,1,210000,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,2,192600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,0,138200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,1,124000,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,2,122100,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,0,179600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,1,162600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,2,173700,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,0,158900,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,1,136700,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,2,133600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,0,190500,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,1,166400,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,2,151600,1
+irrelevant,sorted,Int32,1000,minimum_cover,0,126700,1
+irrelevant,sorted,Int32,1000,minimum_cover,1,112700,1
+irrelevant,sorted,Int32,1000,minimum_cover,2,108500,1
+irrelevant,sorted,Int32,1000,minimum_cost_cover,0,161700,1
+irrelevant,sorted,Int32,1000,minimum_cost_cover,1,146600,1
+irrelevant,sorted,Int32,1000,minimum_cost_cover,2,128600,1
+irrelevant,sorted,Int64,1000,minimum_cover,0,133500,1
+irrelevant,sorted,Int64,1000,minimum_cover,1,112000,1
+irrelevant,sorted,Int64,1000,minimum_cover,2,110900,1
+irrelevant,sorted,Int64,1000,minimum_cost_cover,0,145500,1
+irrelevant,sorted,Int64,1000,minimum_cost_cover,1,164700,1
+irrelevant,sorted,Int64,1000,minimum_cost_cover,2,144300,1
+irrelevant,sorted,UInt64,1000,minimum_cover,0,127600,1
+irrelevant,sorted,UInt64,1000,minimum_cover,1,111600,1
+irrelevant,sorted,UInt64,1000,minimum_cover,2,110000,1
+irrelevant,sorted,UInt64,1000,minimum_cost_cover,0,160900,1
+irrelevant,sorted,UInt64,1000,minimum_cost_cover,1,203600,1
+irrelevant,sorted,UInt64,1000,minimum_cost_cover,2,142700,1
+irrelevant,sorted,Date,1000,minimum_cover,0,128700,1
+irrelevant,sorted,Date,1000,minimum_cover,1,110100,1
+irrelevant,sorted,Date,1000,minimum_cover,2,109500,1
+irrelevant,sorted,Date,1000,minimum_cost_cover,0,149700,1
+irrelevant,sorted,Date,1000,minimum_cost_cover,1,162300,1
+irrelevant,sorted,Date,1000,minimum_cost_cover,2,146400,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,0,128700,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,1,131000,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,2,147600,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,0,186100,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,1,164100,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,2,138600,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,0,132300,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,1,118700,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,2,115600,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,0,178700,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,1,179600,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,2,160800,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,0,133300,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,1,124800,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,2,117400,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,0,173700,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,1,157300,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,2,143300,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,0,138100,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,1,117700,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,2,117600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,0,157000,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,1,173300,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,2,178200,1
+irrelevant,shuffled,Int32,1000,minimum_cover,0,135800,1
+irrelevant,shuffled,Int32,1000,minimum_cover,1,117300,1
+irrelevant,shuffled,Int32,1000,minimum_cover,2,111700,1
+irrelevant,shuffled,Int32,1000,minimum_cost_cover,0,169800,1
+irrelevant,shuffled,Int32,1000,minimum_cost_cover,1,159300,1
+irrelevant,shuffled,Int32,1000,minimum_cost_cover,2,175600,1
+irrelevant,shuffled,Int64,1000,minimum_cover,0,127100,1
+irrelevant,shuffled,Int64,1000,minimum_cover,1,119600,1
+irrelevant,shuffled,Int64,1000,minimum_cover,2,109900,1
+irrelevant,shuffled,Int64,1000,minimum_cost_cover,0,170500,1
+irrelevant,shuffled,Int64,1000,minimum_cost_cover,1,156600,1
+irrelevant,shuffled,Int64,1000,minimum_cost_cover,2,138500,1
+irrelevant,shuffled,UInt64,1000,minimum_cover,0,131000,1
+irrelevant,shuffled,UInt64,1000,minimum_cover,1,112800,1
+irrelevant,shuffled,UInt64,1000,minimum_cover,2,109500,1
+irrelevant,shuffled,UInt64,1000,minimum_cost_cover,0,164900,1
+irrelevant,shuffled,UInt64,1000,minimum_cost_cover,1,143400,1
+irrelevant,shuffled,UInt64,1000,minimum_cost_cover,2,130200,1
+irrelevant,shuffled,Date,1000,minimum_cover,0,125500,1
+irrelevant,shuffled,Date,1000,minimum_cover,1,110900,1
+irrelevant,shuffled,Date,1000,minimum_cover,2,111000,1
+irrelevant,shuffled,Date,1000,minimum_cost_cover,0,159200,1
+irrelevant,shuffled,Date,1000,minimum_cost_cover,1,147900,1
+irrelevant,shuffled,Date,1000,minimum_cost_cover,2,171300,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,0,132400,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,1,115100,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cover,2,114200,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,0,194800,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,1,178700,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000,minimum_cost_cover,2,160100,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,0,133300,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,1,115200,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cover,2,113200,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,0,136700,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,1,152200,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,minimum_cost_cover,2,161000,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,0,134800,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,1,117900,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cover,2,115900,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,0,162600,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,1,155500,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000,minimum_cost_cover,2,138200,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,0,133800,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,1,120100,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cover,2,118100,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,0,176400,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,1,178900,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000,minimum_cost_cover,2,169500,1
+chain,sorted,Int32,10000,minimum_cover,0,241600,10000
+chain,sorted,Int32,10000,minimum_cover,1,233700,10000
+chain,sorted,Int32,10000,minimum_cover,2,200900,10000
+chain,sorted,Int32,10000,minimum_cost_cover,0,1222300,10000
+chain,sorted,Int32,10000,minimum_cost_cover,1,1206100,10000
+chain,sorted,Int32,10000,minimum_cost_cover,2,1178600,10000
+chain,sorted,Int64,10000,minimum_cover,0,309500,10000
+chain,sorted,Int64,10000,minimum_cover,1,213200,10000
+chain,sorted,Int64,10000,minimum_cover,2,244800,10000
+chain,sorted,Int64,10000,minimum_cost_cover,0,1246200,10000
+chain,sorted,Int64,10000,minimum_cost_cover,1,1240800,10000
+chain,sorted,Int64,10000,minimum_cost_cover,2,1137600,10000
+chain,sorted,UInt64,10000,minimum_cover,0,287100,10000
+chain,sorted,UInt64,10000,minimum_cover,1,193400,10000
+chain,sorted,UInt64,10000,minimum_cover,2,168300,10000
+chain,sorted,UInt64,10000,minimum_cost_cover,0,1191200,10000
+chain,sorted,UInt64,10000,minimum_cost_cover,1,1247600,10000
+chain,sorted,UInt64,10000,minimum_cost_cover,2,1269600,10000
+chain,sorted,Date,10000,minimum_cover,0,376200,10000
+chain,sorted,Date,10000,minimum_cover,1,254400,10000
+chain,sorted,Date,10000,minimum_cover,2,220600,10000
+chain,sorted,Date,10000,minimum_cost_cover,0,1219500,10000
+chain,sorted,Date,10000,minimum_cost_cover,1,1182000,10000
+chain,sorted,Date,10000,minimum_cost_cover,2,1344400,10000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,0,272700,10000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,1,236400,10000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,2,189200,10000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,0,1257500,10000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,1,1141400,10000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,2,1167000,10000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,0,295600,10000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,1,264400,10000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,2,203000,10000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,0,1245000,10000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,1,1235700,10000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,2,1218400,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,0,304200,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,1,192600,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,2,176400,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,0,1146600,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,1,1252800,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,2,1222100,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,0,298100,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,1,190300,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,2,175500,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,0,1215400,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,1,1342500,10000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,2,1384400,10000
+chain,shuffled,Int32,10000,minimum_cover,0,505700,10000
+chain,shuffled,Int32,10000,minimum_cover,1,433000,10000
+chain,shuffled,Int32,10000,minimum_cover,2,420200,10000
+chain,shuffled,Int32,10000,minimum_cost_cover,0,1435900,10000
+chain,shuffled,Int32,10000,minimum_cost_cover,1,1590300,10000
+chain,shuffled,Int32,10000,minimum_cost_cover,2,1353300,10000
+chain,shuffled,Int64,10000,minimum_cover,0,549800,10000
+chain,shuffled,Int64,10000,minimum_cover,1,464100,10000
+chain,shuffled,Int64,10000,minimum_cover,2,439200,10000
+chain,shuffled,Int64,10000,minimum_cost_cover,0,1524900,10000
+chain,shuffled,Int64,10000,minimum_cost_cover,1,1473500,10000
+chain,shuffled,Int64,10000,minimum_cost_cover,2,1602700,10000
+chain,shuffled,UInt64,10000,minimum_cover,0,574500,10000
+chain,shuffled,UInt64,10000,minimum_cover,1,481500,10000
+chain,shuffled,UInt64,10000,minimum_cover,2,423700,10000
+chain,shuffled,UInt64,10000,minimum_cost_cover,0,1587500,10000
+chain,shuffled,UInt64,10000,minimum_cost_cover,1,1313600,10000
+chain,shuffled,UInt64,10000,minimum_cost_cover,2,1385000,10000
+chain,shuffled,Date,10000,minimum_cover,0,503300,10000
+chain,shuffled,Date,10000,minimum_cover,1,435400,10000
+chain,shuffled,Date,10000,minimum_cover,2,376600,10000
+chain,shuffled,Date,10000,minimum_cost_cover,0,1367800,10000
+chain,shuffled,Date,10000,minimum_cost_cover,1,1432300,10000
+chain,shuffled,Date,10000,minimum_cost_cover,2,1394300,10000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,0,496400,10000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,1,483100,10000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,2,438500,10000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,0,1457200,10000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,1,1569600,10000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,2,1461500,10000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,0,549600,10000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,1,537500,10000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,2,452200,10000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,0,1488600,10000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,1,1486000,10000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,2,1633300,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,0,540800,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,1,477500,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,2,437500,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,0,1419800,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,1,1488800,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,2,1542600,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,0,545200,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,1,425700,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,2,418900,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,0,1459000,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,1,1463300,10000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,2,1587200,10000
+dense,sorted,Int32,10000,minimum_cover,0,239400,2
+dense,sorted,Int32,10000,minimum_cover,1,200200,2
+dense,sorted,Int32,10000,minimum_cover,2,225300,2
+dense,sorted,Int32,10000,minimum_cost_cover,0,1163900,3
+dense,sorted,Int32,10000,minimum_cost_cover,1,1226000,3
+dense,sorted,Int32,10000,minimum_cost_cover,2,1180600,3
+dense,sorted,Int64,10000,minimum_cover,0,223800,2
+dense,sorted,Int64,10000,minimum_cover,1,201200,2
+dense,sorted,Int64,10000,minimum_cover,2,192000,2
+dense,sorted,Int64,10000,minimum_cost_cover,0,1200400,3
+dense,sorted,Int64,10000,minimum_cost_cover,1,1155600,3
+dense,sorted,Int64,10000,minimum_cost_cover,2,1141100,3
+dense,sorted,UInt64,10000,minimum_cover,0,260300,2
+dense,sorted,UInt64,10000,minimum_cover,1,169700,2
+dense,sorted,UInt64,10000,minimum_cover,2,193500,2
+dense,sorted,UInt64,10000,minimum_cost_cover,0,1365100,3
+dense,sorted,UInt64,10000,minimum_cost_cover,1,1317300,3
+dense,sorted,UInt64,10000,minimum_cost_cover,2,1377600,3
+dense,sorted,Date,10000,minimum_cover,0,238400,2
+dense,sorted,Date,10000,minimum_cover,1,205400,2
+dense,sorted,Date,10000,minimum_cover,2,174600,2
+dense,sorted,Date,10000,minimum_cost_cover,0,1193400,3
+dense,sorted,Date,10000,minimum_cost_cover,1,1171700,3
+dense,sorted,Date,10000,minimum_cost_cover,2,1206500,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,0,219000,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,1,161100,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,2,155400,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,0,1231300,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,1,1261800,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,2,1293700,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,0,238800,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,1,203300,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,2,207000,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,0,1211600,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,1,1255300,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,2,1384200,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,0,248900,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,1,225300,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,2,174800,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,0,1246300,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,1,1244600,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,2,1247600,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,0,244000,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,1,162900,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,2,157600,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,0,1210300,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,1,1318100,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,2,1155300,3
+dense,shuffled,Int32,10000,minimum_cover,0,430700,2
+dense,shuffled,Int32,10000,minimum_cover,1,363400,2
+dense,shuffled,Int32,10000,minimum_cover,2,374500,2
+dense,shuffled,Int32,10000,minimum_cost_cover,0,1366800,3
+dense,shuffled,Int32,10000,minimum_cost_cover,1,1339500,3
+dense,shuffled,Int32,10000,minimum_cost_cover,2,1369900,3
+dense,shuffled,Int64,10000,minimum_cover,0,433400,2
+dense,shuffled,Int64,10000,minimum_cover,1,415000,2
+dense,shuffled,Int64,10000,minimum_cover,2,403500,2
+dense,shuffled,Int64,10000,minimum_cost_cover,0,1651100,3
+dense,shuffled,Int64,10000,minimum_cost_cover,1,1456800,3
+dense,shuffled,Int64,10000,minimum_cost_cover,2,1517600,3
+dense,shuffled,UInt64,10000,minimum_cover,0,488000,2
+dense,shuffled,UInt64,10000,minimum_cover,1,408300,2
+dense,shuffled,UInt64,10000,minimum_cover,2,416200,2
+dense,shuffled,UInt64,10000,minimum_cost_cover,0,1608600,3
+dense,shuffled,UInt64,10000,minimum_cost_cover,1,1524200,3
+dense,shuffled,UInt64,10000,minimum_cost_cover,2,1471500,3
+dense,shuffled,Date,10000,minimum_cover,0,422900,2
+dense,shuffled,Date,10000,minimum_cover,1,348100,2
+dense,shuffled,Date,10000,minimum_cover,2,334500,2
+dense,shuffled,Date,10000,minimum_cost_cover,0,1423400,3
+dense,shuffled,Date,10000,minimum_cost_cover,1,1629200,3
+dense,shuffled,Date,10000,minimum_cost_cover,2,1426200,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,0,444000,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,1,391900,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,2,429100,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,0,1518700,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,1,1589600,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,2,1519400,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,0,482800,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,1,395300,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,2,423000,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,0,1584800,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,1,1547700,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,2,1588700,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,0,468000,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,1,380900,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,2,405500,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,0,1590100,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,1,1506500,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,2,1732200,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,0,529600,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,1,457600,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,2,418300,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,0,1610400,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,1,1577000,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,2,1476600,3
+duplicates,sorted,Int32,10000,minimum_cover,0,274600,1
+duplicates,sorted,Int32,10000,minimum_cover,1,253500,1
+duplicates,sorted,Int32,10000,minimum_cover,2,208900,1
+duplicates,sorted,Int32,10000,minimum_cost_cover,0,439600,1
+duplicates,sorted,Int32,10000,minimum_cost_cover,1,366300,1
+duplicates,sorted,Int32,10000,minimum_cost_cover,2,358000,1
+duplicates,sorted,Int64,10000,minimum_cover,0,227100,1
+duplicates,sorted,Int64,10000,minimum_cover,1,190200,1
+duplicates,sorted,Int64,10000,minimum_cover,2,221800,1
+duplicates,sorted,Int64,10000,minimum_cost_cover,0,292100,1
+duplicates,sorted,Int64,10000,minimum_cost_cover,1,420400,1
+duplicates,sorted,Int64,10000,minimum_cost_cover,2,504700,1
+duplicates,sorted,UInt64,10000,minimum_cover,0,177000,1
+duplicates,sorted,UInt64,10000,minimum_cover,1,219400,1
+duplicates,sorted,UInt64,10000,minimum_cover,2,178100,1
+duplicates,sorted,UInt64,10000,minimum_cost_cover,0,395400,1
+duplicates,sorted,UInt64,10000,minimum_cost_cover,1,394400,1
+duplicates,sorted,UInt64,10000,minimum_cost_cover,2,298200,1
+duplicates,sorted,Date,10000,minimum_cover,0,214800,1
+duplicates,sorted,Date,10000,minimum_cover,1,195600,1
+duplicates,sorted,Date,10000,minimum_cover,2,201200,1
+duplicates,sorted,Date,10000,minimum_cost_cover,0,327700,1
+duplicates,sorted,Date,10000,minimum_cost_cover,1,340500,1
+duplicates,sorted,Date,10000,minimum_cost_cover,2,340500,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,0,208800,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,1,165700,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,2,159700,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,0,584800,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,1,471800,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,2,301100,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,0,236100,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,1,235300,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,2,238000,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,0,315500,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,1,272100,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,2,588400,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,0,255200,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,1,224600,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,2,226700,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,0,421400,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,1,550100,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,2,485200,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,0,204000,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,1,214300,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,2,185800,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,0,439100,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,1,382700,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,2,396600,1
+duplicates,shuffled,Int32,10000,minimum_cover,0,177800,1
+duplicates,shuffled,Int32,10000,minimum_cover,1,164800,1
+duplicates,shuffled,Int32,10000,minimum_cover,2,164700,1
+duplicates,shuffled,Int32,10000,minimum_cost_cover,0,338400,1
+duplicates,shuffled,Int32,10000,minimum_cost_cover,1,361200,1
+duplicates,shuffled,Int32,10000,minimum_cost_cover,2,440300,1
+duplicates,shuffled,Int64,10000,minimum_cover,0,179000,1
+duplicates,shuffled,Int64,10000,minimum_cover,1,239100,1
+duplicates,shuffled,Int64,10000,minimum_cover,2,190400,1
+duplicates,shuffled,Int64,10000,minimum_cost_cover,0,372500,1
+duplicates,shuffled,Int64,10000,minimum_cost_cover,1,392900,1
+duplicates,shuffled,Int64,10000,minimum_cost_cover,2,294600,1
+duplicates,shuffled,UInt64,10000,minimum_cover,0,325600,1
+duplicates,shuffled,UInt64,10000,minimum_cover,1,314700,1
+duplicates,shuffled,UInt64,10000,minimum_cover,2,191700,1
+duplicates,shuffled,UInt64,10000,minimum_cost_cover,0,417000,1
+duplicates,shuffled,UInt64,10000,minimum_cost_cover,1,393700,1
+duplicates,shuffled,UInt64,10000,minimum_cost_cover,2,403500,1
+duplicates,shuffled,Date,10000,minimum_cover,0,210800,1
+duplicates,shuffled,Date,10000,minimum_cover,1,209500,1
+duplicates,shuffled,Date,10000,minimum_cover,2,177200,1
+duplicates,shuffled,Date,10000,minimum_cost_cover,0,344800,1
+duplicates,shuffled,Date,10000,minimum_cost_cover,1,358600,1
+duplicates,shuffled,Date,10000,minimum_cost_cover,2,311500,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,0,210200,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,1,170000,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,2,171500,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,0,466100,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,1,432300,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,2,476500,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,0,196900,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,1,219200,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,2,215500,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,0,313900,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,1,286700,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,2,293600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,0,219500,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,1,170100,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,2,162600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,0,301200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,1,401100,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,2,288700,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,0,231200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,1,226800,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,2,230500,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,0,405800,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,1,301400,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,2,570700,1
+irrelevant,sorted,Int32,10000,minimum_cover,0,148800,1
+irrelevant,sorted,Int32,10000,minimum_cover,1,130900,1
+irrelevant,sorted,Int32,10000,minimum_cover,2,151200,1
+irrelevant,sorted,Int32,10000,minimum_cost_cover,0,203500,1
+irrelevant,sorted,Int32,10000,minimum_cost_cover,1,297900,1
+irrelevant,sorted,Int32,10000,minimum_cost_cover,2,225200,1
+irrelevant,sorted,Int64,10000,minimum_cover,0,178900,1
+irrelevant,sorted,Int64,10000,minimum_cover,1,157100,1
+irrelevant,sorted,Int64,10000,minimum_cover,2,129200,1
+irrelevant,sorted,Int64,10000,minimum_cost_cover,0,291300,1
+irrelevant,sorted,Int64,10000,minimum_cost_cover,1,220400,1
+irrelevant,sorted,Int64,10000,minimum_cost_cover,2,190200,1
+irrelevant,sorted,UInt64,10000,minimum_cover,0,174700,1
+irrelevant,sorted,UInt64,10000,minimum_cover,1,141600,1
+irrelevant,sorted,UInt64,10000,minimum_cover,2,152000,1
+irrelevant,sorted,UInt64,10000,minimum_cost_cover,0,185100,1
+irrelevant,sorted,UInt64,10000,minimum_cost_cover,1,152100,1
+irrelevant,sorted,UInt64,10000,minimum_cost_cover,2,183600,1
+irrelevant,sorted,Date,10000,minimum_cover,0,151700,1
+irrelevant,sorted,Date,10000,minimum_cover,1,154600,1
+irrelevant,sorted,Date,10000,minimum_cover,2,143700,1
+irrelevant,sorted,Date,10000,minimum_cost_cover,0,178100,1
+irrelevant,sorted,Date,10000,minimum_cost_cover,1,191600,1
+irrelevant,sorted,Date,10000,minimum_cost_cover,2,244600,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,0,163700,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,1,200700,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,2,181800,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,0,247900,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,1,229200,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,2,208200,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,0,167600,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,1,139600,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,2,132200,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,0,208900,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,1,184000,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,2,201700,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,0,193900,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,1,172400,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,2,181600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,0,217500,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,1,169200,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,2,191300,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,0,211200,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,1,172400,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,2,164600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,0,217900,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,1,183500,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,2,203100,1
+irrelevant,shuffled,Int32,10000,minimum_cover,0,156000,1
+irrelevant,shuffled,Int32,10000,minimum_cover,1,146000,1
+irrelevant,shuffled,Int32,10000,minimum_cover,2,146300,1
+irrelevant,shuffled,Int32,10000,minimum_cost_cover,0,256100,1
+irrelevant,shuffled,Int32,10000,minimum_cost_cover,1,212900,1
+irrelevant,shuffled,Int32,10000,minimum_cost_cover,2,208100,1
+irrelevant,shuffled,Int64,10000,minimum_cover,0,147300,1
+irrelevant,shuffled,Int64,10000,minimum_cover,1,139600,1
+irrelevant,shuffled,Int64,10000,minimum_cover,2,132700,1
+irrelevant,shuffled,Int64,10000,minimum_cost_cover,0,202700,1
+irrelevant,shuffled,Int64,10000,minimum_cost_cover,1,290100,1
+irrelevant,shuffled,Int64,10000,minimum_cost_cover,2,216700,1
+irrelevant,shuffled,UInt64,10000,minimum_cover,0,164500,1
+irrelevant,shuffled,UInt64,10000,minimum_cover,1,167400,1
+irrelevant,shuffled,UInt64,10000,minimum_cover,2,151400,1
+irrelevant,shuffled,UInt64,10000,minimum_cost_cover,0,225400,1
+irrelevant,shuffled,UInt64,10000,minimum_cost_cover,1,255600,1
+irrelevant,shuffled,UInt64,10000,minimum_cost_cover,2,272900,1
+irrelevant,shuffled,Date,10000,minimum_cover,0,158000,1
+irrelevant,shuffled,Date,10000,minimum_cover,1,142600,1
+irrelevant,shuffled,Date,10000,minimum_cover,2,169700,1
+irrelevant,shuffled,Date,10000,minimum_cost_cover,0,178200,1
+irrelevant,shuffled,Date,10000,minimum_cost_cover,1,202300,1
+irrelevant,shuffled,Date,10000,minimum_cost_cover,2,290600,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,0,173200,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,1,154400,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cover,2,141000,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,0,225700,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,1,189000,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",10000,minimum_cost_cover,2,181000,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,0,170300,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,1,182700,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cover,2,160100,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,0,214800,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,1,195000,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,minimum_cost_cover,2,226200,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,0,175600,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,1,241500,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cover,2,230300,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,0,206900,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,1,237400,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",10000,minimum_cost_cover,2,230000,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,0,163600,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,1,146900,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cover,2,166700,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,0,217500,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,1,207700,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",10000,minimum_cost_cover,2,273700,1
+chain,sorted,Int32,100000,minimum_cover,0,1172200,100000
+chain,sorted,Int32,100000,minimum_cover,1,1125300,100000
+chain,sorted,Int32,100000,minimum_cover,2,1068400,100000
+chain,sorted,Int32,100000,minimum_cost_cover,0,10749100,100000
+chain,sorted,Int32,100000,minimum_cost_cover,1,10844100,100000
+chain,sorted,Int32,100000,minimum_cost_cover,2,10641500,100000
+chain,sorted,Int64,100000,minimum_cover,0,1603600,100000
+chain,sorted,Int64,100000,minimum_cover,1,1541600,100000
+chain,sorted,Int64,100000,minimum_cover,2,1427900,100000
+chain,sorted,Int64,100000,minimum_cost_cover,0,11021900,100000
+chain,sorted,Int64,100000,minimum_cost_cover,1,10994600,100000
+chain,sorted,Int64,100000,minimum_cost_cover,2,11107300,100000
+chain,sorted,UInt64,100000,minimum_cover,0,1615800,100000
+chain,sorted,UInt64,100000,minimum_cover,1,1660600,100000
+chain,sorted,UInt64,100000,minimum_cover,2,1759600,100000
+chain,sorted,UInt64,100000,minimum_cost_cover,0,11167500,100000
+chain,sorted,UInt64,100000,minimum_cost_cover,1,11028900,100000
+chain,sorted,UInt64,100000,minimum_cost_cover,2,10855200,100000
+chain,sorted,Date,100000,minimum_cover,0,1710100,100000
+chain,sorted,Date,100000,minimum_cover,1,1278200,100000
+chain,sorted,Date,100000,minimum_cover,2,1560000,100000
+chain,sorted,Date,100000,minimum_cost_cover,0,11454800,100000
+chain,sorted,Date,100000,minimum_cost_cover,1,11206600,100000
+chain,sorted,Date,100000,minimum_cost_cover,2,11233200,100000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,0,1970800,100000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,1,1822700,100000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,2,1678900,100000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,0,11503800,100000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,1,11252800,100000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,2,11259600,100000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,0,1669900,100000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,1,1633900,100000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,2,1634100,100000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,0,11412200,100000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,1,10778500,100000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,2,10931300,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,0,2048800,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,1,1536800,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,2,1717200,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,0,11121100,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,1,10812900,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,2,10654500,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,0,1586700,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,1,1546000,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,2,1595900,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,0,11600000,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,1,11312700,100000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,2,11162900,100000
+chain,shuffled,Int32,100000,minimum_cover,0,3749500,100000
+chain,shuffled,Int32,100000,minimum_cover,1,3550200,100000
+chain,shuffled,Int32,100000,minimum_cover,2,3525500,100000
+chain,shuffled,Int32,100000,minimum_cost_cover,0,13870800,100000
+chain,shuffled,Int32,100000,minimum_cost_cover,1,13679500,100000
+chain,shuffled,Int32,100000,minimum_cost_cover,2,13554600,100000
+chain,shuffled,Int64,100000,minimum_cover,0,4471100,100000
+chain,shuffled,Int64,100000,minimum_cover,1,4344700,100000
+chain,shuffled,Int64,100000,minimum_cover,2,4559400,100000
+chain,shuffled,Int64,100000,minimum_cost_cover,0,15433600,100000
+chain,shuffled,Int64,100000,minimum_cost_cover,1,14117800,100000
+chain,shuffled,Int64,100000,minimum_cost_cover,2,16031700,100000
+chain,shuffled,UInt64,100000,minimum_cover,0,4854400,100000
+chain,shuffled,UInt64,100000,minimum_cover,1,4545900,100000
+chain,shuffled,UInt64,100000,minimum_cover,2,4611200,100000
+chain,shuffled,UInt64,100000,minimum_cost_cover,0,14079500,100000
+chain,shuffled,UInt64,100000,minimum_cost_cover,1,13138300,100000
+chain,shuffled,UInt64,100000,minimum_cost_cover,2,14059600,100000
+chain,shuffled,Date,100000,minimum_cover,0,3683100,100000
+chain,shuffled,Date,100000,minimum_cover,1,3670200,100000
+chain,shuffled,Date,100000,minimum_cover,2,3598300,100000
+chain,shuffled,Date,100000,minimum_cost_cover,0,13856600,100000
+chain,shuffled,Date,100000,minimum_cost_cover,1,13522400,100000
+chain,shuffled,Date,100000,minimum_cost_cover,2,13408600,100000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,0,4511600,100000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,1,4566000,100000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,2,4472400,100000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,0,13706600,100000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,1,15237300,100000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,2,14696300,100000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,0,4613700,100000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,1,4448000,100000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,2,4471600,100000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,0,14606500,100000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,1,14904200,100000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,2,15185400,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,0,4668300,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,1,4496200,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,2,4450600,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,0,15363100,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,1,15582900,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,2,15323600,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,0,4693000,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,1,4493900,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,2,4363600,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,0,14851600,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,1,15314000,100000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,2,16839800,100000
+dense,sorted,Int32,100000,minimum_cover,0,1262400,2
+dense,sorted,Int32,100000,minimum_cover,1,1129800,2
+dense,sorted,Int32,100000,minimum_cover,2,1320900,2
+dense,sorted,Int32,100000,minimum_cost_cover,0,13843100,3
+dense,sorted,Int32,100000,minimum_cost_cover,1,14250500,3
+dense,sorted,Int32,100000,minimum_cost_cover,2,14449200,3
+dense,sorted,Int64,100000,minimum_cover,0,1900500,2
+dense,sorted,Int64,100000,minimum_cover,1,1787500,2
+dense,sorted,Int64,100000,minimum_cover,2,1575300,2
+dense,sorted,Int64,100000,minimum_cost_cover,0,14971700,3
+dense,sorted,Int64,100000,minimum_cost_cover,1,14558100,3
+dense,sorted,Int64,100000,minimum_cost_cover,2,14156800,3
+dense,sorted,UInt64,100000,minimum_cover,0,1949600,2
+dense,sorted,UInt64,100000,minimum_cover,1,1664300,2
+dense,sorted,UInt64,100000,minimum_cover,2,1710400,2
+dense,sorted,UInt64,100000,minimum_cost_cover,0,13483100,3
+dense,sorted,UInt64,100000,minimum_cost_cover,1,14034800,3
+dense,sorted,UInt64,100000,minimum_cost_cover,2,13288500,3
+dense,sorted,Date,100000,minimum_cover,0,1521100,2
+dense,sorted,Date,100000,minimum_cover,1,1338900,2
+dense,sorted,Date,100000,minimum_cover,2,1590700,2
+dense,sorted,Date,100000,minimum_cost_cover,0,14696400,3
+dense,sorted,Date,100000,minimum_cost_cover,1,14053800,3
+dense,sorted,Date,100000,minimum_cost_cover,2,15139300,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,0,1699400,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,1,1887600,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,2,1915200,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,0,14885200,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,1,14789100,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,2,14908800,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,0,1735300,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,1,1605900,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,2,1476600,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,0,13948000,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,1,13099500,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,2,15115200,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,0,1974800,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,1,1502200,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,2,1744500,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,0,13730600,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,1,14005100,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,2,15636100,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,0,1811000,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,1,1601500,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,2,1519600,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,0,15019200,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,1,14477500,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,2,14103900,3
+dense,shuffled,Int32,100000,minimum_cover,0,4949900,2
+dense,shuffled,Int32,100000,minimum_cover,1,4187600,2
+dense,shuffled,Int32,100000,minimum_cover,2,4858800,2
+dense,shuffled,Int32,100000,minimum_cost_cover,0,20314700,3
+dense,shuffled,Int32,100000,minimum_cost_cover,1,21714800,3
+dense,shuffled,Int32,100000,minimum_cost_cover,2,20316900,3
+dense,shuffled,Int64,100000,minimum_cover,0,4244600,2
+dense,shuffled,Int64,100000,minimum_cover,1,4566900,2
+dense,shuffled,Int64,100000,minimum_cover,2,4884700,2
+dense,shuffled,Int64,100000,minimum_cost_cover,0,18229100,3
+dense,shuffled,Int64,100000,minimum_cost_cover,1,19720400,3
+dense,shuffled,Int64,100000,minimum_cost_cover,2,23700900,3
+dense,shuffled,UInt64,100000,minimum_cover,0,6240200,2
+dense,shuffled,UInt64,100000,minimum_cover,1,4950400,2
+dense,shuffled,UInt64,100000,minimum_cover,2,4508400,2
+dense,shuffled,UInt64,100000,minimum_cost_cover,0,17699800,3
+dense,shuffled,UInt64,100000,minimum_cost_cover,1,18878700,3
+dense,shuffled,UInt64,100000,minimum_cost_cover,2,17916300,3
+dense,shuffled,Date,100000,minimum_cover,0,3968300,2
+dense,shuffled,Date,100000,minimum_cover,1,4815900,2
+dense,shuffled,Date,100000,minimum_cover,2,3705400,2
+dense,shuffled,Date,100000,minimum_cost_cover,0,18907000,3
+dense,shuffled,Date,100000,minimum_cost_cover,1,16118300,3
+dense,shuffled,Date,100000,minimum_cost_cover,2,17847100,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,0,5418900,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,1,4771700,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,2,4685100,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,0,18074900,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,1,20262800,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,2,17972600,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,0,5398700,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,1,4686000,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,2,5345000,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,0,17628200,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,1,18097300,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,2,16230900,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,0,4344800,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,1,4169300,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,2,4347900,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,0,15721000,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,1,15810100,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,2,18028800,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,0,4526600,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,1,4204100,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,2,4409800,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,0,20121400,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,1,19382600,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,2,19271200,3
+duplicates,sorted,Int32,100000,minimum_cover,0,1402500,1
+duplicates,sorted,Int32,100000,minimum_cover,1,1350700,1
+duplicates,sorted,Int32,100000,minimum_cover,2,1179900,1
+duplicates,sorted,Int32,100000,minimum_cost_cover,0,2398600,1
+duplicates,sorted,Int32,100000,minimum_cost_cover,1,2655000,1
+duplicates,sorted,Int32,100000,minimum_cost_cover,2,2596700,1
+duplicates,sorted,Int64,100000,minimum_cover,0,1465700,1
+duplicates,sorted,Int64,100000,minimum_cover,1,1585100,1
+duplicates,sorted,Int64,100000,minimum_cover,2,1544400,1
+duplicates,sorted,Int64,100000,minimum_cost_cover,0,3057600,1
+duplicates,sorted,Int64,100000,minimum_cost_cover,1,2917300,1
+duplicates,sorted,Int64,100000,minimum_cost_cover,2,2676100,1
+duplicates,sorted,UInt64,100000,minimum_cover,0,1600800,1
+duplicates,sorted,UInt64,100000,minimum_cover,1,1423800,1
+duplicates,sorted,UInt64,100000,minimum_cover,2,1371200,1
+duplicates,sorted,UInt64,100000,minimum_cost_cover,0,2853300,1
+duplicates,sorted,UInt64,100000,minimum_cost_cover,1,2751700,1
+duplicates,sorted,UInt64,100000,minimum_cost_cover,2,2628900,1
+duplicates,sorted,Date,100000,minimum_cover,0,1234700,1
+duplicates,sorted,Date,100000,minimum_cover,1,1147800,1
+duplicates,sorted,Date,100000,minimum_cover,2,1292600,1
+duplicates,sorted,Date,100000,minimum_cost_cover,0,2471700,1
+duplicates,sorted,Date,100000,minimum_cost_cover,1,2364500,1
+duplicates,sorted,Date,100000,minimum_cost_cover,2,2379400,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,0,1506100,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,1,1452800,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,2,1486700,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,0,3336400,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,1,3086700,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,2,3232000,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,0,1523500,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,1,1603100,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,2,1709900,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,0,3113700,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,1,2833300,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,2,3262500,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,0,1744300,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,1,1736300,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,2,1698800,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,0,3145300,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,1,2989100,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,2,2900800,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,0,1453200,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,1,1513800,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,2,1470500,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,0,2987500,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,1,2905900,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,2,2676500,1
+duplicates,shuffled,Int32,100000,minimum_cover,0,1261700,1
+duplicates,shuffled,Int32,100000,minimum_cover,1,1197800,1
+duplicates,shuffled,Int32,100000,minimum_cover,2,1153500,1
+duplicates,shuffled,Int32,100000,minimum_cost_cover,0,2615000,1
+duplicates,shuffled,Int32,100000,minimum_cost_cover,1,2656000,1
+duplicates,shuffled,Int32,100000,minimum_cost_cover,2,2547900,1
+duplicates,shuffled,Int64,100000,minimum_cover,0,1562900,1
+duplicates,shuffled,Int64,100000,minimum_cover,1,1489500,1
+duplicates,shuffled,Int64,100000,minimum_cover,2,1640600,1
+duplicates,shuffled,Int64,100000,minimum_cost_cover,0,3095200,1
+duplicates,shuffled,Int64,100000,minimum_cost_cover,1,3043700,1
+duplicates,shuffled,Int64,100000,minimum_cost_cover,2,2859400,1
+duplicates,shuffled,UInt64,100000,minimum_cover,0,1620600,1
+duplicates,shuffled,UInt64,100000,minimum_cover,1,1436000,1
+duplicates,shuffled,UInt64,100000,minimum_cover,2,1482000,1
+duplicates,shuffled,UInt64,100000,minimum_cost_cover,0,3078500,1
+duplicates,shuffled,UInt64,100000,minimum_cost_cover,1,3728000,1
+duplicates,shuffled,UInt64,100000,minimum_cost_cover,2,3625900,1
+duplicates,shuffled,Date,100000,minimum_cover,0,1315700,1
+duplicates,shuffled,Date,100000,minimum_cover,1,1137200,1
+duplicates,shuffled,Date,100000,minimum_cover,2,1184400,1
+duplicates,shuffled,Date,100000,minimum_cost_cover,0,2620100,1
+duplicates,shuffled,Date,100000,minimum_cost_cover,1,2669500,1
+duplicates,shuffled,Date,100000,minimum_cost_cover,2,2678500,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,0,1459000,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,1,1477600,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,2,2226200,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,0,3204200,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,1,2958700,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,2,2729500,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,0,1627600,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,1,1500600,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,2,1648800,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,0,3014600,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,1,3369800,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,2,3567200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,0,1574400,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,1,1530500,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,2,1476500,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,0,3287500,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,1,2866200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,2,2712700,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,0,1532000,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,1,1446600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,2,1519200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,0,3405000,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,1,3065100,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,2,2879400,1
+irrelevant,sorted,Int32,100000,minimum_cover,0,292900,1
+irrelevant,sorted,Int32,100000,minimum_cover,1,269700,1
+irrelevant,sorted,Int32,100000,minimum_cover,2,380200,1
+irrelevant,sorted,Int32,100000,minimum_cost_cover,0,766100,1
+irrelevant,sorted,Int32,100000,minimum_cost_cover,1,786300,1
+irrelevant,sorted,Int32,100000,minimum_cost_cover,2,764300,1
+irrelevant,sorted,Int64,100000,minimum_cover,0,346200,1
+irrelevant,sorted,Int64,100000,minimum_cover,1,348000,1
+irrelevant,sorted,Int64,100000,minimum_cover,2,340700,1
+irrelevant,sorted,Int64,100000,minimum_cost_cover,0,813000,1
+irrelevant,sorted,Int64,100000,minimum_cost_cover,1,1030400,1
+irrelevant,sorted,Int64,100000,minimum_cost_cover,2,967200,1
+irrelevant,sorted,UInt64,100000,minimum_cover,0,421000,1
+irrelevant,sorted,UInt64,100000,minimum_cover,1,313800,1
+irrelevant,sorted,UInt64,100000,minimum_cover,2,277800,1
+irrelevant,sorted,UInt64,100000,minimum_cost_cover,0,909700,1
+irrelevant,sorted,UInt64,100000,minimum_cost_cover,1,790000,1
+irrelevant,sorted,UInt64,100000,minimum_cost_cover,2,831000,1
+irrelevant,sorted,Date,100000,minimum_cover,0,311200,1
+irrelevant,sorted,Date,100000,minimum_cover,1,281300,1
+irrelevant,sorted,Date,100000,minimum_cover,2,279700,1
+irrelevant,sorted,Date,100000,minimum_cost_cover,0,847300,1
+irrelevant,sorted,Date,100000,minimum_cost_cover,1,871800,1
+irrelevant,sorted,Date,100000,minimum_cost_cover,2,775500,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,0,336800,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,1,293700,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,2,318400,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,0,968200,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,1,885900,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,2,766000,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,0,312600,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,1,326200,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,2,339100,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,0,875700,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,1,798400,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,2,1044200,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,0,377600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,1,297200,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,2,300600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,0,745100,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,1,1055800,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,2,891000,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,0,296000,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,1,315600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,2,269400,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,0,826000,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,1,922700,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,2,793000,1
+irrelevant,shuffled,Int32,100000,minimum_cover,0,349700,1
+irrelevant,shuffled,Int32,100000,minimum_cover,1,395800,1
+irrelevant,shuffled,Int32,100000,minimum_cover,2,372300,1
+irrelevant,shuffled,Int32,100000,minimum_cost_cover,0,803500,1
+irrelevant,shuffled,Int32,100000,minimum_cost_cover,1,784900,1
+irrelevant,shuffled,Int32,100000,minimum_cost_cover,2,848200,1
+irrelevant,shuffled,Int64,100000,minimum_cover,0,343300,1
+irrelevant,shuffled,Int64,100000,minimum_cover,1,351800,1
+irrelevant,shuffled,Int64,100000,minimum_cover,2,334500,1
+irrelevant,shuffled,Int64,100000,minimum_cost_cover,0,959800,1
+irrelevant,shuffled,Int64,100000,minimum_cost_cover,1,808100,1
+irrelevant,shuffled,Int64,100000,minimum_cost_cover,2,818700,1
+irrelevant,shuffled,UInt64,100000,minimum_cover,0,377400,1
+irrelevant,shuffled,UInt64,100000,minimum_cover,1,317100,1
+irrelevant,shuffled,UInt64,100000,minimum_cover,2,360000,1
+irrelevant,shuffled,UInt64,100000,minimum_cost_cover,0,767500,1
+irrelevant,shuffled,UInt64,100000,minimum_cost_cover,1,786300,1
+irrelevant,shuffled,UInt64,100000,minimum_cost_cover,2,795700,1
+irrelevant,shuffled,Date,100000,minimum_cover,0,350500,1
+irrelevant,shuffled,Date,100000,minimum_cover,1,314900,1
+irrelevant,shuffled,Date,100000,minimum_cover,2,327900,1
+irrelevant,shuffled,Date,100000,minimum_cost_cover,0,749900,1
+irrelevant,shuffled,Date,100000,minimum_cost_cover,1,795300,1
+irrelevant,shuffled,Date,100000,minimum_cost_cover,2,780400,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,0,339000,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,1,345600,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cover,2,339900,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,0,810200,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,1,821700,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",100000,minimum_cost_cover,2,797500,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,0,341700,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,1,363100,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cover,2,333500,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,0,798300,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,1,792000,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,minimum_cost_cover,2,820700,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,0,382900,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,1,379100,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cover,2,335500,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,0,799800,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,1,839200,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",100000,minimum_cost_cover,2,810000,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,0,365500,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,1,376500,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cover,2,347900,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,0,817500,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,1,828600,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",100000,minimum_cost_cover,2,812300,1
+chain,sorted,Int32,1000000,minimum_cover,0,11368700,1000000
+chain,sorted,Int32,1000000,minimum_cover,1,11218800,1000000
+chain,sorted,Int32,1000000,minimum_cover,2,10821600,1000000
+chain,sorted,Int32,1000000,minimum_cost_cover,0,120973500,1000000
+chain,sorted,Int32,1000000,minimum_cost_cover,1,117596800,1000000
+chain,sorted,Int32,1000000,minimum_cost_cover,2,127995400,1000000
+chain,sorted,Int64,1000000,minimum_cover,0,15509200,1000000
+chain,sorted,Int64,1000000,minimum_cover,1,15465600,1000000
+chain,sorted,Int64,1000000,minimum_cover,2,15049200,1000000
+chain,sorted,Int64,1000000,minimum_cost_cover,0,123684600,1000000
+chain,sorted,Int64,1000000,minimum_cost_cover,1,122816500,1000000
+chain,sorted,Int64,1000000,minimum_cost_cover,2,123673600,1000000
+chain,sorted,UInt64,1000000,minimum_cover,0,16162000,1000000
+chain,sorted,UInt64,1000000,minimum_cover,1,16280500,1000000
+chain,sorted,UInt64,1000000,minimum_cover,2,15197700,1000000
+chain,sorted,UInt64,1000000,minimum_cost_cover,0,139791300,1000000
+chain,sorted,UInt64,1000000,minimum_cost_cover,1,117884400,1000000
+chain,sorted,UInt64,1000000,minimum_cost_cover,2,117605300,1000000
+chain,sorted,Date,1000000,minimum_cover,0,11214400,1000000
+chain,sorted,Date,1000000,minimum_cover,1,11117600,1000000
+chain,sorted,Date,1000000,minimum_cover,2,11728900,1000000
+chain,sorted,Date,1000000,minimum_cost_cover,0,119779700,1000000
+chain,sorted,Date,1000000,minimum_cost_cover,1,129682100,1000000
+chain,sorted,Date,1000000,minimum_cost_cover,2,117304500,1000000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,0,15426000,1000000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,1,15494800,1000000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,2,15532700,1000000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,0,129395800,1000000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,1,136315900,1000000
+chain,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,2,125523100,1000000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,0,15776200,1000000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,1,15185800,1000000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,2,15160800,1000000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,0,124171400,1000000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,1,136682400,1000000
+chain,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,2,132124400,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,0,15866600,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,1,17325700,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,2,16356100,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,0,148281900,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,1,139128600,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,2,126500800,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,0,17053700,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,1,16131300,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,2,15770600,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,0,124901900,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,1,128810200,1000000
+chain,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,2,126319100,1000000
+chain,shuffled,Int32,1000000,minimum_cover,0,40296100,1000000
+chain,shuffled,Int32,1000000,minimum_cover,1,39985100,1000000
+chain,shuffled,Int32,1000000,minimum_cover,2,39831700,1000000
+chain,shuffled,Int32,1000000,minimum_cost_cover,0,216614400,1000000
+chain,shuffled,Int32,1000000,minimum_cost_cover,1,195318400,1000000
+chain,shuffled,Int32,1000000,minimum_cost_cover,2,196087200,1000000
+chain,shuffled,Int64,1000000,minimum_cover,0,69028200,1000000
+chain,shuffled,Int64,1000000,minimum_cover,1,69402000,1000000
+chain,shuffled,Int64,1000000,minimum_cover,2,58116100,1000000
+chain,shuffled,Int64,1000000,minimum_cost_cover,0,210802000,1000000
+chain,shuffled,Int64,1000000,minimum_cost_cover,1,207562900,1000000
+chain,shuffled,Int64,1000000,minimum_cost_cover,2,212560300,1000000
+chain,shuffled,UInt64,1000000,minimum_cover,0,52675400,1000000
+chain,shuffled,UInt64,1000000,minimum_cover,1,52217900,1000000
+chain,shuffled,UInt64,1000000,minimum_cover,2,52464700,1000000
+chain,shuffled,UInt64,1000000,minimum_cost_cover,0,209150700,1000000
+chain,shuffled,UInt64,1000000,minimum_cost_cover,1,208286500,1000000
+chain,shuffled,UInt64,1000000,minimum_cost_cover,2,202123500,1000000
+chain,shuffled,Date,1000000,minimum_cover,0,41957100,1000000
+chain,shuffled,Date,1000000,minimum_cover,1,39828300,1000000
+chain,shuffled,Date,1000000,minimum_cover,2,39554800,1000000
+chain,shuffled,Date,1000000,minimum_cost_cover,0,196974800,1000000
+chain,shuffled,Date,1000000,minimum_cost_cover,1,194293900,1000000
+chain,shuffled,Date,1000000,minimum_cost_cover,2,196340700,1000000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,0,52908600,1000000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,1,53292400,1000000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,2,52096500,1000000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,0,209015400,1000000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,1,225936700,1000000
+chain,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,2,213339200,1000000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,0,52938800,1000000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,1,52612300,1000000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,2,51694500,1000000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,0,208210900,1000000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,1,206455500,1000000
+chain,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,2,206300500,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,0,52715000,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,1,51683600,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,2,52576500,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,0,267976400,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,1,221161200,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,2,211568300,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,0,51792200,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,1,51639800,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,2,51256400,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,0,207431400,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,1,205187700,1000000
+chain,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,2,204272000,1000000
+dense,sorted,Int32,1000000,minimum_cover,0,9957400,2
+dense,sorted,Int32,1000000,minimum_cover,1,10284600,2
+dense,sorted,Int32,1000000,minimum_cover,2,10070200,2
+dense,sorted,Int32,1000000,minimum_cost_cover,0,137340500,3
+dense,sorted,Int32,1000000,minimum_cost_cover,1,135669500,3
+dense,sorted,Int32,1000000,minimum_cost_cover,2,137490400,3
+dense,sorted,Int64,1000000,minimum_cover,0,14279900,2
+dense,sorted,Int64,1000000,minimum_cover,1,14432500,2
+dense,sorted,Int64,1000000,minimum_cover,2,14524900,2
+dense,sorted,Int64,1000000,minimum_cost_cover,0,146156200,3
+dense,sorted,Int64,1000000,minimum_cost_cover,1,144968100,3
+dense,sorted,Int64,1000000,minimum_cost_cover,2,141522200,3
+dense,sorted,UInt64,1000000,minimum_cover,0,13884100,2
+dense,sorted,UInt64,1000000,minimum_cover,1,14275400,2
+dense,sorted,UInt64,1000000,minimum_cover,2,14200000,2
+dense,sorted,UInt64,1000000,minimum_cost_cover,0,136209800,3
+dense,sorted,UInt64,1000000,minimum_cost_cover,1,136913200,3
+dense,sorted,UInt64,1000000,minimum_cost_cover,2,135989200,3
+dense,sorted,Date,1000000,minimum_cover,0,12374600,2
+dense,sorted,Date,1000000,minimum_cover,1,10229200,2
+dense,sorted,Date,1000000,minimum_cover,2,10705600,2
+dense,sorted,Date,1000000,minimum_cost_cover,0,135731000,3
+dense,sorted,Date,1000000,minimum_cost_cover,1,136162100,3
+dense,sorted,Date,1000000,minimum_cost_cover,2,138884900,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,0,17527400,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,1,14930700,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,2,14251900,2
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,0,152543100,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,1,145273500,3
+dense,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,2,141653400,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,0,14603700,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,1,14884000,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,2,14246500,2
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,0,141562600,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,1,142016600,3
+dense,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,2,142773500,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,0,13685100,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,1,14344700,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,2,14580700,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,0,141880600,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,1,143339600,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,2,141082100,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,0,14323600,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,1,14408100,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,2,14205700,2
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,0,148626900,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,1,145241200,3
+dense,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,2,152673800,3
+dense,shuffled,Int32,1000000,minimum_cover,0,38941900,2
+dense,shuffled,Int32,1000000,minimum_cover,1,37506400,2
+dense,shuffled,Int32,1000000,minimum_cover,2,36854400,2
+dense,shuffled,Int32,1000000,minimum_cost_cover,0,248327400,3
+dense,shuffled,Int32,1000000,minimum_cost_cover,1,253388100,3
+dense,shuffled,Int32,1000000,minimum_cost_cover,2,271082500,3
+dense,shuffled,Int64,1000000,minimum_cover,0,51146700,2
+dense,shuffled,Int64,1000000,minimum_cover,1,50787600,2
+dense,shuffled,Int64,1000000,minimum_cover,2,50964600,2
+dense,shuffled,Int64,1000000,minimum_cost_cover,0,261854300,3
+dense,shuffled,Int64,1000000,minimum_cost_cover,1,270045800,3
+dense,shuffled,Int64,1000000,minimum_cost_cover,2,263159700,3
+dense,shuffled,UInt64,1000000,minimum_cover,0,48571700,2
+dense,shuffled,UInt64,1000000,minimum_cover,1,49611200,2
+dense,shuffled,UInt64,1000000,minimum_cover,2,50065100,2
+dense,shuffled,UInt64,1000000,minimum_cost_cover,0,249824400,3
+dense,shuffled,UInt64,1000000,minimum_cost_cover,1,245945400,3
+dense,shuffled,UInt64,1000000,minimum_cost_cover,2,252729300,3
+dense,shuffled,Date,1000000,minimum_cover,0,36000400,2
+dense,shuffled,Date,1000000,minimum_cover,1,36556200,2
+dense,shuffled,Date,1000000,minimum_cover,2,36191500,2
+dense,shuffled,Date,1000000,minimum_cost_cover,0,237819800,3
+dense,shuffled,Date,1000000,minimum_cost_cover,1,237632400,3
+dense,shuffled,Date,1000000,minimum_cost_cover,2,242084100,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,0,49218200,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,1,66378700,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,2,56540300,2
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,0,256132000,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,1,258860300,3
+dense,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,2,260178600,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,0,48914300,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,1,49599900,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,2,49364500,2
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,0,254632200,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,1,270594800,3
+dense,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,2,263561600,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,0,48776500,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,1,49571500,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,2,48896400,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,0,263268700,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,1,275232800,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,2,254529200,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,0,48754000,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,1,48863400,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,2,49290900,2
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,0,276101700,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,1,256237200,3
+dense,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,2,256893900,3
+duplicates,sorted,Int32,1000000,minimum_cover,0,10836200,1
+duplicates,sorted,Int32,1000000,minimum_cover,1,10671500,1
+duplicates,sorted,Int32,1000000,minimum_cover,2,10962200,1
+duplicates,sorted,Int32,1000000,minimum_cost_cover,0,24473400,1
+duplicates,sorted,Int32,1000000,minimum_cost_cover,1,24507800,1
+duplicates,sorted,Int32,1000000,minimum_cost_cover,2,24288800,1
+duplicates,sorted,Int64,1000000,minimum_cover,0,14899400,1
+duplicates,sorted,Int64,1000000,minimum_cover,1,14981800,1
+duplicates,sorted,Int64,1000000,minimum_cover,2,15016400,1
+duplicates,sorted,Int64,1000000,minimum_cost_cover,0,29228100,1
+duplicates,sorted,Int64,1000000,minimum_cost_cover,1,28942700,1
+duplicates,sorted,Int64,1000000,minimum_cost_cover,2,28505900,1
+duplicates,sorted,UInt64,1000000,minimum_cover,0,15510300,1
+duplicates,sorted,UInt64,1000000,minimum_cover,1,15005800,1
+duplicates,sorted,UInt64,1000000,minimum_cover,2,15191900,1
+duplicates,sorted,UInt64,1000000,minimum_cost_cover,0,31185900,1
+duplicates,sorted,UInt64,1000000,minimum_cost_cover,1,30357800,1
+duplicates,sorted,UInt64,1000000,minimum_cost_cover,2,29120700,1
+duplicates,sorted,Date,1000000,minimum_cover,0,11064400,1
+duplicates,sorted,Date,1000000,minimum_cover,1,11581300,1
+duplicates,sorted,Date,1000000,minimum_cover,2,11150800,1
+duplicates,sorted,Date,1000000,minimum_cost_cover,0,24740600,1
+duplicates,sorted,Date,1000000,minimum_cost_cover,1,24488000,1
+duplicates,sorted,Date,1000000,minimum_cost_cover,2,24492200,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,0,14683200,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,1,15882800,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,2,15031100,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,0,29049300,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,1,30286300,1
+duplicates,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,2,29527400,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,0,15177200,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,1,18574700,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,2,16339900,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,0,31693100,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,1,35032100,1
+duplicates,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,2,29570900,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,0,15582900,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,1,16069100,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,2,14908700,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,0,29096300,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,1,29596400,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,2,29404400,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,0,14946400,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,1,15265800,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,2,15785700,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,0,31642200,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,1,30677800,1
+duplicates,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,2,30256200,1
+duplicates,shuffled,Int32,1000000,minimum_cover,0,11302800,1
+duplicates,shuffled,Int32,1000000,minimum_cover,1,10732300,1
+duplicates,shuffled,Int32,1000000,minimum_cover,2,10742900,1
+duplicates,shuffled,Int32,1000000,minimum_cost_cover,0,24071500,1
+duplicates,shuffled,Int32,1000000,minimum_cost_cover,1,24234200,1
+duplicates,shuffled,Int32,1000000,minimum_cost_cover,2,24104800,1
+duplicates,shuffled,Int64,1000000,minimum_cover,0,14686900,1
+duplicates,shuffled,Int64,1000000,minimum_cover,1,15348500,1
+duplicates,shuffled,Int64,1000000,minimum_cover,2,14374100,1
+duplicates,shuffled,Int64,1000000,minimum_cost_cover,0,29378500,1
+duplicates,shuffled,Int64,1000000,minimum_cost_cover,1,29022700,1
+duplicates,shuffled,Int64,1000000,minimum_cost_cover,2,29358700,1
+duplicates,shuffled,UInt64,1000000,minimum_cover,0,14678700,1
+duplicates,shuffled,UInt64,1000000,minimum_cover,1,14903600,1
+duplicates,shuffled,UInt64,1000000,minimum_cover,2,15291100,1
+duplicates,shuffled,UInt64,1000000,minimum_cost_cover,0,28363200,1
+duplicates,shuffled,UInt64,1000000,minimum_cost_cover,1,28851900,1
+duplicates,shuffled,UInt64,1000000,minimum_cost_cover,2,28519200,1
+duplicates,shuffled,Date,1000000,minimum_cover,0,11038600,1
+duplicates,shuffled,Date,1000000,minimum_cover,1,10662200,1
+duplicates,shuffled,Date,1000000,minimum_cover,2,10817800,1
+duplicates,shuffled,Date,1000000,minimum_cost_cover,0,24296700,1
+duplicates,shuffled,Date,1000000,minimum_cost_cover,1,24225000,1
+duplicates,shuffled,Date,1000000,minimum_cost_cover,2,24243000,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,0,14850800,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,1,14844600,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,2,14694700,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,0,34519100,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,1,28508000,1
+duplicates,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,2,31757200,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,0,15863000,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,1,17855500,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,2,17749700,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,0,29989000,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,1,29958400,1
+duplicates,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,2,32751100,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,0,16382300,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,1,15561400,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,2,15087200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,0,29136200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,1,29586600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,2,29471600,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,0,15648200,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,1,16796000,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,2,15380500,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,0,31517500,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,1,30733900,1
+duplicates,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,2,31404800,1
+irrelevant,sorted,Int32,1000000,minimum_cover,0,3147300,1
+irrelevant,sorted,Int32,1000000,minimum_cover,1,2136700,1
+irrelevant,sorted,Int32,1000000,minimum_cover,2,2196300,1
+irrelevant,sorted,Int32,1000000,minimum_cost_cover,0,6522200,1
+irrelevant,sorted,Int32,1000000,minimum_cost_cover,1,6856800,1
+irrelevant,sorted,Int32,1000000,minimum_cost_cover,2,6469200,1
+irrelevant,sorted,Int64,1000000,minimum_cover,0,2242900,1
+irrelevant,sorted,Int64,1000000,minimum_cover,1,1947700,1
+irrelevant,sorted,Int64,1000000,minimum_cover,2,2135000,1
+irrelevant,sorted,Int64,1000000,minimum_cost_cover,0,6629700,1
+irrelevant,sorted,Int64,1000000,minimum_cost_cover,1,6554000,1
+irrelevant,sorted,Int64,1000000,minimum_cost_cover,2,6814900,1
+irrelevant,sorted,UInt64,1000000,minimum_cover,0,2352900,1
+irrelevant,sorted,UInt64,1000000,minimum_cover,1,2247200,1
+irrelevant,sorted,UInt64,1000000,minimum_cover,2,2655300,1
+irrelevant,sorted,UInt64,1000000,minimum_cost_cover,0,6925300,1
+irrelevant,sorted,UInt64,1000000,minimum_cost_cover,1,6871800,1
+irrelevant,sorted,UInt64,1000000,minimum_cost_cover,2,6839000,1
+irrelevant,sorted,Date,1000000,minimum_cover,0,2097800,1
+irrelevant,sorted,Date,1000000,minimum_cover,1,2132300,1
+irrelevant,sorted,Date,1000000,minimum_cover,2,2137100,1
+irrelevant,sorted,Date,1000000,minimum_cost_cover,0,6706500,1
+irrelevant,sorted,Date,1000000,minimum_cost_cover,1,7131100,1
+irrelevant,sorted,Date,1000000,minimum_cost_cover,2,6640200,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,0,2241500,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,1,2165200,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,2,2118700,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,0,6540700,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,1,6659700,1
+irrelevant,sorted,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,2,6417800,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,0,2305300,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,1,2175300,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,2,2118000,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,0,6631100,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,1,6511900,1
+irrelevant,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,2,6697900,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,0,2283600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,1,2301600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,2,2071600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,0,6443100,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,1,6653200,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,2,6608400,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,0,2321600,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,1,2271700,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,2,2221900,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,0,7088900,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,1,6852700,1
+irrelevant,sorted,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,2,6725000,1
+irrelevant,shuffled,Int32,1000000,minimum_cover,0,2085100,1
+irrelevant,shuffled,Int32,1000000,minimum_cover,1,2092300,1
+irrelevant,shuffled,Int32,1000000,minimum_cover,2,2123100,1
+irrelevant,shuffled,Int32,1000000,minimum_cost_cover,0,6389900,1
+irrelevant,shuffled,Int32,1000000,minimum_cost_cover,1,6606100,1
+irrelevant,shuffled,Int32,1000000,minimum_cost_cover,2,6350000,1
+irrelevant,shuffled,Int64,1000000,minimum_cover,0,2203800,1
+irrelevant,shuffled,Int64,1000000,minimum_cover,1,2227000,1
+irrelevant,shuffled,Int64,1000000,minimum_cover,2,2166900,1
+irrelevant,shuffled,Int64,1000000,minimum_cost_cover,0,6870000,1
+irrelevant,shuffled,Int64,1000000,minimum_cost_cover,1,6690000,1
+irrelevant,shuffled,Int64,1000000,minimum_cost_cover,2,6829500,1
+irrelevant,shuffled,UInt64,1000000,minimum_cover,0,2403900,1
+irrelevant,shuffled,UInt64,1000000,minimum_cover,1,2215500,1
+irrelevant,shuffled,UInt64,1000000,minimum_cover,2,1913700,1
+irrelevant,shuffled,UInt64,1000000,minimum_cost_cover,0,6884300,1
+irrelevant,shuffled,UInt64,1000000,minimum_cost_cover,1,6688500,1
+irrelevant,shuffled,UInt64,1000000,minimum_cost_cover,2,6787700,1
+irrelevant,shuffled,Date,1000000,minimum_cover,0,2191900,1
+irrelevant,shuffled,Date,1000000,minimum_cover,1,2130800,1
+irrelevant,shuffled,Date,1000000,minimum_cover,2,1901200,1
+irrelevant,shuffled,Date,1000000,minimum_cost_cover,0,6447900,1
+irrelevant,shuffled,Date,1000000,minimum_cost_cover,1,6605700,1
+irrelevant,shuffled,Date,1000000,minimum_cost_cover,2,6470400,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,0,2416200,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,1,2232500,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cover,2,2488600,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,0,6848400,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,1,6545700,1
+irrelevant,shuffled,"Datetime(time_unit='ms', time_zone=None)",1000000,minimum_cost_cover,2,6691400,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,0,2382400,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,1,2180700,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cover,2,2133800,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,0,6809700,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,1,6648200,1
+irrelevant,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,minimum_cost_cover,2,6496200,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,0,2082600,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,1,2172500,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cover,2,2162100,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,0,6512200,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,1,6738700,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='UTC')",1000000,minimum_cost_cover,2,6669800,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,0,2323400,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,1,2075400,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cover,2,2221000,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,0,6392300,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,1,6792200,1
+irrelevant,shuffled,"Datetime(time_unit='ns', time_zone='Europe/Helsinki')",1000000,minimum_cost_cover,2,6609000,1
