@@ -5,7 +5,99 @@ from pathlib import Path
 import polars as pl
 from polars.plugins import register_plugin_function
 
-__all__ = ["assign_lanes", "max_weight_non_overlapping", "overlap_count"]
+__all__ = [
+    "assign_lanes",
+    "max_weight_non_overlapping",
+    "max_weight_with_capacity",
+    "overlap_count",
+]
+
+
+def max_weight_with_capacity(
+    start: str | pl.Expr, end: str | pl.Expr, *, weight: str | pl.Expr, capacity: int
+) -> pl.Expr:
+    """Select a globally maximum-weight subset of intervals subject to a maximum simultaneous capacity.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+        weight: Column name or expression producing signed or unsigned integer weights.
+        capacity: Nonnegative integer maximum simultaneous selected non-empty intervals.
+
+    Returns:
+        pl.Expr: Non-null Boolean mask with one value per original row. True selects
+            that row in an exact globally optimal subset. Empty input returns an
+            empty mask. Ties are deterministic for identical input, but the exact
+            optimal mask is not part of the stable public contract.
+
+    Raises:
+        TypeError: If capacity is not an integer (Boolean is rejected).
+        ValueError: If capacity is negative or exceeds the platform usize range.
+        polars.exceptions.PolarsError: For unequal lengths, null endpoints/weights,
+            unsupported dtypes, mismatched endpoint logical dtypes, reversed intervals
+            (with original row index), or checked i128 overflow. Validated on evaluation.
+
+    Notes:
+        Intervals are half-open `[start, end)`: touching endpoints do not overlap.
+        Positive empty intervals `[x, x)` are always selected and consume no
+        capacity. Negative and zero-weight rows are omitted. The empty subset
+        is allowed with objective zero. Capacity zero permits only empty rows.
+        Capacity one is equivalent in objective to `max_weight_non_overlapping`
+        and delegates to that specialized dynamic program.
+
+        Weights accept Int8/16/32/64 and UInt8/16/32/64, with exact checked i128
+        accumulation. Null, floating-point, Decimal, Boolean, temporal and Int128
+        weights are rejected. No implicit casts or scalar broadcasting occur.
+        Endpoints accept matching integer dtypes up to 64 bits, Date, or Datetime
+        with exactly matching units and timezone metadata, preserving precision.
+
+        Use directly in `df.filter(...)`, in eager or lazy queries, or with
+        `.over("group")` to optimize each group independently. Grouped aggregation
+        returns Boolean lists. All chunks form one instance. The full collection
+        is required even with the streaming engine. Filtering before optimization
+        changes the instance being solved.
+
+        The exact Rust solver uses an interval min-cost flow network with residual
+        edges and successive shortest paths. Empty/nonpositive rows are removed;
+        sufficient capacity selects all useful rows directly; independent overlap
+        components are solved separately. For n rows and constrained components
+        of sizes n_c, time is O(n log n + sum(capacity * n_c * log(n_c + 1)))
+        and additional space is O(n). Capacity zero is O(n), capacity one O(n log n).
+        Substantial independent component workloads use at most eight Rust workers;
+        small inputs and single components remain serial.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({
+        ...     "start": [0, 0, 4, 7], "end": [10, 4, 7, 10],
+        ...     "weight": [15, 10, 10, 10],
+        ... })
+        >>> df.filter(pi.max_weight_with_capacity(
+        ...     "start", "end", weight="weight", capacity=1,
+        ... ))["weight"].sum()
+        30
+        >>> df.filter(pi.max_weight_with_capacity(
+        ...     "start", "end", weight="weight", capacity=2,
+        ... ))["weight"].sum()
+        45
+
+        Capacity one chooses the three shorter intervals. Capacity two allows
+        the long interval to coexist with that schedule.
+    """
+    import sys
+
+    if not isinstance(capacity, int) or isinstance(capacity, bool):
+        raise TypeError("capacity must be a nonnegative integer")
+    if not 0 <= capacity <= 2 * sys.maxsize + 1:
+        raise ValueError("capacity must be nonnegative and fit in the platform usize range")
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="max_weight_with_capacity_plugin",
+        args=[start, end, weight],
+        kwargs={"capacity": str(capacity)},
+        is_elementwise=False,
+    )
 
 
 def max_weight_non_overlapping(

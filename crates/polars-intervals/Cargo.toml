@@ -15,6 +15,7 @@ polars = { version = "0.55.2", default-features = false, features = ["dtype-i8",
 polars-core = { version = "0.55.2", default-features = false, features = ["dtype-decimal"] }
 pyo3 = "0.29"
 pyo3-polars = { version = "0.28", default-features = false, features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
 
 [dev-dependencies]
 proptest = "1.11"

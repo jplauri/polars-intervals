@@ -249,6 +249,16 @@ def installed(checkout):
         weighted.dtype == pl.Boolean and weighted.to_list() == [False, True, True, True],
         "Weighted scheduling smoke test failed.",
     )
+    capacity_frame = pl.DataFrame(
+        {"start": [0, 0, 0, 2], "end": [5, 5, 5, 2], "weight": [9, 7, 5, 3]}
+    )
+    for capacity, expected in [(0, [False, False, False, True]), (2, [True, True, False, True])]:
+        mask = capacity_frame.select(
+            pi.max_weight_with_capacity("start", "end", weight="weight", capacity=capacity)
+        ).to_series()
+        require(
+            mask.dtype == pl.Boolean and mask.to_list() == expected, "Capacity smoke test failed."
+        )
     for dtype, starts, ends in [
         (pl.Date, [date(2026, 1, 1), date(2026, 1, 2)], [date(2026, 1, 3), date(2026, 1, 4)]),
         (
@@ -288,6 +298,16 @@ def installed(checkout):
         require(
             weighted.dtype == pl.Boolean and weighted.to_list() == [False, True],
             f"Temporal weighted scheduling smoke test failed for {dtype}.",
+        )
+        capacity_mask = (
+            pl.DataFrame({"start": starts, "end": ends}, schema={"start": dtype, "end": dtype})
+            .with_columns(pl.Series("weight", [10, 20], dtype=pl.UInt64))
+            .select(pi.max_weight_with_capacity("start", "end", weight="weight", capacity=2))
+            .to_series()
+        )
+        require(
+            capacity_mask.dtype == pl.Boolean and capacity_mask.to_list() == [True, True],
+            f"Temporal capacity smoke test failed for {dtype}.",
         )
     print(f"Testing installed artifact from {package}")
     with tempfile.TemporaryDirectory() as temporary:

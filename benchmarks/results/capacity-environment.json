@@ -1,0 +1,108 @@
+{
+  "date": "2026-09-26T12:40:12.1472941+03:00",
+  "base_commit": "cd3a0181232bda9a2c1f7b0aafdfef1adcd8233f",
+  "branch": "codex/max-weight-with-capacity",
+  "rust": [
+    "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "binary: rustc",
+    "commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985",
+    "commit-date: 2026-09-01",
+    "host: x86_64-pc-windows-msvc",
+    "release: 1.98.1",
+    "LLVM version: 22.1.8"
+  ],
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "uv": "uv 0.11.3 (45da18ac3 2026-04-01 x86_64-pc-windows-msvc)",
+  "os": "Microsoft Windows 11 Home",
+  "os_version": "10.0.26200",
+  "cpu": "AMD Ryzen 9 3900X 12-Core Processor            ",
+  "physical_cores": 12,
+  "logical_processors": 24,
+  "usable_ram_kib": 33475628,
+  "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+  "polars": "1.44.2",
+  "profile": "Cargo bench default optimized; no CPU-heavy concurrent tasks",
+  "command": "cargo bench -p intervals-core --bench max_weight_with_capacity --locked",
+  "samples": 3,
+  "warmups": "one instrumented verified full invocation per candidate; independent reference invocation",
+  "workers": "serial plus forced eight-worker candidate; production up to eight workers with 64000 work threshold and eight components",
+  "max_flow_work": 2000000,
+  "sizes": [
+    0,
+    1000,
+    10000,
+    100000,
+    1000000
+  ],
+  "source_sha256": {
+    "crates/intervals-core/src/capacity.rs": "60F4DE662C5C22043CC872B8DDBE569A0423C1BD9A3DBFACB124FA6A6A3B1E3F",
+    "crates/intervals-core/src/weighted.rs": "6B24FC5D4688C07EC6DE0F80336459B14CED4B68BE2AEF020B6D356B198EFF6E",
+    "crates/intervals-core/benches/max_weight_with_capacity.rs": "FE5EC201DC603DB1E587976E5A3803FDF733B6A85997D020651EABF85282A74F",
+    "crates/intervals-core/benches/support/capacity_candidates.rs": "A4FB43742C5DE9A7971A45CEAD3F37B54E25C226D70F12091615DC4032B1BA03",
+    "crates/intervals-core/benches/support/capacity_reference.rs": "5407A4E96243C6A23A9CBDC56090C150F4D11D58106E8FD5FF4D475C05FA7FE8",
+    "crates/intervals-core/benches/support/allocations.rs": "BA1DA9A191823C6D4094B94FA9490A4322812A8E089A6EDC09C322DF558EDA1C",
+    "benchmarks/capacity_temporal.py": "105A2652561FFBA6C35B3415CF36BB623A2A8CE358ADB39E940055115145C47C",
+    "crates/polars-intervals/src/lib.rs": "98AD810549B10C0EBAC7A871B2264605A1423B9AD83843C08E400C8568D75A7C",
+    "python/polars_intervals/__init__.py": "D6BA1D7E9E1F3B3AA19A525E9F0CD715EE644EF8694896A52F4E41321F4E7FC9",
+    "Cargo.lock": "3A22E32E855B68BC423C01A23542E73F4CB92F6206187141B1A5AECFB2E9ACE9",
+    "uv.lock": "DE1A426DDD8F8CC68031D26BD63F844D3B60A5F7158FE394723190AAE7B4B86A",
+    "crates/intervals-core/tests/max_weight_with_capacity.rs": "B39C1974352ADDF07F7CBDB553158CF19066226691141CBD84D2CCCED6198004"
+  },
+  "results": {
+    "timed_samples": 36984,
+    "workloads": 2014,
+    "algorithms": 7,
+    "max_peak_bytes": 612108864,
+    "cases_by_n": [
+      {
+        "n": 0,
+        "len": 14
+      },
+      {
+        "n": 1000,
+        "len": 1388
+      },
+      {
+        "n": 10000,
+        "len": 362
+      },
+      {
+        "n": 100000,
+        "len": 158
+      },
+      {
+        "n": 1000000,
+        "len": 92
+      }
+    ],
+    "omitted_workloads": 182
+  },
+  "native_results": "capacity-windows.csv",
+  "omissions_and_completion_log": "capacity-windows.log",
+  "temporal_results": "capacity-temporal-windows.csv",
+  "memory_metric": "Peak live requested allocation bytes and allocation/reallocation events in an untimed full call; inputs, validation oracle, allocator metadata, stacks and process RSS excluded",
+  "phase_metric": "Untimed instrumented warmup; zero means unavailable. Parallel flow_ns includes all worker work.",
+  "temporal_measurement": {
+    "samples": 480,
+    "cases": 160,
+    "warmups": 1,
+    "timed_repeats": 3,
+    "oracle": "independent per-component clique top-k plus feasibility on every result"
+  },
+  "validation": {
+    "rust_tests_including_doctests": 91,
+    "python_tests_and_doctests": 1086,
+    "ci_release_helper_tests": 49,
+    "isolated_wheel_polars_versions": [
+      "1.44.1",
+      "1.44.2"
+    ],
+    "isolated_wheel_python": "3.14.0",
+    "native_benchmark_exit_code": 0,
+    "temporal_benchmark_exit_code": 0
+  },
+  "seeds": {
+    "weights": 42,
+    "shuffle_and_method_order": 73
+  }
+}

@@ -1,0 +1,240 @@
+   Compiling intervals-core v0.1.0 (D:\polars-intervals\crates\intervals-core)
+    Finished `bench` profile [optimized] target(s) in 1.69s
+     Running benches\max_weight_with_capacity.rs (target\release\deps\max_weight_with_capacity-ea7e6e805483d77c.exe)
+verified/measured n=0 family=disjoint
+verified/measured n=0 family=sparse
+verified/measured n=0 family=moderate
+verified/measured n=0 family=dense
+verified/measured n=0 family=components
+verified/measured n=0 family=nested
+verified/measured n=0 family=staircase
+verified/measured n=0 family=identical
+verified/measured n=0 family=equal_endpoints
+verified/measured n=0 family=touching
+verified/measured n=0 family=empties
+verified/measured n=1000 family=disjoint
+verified/measured n=1000 family=sparse
+verified/measured n=1000 family=moderate
+verified/measured n=1000 family=dense
+verified/measured n=1000 family=components
+verified/measured n=1000 family=nested
+verified/measured n=1000 family=staircase
+verified/measured n=1000 family=identical
+verified/measured n=1000 family=equal_endpoints
+verified/measured n=1000 family=touching
+verified/measured n=1000 family=empties
+verified/measured n=10000 family=disjoint
+verified/measured n=10000 family=sparse
+verified/measured n=10000 family=moderate
+omitted forced-flow work budget: dense/positive/sorted n=10000 k=9999 peak=10000
+omitted forced-flow work budget: dense/positive/sorted n=10000 k=10000 peak=10000
+omitted forced-flow work budget: dense/positive/sorted n=10000 k=10001 peak=10000
+omitted forced-flow work budget: dense/positive/shuffled n=10000 k=9999 peak=10000
+omitted forced-flow work budget: dense/positive/shuffled n=10000 k=10000 peak=10000
+omitted forced-flow work budget: dense/positive/shuffled n=10000 k=10001 peak=10000
+omitted forced-flow work budget: dense/mixed/sorted n=10000 k=5043 peak=5044
+omitted forced-flow work budget: dense/mixed/sorted n=10000 k=5044 peak=5044
+omitted forced-flow work budget: dense/mixed/sorted n=10000 k=5045 peak=5044
+omitted forced-flow work budget: dense/mixed/shuffled n=10000 k=5043 peak=5044
+omitted forced-flow work budget: dense/mixed/shuffled n=10000 k=5044 peak=5044
+omitted forced-flow work budget: dense/mixed/shuffled n=10000 k=5045 peak=5044
+verified/measured n=10000 family=dense
+verified/measured n=10000 family=components
+omitted forced-flow work budget: nested/positive/sorted n=10000 k=9999 peak=10000
+omitted forced-flow work budget: nested/positive/sorted n=10000 k=10000 peak=10000
+omitted forced-flow work budget: nested/positive/sorted n=10000 k=10001 peak=10000
+omitted forced-flow work budget: nested/positive/shuffled n=10000 k=9999 peak=10000
+omitted forced-flow work budget: nested/positive/shuffled n=10000 k=10000 peak=10000
+omitted forced-flow work budget: nested/positive/shuffled n=10000 k=10001 peak=10000
+omitted forced-flow work budget: nested/mixed/sorted n=10000 k=5043 peak=5044
+omitted forced-flow work budget: nested/mixed/sorted n=10000 k=5044 peak=5044
+omitted forced-flow work budget: nested/mixed/sorted n=10000 k=5045 peak=5044
+omitted forced-flow work budget: nested/mixed/shuffled n=10000 k=5043 peak=5044
+omitted forced-flow work budget: nested/mixed/shuffled n=10000 k=5044 peak=5044
+omitted forced-flow work budget: nested/mixed/shuffled n=10000 k=5045 peak=5044
+verified/measured n=10000 family=nested
+verified/measured n=10000 family=staircase
+omitted forced-flow work budget: identical/positive/sorted n=10000 k=9999 peak=10000
+omitted forced-flow work budget: identical/positive/sorted n=10000 k=10000 peak=10000
+omitted forced-flow work budget: identical/positive/sorted n=10000 k=10001 peak=10000
+omitted forced-flow work budget: identical/positive/shuffled n=10000 k=9999 peak=10000
+omitted forced-flow work budget: identical/positive/shuffled n=10000 k=10000 peak=10000
+omitted forced-flow work budget: identical/positive/shuffled n=10000 k=10001 peak=10000
+omitted forced-flow work budget: identical/mixed/sorted n=10000 k=5043 peak=5044
+omitted forced-flow work budget: identical/mixed/sorted n=10000 k=5044 peak=5044
+omitted forced-flow work budget: identical/mixed/sorted n=10000 k=5045 peak=5044
+omitted forced-flow work budget: identical/mixed/shuffled n=10000 k=5043 peak=5044
+omitted forced-flow work budget: identical/mixed/shuffled n=10000 k=5044 peak=5044
+omitted forced-flow work budget: identical/mixed/shuffled n=10000 k=5045 peak=5044
+verified/measured n=10000 family=identical
+verified/measured n=10000 family=equal_endpoints
+verified/measured n=10000 family=touching
+verified/measured n=10000 family=empties
+verified/measured n=100000 family=disjoint
+verified/measured n=100000 family=sparse
+omitted forced-flow work budget: moderate/positive/sorted n=100000 k=31 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=100000 k=32 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=100000 k=33 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=100000 k=64 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=100000 k=31 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=100000 k=32 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=100000 k=33 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=100000 k=64 peak=32
+verified/measured n=100000 family=moderate
+omitted forced-flow work budget: dense/positive/sorted n=100000 k=64 peak=100000
+omitted forced-flow work budget: dense/positive/sorted n=100000 k=99999 peak=100000
+omitted forced-flow work budget: dense/positive/sorted n=100000 k=100000 peak=100000
+omitted forced-flow work budget: dense/positive/sorted n=100000 k=100001 peak=100000
+omitted forced-flow work budget: dense/positive/shuffled n=100000 k=64 peak=100000
+omitted forced-flow work budget: dense/positive/shuffled n=100000 k=99999 peak=100000
+omitted forced-flow work budget: dense/positive/shuffled n=100000 k=100000 peak=100000
+omitted forced-flow work budget: dense/positive/shuffled n=100000 k=100001 peak=100000
+verified/measured n=100000 family=dense
+verified/measured n=100000 family=components
+omitted forced-flow work budget: nested/positive/sorted n=100000 k=64 peak=100000
+omitted forced-flow work budget: nested/positive/sorted n=100000 k=99999 peak=100000
+omitted forced-flow work budget: nested/positive/sorted n=100000 k=100000 peak=100000
+omitted forced-flow work budget: nested/positive/sorted n=100000 k=100001 peak=100000
+omitted forced-flow work budget: nested/positive/shuffled n=100000 k=64 peak=100000
+omitted forced-flow work budget: nested/positive/shuffled n=100000 k=99999 peak=100000
+omitted forced-flow work budget: nested/positive/shuffled n=100000 k=100000 peak=100000
+omitted forced-flow work budget: nested/positive/shuffled n=100000 k=100001 peak=100000
+verified/measured n=100000 family=nested
+verified/measured n=100000 family=staircase
+omitted forced-flow work budget: identical/positive/sorted n=100000 k=64 peak=100000
+omitted forced-flow work budget: identical/positive/sorted n=100000 k=99999 peak=100000
+omitted forced-flow work budget: identical/positive/sorted n=100000 k=100000 peak=100000
+omitted forced-flow work budget: identical/positive/sorted n=100000 k=100001 peak=100000
+omitted forced-flow work budget: identical/positive/shuffled n=100000 k=64 peak=100000
+omitted forced-flow work budget: identical/positive/shuffled n=100000 k=99999 peak=100000
+omitted forced-flow work budget: identical/positive/shuffled n=100000 k=100000 peak=100000
+omitted forced-flow work budget: identical/positive/shuffled n=100000 k=100001 peak=100000
+verified/measured n=100000 family=identical
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=100000 k=27 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=100000 k=28 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=100000 k=29 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=100000 k=64 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=100000 k=27 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=100000 k=28 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=100000 k=29 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=100000 k=64 peak=28
+verified/measured n=100000 family=equal_endpoints
+verified/measured n=100000 family=touching
+verified/measured n=100000 family=empties
+verified/measured n=1000000 family=disjoint
+omitted forced-flow work budget: sparse/positive/sorted n=1000000 k=3 peak=3
+omitted forced-flow work budget: sparse/positive/sorted n=1000000 k=4 peak=3
+omitted forced-flow work budget: sparse/positive/sorted n=1000000 k=8 peak=3
+omitted forced-flow work budget: sparse/positive/sorted n=1000000 k=16 peak=3
+omitted forced-flow work budget: sparse/positive/sorted n=1000000 k=64 peak=3
+omitted forced-flow work budget: sparse/positive/shuffled n=1000000 k=3 peak=3
+omitted forced-flow work budget: sparse/positive/shuffled n=1000000 k=4 peak=3
+omitted forced-flow work budget: sparse/positive/shuffled n=1000000 k=8 peak=3
+omitted forced-flow work budget: sparse/positive/shuffled n=1000000 k=16 peak=3
+omitted forced-flow work budget: sparse/positive/shuffled n=1000000 k=64 peak=3
+verified/measured n=1000000 family=sparse
+omitted forced-flow work budget: moderate/positive/sorted n=1000000 k=4 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=1000000 k=8 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=1000000 k=16 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=1000000 k=31 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=1000000 k=32 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=1000000 k=33 peak=32
+omitted forced-flow work budget: moderate/positive/sorted n=1000000 k=64 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=1000000 k=4 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=1000000 k=8 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=1000000 k=16 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=1000000 k=31 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=1000000 k=32 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=1000000 k=33 peak=32
+omitted forced-flow work budget: moderate/positive/shuffled n=1000000 k=64 peak=32
+verified/measured n=1000000 family=moderate
+omitted forced-flow work budget: dense/positive/sorted n=1000000 k=4 peak=1000000
+omitted forced-flow work budget: dense/positive/sorted n=1000000 k=8 peak=1000000
+omitted forced-flow work budget: dense/positive/sorted n=1000000 k=16 peak=1000000
+omitted forced-flow work budget: dense/positive/sorted n=1000000 k=64 peak=1000000
+omitted forced-flow work budget: dense/positive/sorted n=1000000 k=999999 peak=1000000
+omitted forced-flow work budget: dense/positive/sorted n=1000000 k=1000000 peak=1000000
+omitted forced-flow work budget: dense/positive/sorted n=1000000 k=1000001 peak=1000000
+omitted forced-flow work budget: dense/positive/shuffled n=1000000 k=4 peak=1000000
+omitted forced-flow work budget: dense/positive/shuffled n=1000000 k=8 peak=1000000
+omitted forced-flow work budget: dense/positive/shuffled n=1000000 k=16 peak=1000000
+omitted forced-flow work budget: dense/positive/shuffled n=1000000 k=64 peak=1000000
+omitted forced-flow work budget: dense/positive/shuffled n=1000000 k=999999 peak=1000000
+omitted forced-flow work budget: dense/positive/shuffled n=1000000 k=1000000 peak=1000000
+omitted forced-flow work budget: dense/positive/shuffled n=1000000 k=1000001 peak=1000000
+verified/measured n=1000000 family=dense
+omitted forced-flow work budget: components/positive/sorted n=1000000 k=4 peak=16
+omitted forced-flow work budget: components/positive/sorted n=1000000 k=8 peak=16
+omitted forced-flow work budget: components/positive/sorted n=1000000 k=15 peak=16
+omitted forced-flow work budget: components/positive/sorted n=1000000 k=16 peak=16
+omitted forced-flow work budget: components/positive/sorted n=1000000 k=17 peak=16
+omitted forced-flow work budget: components/positive/sorted n=1000000 k=64 peak=16
+omitted forced-flow work budget: components/positive/shuffled n=1000000 k=4 peak=16
+omitted forced-flow work budget: components/positive/shuffled n=1000000 k=8 peak=16
+omitted forced-flow work budget: components/positive/shuffled n=1000000 k=15 peak=16
+omitted forced-flow work budget: components/positive/shuffled n=1000000 k=16 peak=16
+omitted forced-flow work budget: components/positive/shuffled n=1000000 k=17 peak=16
+omitted forced-flow work budget: components/positive/shuffled n=1000000 k=64 peak=16
+verified/measured n=1000000 family=components
+omitted forced-flow work budget: nested/positive/sorted n=1000000 k=4 peak=1000000
+omitted forced-flow work budget: nested/positive/sorted n=1000000 k=8 peak=1000000
+omitted forced-flow work budget: nested/positive/sorted n=1000000 k=16 peak=1000000
+omitted forced-flow work budget: nested/positive/sorted n=1000000 k=64 peak=1000000
+omitted forced-flow work budget: nested/positive/sorted n=1000000 k=999999 peak=1000000
+omitted forced-flow work budget: nested/positive/sorted n=1000000 k=1000000 peak=1000000
+omitted forced-flow work budget: nested/positive/sorted n=1000000 k=1000001 peak=1000000
+omitted forced-flow work budget: nested/positive/shuffled n=1000000 k=4 peak=1000000
+omitted forced-flow work budget: nested/positive/shuffled n=1000000 k=8 peak=1000000
+omitted forced-flow work budget: nested/positive/shuffled n=1000000 k=16 peak=1000000
+omitted forced-flow work budget: nested/positive/shuffled n=1000000 k=64 peak=1000000
+omitted forced-flow work budget: nested/positive/shuffled n=1000000 k=999999 peak=1000000
+omitted forced-flow work budget: nested/positive/shuffled n=1000000 k=1000000 peak=1000000
+omitted forced-flow work budget: nested/positive/shuffled n=1000000 k=1000001 peak=1000000
+verified/measured n=1000000 family=nested
+verified/measured n=1000000 family=staircase
+omitted forced-flow work budget: identical/positive/sorted n=1000000 k=4 peak=1000000
+omitted forced-flow work budget: identical/positive/sorted n=1000000 k=8 peak=1000000
+omitted forced-flow work budget: identical/positive/sorted n=1000000 k=16 peak=1000000
+omitted forced-flow work budget: identical/positive/sorted n=1000000 k=64 peak=1000000
+omitted forced-flow work budget: identical/positive/sorted n=1000000 k=999999 peak=1000000
+omitted forced-flow work budget: identical/positive/sorted n=1000000 k=1000000 peak=1000000
+omitted forced-flow work budget: identical/positive/sorted n=1000000 k=1000001 peak=1000000
+omitted forced-flow work budget: identical/positive/shuffled n=1000000 k=4 peak=1000000
+omitted forced-flow work budget: identical/positive/shuffled n=1000000 k=8 peak=1000000
+omitted forced-flow work budget: identical/positive/shuffled n=1000000 k=16 peak=1000000
+omitted forced-flow work budget: identical/positive/shuffled n=1000000 k=64 peak=1000000
+omitted forced-flow work budget: identical/positive/shuffled n=1000000 k=999999 peak=1000000
+omitted forced-flow work budget: identical/positive/shuffled n=1000000 k=1000000 peak=1000000
+omitted forced-flow work budget: identical/positive/shuffled n=1000000 k=1000001 peak=1000000
+verified/measured n=1000000 family=identical
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=1000000 k=4 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=1000000 k=8 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=1000000 k=16 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=1000000 k=27 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=1000000 k=28 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=1000000 k=29 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/sorted n=1000000 k=64 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=1000000 k=4 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=1000000 k=8 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=1000000 k=16 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=1000000 k=27 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=1000000 k=28 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=1000000 k=29 peak=28
+omitted forced-flow work budget: equal_endpoints/positive/shuffled n=1000000 k=64 peak=28
+verified/measured n=1000000 family=equal_endpoints
+verified/measured n=1000000 family=touching
+omitted forced-flow work budget: empties/positive/sorted n=1000000 k=4 peak=11
+omitted forced-flow work budget: empties/positive/sorted n=1000000 k=8 peak=11
+omitted forced-flow work budget: empties/positive/sorted n=1000000 k=10 peak=11
+omitted forced-flow work budget: empties/positive/sorted n=1000000 k=11 peak=11
+omitted forced-flow work budget: empties/positive/sorted n=1000000 k=12 peak=11
+omitted forced-flow work budget: empties/positive/sorted n=1000000 k=16 peak=11
+omitted forced-flow work budget: empties/positive/sorted n=1000000 k=64 peak=11
+omitted forced-flow work budget: empties/positive/shuffled n=1000000 k=4 peak=11
+omitted forced-flow work budget: empties/positive/shuffled n=1000000 k=8 peak=11
+omitted forced-flow work budget: empties/positive/shuffled n=1000000 k=10 peak=11
+omitted forced-flow work budget: empties/positive/shuffled n=1000000 k=11 peak=11
+omitted forced-flow work budget: empties/positive/shuffled n=1000000 k=12 peak=11
+omitted forced-flow work budget: empties/positive/shuffled n=1000000 k=16 peak=11
+omitted forced-flow work budget: empties/positive/shuffled n=1000000 k=64 peak=11
+verified/measured n=1000000 family=empties

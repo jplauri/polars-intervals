@@ -41,31 +41,58 @@ fn assign_lanes_plugin(inputs: &[Series]) -> PolarsResult<Series> {
     assign_lanes(starts, ends)
 }
 
-fn weighted_inputs<T>(inputs: &[T]) -> PolarsResult<&[T; 3]> {
+fn weighted_inputs<'a, T>(inputs: &'a [T], name: &str) -> PolarsResult<&'a [T; 3]> {
     inputs.try_into().map_err(|_| {
-        polars_err!(InvalidOperation: "max_weight_non_overlapping requires exactly three inputs, got {}", inputs.len())
+        polars_err!(InvalidOperation: "{} requires exactly three inputs, got {}", name, inputs.len())
     })
 }
 
 fn weighted_output(inputs: &[Field]) -> PolarsResult<Field> {
-    let [start, _, weight] = weighted_inputs(inputs)?;
-    validate_weight_dtype(weight.dtype())?;
+    weighted_field(inputs, "max_weight_non_overlapping")
+}
+
+fn capacity_output(inputs: &[Field]) -> PolarsResult<Field> {
+    weighted_field(inputs, "max_weight_with_capacity")
+}
+
+fn weighted_field(inputs: &[Field], name: &str) -> PolarsResult<Field> {
+    let [start, _, weight] = weighted_inputs(inputs, name)?;
+    validate_weight_dtype(weight.dtype(), name)?;
     Ok(Field::new(start.name().clone(), DataType::Boolean))
 }
 
-fn validate_weight_dtype(dtype: &DataType) -> PolarsResult<()> {
+fn validate_weight_dtype(dtype: &DataType, name: &str) -> PolarsResult<()> {
     polars_ensure!(matches!(dtype,
         DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
         DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64),
         InvalidOperation:
-        "max_weight_non_overlapping requires an 8-, 16-, 32-, or 64-bit integer weight dtype, got {}", dtype);
+        "{} requires an 8-, 16-, 32-, or 64-bit integer weight dtype, got {}", name, dtype);
     Ok(())
 }
 
 #[pyo3_polars::derive::polars_expr(output_type_func = weighted_output)]
 fn max_weight_non_overlapping_plugin(inputs: &[Series]) -> PolarsResult<Series> {
-    let [starts, ends, weights] = weighted_inputs(inputs)?;
+    let [starts, ends, weights] = weighted_inputs(inputs, "max_weight_non_overlapping")?;
     max_weight_non_overlapping(starts, ends, weights)
+}
+
+#[derive(serde::Deserialize)]
+struct CapacityOptions {
+    // serde-pickle only decodes signed 64-bit Python integers. Decimal text
+    // transports the full usize range losslessly, including usize::MAX.
+    capacity: String,
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = capacity_output)]
+fn max_weight_with_capacity_plugin(
+    inputs: &[Series],
+    kwargs: CapacityOptions,
+) -> PolarsResult<Series> {
+    let [starts, ends, weights] = weighted_inputs(inputs, "max_weight_with_capacity")?;
+    let capacity = kwargs.capacity.parse::<usize>().map_err(
+        |_| polars_err!(InvalidOperation: "capacity must be nonnegative and fit in usize"),
+    )?;
+    max_weight_with_capacity(starts, ends, weights, capacity)
 }
 
 /// Counts other overlapping intervals in the supplied start and end columns.
@@ -178,12 +205,55 @@ pub fn max_weight_non_overlapping(
     ends: &Series,
     weights: &Series,
 ) -> PolarsResult<Series> {
-    validate_weight_dtype(weights.dtype())?;
+    evaluate_weighted(starts, ends, weights, None)
+}
+
+/// Select a globally maximum-weight subset subject to maximum simultaneous capacity.
+///
+/// Returns a non-null Boolean Series named `max_weight_with_capacity` in original
+/// row order. Matching integer, Date, and Datetime endpoints follow
+/// [`overlap_count`]. Weights follow [`max_weight_non_overlapping`]: non-null
+/// signed/unsigned integers up to 64 bits, accumulated exactly in checked i128.
+/// Positive empty intervals consume no capacity and are always selected;
+/// nonpositive weights are omitted. Ties are deterministic but unspecified.
+/// Capacity zero permits only empty intervals; one delegates to the specialized
+/// weighted scheduler. Each collection (including all chunks) is one instance.
+///
+/// The core uses exact min-cost flow with sufficient-capacity and overlap-component
+/// fast paths: `O(n log n + sum(k * n_c * log(n_c + 1)))` time over constrained
+/// components, `O(n)` additional space. See [`intervals_core::max_weight_with_capacity`].
+///
+/// # Errors
+///
+/// Rejects unequal lengths, nulls, unsupported weights/endpoints, mismatched
+/// endpoint logical dtypes, reversed intervals with original row index, and
+/// i128 overflow. No dtype coercion or scalar broadcasting is performed.
+pub fn max_weight_with_capacity(
+    starts: &Series,
+    ends: &Series,
+    weights: &Series,
+    capacity: usize,
+) -> PolarsResult<Series> {
+    evaluate_weighted(starts, ends, weights, Some(capacity))
+}
+
+fn evaluate_weighted(
+    starts: &Series,
+    ends: &Series,
+    weights: &Series,
+    capacity: Option<usize>,
+) -> PolarsResult<Series> {
+    let name = if capacity.is_some() {
+        "max_weight_with_capacity"
+    } else {
+        "max_weight_non_overlapping"
+    };
+    validate_weight_dtype(weights.dtype(), name)?;
     polars_ensure!(starts.len() == weights.len(), ShapeMismatch:
-        "max_weight_non_overlapping requires equal lengths, got {} intervals and {} weights",
-        starts.len(), weights.len());
+        "{} requires equal lengths, got {} intervals and {} weights",
+        name, starts.len(), weights.len());
     polars_ensure!(weights.null_count() == 0, ComputeError:
-        "max_weight_non_overlapping does not support null weights");
+        "{} does not support null weights", name);
     // Normalize only the accumulator representation, avoiding 8 x 8 endpoint /
     // weight monomorphizations. No Polars cast or loss of integer precision.
     macro_rules! widen {
@@ -206,7 +276,11 @@ pub fn max_weight_non_overlapping(
         DataType::UInt64 => widen!(u64),
         _ => unreachable!("weight dtype was validated above"),
     };
-    evaluate(starts, ends, Algorithm::MaxWeight(&weights))
+    let algorithm = match capacity {
+        Some(capacity) => Algorithm::Capacity(&weights, capacity),
+        None => Algorithm::MaxWeight(&weights),
+    };
+    evaluate(starts, ends, algorithm)
 }
 
 #[derive(Clone, Copy)]
@@ -214,6 +288,7 @@ enum Algorithm<'a> {
     OverlapCount,
     AssignLanes,
     MaxWeight(&'a [i128]),
+    Capacity(&'a [i128], usize),
 }
 
 impl Algorithm<'_> {
@@ -222,6 +297,7 @@ impl Algorithm<'_> {
             Self::OverlapCount => "overlap_count",
             Self::AssignLanes => "assign_lanes",
             Self::MaxWeight(_) => "max_weight_non_overlapping",
+            Self::Capacity(_, _) => "max_weight_with_capacity",
         }
     }
 }
@@ -298,6 +374,11 @@ where
         }
         Algorithm::MaxWeight(weights) => {
             let mask = intervals_core::max_weight_non_overlapping(&starts, &ends, weights)
+                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(Series::new(algorithm.name().into(), mask))
+        }
+        Algorithm::Capacity(weights, capacity) => {
+            let mask = intervals_core::max_weight_with_capacity(&starts, &ends, weights, capacity)
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;
             Ok(Series::new(algorithm.name().into(), mask))
         }

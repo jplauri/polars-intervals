@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Add exact `max_weight_with_capacity` selection to Python, Rust Polars and the
+  independent core, with integer weights, half-open intervals, free positive
+  empty intervals, and independent group/window optimization. Capacity one uses
+  the existing weighted scheduler; general capacities use interval min-cost flow.
+- Add exact flow candidates, component comparisons, release benchmarks, exhaustive
+  and property-based optimality checks, and residual-network invariant tests.
+
 - Add exact `max_weight_non_overlapping` scheduling to Python, Rust Polars, and
   the independent core, with a Boolean mask, integer weights and checked `i128`
   accumulation. Supports integer/Date/Datetime endpoints, groups and empties.

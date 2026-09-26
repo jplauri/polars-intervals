@@ -133,3 +133,15 @@ from `925033f`. Earlier join-only measurements remain in the
 Add `benchmarks/<function>.py` using the measurement rules above. Add one section
 here with its baselines, run command, workload, compact results, and limitations.
 Keep published raw reports in `benchmarks/results/`.
+
+## Capacity-constrained weighted selection
+
+Run `cargo bench -p intervals-core --bench max_weight_with_capacity --locked` to
+compare specialized whole-instance flow, guarded whole-instance flow, serial and
+parallel component flow, a generic reference, and the capacity-1 specialization.
+Every case verifies optimum objectives and capacity feasibility before timing.
+
+See [the capacity benchmark report](https://github.com/jplauri/polars-intervals/blob/master/docs/capacity-scheduling-benchmarks.md) for
+workloads, bounded large-instance coverage, allocation measurements, raw results,
+algorithm selection, complexity, and reproducibility commands. The companion
+`capacity_temporal.py` measures the release plugin on integer and temporal columns.
