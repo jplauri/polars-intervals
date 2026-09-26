@@ -1,8 +1,10 @@
 site_name: polars-intervals
-site_description: Interval overlap counts, lane assignment, and maximum-weight scheduling for Polars
+site_description: Interval algorithms for Polars
 repo_url: https://github.com/jplauri/polars-intervals
 site_dir: target/docs
-watch: [CONTRIBUTING.md, benchmarks/README.md, python]
+watch: [CONTRIBUTING.md, benchmarks, python]
+exclude_docs: |
+  assets/benchmarks/*.md
 theme:
   name: material
   features:
@@ -20,12 +22,16 @@ nav:
   - Getting started: index.md
   - Usage: usage.md
   - API reference: api.md
-  - Benchmarks: benchmarks.md
-  - Lane algorithm comparison: assign-lanes-benchmarks.md
-  - Weighted scheduling comparison: weighted-scheduling-benchmarks.md
-  - Capacity scheduling comparison: capacity-scheduling-benchmarks.md
-  - Exact covering comparison: covering-benchmarks.md
-  - Minimum stabbing comparison: stabbing-benchmarks.md
+  - Benchmarks:
+      - Overview: benchmarks.md
+      - Overlap counting: overlap-count-benchmarks.md
+      - Lane assignment: assign-lanes-benchmarks.md
+      - Weighted scheduling: weighted-scheduling-benchmarks.md
+      - Capacity scheduling: capacity-scheduling-benchmarks.md
+      - Minimum covering: covering-benchmarks.md
+      - Minimum-cost covering: cost-covering-benchmarks.md
+      - Minimum stabbing points: stabbing-benchmarks.md
+      - Running and publishing: benchmarking.md
   - Release notes: changelog.md
   - Development:
       - Contributing: contributing.md
@@ -45,6 +51,7 @@ plugins:
             separate_signature: true
             show_signature_annotations: true
 markdown_extensions:
+  - md_in_html
   - pymdownx.superfences
   - pymdownx.highlight
   - pymdownx.snippets:

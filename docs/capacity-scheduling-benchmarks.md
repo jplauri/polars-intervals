@@ -1,14 +1,21 @@
-# Capacity-constrained weighted selection
+# Capacity scheduling benchmarks
 
-`max_weight_with_capacity` selects an exact globally maximum-weight subset of
-half-open intervals, with at most `capacity` selected non-empty intervals active
-at any point. It exposes a Boolean mask through Python expressions, Rust Polars,
-and the Polars-independent core.
+[All benchmarks](benchmarks.md) · [Running and publishing](benchmarking.md)
 
-## Candidates and decision
+## Summary
 
-The benchmark compiles the production source directly into a private target;
-no benchmark API or generic graph API is exported by either library.
+`max_weight_with_capacity` selects an exact globally maximum-weight subset of half-open
+intervals, with at most `capacity` selected non-empty intervals active at any point. It
+exposes a Boolean mask through Python expressions, Rust Polars, and the
+Polars-independent core.
+
+Production uses guarded component flow, with direct fast paths and thresholded
+parallelism. See the results for the workload-dependent tradeoffs.
+
+## Compared implementations
+
+The benchmark compiles the production source directly into a private target. No
+benchmark API or generic graph API is exported by either library.
 
 | Candidate | Implementation |
 | --- | --- |
@@ -20,46 +27,73 @@ no benchmark API or generic graph API is exported by either library.
 | `capacity_one` | The unchanged existing `max_weight_non_overlapping` kernel, measured only at capacity 1 |
 | `production` | Selected design: all fast paths, specialized component flow, thresholded parallelism |
 
-The production network uses compact sorted endpoint indices, paired residual
-edges in one contiguous buffer, and CSR adjacency indices. An initial DAG pass
-finds both the first path and feasible potentials. Later paths use Dijkstra with
-exact reduced costs, reusing distance, predecessor and heap buffers. Strict
-relaxation and `(distance, vertex)` heap ordering make ties deterministic.
-Augmentations send the path bottleneck, including multiple idle units when
-appropriate; a directly invoked network sends exactly k units.
+The production network uses compact sorted endpoint indices, paired residual edges in
+one contiguous buffer, and CSR adjacency indices. An initial DAG pass finds both the
+first path and feasible potentials. Later paths use Dijkstra with exact reduced costs,
+reusing distance, predecessor and heap buffers. Strict relaxation and `(distance,
+vertex)` heap ordering make ties deterministic. Augmentations send the path bottleneck,
+including multiple idle units when appropriate. A directly invoked network sends exactly
+k units.
 
-The generic implementation stays private for reproducibility and cross-checks.
-It adds no dependency. The only new direct package dependency is `serde`, already
-present transitively, for the plugin's capacity option. The independent core
-still has no production dependencies.
+The generic implementation stays private for reproducibility and cross-checks. It adds
+no dependency. The only new direct package dependency is `serde`, already present
+transitively, for the plugin's capacity option. The independent core still has no
+production dependencies.
 
-A fixed-small-k DP was considered but not implemented: storing combinations of
-resource finish states would introduce an `O(n^k)` subsystem, outside the requested
-complexity budget. The DAG initial path already handles k=1 efficiently inside
-flow, but it does not eliminate network construction and compression overhead.
-The existing capacity-1 scheduler remains unchanged.
+A fixed-small-k DP was considered but not implemented: storing combinations of resource
+finish states would introduce an `O(n^k)` subsystem, outside the requested complexity
+budget. The DAG initial path already handles k=1 efficiently inside flow, but it does
+not eliminate network construction and compression overhead. The existing capacity-1
+scheduler remains unchanged.
 
-## Measurements on this machine
+### Fast paths and parallelism
 
-The tables and raw results below record commit `29d75ee`. A subsequent cleanup
-replaces the per-interval edge-index vector with one offset into the already
-contiguous edge buffer, removing one allocation and one `usize` per interval
-in each network. Worker results are also folded directly into the output mask.
-The algorithms, fast paths, and candidate-selection decision are unchanged.
+1. Empty valid input returns immediately without allocating a network.
+2. Capacity zero validates every row and selects only positive empty intervals.
+3. Capacity one delegates directly to `max_weight_non_overlapping`.
+4. Empty intervals are handled separately. Nonpositive rows are omitted.
+5. A start/end sweep computes positive-candidate maximum concurrency. Sufficient
+   capacity selects everything useful without building a network.
+6. A start-order sweep separates overlap components at `next_start >= max_end`.
+   Each component also checks its own concurrency before invoking flow.
 
-The cleanup reran 330 workloads before and after: component cases through 1M
-rows and dense cases at 1K, with three timed samples per candidate. All objectives
-matched. On the 1M positive shuffled component case at k=2, production allocation events
-fell from 437,664 to 406,414; whole-flow peak requested bytes fell by 8,000,000.
-Timing variation also affected the unchanged generic engine, so no speedup is
-claimed. [Cleanup samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-cleanup-windows.csv)
+The component pilot showed that thread startup loses on small inputs but wins on
+substantial independent work. Production uses up to `min(8, available_parallelism)`
+scoped standard-library workers when there are at least eight components and
+`positive_nonempty_rows * capacity >= 64_000`. Otherwise it stays serial. Workers own
+local masks over disjoint batches and restore original indices in batch order. There is
+no shared mutable flow network. Endpoint types in the core API therefore require `Ord +
+Copy + Sync`. Weights still convert losslessly to i128. The threshold is a practical
+policy from this machine, not a universal crossover.
+
+## Results
+
+The plotted run used Windows 11, Ryzen 9 3900X, Rust 1.98.1 and the optimized Cargo
+bench profile. The historical run and cleanup distinction below also applies to this
+plot.
+
+--8<-- "docs/assets/benchmarks/capacity-runtime.md"
+
+### Full matrix and recorded revision
+
+The tables and raw results below record commit `29d75ee`. A subsequent cleanup replaces
+the per-interval edge-index vector with one offset into the already contiguous edge
+buffer, removing one allocation and one `usize` per interval in each network. Worker
+results are also folded directly into the output mask. The algorithms, fast paths, and
+candidate-selection decision are unchanged.
+
+The cleanup reran 330 workloads before and after: component cases through 1M rows and
+dense cases at 1K, with three timed samples per candidate. All objectives matched. On
+the 1M positive shuffled component case at k=2, production allocation events fell from
+437,664 to 406,414. Whole-flow peak requested bytes fell by 8,000,000. Timing variation
+also affected the unchanged generic engine, so no speedup is claimed. [Cleanup
+samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-cleanup-windows.csv)
 and the environment file record these comparisons separately.
 
-Windows 11, Ryzen 9 3900X (12 cores / 24 logical processors), about 32 GiB RAM,
-Rust 1.98.1 / LLVM 22.1.8, optimized Cargo bench profile. Values below are medians
-of three timed samples, in milliseconds. These are observed tradeoffs, not
-universal performance guarantees. All table cases use positive weights and
-shuffled rows unless noted.
+Windows 11, Ryzen 9 3900X (12 cores / 24 logical processors), about 32 GiB RAM, Rust
+1.98.1 / LLVM 22.1.8, optimized Cargo bench profile. Values below are medians of three
+timed samples, in milliseconds. These are observed tradeoffs, not universal performance
+guarantees. All table cases use positive weights and shuffled rows unless noted.
 
 ### Scaling with size and density
 
@@ -96,10 +130,10 @@ shuffled rows unless noted.
 | 17 | 6.456 | 6.167 | 6.401 | 250.405 |
 | 64 | 6.355 | 6.357 | 6.430 | 251.721 |
 
-Concurrency is 16. The runtime drop at k=16 is the sufficient-capacity bypass.
-At k=8, decomposition alone cuts 152.2 ms to 76.8 ms; thresholded parallel
-production takes 17.8 ms. At 1M rows and k=2, serial components take 267.8 ms
-versus 501.5 ms for one network, while production takes 128.4 ms.
+Concurrency is 16. The runtime drop at k=16 is the sufficient-capacity bypass. At k=8,
+decomposition alone cuts 152.2 ms to 76.8 ms. Thresholded parallel production takes 17.8
+ms. At 1M rows and k=2, serial components take 267.8 ms versus 501.5 ms for one network,
+while production takes 128.4 ms.
 
 ### Capacity one (1M rows)
 
@@ -110,14 +144,14 @@ versus 501.5 ms for one network, while production takes 128.4 ms.
 | dense | 119.478 | 127.079 | 329.167 | 368.254 |
 | components | 122.181 | 121.229 | 332.898 | 106.680 |
 
-The existing kernel is unchanged and delegation tracks its performance.
-General flow is usually materially slower. One exception is the largest
-component workload, where forced parallel flow beats the serial DP modestly.
-This does not justify adding preprocessing to every capacity-1 call; retain
-the direct specialization. The generic solver can also be competitive on
-highly compressed identical-interval networks; no universal winner is claimed.
+The existing kernel is unchanged and delegation tracks its performance. General flow is
+usually materially slower. One exception is the largest component workload, where forced
+parallel flow beats the serial DP modestly. This does not justify adding preprocessing
+to every capacity-1 call. Retain the direct specialization. The generic solver can also
+be competitive on highly compressed identical-interval networks. No universal winner is
+claimed.
 
-### Peak requested allocation (1M rows, k=2; MiB)
+### Peak requested allocation (1M rows, k=2, MiB)
 
 | Family | Production | Serial components | Whole flow | Generic flow |
 | --- | ---: | ---: | ---: | ---: |
@@ -126,12 +160,12 @@ highly compressed identical-interval networks; no universal winner is claimed.
 | dense | 409.0 | 409.0 | 409.0 | 583.8 |
 | components | 96.4 | 56.6 | 316.0 | 457.9 |
 
-For the 1M component case, production records 437,664 allocation/reallocation
-events, versus 1,500,072 for the generic engine and just 37 growing-buffer
-allocations for whole specialized flow. Component solving allocates per component
-to reduce the live network size. Serial decomposition has lower
-peak memory than parallel decomposition; bounded parallelism spends extra row
-and mask buffers to reduce wall time. See the measurement definition below.
+For the 1M component case, production records 437,664 allocation/reallocation events,
+versus 1,500,072 for the generic engine and just 37 growing-buffer allocations for whole
+specialized flow. Component solving allocates per component to reduce the live network
+size. Serial decomposition has lower peak memory than parallel decomposition. Bounded
+parallelism spends extra row and mask buffers to reduce wall time. See the measurement
+definition below.
 
 ### Weight distributions (1K rows, moderate overlap, k=8)
 
@@ -145,8 +179,8 @@ and mask buffers to reduce wall time. See the measurement definition below.
 | skewed | 0.783 | 0.784 | 1.039 |
 | valuable_long | 0.514 | 0.505 | 0.665 |
 
-Removing nonpositive rows reduces both network size and candidate concurrency.
-All accumulations, including the skewed distribution, remain integer-exact.
+Removing nonpositive rows reduces both network size and candidate concurrency. All
+accumulations, including the skewed distribution, remain integer-exact.
 
 ### Release plugin with temporal endpoints (1M rows)
 
@@ -163,163 +197,163 @@ All accumulations, including the skewed distribution, remain integer-exact.
 | 33 | 43.336 | 36.196 | 44.719 | 40.886 |
 | 64 | 40.975 | 30.640 | 40.946 | 40.540 |
 
-These are end-to-end query times, including the adapter and output creation,
-on independent 32-row cliques. Casts are outside timing. They do not isolate
-the cost of temporal dtype handling. All 160 dtype/size/capacity cases matched
-the independent top-k oracle and capacity check; 480 timed samples are retained.
+These are end-to-end query times, including the adapter and output creation, on
+independent 32-row cliques. Casts are outside timing. They do not isolate the cost of
+temporal dtype handling. All 160 dtype/size/capacity cases matched the independent top-k
+oracle and capacity check. 480 timed samples are retained.
 
-The native run contains **2,014 workloads and 36,984 timed samples**. It covers
-14 empty cases, 1,388 at 1K, 362 at 10K, 158 at 100K, and 92 at 1M. The work
-budget explicitly omits 182 larger forced-flow combinations. All included exact
-candidates agreed before timing, and every timed selection was checked again.
+The native run contains **2,014 workloads and 36,984 timed samples**. It covers 14 empty
+cases, 1,388 at 1K, 362 at 10K, 158 at 100K, and 92 at 1M. The work budget explicitly
+omits 182 larger forced-flow combinations. All included exact candidates agreed before
+timing, and every timed selection was checked again.
 
-Raw artifacts:
+## Workloads and correctness
+
+`CAPACITY_BENCH_MAX_N`, `CAPACITY_BENCH_SAMPLES`, and `CAPACITY_BENCH_FAMILY` allow
+smaller reproducibility runs. Defaults are 1M rows, three timed samples, and all
+families. Candidate order is deterministically shuffled between samples. Each candidate
+gets a verified untimed warmup with allocation instrumentation, then timed runs with
+allocation counting and phase timers disabled. CSV phase times come from that separate
+instrumented call (repeated on the three sample rows), so they diagnose where work
+occurs and need not sum to the uninstrumented total. Zero phase fields mean unavailable
+for that candidate, not zero work. For the parallel candidate, `flow_ns` measures the
+entire worker phase, including local network preparation and reconstruction. Serial
+candidates separate these phases.
+
+The full suite covers disjoint, sparse (width 3), moderate (width 32), dense giant
+cliques, independent 32-row components (peak 16), nesting, staircase/path overlap,
+identical intervals, repeated starts/ends, touching endpoints, and many empties. Every
+family has sorted and shuffled input. All seven weight distributions (positive, mixed,
+zeros, equal, ties, skewed, valuable-long) run at 1K. Positive and mixed run at 10K.
+Positive structural scaling runs at 100K and 1M. Capacities include 0, 1, 2, 4, 8, 16,
+64, and peak-1/peak/peak+1, deduplicated.
+
+Forced-flow work is capped at `n * min(k, peak) <= 2_000_000`. Larger combinations are
+explicitly logged as omitted, avoiding hundreds of thousands of shortest paths for
+near-capacity giant cliques. This is a bounded stratified suite, not every
+size/weight/capacity Cartesian combination. Every retained case compares every
+candidate's full optimum and feasibility before accepting any timing. Full-instance
+structural oracles check empty/sufficient capacity and clique top-k. Capacity one is
+independently compared with the existing scheduler. Every workload also checks all
+candidates on a ten-row restriction against exhaustive subset search. Large
+non-structural instances rely on agreement of the independent flow engines, not an
+infeasible full-size brute-force claim.
+
+The temporal benchmark uses independent 32-row cliques with an analytical top-k oracle
+at 1K/10K/100K/1M, including near/equal/above concurrency. It measures the compiled
+plugin end to end with Int64, Date, Datetime(us), and Datetime(ns, UTC). Construction
+and casts occur outside timing. Objectives and feasibility are verified after each
+evaluation.
+
+### Exactness
+
+For each distinct endpoint, create a vertex. Consecutive timeline edges have capacity k
+and zero cost. Each positive non-empty interval is a forward edge with capacity one and
+cost `-weight`. Send k integral units from first to last.
+
+At any cut between consecutive endpoints, interval flow plus timeline flow equals k, so
+the selected intervals have concurrency at most k. Conversely, a feasible interval
+subset can be placed on k non-overlapping schedules. Each schedule gives a
+source-to-sink path with timeline edges between its intervals. Thus minimum cost is the
+negative of the maximum selected weight. Reverse edges allow later augmentations to
+revise earlier selections. Repeatedly fixing a capacity-1 optimum lacks this ability:
+`[0,2), [1,3), [2,4), [3,5)` with weights `3,2,2,3` gives only 8 by repeated scheduling,
+while capacity 2 admits weight 10.
+
+Removing nonpositive rows cannot lower the optimum. Positive empty rows always increase
+it without using capacity. Different overlap components share no capacity constraints,
+so their optimum objectives add.
+
+### Verification coverage
+
+Deterministic cases cover empty input, every capacity fast path, disjoint/touching rows,
+cliques/top-k, nested intervals, duplicates, greedy and repeated-DP counterexamples,
+multiple components, signs/zeros, free empties, original order, invalid rows/lengths and
+integer boundaries/overflow. Parallel tests compare worker counts, deterministic
+reconstruction and error propagation.
+
+Proptest generates up to eleven rows on a small endpoint domain. It checks feasibility,
+exhaustive optimality, shape, determinism, capacity monotonicity, capacity-1
+equivalence, sufficient capacity, permutations, translation, negative row addition,
+positive empty addition, capacities beyond n, clique top-k and component additivity.
+Internal generated networks additionally verify residual reverse pairs, conservation,
+capacity bounds, exactly k sink flow, interval-edge mask reconstruction, cost/objective
+agreement and deterministic shortest paths.
+
+Python and Rust Polars tests cover integer/Date/Datetime endpoints, all supported
+integer weight widths, eager/lazy/filter/window/group execution, chunks, shuffles,
+streaming, nulls, dtype rejection, invalid intervals and no broadcasting. Package checks
+include explicit capacity and temporal smoke tests outside the checkout.
+
+## Reproduce
+
+| File | Role |
+| --- | --- |
+| [`max_weight_with_capacity.rs`](https://github.com/jplauri/polars-intervals/blob/master/crates/intervals-core/benches/max_weight_with_capacity.rs) | Run Rust candidate comparisons |
+| [`capacity_summary.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/capacity_summary.py) | Summarize supplied candidate CSVs |
+| [`capacity_temporal.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/capacity_temporal.py) | Time release-plugin integer and temporal queries |
+| [`plot.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/plot.py) | Generate figures and tables from saved samples |
+
+Build the release plugin using the shared setup guide before the temporal command. Save
+a new local run without replacing the published data:
+
+```sh
+cargo bench -p intervals-core --bench max_weight_with_capacity --locked > benchmarks/results/capacity-local.csv
+uv run --no-sync python benchmarks/capacity_summary.py benchmarks/results/capacity-local.csv
+uv run --no-sync python benchmarks/capacity_temporal.py > benchmarks/results/capacity-temporal-local.csv
+```
+
+## Limitations
+
+Allocation data counts successful allocations/reallocations and peak live requested
+bytes during the whole call, including output and worker buffers. It excludes inputs,
+verification, allocator metadata, stacks and process RSS. Thread/runtime allocation
+effects are included where they occur within the call. This is an allocation metric
+rather than a claim about operating-system peak RAM.
+
+### Complexity and arithmetic
+
+For n input rows and constrained component sizes n_c, the worst-case work is `O(n log n
++ sum(k * n_c * log(n_c + 1)))`, with `O(n)` additional space including the mask. The
+heap can hold O(n_c) entries. Sufficient-capacity cases cost `O(n log n)`. Capacity zero
+is linear and capacity one uses the existing `O(n log n)` DP. Parallelism changes wall
+time, not total asymptotic work.
+
+Serial decomposition retains only one component's network at a time. Parallel workers
+additionally copy their disjoint row batches and return selected indices. Total extra
+storage remains O(n), with at most eight live networks. Generic adjacency storage
+allocates per vertex. Specialized CSR uses a fixed set of growing contiguous buffers. No
+interval conflict graph is constructed.
+
+Signed/unsigned 8-, 16-, 32-, and 64-bit weights are widened exactly to i128. The core
+also accepts wider values convertible to i128, including direct i128 test inputs.
+Cost/potential arithmetic and the final selected objective use checked operations.
+Overflow returns `IntervalError::WeightOverflow`. Unsigned u128 reduced distances
+accommodate large non-shortest detours without signed wraparound. No float conversion,
+saturation of objectives or silent weight cast occurs. All-negative input selects
+nothing. Zero-weight rows are omitted.
+
+These synthetic measurements cover one Windows host. The bounded forced-flow matrix
+omits expensive combinations explicitly. The work limit is described above. There is no
+equivalent native Polars expression baseline in this report.
+
+## Raw data
 
 - [Native samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-windows.csv)
 - [Completion and omission log](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-windows.log)
 - [Environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-environment.json)
 - [Temporal samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-temporal-windows.csv)
 
-## Fast paths and parallelism
+### Historical validation
 
-1. Empty valid input returns immediately without allocating a network.
-2. Capacity zero validates every row and selects only positive empty intervals.
-3. Capacity one delegates directly to `max_weight_non_overlapping`.
-4. Empty intervals are handled separately; nonpositive rows are omitted.
-5. A start/end sweep computes positive-candidate maximum concurrency. Sufficient
-   capacity selects everything useful without building a network.
-6. A start-order sweep separates overlap components at `next_start >= max_end`.
-   Each component also checks its own concurrency before invoking flow.
-
-The component pilot showed that thread startup loses on small inputs but wins on
-substantial independent work. Production uses up to `min(8, available_parallelism)`
-scoped standard-library workers when there are at least eight components and
-`positive_nonempty_rows * capacity >= 64_000`. Otherwise it stays serial. Workers
-own local masks over disjoint batches and restore original indices in batch
-order. There is no shared mutable flow network. Endpoint types in the core API
-therefore require `Ord + Copy + Sync`; weights still convert losslessly to i128.
-The threshold is a practical policy from this machine, not a universal crossover.
-
-## Why the answer is exact
-
-For each distinct endpoint, create a vertex. Consecutive timeline edges have
-capacity k and zero cost. Each positive non-empty interval is a forward edge
-with capacity one and cost `-weight`. Send k integral units from first to last.
-
-At any cut between consecutive endpoints, interval flow plus timeline flow
-equals k, so the selected intervals have concurrency at most k. Conversely, a
-feasible interval subset can be placed on k non-overlapping schedules; each
-schedule gives a source-to-sink path with timeline edges between its intervals.
-Thus minimum cost is the negative of the maximum selected weight. Reverse edges
-allow later augmentations to revise earlier selections. Repeatedly fixing a
-capacity-1 optimum lacks this ability: `[0,2), [1,3), [2,4), [3,5)` with weights
-`3,2,2,3` gives only 8 by repeated scheduling, while capacity 2 admits weight 10.
-
-Removing nonpositive rows cannot lower the optimum; positive empty rows always
-increase it without using capacity. Different overlap components share no
-capacity constraints, so their optimum objectives add.
-
-## Complexity, memory and arithmetic
-
-For n input rows and constrained component sizes n_c, the worst-case work is
-`O(n log n + sum(k * n_c * log(n_c + 1)))`, with `O(n)` additional space including
-the mask. The heap can hold O(n_c) entries. Sufficient-capacity cases cost
-`O(n log n)`; capacity zero is linear and capacity one uses the existing
-`O(n log n)` DP. Parallelism changes wall time, not total asymptotic work.
-
-Serial decomposition retains only one component's network at a time. Parallel
-workers additionally copy their disjoint row batches and return selected indices;
-total extra storage remains O(n), with at most eight live networks. Generic
-adjacency storage allocates per vertex; specialized CSR uses a fixed set of
-growing contiguous buffers. No interval conflict graph is constructed.
-
-Signed/unsigned 8-, 16-, 32-, and 64-bit weights are widened exactly to i128.
-The core also accepts wider values convertible to i128, including direct i128
-test inputs. Cost/potential arithmetic and the final selected objective use
-checked operations; overflow returns `IntervalError::WeightOverflow`. Unsigned
-u128 reduced distances accommodate large non-shortest detours without signed
-wraparound. No float conversion, saturation of objectives or silent weight cast
-occurs. All-negative input selects nothing; zero-weight rows are omitted.
-
-## Reproduction and measurement
-
-```sh
-cargo bench -p intervals-core --bench max_weight_with_capacity --locked > benchmarks/results/capacity-windows.csv
-uv run --locked python benchmarks/capacity_summary.py benchmarks/results/capacity-windows.csv
-uv run --locked python benchmarks/capacity_temporal.py > benchmarks/results/capacity-temporal-windows.csv
-```
-
-`CAPACITY_BENCH_MAX_N`, `CAPACITY_BENCH_SAMPLES`, and `CAPACITY_BENCH_FAMILY` allow
-smaller reproducibility runs. Defaults are 1M rows, three timed samples, and all
-families. Candidate order is deterministically shuffled between samples. Each
-candidate gets a verified untimed warmup with allocation instrumentation, then
-timed runs with allocation counting and phase timers disabled. CSV phase times
-come from that separate instrumented call (repeated on the three sample rows),
-so they diagnose where work occurs and need not sum to the uninstrumented total.
-Zero phase fields mean unavailable for that candidate, not zero work. For the
-parallel candidate, `flow_ns` measures the entire worker phase, including local
-network preparation and reconstruction; serial candidates separate these phases.
-
-Allocation data counts successful allocations/reallocations and peak live
-requested bytes during the whole call, including output and worker buffers.
-It excludes inputs, verification, allocator metadata, stacks and process RSS.
-Thread/runtime allocation effects are included where they occur within the call.
-This is an allocation metric rather than a claim about operating-system peak RAM.
-
-The full suite covers disjoint, sparse (width 3), moderate (width 32), dense giant
-cliques, independent 32-row components (peak 16), nesting, staircase/path overlap,
-identical intervals, repeated starts/ends, touching endpoints, and many empties.
-Every family has sorted and shuffled input. All seven weight distributions
-(positive, mixed, zeros, equal, ties, skewed, valuable-long) run at 1K; positive
-and mixed run at 10K; positive structural scaling runs at 100K and 1M. Capacities
-include 0, 1, 2, 4, 8, 16, 64, and peak-1/peak/peak+1, deduplicated.
-
-Forced-flow work is capped at `n * min(k, peak) <= 2_000_000`. Larger combinations
-are explicitly logged as omitted, avoiding hundreds of thousands of shortest
-paths for near-capacity giant cliques. This is a bounded stratified suite, not
-every size/weight/capacity Cartesian combination. Every retained case compares
-every candidate's full optimum and feasibility before accepting any timing.
-Full-instance structural oracles check empty/sufficient capacity and clique top-k;
-k=1 is independently compared with the existing scheduler. Every workload also
-checks all candidates on a ten-row restriction against exhaustive subset search.
-Large non-structural instances rely on agreement of the independent flow engines,
-not an infeasible full-size brute-force claim.
-
-The temporal benchmark uses independent 32-row cliques with an analytical top-k
-oracle at 1K/10K/100K/1M, including near/equal/above concurrency. It measures the
-compiled plugin end to end with Int64, Date, Datetime(us), and Datetime(ns, UTC).
-Construction and casts occur outside timing; objectives and feasibility are
-verified after each evaluation.
-
-## Verification coverage
-
-Deterministic cases cover empty input, every capacity fast path, disjoint/touching
-rows, cliques/top-k, nested intervals, duplicates, greedy and repeated-DP
-counterexamples, multiple components, signs/zeros, free empties, original order,
-invalid rows/lengths and integer boundaries/overflow. Parallel tests compare
-worker counts, deterministic reconstruction and error propagation.
-
-Proptest generates up to eleven rows on a small endpoint domain. It checks
-feasibility, exhaustive optimality, shape, determinism, capacity monotonicity,
-capacity-1 equivalence, sufficient capacity, permutations, translation, negative
-row addition, positive empty addition, capacities beyond n, clique top-k and
-component additivity. Internal generated networks additionally verify residual
-reverse pairs, conservation, capacity bounds, exactly k sink flow, interval-edge
-mask reconstruction, cost/objective agreement and deterministic shortest paths.
-
-Python and Rust Polars tests cover integer/Date/Datetime endpoints, all supported
-integer weight widths, eager/lazy/filter/window/group execution, chunks, shuffles,
-streaming, nulls, dtype rejection, invalid intervals and no broadcasting. Package
-checks include explicit capacity and temporal smoke tests outside the checkout.
-
-## Validation results
+These counts describe the original measured revision.
 
 - `cargo fmt --check`, `cargo test --workspace --locked` (91 tests including
   Rust doctests), and Clippy on all workspace targets with warnings denied: pass.
 - `cargo doc --workspace --no-deps --locked` with `RUSTDOCFLAGS=-D warnings`: pass.
 - `uv lock --check`, Ruff lint/format, and strict MkDocs build: pass.
 - Python tests plus API doctests: 1,086 pass.
-- CI/release helper tests: 49 pass; package version/compiler policy check passes.
+- CI/release helper tests: 49 pass. Package version/compiler policy check passes.
 - The release wheel built from the source distribution passes the same 1,086
   tests and integer/temporal smoke checks in a fresh environment outside the
   checkout, on both Polars 1.44.1 and 1.44.2, Python 3.14.
@@ -327,6 +361,6 @@ checks include explicit capacity and temporal smoke tests outside the checkout.
 - Full native and temporal release benchmark runs complete with all checks passing.
 
 Rust Polars tests on this Windows host need `PYO3_PYTHON` set to the environment's
-Python executable and the base Python DLL directory on `PATH`. Other platform
-wheel builds and Python 3.12/3.13 remain covered by repository CI; they were not
-executed locally. No release was published.
+Python executable and the base Python DLL directory on `PATH`. Other platform wheel
+builds and Python 3.12/3.13 remain covered by repository CI. They were not executed
+locally. No release was published.

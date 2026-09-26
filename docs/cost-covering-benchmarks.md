@@ -1,30 +1,28 @@
-# Minimum covering benchmarks
+# Minimum-cost covering benchmarks
 
 [All benchmarks](benchmarks.md) · [Running and publishing](benchmarking.md)
 
 ## Summary
 
-`minimum_cover` selects the fewest intervals that continuously cover one half-open
-target. Production uses packed candidates and a start-sorted greedy sweep: `O(n log n)`
-time and `O(n)` additional space. It performs well on varied shuffled input. Indirect
-sorting can win on ordered or repeated geometry.
+`minimum_cost_cover` selects a continuous cover with minimum total cost, breaking cost
+ties by the fewest intervals. Production uses a reversed Fenwick suffix-minimum dynamic
+program: `O(n log n)` time and `O(n)` additional space. It uses less storage than the
+segment-tree reference and wins many workloads with many reachable frontiers, with some
+measured exceptions.
 
-For the weighted operation from the same harness, see [minimum-cost
-covering](cost-covering-benchmarks.md).
+The unweighted operation has its own [minimum-covering report](covering-benchmarks.md).
 
 ## Compared implementations
 
 | Candidate | Implementation | Role |
 | --- | --- | --- |
-| MC-A | Packed candidates, start sort, linear greedy sweep | Production and instrumented benchmark |
-| MC-B | Original-index sort, indirect greedy sweep | Tests/benchmarks |
-| MC-C | Start sort, max-heap reference | Tests/benchmarks |
-| MC-A-detect | MC-A with an explicit linear sortedness check | Tests/benchmarks |
+| MCC-A | Reversed Fenwick suffix-min frontier DP | Production and instrumented benchmark |
+| MCC-B | Iterative segment-tree range-min frontier DP | Tests/benchmarks |
+| MCC-C | Direct scan of prior reachable frontier states | Tests/benchmarks, at most 1K rows |
 
-Packed sorting avoids scattered endpoint access on varied shuffled data. Indirect
-sorting saves candidate storage. The heap is a distinct cross-check. No explicit
-sorted-input fast path is retained: the standard sort already handles ordered input
-well, and the extra scan has inconsistent benefits.
+Both trees stop ancestor updates when the stored minimum does not improve. The
+segment-tree reference retains no redundant second DP array. Production has no method
+switch or graph/solver dependency.
 
 ### Semantics and exactness
 
@@ -34,18 +32,37 @@ discarded after validation, and useful rows are clipped to the target. Reversed
 targets/intervals and null endpoints are errors. A non-empty target without a continuous
 cover raises `target interval cannot be covered by the supplied intervals`.
 
-Sort packed `(effective_start, effective_end, row)` records and linearly sweep. Among
-every interval beginning at or before the current frontier, choose the furthest end.
-Every scanned alternative ends at or before that new frontier and can be discarded. An
-exchange argument establishes optimality: replacing an optimal cover's first advancing
-interval with this furthest-reaching interval never increases the required remaining
-intervals. Repeat on the remaining target suffix. Equal effective ends prefer the
-original row index.
+Sort candidates by effective right end, compress right ends plus target start, and
+maintain the best `(cost, count, frontier_index)` at reachable frontiers. A reversed
+Fenwick tree queries the minimum over reachable frontiers `x >= l`. Only frontiers
+strictly below `r` have been published when processing `[l,r)`. Add the interval's cost
+and one selected interval. Publish the best state only after all candidates ending at
+`r` have been queried. Backpointers reconstruct the original row mask.
 
-The result is a Boolean mask in original row order. Rust Polars accepts two scalar
-targets with exact matching endpoint dtypes. The independent core accepts slices and
-scalar endpoints. Contiguous physical endpoint columns are borrowed. Multiple chunks
-require copying. The core has no production dependencies.
+This recurrence is exact: any advancing interval extends a reachable continuous prefix,
+and any nonredundant cover can be ordered by its advancing right endpoints. Nonnegative
+costs and the secondary count objective ensure that a nonadvancing interval is never
+necessary. The cheapest local interval is not a valid greedy rule: `[0,4):1`, `[0,6):5`,
+`[4,10):100`, `[6,10):5` has optimum 10, although starting with the cheapest interval
+can cost 101.
+
+Weighted comparisons first minimize cost, then count. Remaining ties use row index and
+predecessor coordinate. Deterministic masks are guaranteed for identical input, but a
+particular tied mask is not a stable public contract. Costs must be nonnegative
+integers. Python/Polars accepts the eight integer dtypes through 64 bits, without nulls
+or casts. The core accepts integer types convertible to `i128`. Addition is checked.
+Overflowing paths cannot return to a representable cost because costs are nonnegative.
+Such paths are discarded. If the final state is absent after an overflow, an unweighted
+feasibility check distinguishes infeasible coverage from an optimum exceeding
+`i128::MAX`.
+
+The production algorithm takes **O(n log n) time and O(n) additional space**, including
+output. Reconstruction is linear after sorting and dynamic programming. For `m` useful
+rows and `q <= m+1` distinct frontier coordinates, weighted storage is `O(m+q+n)`:
+candidates, coordinates, one Fenwick tree, backpointers and the output mask. The tree is
+released before allocating the output mask. The Polars adapter borrows contiguous
+physical endpoint slices. Multiple chunks require copying. Costs are widened once to
+`i128`.
 
 ## Results
 
@@ -55,38 +72,42 @@ covering run has 7,425 timed samples across 396 workloads and 2,475 candidate/wo
 combinations, with three repeats each. These counts cover both operations, not just the
 operation on this page.
 
---8<-- "docs/assets/benchmarks/cover-runtime.md"
+--8<-- "docs/assets/benchmarks/cost-cover-runtime.md"
 
 ### Wider workload comparison
 
-Median per-workload runtime ratios (candidate / packed baseline). Values below one favor the candidate.
+Median per-workload runtime ratios (candidate / Fenwick baseline). Values below one favor the candidate.
 Each geometry/order/cost/size combination has equal weight:
 
 | Candidate | Sorted | Nearly sorted | Shuffled |
 | --- | ---: | ---: | ---: |
-| MC-A-detect / MC-A | 0.944 | 0.984 | 1.000 |
-| MC-B / MC-A | 0.880 | 1.015 | 1.339 |
-| MC-C / MC-A | 1.662 | 1.458 | 1.207 |
+| MCC-B / MCC-A | 1.237 | 1.209 | 1.122 |
+| MCC-C / MCC-A, 1K only | 1.254 | 1.250 | 1.141 |
 
-Sorted/shuffled include the physical-width runs. Nearly sorted does not. Selected 1M-row
-shuffled medians, milliseconds:
+Sorted/shuffled include physical-width runs. Nearly sorted does not. Small compressed
+state spaces hide the quadratic reference's poor scaling: at 1K rows its medians are
+1.51 ms on dense data and 2.25 ms on equal starts, versus 0.089 ms for Fenwick on the
+shuffled dense/random case.
 
-| Workload | Packed | Indirect | Heap |
-| --- | ---: | ---: | ---: |
-| Touching chain | 50.07 | 84.18 | 54.84 |
-| Dense overlaps | 47.48 | 65.37 | 64.24 |
-| Equal starts | 13.85 | 8.99 | 30.05 |
-| Mostly irrelevant | 0.91 | 0.93 | 0.88 |
-| Date-width chain | 38.79 | 72.23 | 51.50 |
-| Date-width dense | 47.05 | 79.82 | 69.78 |
+Selected 1M-row shuffled medians, milliseconds:
 
-For the 1M-row i64 chain, packed/indirect peak requested allocation is 26.17/9.39 MB.
-Packed preprocessing/sweep medians are 45.95/3.09 ms, with 20 allocation/reallocation
-events. Mostly irrelevant rows need about 1 MB, primarily for the output mask.
+| Workload | Fenwick | Segment tree |
+| --- | ---: | ---: |
+| Touching chain | 188.08 | 205.33 |
+| Dense overlaps | 226.50 | 389.63 |
+| Equal starts | 198.61 | 274.19 |
+| Mostly irrelevant | 2.05 | 2.04 |
+| Date-width chain | 210.87 | 195.95 |
+| Date-width dense | 275.19 | 448.58 |
 
-Sortedness detection changes the 1M sorted chain from 13.86 to 14.11 ms and the sorted
-Datetime-width dense case from 14.26 to 15.28 ms. Benefits elsewhere were too
-inconsistent to justify an extra production pass.
+The Date-width chain favors the segment tree. Fenwick is not a universal winner. For the
+1M-row i64 chain, Fenwick/segment-tree peak requested allocations are 105.17/157.83 MB.
+For dense input they are 87.17/151.83 MB. Irrelevant-row workloads need about 1 MB,
+mostly output. The maximum shared-run peak is 157.83 decimal MB, not RSS.
+
+For the shuffled chain, Fenwick preprocessing/DP/reconstruction medians are
+50.26/131.92/3.60 ms, with 23 allocation/reallocation events. Dense phases are
+50.28/172.78/0.063 ms. Raw samples retain phase and memory data, including failures.
 
 ### End-to-end temporal measurements
 
@@ -96,16 +117,16 @@ shuffled-chain medians include plugin, validation, adapter and output overhead. 
 native fixtures and costs differ from the core harness. Subtracting their times does not
 estimate adapter overhead.
 
-| Endpoint dtype | minimum_cover (ms) |
+| Endpoint dtype | minimum_cost_cover (ms) |
 | --- | ---: |
-| Int32 | 39.99 |
-| Int64 | 69.03 |
-| UInt64 | 52.47 |
-| Date | 39.83 |
-| Datetime(ms) | 52.91 |
-| Datetime(us) | 52.61 |
-| Datetime(ns, UTC) | 52.58 |
-| Datetime(ns, Europe/Helsinki) | 51.64 |
+| Int32 | 196.09 |
+| Int64 | 210.80 |
+| UInt64 | 208.29 |
+| Date | 196.34 |
+| Datetime(ms) | 213.34 |
+| Datetime(us) | 206.46 |
+| Datetime(ns, UTC) | 221.16 |
+| Datetime(ns, Europe/Helsinki) | 205.19 |
 
 ## Workloads and correctness
 

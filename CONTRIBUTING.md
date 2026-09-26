@@ -67,7 +67,14 @@ uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
 The site is written to `target/docs/`. Building it does not compile the Rust
-plugin. Check the API examples against the installed plugin with:
+plugin. Benchmark reports use a [shared template and plot workflow](https://github.com/jplauri/polars-intervals/blob/master/docs/benchmarking.md).
+After changing saved results or `benchmarks/plots.toml`, regenerate their figures:
+
+```sh
+uv run --locked --isolated --only-group plots python benchmarks/plot.py
+```
+
+Check the API examples against the installed plugin with:
 
 ```sh
 uv run --locked pytest --doctest-modules python/polars_intervals
