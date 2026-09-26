@@ -1,6 +1,6 @@
 //! Interval algorithms for Rust Polars, backed by `intervals-core`.
 //!
-//! [`overlap_count`] adapts integer [`Series`] to the Polars-independent core.
+//! [`overlap_count`] adapts integer, Date, and Datetime [`Series`] to the core.
 //! The Python package exposes the same operation as a Polars expression plugin.
 
 use polars::prelude::*;
@@ -22,7 +22,10 @@ fn overlap_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
 /// Counts other overlapping intervals in the supplied start and end columns.
 ///
 /// Both columns must have the same dtype: `Int8`, `Int16`, `Int32`, `Int64`,
-/// `UInt8`, `UInt16`, `UInt32`, or `UInt64`. No dtype coercion is performed.
+/// `UInt8`, `UInt16`, `UInt32`, `UInt64`, `Date`, or `Datetime`. Datetime units
+/// (ms, us, ns) and timezone metadata must match exactly. No dtype coercion is
+/// performed. Dates use physical integer days and datetimes use physical integer
+/// timestamps, preserving endpoint values without timezone arithmetic.
 /// Nulls are rejected in either column, even when both endpoints are null.
 ///
 /// Intervals use half-open `[start, end)` semantics. Two non-empty intervals
@@ -60,7 +63,7 @@ pub fn overlap_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     );
     polars_ensure!(
         starts.dtype() == ends.dtype(),
-        InvalidOperation: "overlap_count requires matching integer dtypes, got {} and {}",
+        InvalidOperation: "overlap_count requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
         starts.dtype(), ends.dtype()
     );
     match starts.dtype() {
@@ -72,8 +75,12 @@ pub fn overlap_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
         DataType::UInt16 => count_typed(starts.u16()?, ends.u16()?),
         DataType::UInt32 => count_typed(starts.u32()?, ends.u32()?),
         DataType::UInt64 => count_typed(starts.u64()?, ends.u64()?),
+        DataType::Date => count_typed(starts.date()?.physical(), ends.date()?.physical()),
+        DataType::Datetime(_, _) => {
+            count_typed(starts.datetime()?.physical(), ends.datetime()?.physical())
+        }
         dtype => polars_bail!(
-            InvalidOperation: "overlap_count requires an 8-, 16-, 32-, or 64-bit integer dtype, got {}",
+            InvalidOperation: "overlap_count requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
             dtype
         ),
     }

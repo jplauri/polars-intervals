@@ -29,9 +29,9 @@ def plugin_query(
     frame: pl.DataFrame, grouped: bool = False, plugin_path: Path | None = None
 ) -> pl.LazyFrame:
     start, end = pl.col("start"), pl.col("end")
-    # The public plugin does not support datetime. Include the workaround in timing.
-    if frame.schema["start"] == pl.Datetime("us"):
-        start, end = start.cast(pl.Int64), end.cast(pl.Int64)
+    if plugin_path is not None:
+        # Historical reference plugins only accept integer endpoints.
+        start, end = start.to_physical(), end.to_physical()
     count = (
         pi.overlap_count(start, end)
         if plugin_path is None
@@ -225,6 +225,22 @@ def check_semantics(compare_plugin: Path | None = None) -> None:
         expected_frame = pl.DataFrame({"count": expected}, schema={"count": pl.UInt64})
         for query in queries_for(frame, False, compare_plugin).values():
             assert_frame_equal(query.collect(engine="in-memory"), expected_frame)
+
+    # Native temporal inputs must use the same compiled plugin as physical integers.
+    frame = make_frame("dense", 40, 123, groups=7)
+    for dtype in (
+        pl.Date,
+        pl.Datetime("ms"),
+        pl.Datetime("us"),
+        pl.Datetime("ns"),
+        pl.Datetime("us", "Europe/Helsinki"),
+    ):
+        temporal = frame.lazy().with_columns(pl.col("start", "end").cast(dtype)).collect()
+        physical = temporal.lazy().with_columns(pl.col("start", "end").to_physical()).collect()
+        for grouped in (False, True):
+            assert_frame_equal(
+                plugin_query(temporal, grouped).collect(), plugin_query(physical, grouped).collect()
+            )
 
     # Independent quadratic oracle: do not rely on agreement with the plugin alone.
     rng = random.Random(123)

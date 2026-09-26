@@ -50,8 +50,14 @@ uv run --no-sync python benchmarks/overlap_count.py --sizes 1000 100000 1000000 
 This matrix covers sparse/dense overlaps, shuffled/start-sorted input, and
 global/100-group counts. Sparse starts are four units apart within each group,
 with lengths 0–8; dense starts are 0–999 with lengths 0–1,000. Seed 42; groups
-are balanced. Input sorting is outside timing. Optional datetime cases include
-the plugin's required integer cast in timing; its public API accepts integers.
+are balanced. Input sorting is outside timing. Optional datetime cases now pass
+logical Datetime columns directly to the compiled plugin. Before timing, a small
+sanity check compares Date and all Datetime units (including a timezone-aware
+case) with their physical integer equivalents, both globally and within groups.
+The historical results below used explicit integer casts for datetime inputs;
+they do not establish any temporal-specific performance improvement.
+Saved reference binaries still receive physical endpoints to allow comparisons
+with older integer-only versions; that conversion is included in their timing.
 
 Measured 2026-09-25 on Windows 11, Ryzen 9 3900X, Python 3.14.0, Polars 1.44.2,
 24 threads, Rust 1.98.1 release build. Three warmups and nine samples per case.

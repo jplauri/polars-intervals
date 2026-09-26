@@ -89,7 +89,7 @@ For the Rust API reference, set `RUSTDOCFLAGS` to `-D warnings` and run
 
 The core supports ordered endpoint types and has no production dependencies.
 The Rust Polars API exposes `polars_intervals::overlap_count(&starts, &ends)`
-for integer Series.
+for matching integer, Date, or Datetime Series.
 
 For publishing instructions, see the
 [release guide](https://github.com/jplauri/polars-intervals/blob/master/docs/releasing.md).
