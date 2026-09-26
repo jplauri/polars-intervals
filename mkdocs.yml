@@ -21,6 +21,7 @@ nav:
   - Usage: usage.md
   - API reference: api.md
   - Benchmarks: benchmarks.md
+  - Lane algorithm comparison: assign-lanes-benchmarks.md
   - Release notes: changelog.md
   - Development:
       - Contributing: contributing.md

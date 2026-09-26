@@ -58,8 +58,8 @@ promised. Compiler updates should pass the Rust and compiled Python plugin check
 
 ## Documentation
 
-The Python API reference comes from the `overlap_count` docstring. Edit that
-docstring to update the reference; put usage examples in `docs/usage.md`.
+The Python API reference comes from the public function docstrings. Edit those
+to update the reference; put usage examples in `docs/usage.md`.
 
 ```sh
 uv run --locked --isolated --only-group docs mkdocs serve
@@ -89,7 +89,17 @@ For the Rust API reference, set `RUSTDOCFLAGS` to `-D warnings` and run
 
 The core supports ordered endpoint types and has no production dependencies.
 The Rust Polars API exposes `polars_intervals::overlap_count(&starts, &ends)`
+and `polars_intervals::assign_lanes(&starts, &ends)`
 for matching integer, Date, or Datetime Series.
+
+The core lane comparison needs no Polars build:
+
+```sh
+cargo bench -p intervals-core --bench assign_lanes --locked
+```
+
+It validates all candidates before timing. See the
+[methodology and results](https://github.com/jplauri/polars-intervals/blob/master/docs/assign-lanes-benchmarks.md).
 
 For publishing instructions, see the
 [release guide](https://github.com/jplauri/polars-intervals/blob/master/docs/releasing.md).

@@ -222,6 +222,18 @@ def installed(checkout):
         .to_series()
     )
     require(result.dtype == pl.UInt64 and result.to_list() == [1, 1, 2, 0], "Smoke test failed.")
+    lanes = (
+        pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
+        .select(pi.assign_lanes("start", "end"))
+        .to_series()
+    )
+    require(
+        lanes.dtype == pl.UInt32
+        and lanes.n_unique() == 2
+        and lanes[0] == lanes[2]
+        and lanes[0] != lanes[1],
+        "Lane assignment smoke test failed.",
+    )
     for dtype, starts, ends in [
         (pl.Date, [date(2026, 1, 1), date(2026, 1, 2)], [date(2026, 1, 3), date(2026, 1, 4)]),
         (
@@ -240,6 +252,17 @@ def installed(checkout):
         require(
             result.dtype == pl.UInt64 and result.to_list() == [1, 1],
             f"Temporal smoke test failed for {dtype}.",
+        )
+        lanes = (
+            pl.DataFrame({"start": starts, "end": ends}, schema={"start": dtype, "end": dtype})
+            .lazy()
+            .select(pi.assign_lanes("start", "end"))
+            .collect()
+            .to_series()
+        )
+        require(
+            lanes.dtype == pl.UInt32 and set(lanes.to_list()) == {0, 1},
+            f"Temporal lane assignment smoke test failed for {dtype}.",
         )
     print(f"Testing installed artifact from {package}")
     with tempfile.TemporaryDirectory() as temporary:

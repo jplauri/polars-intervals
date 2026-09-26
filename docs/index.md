@@ -1,7 +1,8 @@
 # Getting started
 
-polars-intervals counts overlapping intervals in Polars. It returns one count
-per row and works with eager and lazy queries.
+polars-intervals counts overlaps and assigns intervals to the minimum number of
+non-overlapping lanes in Polars. Both operations return one value per row and
+work with eager and lazy queries.
 
 ## Install
 

@@ -1,5 +1,13 @@
 # Release notes
 
+## Unreleased
+
+- Add `assign_lanes` to the Python expression, Rust Polars, and independent core
+  APIs, returning optimal, deterministic, contiguous `UInt32` lane IDs in row order.
+  Supports the same integer, Date, and Datetime endpoints as `overlap_count`.
+- Compare three exact algorithms in release mode; retain reproducible candidates,
+  independent optimality checks, property tests, and measured selection rationale.
+
 ## 0.1.0 — September 25, 2026
 
 First release of polars-intervals. Count overlapping intervals directly in

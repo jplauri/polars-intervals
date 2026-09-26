@@ -1,5 +1,42 @@
 # Usage
 
+## Assign the minimum number of lanes
+
+`assign_lanes` supports calendar/timeline layout, machine/resource lanes,
+Gantt charts, genomic tracks, and concurrent-job visualization.
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
+result = df.lazy().with_columns(pi.assign_lanes("start", "end").alias("lane")).collect()
+assert result["lane"].dtype == pl.UInt32
+assert result["lane"].n_unique() == 2
+assert result["lane"][0] == result["lane"][2]
+```
+
+The first and last intervals touch, so they can share a lane. For non-empty
+intervals, **minimum number of lanes = maximum concurrency**. Empty intervals
+consume no capacity and receive lane `0`. Nonempty input consisting only of
+empties uses one lane; empty input returns empty output.
+
+IDs are contiguous `0..k-1`, returned in original row order, and deterministic
+for identical input. No particular optimal coloring or stable lane numbers
+across releases or input permutations are promised. Filtering before assignment
+changes the collection being colored; filtering afterwards keeps its assigned IDs
+and can therefore leave gaps in the filtered result.
+
+Use `pi.assign_lanes("start", "end").over("group")` for independent assignments
+per group. `group_by("group").agg(pi.assign_lanes("start", "end").alias("lanes"))`
+returns `List(UInt32)` per group. Eager `select`, lazy `with_columns`, multiple
+chunks, and temporal endpoints all follow the same [input rules](#inputs).
+The whole collection is needed even when collecting with the streaming engine.
+
+See the [API reference](api.md) and [algorithm comparison](assign-lanes-benchmarks.md).
+
+## Count overlaps
+
 `overlap_count` accepts column names or Polars expressions. Use it in `select`
 or `with_columns` on eager or lazy frames. The examples below use lazy queries.
 
