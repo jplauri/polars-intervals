@@ -14,3 +14,7 @@ harness = false
 [[bench]]
 name = "max_weight_non_overlapping"
 harness = false
+
+[[bench]]
+name = "max_weight_with_capacity"
+harness = false

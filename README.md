@@ -1,7 +1,7 @@
 # polars-intervals
 
 Count overlaps, assign optimal interval lanes, and select maximum-weight schedules
-in Polars, without building a graph or a table of overlapping pairs.
+in Polars, without building a conflict graph or a table of overlapping pairs.
 
 [Usage](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md) ·
 [Benchmarks](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md) ·
@@ -152,6 +152,33 @@ different timezones (including naive/aware pairs) are rejected without coercion.
 days or timestamps in the existing Rust algorithm, preserving exact values.
 
 The API is early-stage and may change.
+
+## Select with a simultaneous capacity
+
+`max_weight_with_capacity` selects a globally maximum-weight subset of intervals
+subject to a maximum simultaneous capacity. It returns a Boolean expression in
+original row order, suitable for `select`, `with_columns`, or `filter`:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+jobs = pl.DataFrame(
+    {
+        "start": [0, 0, 4, 7],
+        "end": [10, 4, 7, 10],
+        "weight": [15, 10, 10, 10],
+    }
+)
+selected = jobs.filter(pi.max_weight_with_capacity("start", "end", weight="weight", capacity=2))
+assert selected["weight"].sum() == 45
+```
+
+At capacity 1 the three short intervals give 30, exactly the optimum of
+`max_weight_non_overlapping`. At capacity 2 the long interval can coexist with
+that schedule, giving 45. The optimization is globally exact.
+
+See the [API reference](https://github.com/jplauri/polars-intervals/blob/master/docs/api.md) for semantics and supported types.
 
 ## Contributing
 

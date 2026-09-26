@@ -227,3 +227,56 @@ and validation errors.
 Counts use the entire input, or each group when grouped. Collecting with Polars'
 streaming engine still requires the counting operation to see that collection;
 it uses memory proportional to its size.
+
+## Select with a simultaneous capacity
+
+`max_weight_with_capacity` selects a globally maximum-weight subset of intervals
+subject to a maximum simultaneous capacity. It returns a Boolean expression in
+original row order, suitable for `select`, `with_columns`, or `filter`:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+jobs = pl.DataFrame(
+    {
+        "start": [0, 0, 4, 7],
+        "end": [10, 4, 7, 10],
+        "weight": [15, 10, 10, 10],
+    }
+)
+selected = jobs.filter(pi.max_weight_with_capacity("start", "end", weight="weight", capacity=2))
+assert selected["weight"].sum() == 45
+```
+
+At capacity 1 the three short intervals give 30, exactly the optimum of
+`max_weight_non_overlapping`. At capacity 2 the long interval can coexist with
+that schedule, giving 45. The optimization is globally exact.
+
+Intervals are half-open `[start, end)`, so touching intervals do not overlap.
+Capacity is a nonnegative integer; zero selects only positive empty intervals.
+Positive empty intervals always consume zero capacity. Negative and zero-weight
+rows are omitted. The empty subset is allowed with objective zero. Tie choices
+are deterministic for identical input, but a particular optimal mask is not a
+stable public contract.
+
+Weights must be non-null signed or unsigned integers up to 64 bits. Objectives
+use exact, checked `i128` accumulation; there are no implicit casts or floating
+weights. Endpoints support matching integer, Date, and Datetime dtypes, including
+matching Datetime units/timezones. Nulls, reversed intervals and unequal input
+lengths are rejected; reversed intervals report the original row index.
+
+Use `.over("group")` for independent group optimization; grouped aggregation
+returns Boolean lists. All chunks form a single instance. Filtering before the
+expression changes the optimization problem.
+
+The core preserves the specialized capacity-1 dynamic program. It removes
+irrelevant rows, accepts all positive candidates when capacity is sufficient,
+and splits independent overlap components before exact successive-shortest-path
+min-cost flow. For n rows and constrained component sizes n_c, runtime is
+`O(n log n + sum(capacity * n_c * log(n_c + 1)))`, with `O(n)` additional memory.
+Capacity zero is linear; capacity one is `O(n log n)`.
+
+Substantial independent component workloads use at most eight Rust workers;
+small inputs and single components stay serial. See the [algorithm and benchmark
+report](capacity-scheduling-benchmarks.md) for measured tradeoffs and reproduction.

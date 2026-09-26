@@ -23,6 +23,7 @@ nav:
   - Benchmarks: benchmarks.md
   - Lane algorithm comparison: assign-lanes-benchmarks.md
   - Weighted scheduling comparison: weighted-scheduling-benchmarks.md
+  - Capacity scheduling comparison: capacity-scheduling-benchmarks.md
   - Release notes: changelog.md
   - Development:
       - Contributing: contributing.md

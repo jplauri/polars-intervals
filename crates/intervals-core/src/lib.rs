@@ -13,6 +13,8 @@ mod lanes;
 pub use lanes::assign_lanes;
 mod weighted;
 pub use weighted::max_weight_non_overlapping;
+mod capacity;
+pub use capacity::max_weight_with_capacity;
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
