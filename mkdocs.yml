@@ -1,5 +1,5 @@
 site_name: polars-intervals
-site_description: Count overlapping intervals in Polars
+site_description: Count overlaps and assign interval lanes in Polars
 repo_url: https://github.com/jplauri/polars-intervals
 site_dir: target/docs
 watch: [CONTRIBUTING.md, benchmarks/README.md, python]

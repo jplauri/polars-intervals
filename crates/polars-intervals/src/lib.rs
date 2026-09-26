@@ -13,39 +13,32 @@ mod _internal {}
 // The constant output_type form can abort at the FFI boundary for a dtype whose
 // optional Polars feature is disabled (e.g. Int128), before our validation runs.
 fn count_output(inputs: &[Field]) -> PolarsResult<Field> {
-    output_field(inputs, "overlap_count", DataType::UInt64)
+    let [start, _] = input_pair(inputs, Algorithm::OverlapCount)?;
+    Ok(Field::new(start.name().clone(), DataType::UInt64))
 }
 
 fn lanes_output(inputs: &[Field]) -> PolarsResult<Field> {
-    output_field(inputs, "assign_lanes", DataType::UInt32)
+    let [start, _] = input_pair(inputs, Algorithm::AssignLanes)?;
+    Ok(Field::new(start.name().clone(), DataType::UInt32))
 }
 
-fn output_field(inputs: &[Field], name: &str, dtype: DataType) -> PolarsResult<Field> {
-    polars_ensure!(
-        inputs.len() == 2,
-        InvalidOperation: "{} requires exactly two inputs, got {}", name, inputs.len()
-    );
-    Ok(Field::new(inputs[0].name().clone(), dtype))
+fn input_pair<T>(inputs: &[T], algorithm: Algorithm) -> PolarsResult<&[T; 2]> {
+    inputs.try_into().map_err(|_| {
+        polars_err!(InvalidOperation: "{} requires exactly two inputs, got {}",
+            algorithm.name(), inputs.len())
+    })
 }
 
 #[pyo3_polars::derive::polars_expr(output_type_func = count_output)]
 fn overlap_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
-    polars_ensure!(
-        inputs.len() == 2,
-        InvalidOperation: "overlap_count requires exactly two inputs, got {}",
-        inputs.len()
-    );
-    overlap_count(&inputs[0], &inputs[1])
+    let [starts, ends] = input_pair(inputs, Algorithm::OverlapCount)?;
+    overlap_count(starts, ends)
 }
 
 #[pyo3_polars::derive::polars_expr(output_type_func = lanes_output)]
 fn assign_lanes_plugin(inputs: &[Series]) -> PolarsResult<Series> {
-    polars_ensure!(
-        inputs.len() == 2,
-        InvalidOperation: "assign_lanes requires exactly two inputs, got {}",
-        inputs.len()
-    );
-    assign_lanes(&inputs[0], &inputs[1])
+    let [starts, ends] = input_pair(inputs, Algorithm::AssignLanes)?;
+    assign_lanes(starts, ends)
 }
 
 /// Counts other overlapping intervals in the supplied start and end columns.
@@ -189,14 +182,12 @@ where
         ComputeError: "{} does not support null endpoints", algorithm.name()
     );
     // Borrow contiguous inputs; only materialize columns spanning multiple chunks.
-    let starts = starts
-        .cont_slice()
-        .map(Cow::Borrowed)
-        .unwrap_or_else(|_| Cow::Owned(starts.into_no_null_iter().collect()));
-    let ends = ends
-        .cont_slice()
-        .map(Cow::Borrowed)
-        .unwrap_or_else(|_| Cow::Owned(ends.into_no_null_iter().collect()));
+    let [starts, ends] = [starts, ends].map(|column| {
+        column
+            .cont_slice()
+            .map(Cow::Borrowed)
+            .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
+    });
     match algorithm {
         Algorithm::OverlapCount => {
             let counts = intervals_core::overlap_counts(&starts, &ends)

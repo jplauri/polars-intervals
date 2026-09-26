@@ -42,7 +42,7 @@ The empty interval `[2, 2)` counts zero.
 
 ## Next steps
 
-- [Usage](usage.md): count within groups and choose which rows to compare.
+- [Usage](usage.md): assign lanes, count within groups, and choose which rows to compare.
 - [API reference](api.md): input requirements, return types, and errors.
 - [Benchmarks](benchmarks.md): measured results and reproduction commands.
 - [Release notes](changelog.md): changes and compatibility by version.

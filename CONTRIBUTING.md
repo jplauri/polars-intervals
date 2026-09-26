@@ -84,7 +84,7 @@ For the Rust API reference, set `RUSTDOCFLAGS` to `-D warnings` and run
 | `crates/polars-intervals` | Polars input validation, Rust API, and expression plugin |
 | `python/polars_intervals` | Python expressions and API docstrings |
 | `tests` | Python integration tests |
-| `benchmarks` | Runtime and memory comparisons with native Polars expressions and joins |
+| `benchmarks` | Algorithm comparisons and runtime/memory comparisons with native Polars |
 | `docs` | Documentation site and release guide |
 
 The core supports ordered endpoint types and has no production dependencies.

@@ -1,5 +1,9 @@
 # Usage
 
+`overlap_count` and `assign_lanes` accept column names or Polars expressions.
+Use them in `select` or `with_columns` on eager or lazy frames. The examples
+below use lazy queries.
+
 ## Assign the minimum number of lanes
 
 `assign_lanes` supports calendar/timeline layout, machine/resource lanes,
@@ -34,11 +38,6 @@ chunks, and temporal endpoints all follow the same [input rules](#inputs).
 The whole collection is needed even when collecting with the streaming engine.
 
 See the [API reference](api.md) and [algorithm comparison](assign-lanes-benchmarks.md).
-
-## Count overlaps
-
-`overlap_count` accepts column names or Polars expressions. Use it in `select`
-or `with_columns` on eager or lazy frames. The examples below use lazy queries.
 
 ## Count within groups
 
