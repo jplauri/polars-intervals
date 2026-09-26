@@ -309,6 +309,15 @@ def installed(checkout):
             capacity_mask.dtype == pl.Boolean and capacity_mask.to_list() == [True, True],
             f"Temporal capacity smoke test failed for {dtype}.",
         )
+    stabbing = (
+        pl.DataFrame({"start": [0, 2, 5], "end": [4, 6, 9]})
+        .select(pi.minimum_stabbing_points("start", "end"))
+        .to_series()
+    )
+    require(
+        stabbing.dtype == pl.List(pl.Int64) and stabbing.to_list() == [[3, 8]],
+        "Minimum stabbing points smoke test failed.",
+    )
     print(f"Testing installed artifact from {package}")
     with tempfile.TemporaryDirectory() as temporary:
         previous_directory = Path.cwd()

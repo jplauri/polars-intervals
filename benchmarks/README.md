@@ -142,6 +142,16 @@ for workloads, raw results, production selection, exactness, memory and limitati
 There is no equivalent native dataframe-expression baseline for this iterative
 subset-selection problem.
 
+## Minimum interval stabbing
+
+Run `cargo bench -p intervals-core --bench minimum_stabbing_points --locked`
+for packed, indirect and sorted-input exact candidates through 3M rows.
+`stabbing_temporal.py` measures the installed release wheel on Int64, Date and
+Datetime; `stabbing_summary.py` summarizes raw medians. Every candidate is
+validated before timing against coverage and independent optimality oracles.
+See the [stabbing report](https://github.com/jplauri/polars-intervals/blob/master/docs/stabbing-benchmarks.md)
+for workloads, phase/allocation measurements, reproduction and production choice.
+
 ## Adding a benchmark
 
 Add `benchmarks/<function>.py` using the measurement rules above. Add one section

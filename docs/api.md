@@ -1,5 +1,7 @@
 # API reference
 
+::: polars_intervals.minimum_stabbing_points
+
 ::: polars_intervals.overlap_count
 
 ::: polars_intervals.assign_lanes

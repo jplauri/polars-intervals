@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Add `minimum_stabbing_points` to Python, Rust Polars, and the independent core.
+  Select a globally minimum, sorted, unique list of points hitting every discrete
+  half-open interval. Preserve integer/Date/Datetime logical dtypes and timezone
+  metadata; return one list per collection/group. Empty input returns an empty
+  list; empty intervals are infeasible with original-index errors.
+- Benchmark packed, indirect and sorted-input greedy candidates through 3M rows,
+  with all-coordinate subset and disjoint-packing oracles, proptest properties,
+  native plugin tests, phase timings, and allocation measurements.
+
 - Add exact `minimum_cover` and `minimum_cost_cover` to Python, Rust Polars, and
   the independent core. Cover one continuous half-open scalar target with the
   fewest intervals or minimum nonnegative integer cost (then fewest intervals).
