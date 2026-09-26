@@ -15,7 +15,9 @@ pip install polars-intervals
 
 Or with uv: `uv add polars-intervals`.
 
-## Example
+## Examples
+
+### Count overlaps
 
 Count how many other intervals overlap each row:
 
@@ -23,12 +25,50 @@ Count how many other intervals overlap each row:
 import polars as pl
 import polars_intervals as pi
 
-df = pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
-result = df.lazy().with_columns(pi.overlap_count("start", "end").alias("overlaps")).collect()
+df = pl.DataFrame(
+    {
+        "start": [0, 1, 2],
+        "end": [2, 3, 4],
+    }
+)
+result = (
+    df.lazy()
+    .with_columns(
+        pi.overlap_count("start", "end").alias("overlaps"),
+    )
+    .collect()
+)
+
 print(result["overlaps"].to_list())  # [1, 2, 1]
 ```
 
 Intervals include their start and exclude their end, so touching intervals do not overlap.
+
+### Cover a target
+
+Select the fewest intervals needed to cover `[0, 10)`:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame(
+    {
+        "start": [0, 0, 4, 6, 7],
+        "end": [4, 6, 7, 10, 10],
+    }
+)
+selected = df.filter(
+    pi.minimum_cover(
+        "start",
+        "end",
+        target_start=0,
+        target_end=10,
+    )
+)
+
+print(selected.rows())  # [(0, 6), (6, 10)]
+```
 
 ## Algorithms
 
