@@ -89,13 +89,15 @@ For the Rust API reference, set `RUSTDOCFLAGS` to `-D warnings` and run
 
 The core supports ordered endpoint types and has no production dependencies.
 The Rust Polars API exposes `polars_intervals::overlap_count(&starts, &ends)`
-and `polars_intervals::assign_lanes(&starts, &ends)`
+and `polars_intervals::assign_lanes(&starts, &ends)`, plus
+`polars_intervals::max_weight_non_overlapping(&starts, &ends, &weights)`
 for matching integer, Date, or Datetime Series.
 
 The core lane comparison needs no Polars build:
 
 ```sh
 cargo bench -p intervals-core --bench assign_lanes --locked
+cargo bench -p intervals-core --bench max_weight_non_overlapping --locked
 ```
 
 It validates all candidates before timing. See the

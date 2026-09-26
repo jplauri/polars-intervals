@@ -1,8 +1,61 @@
 # Usage
 
-`overlap_count` and `assign_lanes` accept column names or Polars expressions.
+`overlap_count`, `assign_lanes`, and `max_weight_non_overlapping` accept column names or Polars expressions.
 Use them in `select` or `with_columns` on eager or lazy frames. The examples
 below use lazy queries.
+
+## Select a globally maximum-weight schedule
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame(
+    {
+        "start": [0, 0, 4, 7],
+        "end": [10, 4, 7, 10],
+        "revenue": [15, 10, 10, 10],
+    }
+)
+chosen = df.filter(pi.max_weight_non_overlapping("start", "end", weight="revenue"))
+assert chosen["revenue"].sum() == 30
+```
+
+The intervals `[0, 4)`, `[4, 7)`, and `[7, 10)` together earn 30, beating
+`[0, 10)` at 15. Choosing the largest individual weight, or deciding each row
+independently, cannot solve this global optimization. Earliest-finish greedy is
+also insufficient: `[0, 1)` at weight 1 loses to `[0, 4)` at weight 20.
+
+The output is a non-null Boolean mask in original row order. Selection is exact
+and deterministic for identical input; which optimal subset wins a tie is not
+part of the stable contract. The empty subset has value zero. Negative and
+zero-weight rows are omitted. Positive empty intervals `[x, x)` conflict with
+nothing and are all selected, including several at the same coordinate.
+Touching non-empty intervals are compatible under `[start, end)` semantics.
+
+Weights accept only `Int8/16/32/64` and `UInt8/16/32/64`, with no nulls or
+implicit casts. Objectives use checked `i128` arithmetic, returning an error
+instead of overflowing. Float, Decimal, Boolean and temporal weights are
+unsupported; floating-point weights may be considered separately. Endpoints
+follow the [input rules](#inputs), including Date and Datetime support.
+
+```python
+schedule = pi.max_weight_non_overlapping(
+    pl.col("start"),
+    pl.col("end"),
+    weight=pl.col("revenue") * 2,
+).alias("selected")
+result = df.lazy().with_columns(schedule).collect()
+```
+
+Use `schedule.over("group")` for independent optimization within each group.
+`df.group_by("group").agg(schedule)` returns `List(Boolean)` masks per group.
+All chunks form one instance; the full instance is needed even with the
+streaming engine. Filtering before optimization changes the problem being solved.
+
+The production DP takes `O(n log n)` time and `O(n)` additional space.
+See the [candidate comparison](weighted-scheduling-benchmarks.md) for the measured
+algorithm choice, and the [API reference](api.md) for validation details.
 
 ## Assign the minimum number of lanes
 

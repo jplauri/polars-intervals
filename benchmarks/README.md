@@ -1,5 +1,27 @@
 # Benchmarks
 
+## max_weight_non_overlapping
+
+```sh
+cargo bench -p intervals-core --bench max_weight_non_overlapping --locked > benchmarks/results/weighted-local.csv
+uv run --no-sync python benchmarks/weighted_summary.py benchmarks/results/weighted-local.csv
+```
+
+Three private exact candidates compare one finish sort plus binary searches,
+two sorted orders plus a predecessor sweep, and a sorted endpoint-event DP.
+The full matrix has eleven structures, two input orders, six weight distributions,
+and 1K/10K/100K/1M rows. Two warmups and five recorded samples use shuffled
+candidate order. Every output is verified outside timing against an independent
+suffix DP and feasibility checks. Small instances also have a test-only
+brute-force oracle. Set `WEIGHTED_BENCH_MAX_N=1000` for a short smoke run.
+
+Reports include runtime, coarse phases, peak live vector capacity bytes and
+buffer allocation counts (not RSS or allocator instrumentation). See the
+[weighted scheduling decision](https://github.com/jplauri/polars-intervals/blob/master/docs/weighted-scheduling-benchmarks.md)
+for workload details, environment, results and limitations. No native Polars
+speedup is claimed: this data-dependent DP recurrence is not naturally expressed
+as ordinary dataframe algebra.
+
 ## assign_lanes
 
 Compare the start-sort/min-heap, two-sorts/free-list, and endpoint-event strategies:

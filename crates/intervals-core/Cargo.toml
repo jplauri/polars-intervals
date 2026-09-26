@@ -10,3 +10,7 @@ proptest = "1.11"
 [[bench]]
 name = "assign_lanes"
 harness = false
+
+[[bench]]
+name = "max_weight_non_overlapping"
+harness = false

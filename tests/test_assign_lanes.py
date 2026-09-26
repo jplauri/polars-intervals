@@ -167,9 +167,8 @@ def test_unsupported_dtypes_including_empty(dtype):
 
 
 @pytest.mark.parametrize("algorithm", [pi.assign_lanes, pi.overlap_count])
-def test_disabled_polars_dtype_feature_raises_instead_of_aborting(algorithm):
-    # Int128 field import can fail before the adapter's validation is reached.
-    # The plugin schema callback must catch that failure at its FFI boundary.
+def test_unsupported_int128_raises_instead_of_aborting(algorithm):
+    # Int128 is imported for explicit dtype errors, but remains unsupported.
     for values in [[0], [None], []]:
         frame = pl.DataFrame(
             {name: pl.Series(values, dtype=pl.Int128) for name in ["start", "end"]}

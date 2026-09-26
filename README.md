@@ -1,7 +1,7 @@
 # polars-intervals
 
-Count overlaps and assign optimal interval lanes in Polars, without building a graph
-or a table of overlapping pairs.
+Count overlaps, assign optimal interval lanes, and select maximum-weight schedules
+in Polars, without building a graph or a table of overlapping pairs.
 
 [Usage](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md) ·
 [Benchmarks](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md) ·
@@ -83,9 +83,39 @@ Use `.over("group")` for independent lane assignment per group, or
 [algorithm comparison](https://github.com/jplauri/polars-intervals/blob/master/docs/assign-lanes-benchmarks.md)
 for the measured production choice.
 
+## Select a maximum-weight schedule
+
+`max_weight_non_overlapping` selects a globally maximum-weight subset of mutually
+non-overlapping intervals. It returns a Boolean expression for filtering:
+
+```python
+df = pl.DataFrame(
+    {
+        "start": [0, 0, 4, 7],
+        "end": [10, 4, 7, 10],
+        "weight": [15, 10, 10, 10],
+    }
+)
+selected = df.filter(pi.max_weight_non_overlapping("start", "end", weight="weight"))
+assert selected["weight"].sum() == 30
+```
+
+The three shorter intervals beat the single largest-weight interval (15).
+This is an exact global optimization. Touching endpoints are compatible, and
+every positive empty interval is selected. The empty subset is allowed;
+negative and zero-weight rows are omitted. Weights must be non-null signed or
+unsigned integers up to 64 bits, accumulated exactly with checked `i128` arithmetic.
+Float and Decimal weights are unsupported. The mask follows original row order
+and is deterministic for identical input; no particular optimum on ties is promised.
+Use `.over("group")` for independent schedules or `group_by(...).agg(...)` for lists.
+
+Time is `O(n log n)` and additional space is `O(n)`. See the
+[weighted scheduling comparison](https://github.com/jplauri/polars-intervals/blob/master/docs/weighted-scheduling-benchmarks.md)
+for reproducible candidate benchmarks and the production choice.
+
 ## Date and Datetime intervals
 
-Both `overlap_count` and `assign_lanes` accept Date and Datetime endpoints.
+All three operations accept Date and Datetime endpoints.
 
 ```python
 from datetime import datetime

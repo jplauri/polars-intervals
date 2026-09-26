@@ -3,6 +3,7 @@
 //! [`overlap_counts`] counts overlaps between half-open intervals without
 //! depending on Polars or any particular endpoint type.
 //! [`assign_lanes`] assigns intervals to the minimum number of lanes.
+//! [`max_weight_non_overlapping`] selects an exact maximum-weight schedule.
 
 #![forbid(unsafe_code)]
 
@@ -10,6 +11,8 @@ use std::fmt;
 
 mod lanes;
 pub use lanes::assign_lanes;
+mod weighted;
+pub use weighted::max_weight_non_overlapping;
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,6 +23,13 @@ pub enum IntervalError {
     InvalidInterval { index: usize },
     /// More than `u32::MAX + 1` lanes are required.
     TooManyLanes,
+    /// The weight slice does not contain one value per interval.
+    WeightLengthMismatch {
+        intervals_len: usize,
+        weights_len: usize,
+    },
+    /// The optimal objective exceeds the `i128` accumulator range.
+    WeightOverflow,
 }
 
 impl fmt::Display for IntervalError {
@@ -36,6 +46,14 @@ impl fmt::Display for IntervalError {
                 write!(f, "interval at index {index} has start greater than end")
             }
             Self::TooManyLanes => write!(f, "lane IDs exceed the UInt32 range"),
+            Self::WeightLengthMismatch {
+                intervals_len,
+                weights_len,
+            } => write!(
+                f,
+                "interval and weight lengths differ: {intervals_len} intervals, {weights_len} weights"
+            ),
+            Self::WeightOverflow => write!(f, "maximum weight exceeds the i128 accumulator range"),
         }
     }
 }

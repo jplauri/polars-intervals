@@ -10,6 +10,9 @@ crate-type = ["rlib", "cdylib"]
 [dependencies]
 intervals-core = { path = "../intervals-core" }
 polars = { version = "0.55.2", default-features = false, features = ["dtype-i8", "dtype-i16", "dtype-u8", "dtype-u16", "dtype-date", "dtype-datetime"] }
+# Enable only core type import (already a transitive dependency), so Decimal /
+# Int128 weights get explicit errors without enabling decimal IO or SQL features.
+polars-core = { version = "0.55.2", default-features = false, features = ["dtype-decimal"] }
 pyo3 = "0.29"
 pyo3-polars = { version = "0.28", default-features = false, features = ["derive"] }
 
