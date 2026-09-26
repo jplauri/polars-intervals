@@ -7,3 +7,7 @@
 ::: polars_intervals.max_weight_non_overlapping
 
 ::: polars_intervals.max_weight_with_capacity
+
+::: polars_intervals.minimum_cover
+
+::: polars_intervals.minimum_cost_cover

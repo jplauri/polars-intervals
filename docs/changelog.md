@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add exact `minimum_cover` and `minimum_cost_cover` to Python, Rust Polars, and
+  the independent core. Cover one continuous half-open scalar target with the
+  fewest intervals or minimum nonnegative integer cost (then fewest intervals).
+  Empty targets select nothing; infeasible targets raise. Scalar temporal metadata
+  is validated exactly, and groups independently cover the same target.
+- Compare packed/indirect greedy sweeps, a heap reference, Fenwick/segment-tree
+  frontier DP, and a quadratic reference in release mode. Add exhaustive subset
+  oracles, proptest invariants and metamorphic properties, native integration tests,
+  and reproducible phase/allocation measurements through one million intervals.
+
 - Add exact `max_weight_with_capacity` selection to Python, Rust Polars and the
   independent core, with integer weights, half-open intervals, free positive
   empty intervals, and independent group/window optimization. Capacity one uses

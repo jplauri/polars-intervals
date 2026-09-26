@@ -1,5 +1,6 @@
 """Rust-backed interval expressions for Polars."""
 
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import polars as pl
@@ -9,8 +10,186 @@ __all__ = [
     "assign_lanes",
     "max_weight_non_overlapping",
     "max_weight_with_capacity",
+    "minimum_cost_cover",
+    "minimum_cover",
     "overlap_count",
 ]
+
+
+def _target(value: int | date | datetime | pl.Series) -> dict:
+    if isinstance(value, int) and not isinstance(value, bool):
+        return {"kind": "integer", "value": str(value)}
+    if isinstance(value, datetime):
+        zone = None
+        if value.tzinfo is UTC:
+            zone = "UTC"
+        elif value.tzinfo is not None:
+            zone = getattr(value.tzinfo, "key", None) or getattr(value.tzinfo, "zone", None)
+            if zone is None:
+                raise TypeError("datetime target timezone must be UTC or named; use a typed Series")
+        value = pl.Series([value])
+        if value.dtype.time_zone != zone:
+            raise TypeError("datetime target timezone metadata must be preserved exactly")
+    elif isinstance(value, date):
+        value = pl.Series([value])
+    if not isinstance(value, pl.Series):
+        raise TypeError("target must be an integer, date, datetime, or one-element typed Series")
+    if len(value) != 1 or value.null_count():
+        raise ValueError("target Series must contain exactly one non-null value")
+    dtype = value.dtype
+    if dtype in (pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64):
+        return {"kind": "integer", "value": str(value.item()), "dtype": str(dtype)}
+    if dtype == pl.Date:
+        return {"kind": "date", "value": str(value.to_physical().item())}
+    if isinstance(dtype, pl.Datetime):
+        return {
+            "kind": "datetime",
+            "value": str(value.to_physical().item()),
+            "unit": dtype.time_unit,
+            "timezone": dtype.time_zone,
+        }
+    raise TypeError("target must have a supported integer, Date, or Datetime dtype")
+
+
+def minimum_cover(
+    start: str | pl.Expr,
+    end: str | pl.Expr,
+    *,
+    target_start: int | date | datetime | pl.Series,
+    target_end: int | date | datetime | pl.Series,
+) -> pl.Expr:
+    """Select the fewest intervals whose union continuously covers a target interval.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+        target_start: Scalar inclusive start of the target.
+        target_end: Scalar exclusive end of the target.
+
+    Returns:
+        pl.Expr: Non-null Boolean mask in original row order, selecting one exact
+            minimum-cardinality cover. Identical inputs give deterministic masks;
+            a particular mask under ties is not promised across releases.
+
+    Raises:
+        TypeError: For unsupported target scalar types.
+        ValueError: For a target Series that is not one non-null value.
+        polars.exceptions.PolarsError: For reversed intervals/targets, null endpoints,
+            unequal lengths, unsupported or incompatible dtypes, out-of-range
+            targets, or a target that cannot be covered by the supplied intervals.
+
+    Notes:
+        Intervals and target are half-open: [start, end). Touching intervals chain
+        perfectly. Empty targets select nothing; empty input intervals are never
+        selected. Intervals may extend outside the target. Every input row is
+        validated, including on empty targets. Infeasible non-empty targets raise.
+
+        Endpoints support matching Int8/16/32/64, UInt8/16/32/64, Date, and Datetime
+        dtypes. Python integers must fit the endpoint dtype exactly. Python dates
+        require Date; Python datetimes require Datetime with microsecond units and
+        matching timezone metadata (naive, UTC, or a named timezone). Use a typed
+        Series for other timezone metadata. A one-element Series supplies an explicitly
+        typed scalar, including millisecond/nanosecond Datetime targets. Its dtype
+        must match exactly; no Date/Datetime, unit, timezone, or lossy numeric casts
+        occur. Targets are scalar plugin configuration, never row-valued inputs.
+
+        Use in eager select, lazy with_columns, or directly in df.filter(...).
+        With .over("group"), each group covers the same scalar target independently;
+        group_by aggregation produces Boolean lists. All chunks form one instance.
+        The complete collection is required even with the streaming engine.
+
+        The exact Rust greedy algorithm sorts packed candidates by start, then
+        repeatedly selects the eligible interval reaching furthest right. It uses
+        O(n log n) time and O(n) additional space. Equal effective ends prefer the
+        original row index. Endpoints are compared without subtraction.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({"start": [0, 0, 4, 6, 7], "end": [4, 6, 7, 10, 10]})
+        >>> df.filter(pi.minimum_cover(
+        ...     "start", "end", target_start=0, target_end=10,
+        ... )).rows()
+        [(0, 6), (6, 10)]
+
+        Reaching 6 first permits a two-interval cover; choosing [0,4) first can
+        require three intervals.
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="minimum_cover_plugin",
+        args=[start, end],
+        kwargs={"target_start": _target(target_start), "target_end": _target(target_end)},
+        is_elementwise=False,
+    )
+
+
+def minimum_cost_cover(
+    start: str | pl.Expr,
+    end: str | pl.Expr,
+    *,
+    cost: str | pl.Expr,
+    target_start: int | date | datetime | pl.Series,
+    target_end: int | date | datetime | pl.Series,
+) -> pl.Expr:
+    """Select a minimum-cost set of intervals whose union continuously covers a target interval.
+
+    Equal-cost ties use fewer intervals, preventing gratuitous zero-cost selections.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+        cost: Column name or expression producing nonnegative integer costs.
+        target_start: Scalar inclusive target start; see minimum_cover's scalar rules.
+        target_end: Scalar exclusive target end; see minimum_cover's scalar rules.
+
+    Returns:
+        pl.Expr: Non-null Boolean mask in original row order, minimizing total cost
+            and then selected count exactly. Tied masks are deterministic for
+            identical input, but are not uniquely specified by the public API.
+
+    Raises:
+        TypeError: For unsupported target scalar types.
+        ValueError: For a target Series that is not one non-null value.
+        polars.exceptions.PolarsError: For minimum_cover's invalid/infeasible inputs,
+            unsupported/null/negative costs, cost length mismatch, or i128 overflow.
+
+    Notes:
+        Target conversion, half-open semantics, validation, grouping, chunk handling,
+        empty targets, and infeasibility follow minimum_cover. Empty intervals never
+        help. Costs must be Int8/16/32/64 or UInt8/16/32/64 with no nulls or negatives.
+        Float, Decimal, Boolean, temporal and Int128 costs are rejected without
+        implicit casts. Accumulation is exact checked i128. Overflowing candidate
+        paths cannot improve a representable optimum; an overflow error is raised
+        if every feasible cover exceeds i128::MAX.
+
+        The Rust solver uses exact frontier dynamic programming, a reversed Fenwick
+        suffix-min tree, and backpointer reconstruction. It processes equal-right-end
+        intervals as a batch so they cannot chain through one another. Time is
+        O(n log n), additional space O(n). Internal objective ties use original row
+        and predecessor coordinate order. Python performs no optimization.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({
+        ...     "start": [0, 0, 5], "end": [10, 5, 10], "cost": [100, 10, 10],
+        ... })
+        >>> df.filter(pi.minimum_cost_cover(
+        ...     "start", "end", cost="cost", target_start=0, target_end=10,
+        ... )).rows()
+        [(0, 5, 10), (5, 10, 10)]
+
+        The minimum-cardinality answer uses one interval costing 100. The
+        minimum-cost answer uses two intervals costing 20 in total.
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="minimum_cost_cover_plugin",
+        args=[start, end, cost],
+        kwargs={"target_start": _target(target_start), "target_end": _target(target_end)},
+        is_elementwise=False,
+    )
 
 
 def max_weight_with_capacity(

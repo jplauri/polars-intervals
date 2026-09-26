@@ -128,6 +128,20 @@ binary hashes, and settings. The main run also compares the binary-search plugin
 from `925033f`. Earlier join-only measurements remain in the
 [original report](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/v0.1.0-windows.json).
 
+## Exact continuous target covering
+
+Run `cargo bench -p intervals-core --bench covering --locked` for packed/indirect
+greedy sweeps, heap, Fenwick, segment-tree and quadratic reference comparisons.
+The suite measures total/preprocessing/optimization/reconstruction time and
+allocations through 1M rows; the quadratic reference is limited to 1K.
+`covering_temporal.py` benchmarks the installed release wheel on integer, Date,
+and Datetime endpoints. `covering_summary.py` summarizes the raw candidate CSV.
+
+See the [covering report](https://github.com/jplauri/polars-intervals/blob/master/docs/covering-benchmarks.md)
+for workloads, raw results, production selection, exactness, memory and limitations.
+There is no equivalent native dataframe-expression baseline for this iterative
+subset-selection problem.
+
 ## Adding a benchmark
 
 Add `benchmarks/<function>.py` using the measurement rules above. Add one section

@@ -1,0 +1,153 @@
+{
+  "date_utc": "2026-09-26T15:21:30.752129+00:00",
+  "base_commit": "cee8e52e96a9a260af712d84fb86574c6225d309",
+  "rust": [
+    "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "binary: rustc",
+    "commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985",
+    "commit-date: 2026-09-01",
+    "host: x86_64-pc-windows-msvc",
+    "release: 1.98.1",
+    "LLVM version: 22.1.8"
+  ],
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "uv": "uv 0.11.3 (45da18ac3 2026-04-01 x86_64-pc-windows-msvc)",
+  "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+  "physical_cores": 12,
+  "logical_processors": 24,
+  "os": "Microsoft Windows 11 Home",
+  "os_version": "10.0.26200",
+  "usable_ram_kib": 33475628,
+  "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+  "polars": "1.44.2",
+  "profile": "Cargo bench optimized; wheel built by uv/maturin release optimized; no CPU-heavy compilation concurrent with benchmarks",
+  "seed": 20260926,
+  "core_samples": 7425,
+  "core_workloads": 396,
+  "core_candidate_workload_combinations": 2475,
+  "native_samples": 1536,
+  "native_workloads": 512,
+  "timed_repeats": 3,
+  "warmups": 1,
+  "sizes": [
+    1000,
+    10000,
+    100000,
+    1000000
+  ],
+  "quadratic_max_rows": 1000,
+  "core_command": "cargo bench -p intervals-core --bench covering --locked",
+  "native_command": "external-release-env/python -I benchmarks/covering_temporal.py (cwd outside checkout)",
+  "summary_command": "python benchmarks/covering_summary.py",
+  "orders": [
+    "sorted",
+    "nearly_sorted (1% adjacent swaps)",
+    "shuffled"
+  ],
+  "candidates": [
+    "MC-A",
+    "MC-B",
+    "MC-C",
+    "MC-A-detect",
+    "MCC-A",
+    "MCC-B",
+    "MCC-C"
+  ],
+  "physical_width_supplement": [
+    "i32 Date physical",
+    "i64 Datetime physical"
+  ],
+  "native_dtypes": [
+    "Int32",
+    "Int64",
+    "UInt64",
+    "Date",
+    "Datetime(ms)",
+    "Datetime(us)",
+    "Datetime(ns, UTC)",
+    "Datetime(ns, Europe/Helsinki)"
+  ],
+  "allocation_metric": "Separate untimed full invocation: peak live requested heap bytes and allocation/reallocation count; excludes caller inputs, oracle work, stacks, allocator metadata and RSS",
+  "phase_metric": "Nanoseconds within every timed candidate invocation; greedy reconstruction is fused with sweep; early failures can skip DP/reconstruction; total also includes destruction of temporary buffers",
+  "source_sha256": {
+    "Cargo.lock": "3a22e32e855b68bc423c01a23542e73f4cb92f6206187141b1a5aecfb2e9ace9",
+    "uv.lock": "de1a426ddd8f8cc68031d26bd63f844d3b60a5f7158fe394723190aae7b4b86a",
+    "rust-toolchain.toml": "86810d0ace88a635a96ed7a8d7d432afa6950c0c0b99f78f6e905ed9616a9882",
+    "crates/intervals-core/src/cover.rs": "d386c26a06d34ddba2d73ae58e9e1a8ca0e55b5f56871c8da7230ce5a2b54dec",
+    "crates/intervals-core/src/lib.rs": "22e68889aca3c636754454104a309c4eb925e9b594a5a098bc06fb22542b7116",
+    "crates/intervals-core/benches/covering.rs": "29e424466853c0531461ab7191ffc4d796a863f12f8cf48140281bd37428461b",
+    "crates/intervals-core/benches/support/covering.rs": "5db9030a6f67b8b67e465f333248a3ba77f76146a404211f58047848571fadb9",
+    "crates/intervals-core/benches/support/allocations.rs": "ba1da9a191823c6d4094b94fa9490a4322812a8e089a6edc09c322df558eda1c",
+    "crates/intervals-core/tests/covering.rs": "3b2d60416e28b9ea52248800b164803da87eaacf5796798edf7a1942667c8c58",
+    "crates/polars-intervals/src/lib.rs": "87bb1ddbdf7dbc55294ae4a0765edaf9b05caf799413a8fb9e31fb51181fae31",
+    "crates/polars-intervals/src/cover.rs": "3fd3915d5e9f785ad1f47cad3f70df4bab6de441319d317f7b059b452ee5960e",
+    "crates/polars-intervals/tests/covering.rs": "219c0e989ed5fe00579763e4a2bb5e529f2586f718be978d0206a3e12f3a0e27",
+    "python/polars_intervals/__init__.py": "6232bbee5f68377107996288c3a0557342cad3873f63f1e78a951b1fd7e778e8",
+    "tests/test_covering.py": "f21e867c5753bd1ebe29f744f26fc0d0ad5b62f476a350ff1fdc904f267bc5a7",
+    "benchmarks/covering_temporal.py": "f0fc92a056103ae7f730e1ad19260ef98771822226606e3340acacb79514d524",
+    "benchmarks/covering_summary.py": "0b64292d3786aa22a8fbb5293ef505a479ac1a9167d6d26cfa02bc1fdd52cbf9"
+  },
+  "result_sha256": {
+    "covering-temporal-windows.csv": "315fe987aa3a0f34b0c94b80fe96a9e27717e0a0d70f2f4db399fd1ad95a99ee",
+    "covering-windows.csv": "721d7a349f6eb4ac056424f580495ef8aa5ea3fcb24b87806ec524fae4a85070"
+  },
+  "artifacts_sha256": {
+    "polars_intervals-0.1.0-cp314-cp314-win_amd64.whl": "dbc95283178e1cc770bc96c7a19ea4b7062613a6bbc069434c3cea11afd4f46a",
+    "polars_intervals-0.1.0.tar.gz": "9b9fd3c23674a3a61944bf29059f306122ac94dea917cf1d5741e22a320837e8"
+  },
+  "validation": {
+    "rust_tests_and_doctests": 99,
+    "python_tests_and_doctests": 1229,
+    "release_wheel_external_tests_and_doctests": 1229,
+    "ci_release_helper_tests": 49,
+    "cargo_fmt": "passed",
+    "clippy_all_targets_deny_warnings": "passed",
+    "rustdoc_deny_warnings": "passed",
+    "uv_lock_check": "passed",
+    "ruff_check_and_format": "passed",
+    "mkdocs_strict": "passed",
+    "wheel_and_sdist_metadata_audit": "passed",
+    "twine_strict": "passed"
+  },
+  "limitations": [
+    "One Windows x86-64 host; synthetic workloads; no cross-platform speed guarantee",
+    "Quadratic benchmark limited to 1K; exhaustive subset oracle limited to correctness tests",
+    "Native suite records runtime, core suite records phase timings and allocations",
+    "Local release test covers CPython 3.14 Windows wheel; full 15-wheel CI matrix was not run locally"
+  ],
+  "cleanup_verification": {
+    "date_utc": "2026-09-26T15:32:44.039503+00:00",
+    "scope": "Shared benchmark measurement/verification runner, common plugin input validation, fewer scalar copies, portable CSV summaries, documentation clarity. Public APIs and solver implementations unchanged.",
+    "historical_results": "Original source_sha256, raw result files, and measured solver/candidate sources retained unchanged; cleanup hashes are recorded separately here.",
+    "source_sha256": {
+      "crates/polars-intervals/src/lib.rs": "f2a8c78f886be16d2278fe0903f4d1a355ad298fd277d042bc13e43d8cc29b72",
+      "crates/polars-intervals/src/cover.rs": "5985242dff396c8827a4d8cd8219a9b88bea5f623c70f0aa839fd4aeef27877a",
+      "python/polars_intervals/__init__.py": "731239c9ac6ebf610eccb26cc34a7e4a4437e67ff35c67d34240a9e01f04f2d1",
+      "crates/intervals-core/benches/covering.rs": "2eb00a33e8b2d7448bd0c6d8201aecc719fddca6f39420774c523c61b401882f",
+      "benchmarks/covering_summary.py": "8ddb1b788dbde9b29d54d41b81e920e49b45d9bb7f04d89c876c765ce11c935f",
+      "README.md": "24e1e58158a33c1fe1d27372a4ffeae662227970a644e97951141e43cf950f8e",
+      "docs/index.md": "a29988c5cd3c308f9b12097dbacc6eca427baa35d0214cec01a84f779f7a41e8",
+      "docs/covering-benchmarks.md": "42524bedc00d124e827d8009e4fed06af98286458653ae87a3a87cf96d53cbf8"
+    },
+    "native_plugin_sha256": "ee440c1ff75f6be530a3e77147e4fba93456e19fd090e1e7ae4a612b79e4e233",
+    "release_candidate_smoke": {
+      "max_rows": 1000,
+      "timed_repeats": 3,
+      "samples": 2079,
+      "candidate_workload_combinations": 693,
+      "build_command": "cargo bench -p intervals-core --bench covering --locked (COVER_BENCH_MAX=1000)",
+      "verification": "Every result verifies coverage and optimum agreement. Workload keys, peak bytes and allocation counts match original 1K results exactly. Smoke runtimes are not used as performance evidence."
+    },
+    "checks": {
+      "cargo_test_workspace_locked": 99,
+      "python_tests_and_doctests_on_rebuilt_plugin": 1229,
+      "ci_release_helper_tests": 49,
+      "cargo_fmt": "passed",
+      "clippy_workspace_all_targets_deny_warnings": "passed",
+      "uv_lock": "passed",
+      "ruff_check_and_format": "passed",
+      "mkdocs_strict": "passed",
+      "git_diff_check": "passed"
+    }
+  }
+}
