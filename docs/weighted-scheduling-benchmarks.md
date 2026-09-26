@@ -7,7 +7,7 @@
 Select a globally maximum-weight subset of mutually non-overlapping intervals.
 Production uses **B: two sorted orders and a linear predecessor sweep**, followed by
 exact dynamic programming and reconstruction. Time is `O(n log n)` and additional space
-is `O(n)`. No graph or generic optimizer is constructed.
+is `O(n)`.
 
 ## Compared implementations
 
@@ -205,17 +205,10 @@ existing Polars dependency.
 
 ## Limitations
 
-These are synthetic workloads on one Windows machine with one endpoint width. Relative
-winners can depend on endpoint ordering, overlap, fraction of retained rows,
-allocator/cache effects, hardware and compiler. They do not establish universal
-superiority or a Python/Polars speedup. The extra random-length workload specifically
-challenges the correlation between start and finish order in the structured families. No
-runtime algorithm dispatcher is added.
-
-This operation has a data-dependent dynamic-programming recurrence and is not naturally
-expressible as ordinary Polars dataframe algebra. No clean equivalent native formulation
-was identified, so no misleading native-Polars baseline is reported. Per-row filters,
-unweighted greedy selection and pairwise joins do not compute the same objective.
+These measurements cover the Rust core on one Windows machine with one endpoint
+width. They exclude Python/Polars overhead and a native Polars baseline. Ordering,
+overlap, hardware, and compiler can affect the relative timings. The random-length
+workloads test cases where start and finish order are less correlated.
 
 ## Raw data
 
@@ -225,10 +218,8 @@ run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/
 [environment and source
 hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-environment.json).
 
-### Historical validation
-
-The following checks belong to the original recorded implementation, not to every later
-documentation edit.
+<details markdown="1" id="historical-validation">
+<summary>Validation at the recorded revision</summary>
 
 Completed locally on the environment above (Python 3.14.0):
 
@@ -254,3 +245,5 @@ integer/Date/Datetime smoke cases, then run the full tests and doctests. The sou
 archive was built and inspected for the implementation, tests, benchmark reference,
 lockfile and compiler policy. Other OS/Python wheel targets remain covered by the
 existing CI release matrix. They were not run locally.
+
+</details>

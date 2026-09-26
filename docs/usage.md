@@ -1,158 +1,11 @@
 # Usage
 
-## Minimum stabbing points
+Pass column names or Polars expressions to use interval operations in eager or
+lazy queries. See the [API reference](api.md) for full parameter and return types.
 
-Select the minimum number of discrete points that hit every half-open interval.
+## Count overlaps
 
-```python
-import polars as pl
-import polars_intervals as pi
-
-df = pl.DataFrame({"start": [0, 2, 5], "end": [4, 6, 9]})
-result = df.select(pi.minimum_stabbing_points("start", "end").alias("points"))
-assert result["points"].to_list() == [[3, 8]]
-assert result.schema["points"] == pl.List(pl.Int64)
-```
-
-For `[0,4)`, `[2,6)`, `[5,9)`, the earliest end is 4. Choose **3**, which hits
-the first two intervals. The next uncovered interval is `[5,9)`, so choose **8**.
-The result is `[3,8]`. Selecting 4 would fail to hit `[0,4)` because the end is
-excluded. Similarly, `[0,2)` and `[2,4)` need two points, `[1,3]`.
-
-Endpoints must be discrete: matching Int8/16/32/64, UInt8/16/32/64, Date, or
-Datetime columns. The exact predecessor of `end` is one integer tick, one day
-for Date, or one physical millisecond/microsecond/nanosecond for Datetime.
-`[2026-01-01,2026-01-05)` chooses January 4. Datetime unit and timezone metadata
-are preserved in `List(Datetime(unit, timezone))`; nanosecond columns subtract
-one nanosecond. No floating point, epsilon arithmetic or coercion is involved.
-
-The result is globally optimal, sorted, unique and deterministic for identical
-geometry, including permutations and duplicates. Empty input returns one empty
-list with the correct inner dtype. **Any empty interval `[x,x)` makes the problem
-infeasible**, because it contains no point. The error is
-`cannot stab empty interval at index N`. Validation happens before sorting, so
-`N` is the original zero-based position within the supplied collection/group.
-Nulls, reversed intervals, mismatched dtypes and unequal lengths are rejected.
-
-```python
-grouped = df.with_columns(pl.Series("group", ["a", "a", "b"]))
-result = grouped.group_by("group").agg(pi.minimum_stabbing_points("start", "end").alias("points"))
-# a -> [3], b -> [8], each with dtype List(Int64)
-```
-
-Eager and lazy select return one list. Grouped aggregation independently solves
-each group and returns one list per group. `.over("group")` broadcasts the
-group's list to its rows. All input chunks belong to the same collection.
-Filtering before aggregation changes the problem being solved.
-
-### Why the greedy algorithm is exact
-
-Sort by increasing end and consider the earliest-ending uncovered interval.
-Every feasible solution must put a point `q` in that interval. Move it rightward
-to `predecessor(end)`. Any later-ending interval that contained `q` still contains
-the moved point: its start is at most `q`, and its end is at least this earliest
-end. An optimal solution therefore exists containing the greedy point. Remove
-the intervals it hits and repeat the argument on those remaining.
-
-The triggering intervals are pairwise disjoint, and any stabbing set needs at
-least one point for each of them. This also proves the interval identity:
-
-```text
-minimum stabbing number = maximum number of pairwise disjoint intervals
-```
-
-The implementation uses Rust's unstable comparison sort on packed `(start,end)`
-records, followed by a linear scan. It validates all rows and detects already
-nondecreasing ends before allocating records. Total time is `O(n log n)` and
-additional space is `O(n + k)` including `k` output points. End-sorted input takes
-`O(n)` time and `O(k)` output space. The Polars adapter borrows contiguous columns
-and collects multiple chunks when needed. See [benchmark evidence](stabbing-benchmarks.md).
-
-Rust exposes `intervals_core::minimum_stabbing_points(&starts, &ends) ->
-Result<Vec<T>, IntervalError>` for `T: DiscreteEndpoint`, and
-`polars_intervals::minimum_stabbing_points(&starts, &ends) -> PolarsResult<Series>`
-for Polars Series (one list). `DiscreteEndpoint` only requires `Ord + Copy` and
-`predecessor() -> Option<Self>`; integer primitive implementations use checked
-subtraction. The core has no Polars, Arrow, Python or temporal dependencies.
-
-## Cover one continuous target
-
-`minimum_cover` selects the fewest intervals whose union continuously covers a
-target. It is an exact global optimization. The furthest-reaching greedy choice
-selects `[0,6)` followed by `[6,10)` here:
-
-```python
-import polars as pl
-import polars_intervals as pi
-
-df = pl.DataFrame({"start": [0, 0, 4, 6, 7], "end": [4, 6, 7, 10, 10]})
-df.filter(pi.minimum_cover("start", "end", target_start=0, target_end=10))
-```
-
-Choosing `[0,4)` first can require three intervals. The greedy rule compares
-every eligible interval and takes the one reaching furthest right.
-
-`minimum_cost_cover` instead minimizes total cost, then uses fewer intervals
-among covers with the same cost:
-
-```python
-df = pl.DataFrame({"start": [0, 0, 5], "end": [10, 5, 10], "cost": [100, 10, 10]})
-df.filter(
-    pi.minimum_cost_cover(
-        "start",
-        "end",
-        cost="cost",
-        target_start=0,
-        target_end=10,
-    )
-)
-# Selects [0,5) and [5,10): cost 20 instead of the single interval costing 100.
-```
-
-Both targets and intervals are half-open. Touching intervals chain perfectly;
-empty intervals never help. Intervals extending outside the target are allowed.
-An empty target selects nothing. Reversed targets/intervals and null endpoints
-are errors, even for empty targets. An infeasible non-empty target raises
-`target interval cannot be covered by the supplied intervals`.
-
-Costs accept nonnegative Int8/16/32/64 and UInt8/16/32/64, without nulls, floats,
-Decimal or implicit casts. Totals use exact checked `i128` arithmetic. Core
-inputs can exercise the full accumulator range; overflow is reported if the
-minimum feasible cost cannot be represented. Ties are deterministic for
-identical input, but a particular tied mask is not a stable API promise.
-
-Targets are scalar configuration. Python integers must fit the endpoint dtype.
-Python dates require Date columns; Python datetimes require Datetime with
-microsecond units and identical timezone metadata. For explicit units and full
-nanosecond precision, pass a **one-element typed Series** for each scalar:
-
-```python
-target_start = pl.Series([0], dtype=pl.Int64).cast(pl.Datetime("ns", "UTC"))
-target_end = pl.Series([100], dtype=pl.Int64).cast(pl.Datetime("ns", "UTC"))
-```
-
-Typed targets must match exactly, including integer width, Datetime unit and
-timezone. Date/Datetime, different units, incompatible timezones and lossy
-numeric conversions are rejected. Target values are not broadcast into columns.
-Python datetimes accept naive, UTC, or named timezone metadata; fixed-offset or
-custom timezone objects require an explicitly typed Series to avoid implicit
-timezone normalization by the scalar constructor.
-
-Use the expressions in eager `select`, lazy `with_columns`, or direct `filter`.
-`.over("group")` solves each group independently against the same target scalars;
-one infeasible group raises an error. All chunks form one instance. Filtering
-before selection changes the available intervals.
-
-Both algorithms take `O(n log n)` time and `O(n)` additional space. The unweighted
-solver sorts packed candidates and sweeps linearly; the weighted solver uses
-frontier dynamic programming with a reversed Fenwick suffix-min tree and
-backpointers. See the [candidate benchmark comparison](covering-benchmarks.md).
-
-`overlap_count`, `assign_lanes`, and `max_weight_non_overlapping` accept column names or Polars expressions.
-Use them in `select` or `with_columns` on eager or lazy frames. The examples
-below use lazy queries.
-
-## Select a globally maximum-weight schedule
+`overlap_count` counts how many other intervals overlap each row.
 
 ```python
 import polars as pl
@@ -160,95 +13,40 @@ import polars_intervals as pi
 
 df = pl.DataFrame(
     {
-        "start": [0, 0, 4, 7],
-        "end": [10, 4, 7, 10],
-        "revenue": [15, 10, 10, 10],
+        "start": [1, 3, 2, 2],
+        "end": [3, 5, 4, 2],
     }
 )
-chosen = df.filter(pi.max_weight_non_overlapping("start", "end", weight="revenue"))
-assert chosen["revenue"].sum() == 30
+result = (
+    df.lazy()
+    .with_columns(
+        pi.overlap_count("start", "end").alias("overlaps"),
+    )
+    .collect()
+)
+
+print(result["overlaps"].to_list())  # [1, 1, 2, 0]
 ```
 
-The intervals `[0, 4)`, `[4, 7)`, and `[7, 10)` together earn 30, beating
-`[0, 10)` at 15. Choosing the largest individual weight, or deciding each row
-independently, cannot solve this global optimization. Earliest-finish greedy is
-also insufficient: `[0, 1)` at weight 1 loses to `[0, 4)` at weight 20.
+### Interval rules
 
-The output is a non-null Boolean mask in original row order. Selection is exact
-and deterministic for identical input; which optimal subset wins a tie is not
-part of the stable contract. The empty subset has value zero. Negative and
-zero-weight rows are omitted. Positive empty intervals `[x, x)` conflict with
-nothing and are all selected, including several at the same coordinate.
-Touching non-empty intervals are compatible under `[start, end)` semantics.
+Each count excludes the row itself. Empty intervals count zero and contribute
+no overlaps.
 
-Weights accept only `Int8/16/32/64` and `UInt8/16/32/64`, with no nulls or
-implicit casts. Objectives use checked `i128` arithmetic, returning an error
-instead of overflowing. Float, Decimal, Boolean and temporal weights are
-unsupported; floating-point weights may be considered separately. Endpoints
-follow the [input rules](#inputs), including Date and Datetime support.
+| Case | Overlap counts |
+| --- | --- |
+| `[1, 3)` and `[3, 5)` | Zero for both, as touching endpoints do not overlap |
+| `[1, 4)` and `[3, 5)` | One for each |
+| `[2, 2)` | Zero |
+| Two rows containing `[1, 4)` | One for each, as duplicate rows count separately |
+| A single interval | Zero |
 
-```python
-schedule = pi.max_weight_non_overlapping(
-    pl.col("start"),
-    pl.col("end"),
-    weight=pl.col("revenue") * 2,
-).alias("selected")
-result = df.lazy().with_columns(schedule).collect()
-```
+### Count within groups
 
-Use `schedule.over("group")` for independent optimization within each group.
-`df.group_by("group").agg(schedule)` returns `List(Boolean)` masks per group.
-All chunks form one instance; the full instance is needed even with the
-streaming engine. Filtering before optimization changes the problem being solved.
-
-The production DP takes `O(n log n)` time and `O(n)` additional space.
-See the [candidate comparison](weighted-scheduling-benchmarks.md) for the measured
-algorithm choice, and the [API reference](api.md) for validation details.
-
-## Assign the minimum number of lanes
-
-`assign_lanes` supports calendar/timeline layout, machine/resource lanes,
-Gantt charts, genomic tracks, and concurrent-job visualization.
+Use `.over(...)` to compare intervals within each group while keeping the rows
+and their order:
 
 ```python
-import polars as pl
-import polars_intervals as pi
-
-df = pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
-result = df.lazy().with_columns(pi.assign_lanes("start", "end").alias("lane")).collect()
-assert result["lane"].dtype == pl.UInt32
-assert result["lane"].n_unique() == 2
-assert result["lane"][0] == result["lane"][2]
-```
-
-The first and last intervals touch, so they can share a lane. For non-empty
-intervals, **minimum number of lanes = maximum concurrency**. Empty intervals
-consume no capacity and receive lane `0`. Nonempty input consisting only of
-empties uses one lane; empty input returns empty output.
-
-IDs are contiguous `0..k-1`, returned in original row order, and deterministic
-for identical input. No particular optimal coloring or stable lane numbers
-across releases or input permutations are promised. Filtering before assignment
-changes the collection being colored; filtering afterwards keeps its assigned IDs
-and can therefore leave gaps in the filtered result.
-
-Use `pi.assign_lanes("start", "end").over("group")` for independent assignments
-per group. `group_by("group").agg(pi.assign_lanes("start", "end").alias("lanes"))`
-returns `List(UInt32)` per group. Eager `select`, lazy `with_columns`, multiple
-chunks, and temporal endpoints all follow the same [input rules](#inputs).
-The whole collection is needed even when collecting with the streaming engine.
-
-See the [API reference](api.md) and [algorithm comparison](assign-lanes-benchmarks.md).
-
-## Count within groups
-
-Use `.over(...)` to compare intervals that share a group, such as ranges on the
-same chromosome or positions in the same file.
-
-```python
-import polars as pl
-import polars_intervals as pi
-
 df = pl.DataFrame(
     {
         "group": ["a", "b", "a", "b"],
@@ -258,28 +56,14 @@ df = pl.DataFrame(
 )
 result = (
     df.lazy()
-    .with_columns(pi.overlap_count("start", "end").over("group").alias("overlaps"))
+    .with_columns(
+        pi.overlap_count("start", "end").over("group").alias("overlaps"),
+    )
     .collect()
 )
-print(result)
-```
 
-```text
-shape: (4, 4)
-┌───────┬───────┬─────┬──────────┐
-│ group ┆ start ┆ end ┆ overlaps │
-│ ---   ┆ ---   ┆ --- ┆ ---      │
-│ str   ┆ i64   ┆ i64 ┆ u64      │
-╞═══════╪═══════╪═════╪══════════╡
-│ a     ┆ 1     ┆ 4   ┆ 1        │
-│ b     ┆ 1     ┆ 4   ┆ 0        │
-│ a     ┆ 2     ┆ 3   ┆ 1        │
-│ b     ┆ 5     ┆ 6   ┆ 0        │
-└───────┴───────┴─────┴──────────┘
+print(result["overlaps"].to_list())  # [1, 0, 1, 0]
 ```
-
-The two intervals in group `a` overlap. The two in group `b` do not.
-`.over("group")` keeps the original rows and their order.
 
 To collect the counts into one list per group, use `group_by(...).agg(...)`:
 
@@ -287,100 +71,76 @@ To collect the counts into one list per group, use `group_by(...).agg(...)`:
 grouped = (
     df.lazy()
     .group_by("group", maintain_order=True)
-    .agg(pi.overlap_count("start", "end").alias("overlaps"))
+    .agg(
+        pi.overlap_count("start", "end").alias("overlaps"),
+    )
     .collect()
 )
-print(grouped)
+
+print(grouped.rows())  # [('a', [1, 1]), ('b', [0, 0])]
 ```
 
-```text
-shape: (2, 2)
-┌───────┬───────────┐
-│ group ┆ overlaps  │
-│ ---   ┆ ---       │
-│ str   ┆ list[u64] │
-╞═══════╪═══════════╡
-│ a     ┆ [1, 1]    │
-│ b     ┆ [0, 0]    │
-└───────┴───────────┘
-```
+### Choose which rows to compare
 
-## Choose which rows to compare
-
-Filtering before counting limits the intervals used in the comparison.
-Filtering afterwards keeps counts computed against the full input.
+Filtering before counting compares only the retained intervals. Filtering
+afterwards keeps counts computed against the full input:
 
 ```python
-df = pl.DataFrame({"start": [1, 3, 2, 2], "end": [3, 5, 4, 2]})
+df = pl.DataFrame(
+    {
+        "start": [1, 3, 2, 2],
+        "end": [3, 5, 4, 2],
+    }
+)
 count = pi.overlap_count("start", "end").alias("overlaps")
 keep = pl.col("start") < 3
 
-within_subset = df.lazy().filter(keep).with_columns(count).collect()
-against_all = df.lazy().with_columns(count).filter(keep).collect()
+within_subset = df.filter(keep).with_columns(count)
+against_all = df.with_columns(count).filter(keep)
 
-print(within_subset["overlaps"].to_list())
-print(against_all["overlaps"].to_list())
-```
-
-```text
-[1, 1, 0]
-[1, 2, 0]
+print(within_subset["overlaps"].to_list())  # [1, 1, 0]
+print(against_all["overlaps"].to_list())  # [1, 2, 0]
 ```
 
 The interval `[2, 4)` has one overlap in the subset and two in the full input.
 
-## Interval rules
+## Assign the minimum number of lanes
 
-Intervals are half-open: `[start, end)`. Two non-empty intervals overlap when
-`start < other_end` and `other_start < end`. Each row excludes itself.
-
-| Case | Behavior |
-| --- | --- |
-| `[1, 3)` and `[3, 5)` | Touching endpoints do not overlap |
-| `[1, 4)` and `[3, 5)` | Each counts the other |
-| `[2, 2)` | Empty; counts zero and contributes no overlaps |
-| Two rows containing `[1, 4)` | Separate intervals; each counts the other |
-| A single interval | Counts zero |
-
-## Inputs
-
-Endpoints must have matching integer, `Date`, or `Datetime` dtypes, contain no
-nulls, and satisfy `start <= end`. Both endpoints must be `Date`, or both must
-be `Datetime` with the same time unit (`ms`, `us`, or `ns`) and exactly matching
-timezone metadata. Matching timezone-aware columns are supported; naive/aware
-pairs are rejected, as are Date/Datetime, temporal/integer, and different units
-or timezones. No automatic coercion is performed. `Time`, `Duration`, and
-floating-point columns are not supported. See the [temporal example](api.md)
-in the API reference.
-
-If integer widths differ, cast both inputs explicitly:
+`assign_lanes` places intervals into the fewest lanes without overlaps within
+a lane. This is useful for calendars, timelines, and resource scheduling.
 
 ```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame(
+    {
+        "start": [0, 1, 2],
+        "end": [2, 3, 4],
+    }
+)
 result = (
     df.lazy()
     .with_columns(
-        pi.overlap_count(
-            pl.col("start").cast(pl.Int64),
-            pl.col("end").cast(pl.Int64),
-        ).alias("overlaps")
+        pi.assign_lanes("start", "end").alias("lane"),
     )
     .collect()
 )
+
+print(result["lane"].to_list())  # [0, 1, 0]
 ```
 
-Choose a type that can hold every endpoint; for example, some `UInt64` values
-cannot fit in `Int64`. See the [API reference](api.md) for all supported types
-and validation errors.
+The first and last intervals touch, so they share a lane. Empty intervals use
+no capacity and receive lane `0`. Lane IDs start at zero, but their assignment
+may change across releases or input order. Use `.over("group")` for separate
+assignments within groups.
 
-Counts use the entire input, or each group when grouped. Collecting with Polars'
-streaming engine still requires the counting operation to see that collection;
-it uses memory proportional to its size.
+[API reference](api.md#polars_intervals.assign_lanes) · [Benchmarks](assign-lanes-benchmarks.md)
 
-## Select with a simultaneous capacity
+## Select a globally maximum-weight schedule
 
-`max_weight_with_capacity` selects a globally maximum-weight subset of intervals
-subject to a maximum simultaneous capacity. It returns a Boolean expression in
-original row order, suitable for `select`, `with_columns`, or `filter`:
+`max_weight_non_overlapping` selects non-overlapping intervals with the largest
+total weight:
 
 ```python
 import polars as pl
@@ -390,41 +150,190 @@ jobs = pl.DataFrame(
     {
         "start": [0, 0, 4, 7],
         "end": [10, 4, 7, 10],
-        "weight": [15, 10, 10, 10],
+        "revenue": [15, 10, 10, 10],
     }
 )
-selected = jobs.filter(pi.max_weight_with_capacity("start", "end", weight="weight", capacity=2))
-assert selected["weight"].sum() == 45
+chosen = jobs.filter(
+    pi.max_weight_non_overlapping("start", "end", weight="revenue"),
+)
+
+print(chosen["revenue"].sum())  # 30
 ```
 
-At capacity 1 the three short intervals give 30, exactly the optimum of
-`max_weight_non_overlapping`. At capacity 2 the long interval can coexist with
-that schedule, giving 45. The optimization is globally exact.
+The three shorter jobs earn 30 together, compared with 15 for the long job.
+Weights must be non-null integers up to 64 bits. Rows with zero or negative
+weight are omitted. Positive-weight empty intervals are always selected.
 
-Intervals are half-open `[start, end)`, so touching intervals do not overlap.
-Capacity is a nonnegative integer; zero selects only positive empty intervals.
-Positive empty intervals always consume zero capacity. Negative and zero-weight
-rows are omitted. The empty subset is allowed with objective zero. Tie choices
-are deterministic for identical input, but a particular optimal mask is not a
-stable public contract.
+[API reference](api.md#polars_intervals.max_weight_non_overlapping) · [Benchmarks](weighted-scheduling-benchmarks.md)
 
-Weights must be non-null signed or unsigned integers up to 64 bits. Objectives
-use exact, checked `i128` accumulation; there are no implicit casts or floating
-weights. Endpoints support matching integer, Date, and Datetime dtypes, including
-matching Datetime units/timezones. Nulls, reversed intervals and unequal input
-lengths are rejected; reversed intervals report the original row index.
+## Select with a simultaneous capacity
 
-Use `.over("group")` for independent group optimization; grouped aggregation
-returns Boolean lists. All chunks form a single instance. Filtering before the
-expression changes the optimization problem.
+`max_weight_with_capacity` allows up to `capacity` selected intervals to overlap:
 
-The core preserves the specialized capacity-1 dynamic program. It removes
-irrelevant rows, accepts all positive candidates when capacity is sufficient,
-and splits independent overlap components before exact successive-shortest-path
-min-cost flow. For n rows and constrained component sizes n_c, runtime is
-`O(n log n + sum(capacity * n_c * log(n_c + 1)))`, with `O(n)` additional memory.
-Capacity zero is linear; capacity one is `O(n log n)`.
+```python
+import polars as pl
+import polars_intervals as pi
 
-Substantial independent component workloads use at most eight Rust workers;
-small inputs and single components stay serial. See the [algorithm and benchmark
-report](capacity-scheduling-benchmarks.md) for measured tradeoffs and reproduction.
+jobs = pl.DataFrame(
+    {
+        "start": [0, 0, 4, 7],
+        "end": [10, 4, 7, 10],
+        "revenue": [15, 10, 10, 10],
+    }
+)
+chosen = jobs.filter(
+    pi.max_weight_with_capacity(
+        "start",
+        "end",
+        weight="revenue",
+        capacity=2,
+    )
+)
+
+print(chosen["revenue"].sum())  # 45
+```
+
+At capacity two, the long job can run alongside all three short jobs. Capacity
+one gives the same optimum as `max_weight_non_overlapping`. The same weight
+rules apply. Capacity must be a nonnegative integer, and empty intervals use
+no capacity.
+
+[API reference](api.md#polars_intervals.max_weight_with_capacity) · [Benchmarks](capacity-scheduling-benchmarks.md)
+
+## Cover one continuous target
+
+`minimum_cover` selects the fewest intervals needed to cover a target:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame(
+    {
+        "start": [0, 0, 4, 6, 7],
+        "end": [4, 6, 7, 10, 10],
+    }
+)
+chosen = df.filter(
+    pi.minimum_cover(
+        "start",
+        "end",
+        target_start=0,
+        target_end=10,
+    )
+)
+
+print(chosen.rows())  # [(0, 6), (6, 10)]
+```
+
+Touching intervals can form a continuous cover. Intervals may extend beyond the
+target. An empty target selects nothing, and an uncovered target raises an error.
+
+[API reference](api.md#polars_intervals.minimum_cover) · [Benchmarks](covering-benchmarks.md)
+
+### Cover at minimum cost
+
+`minimum_cost_cover` minimizes total cost, choosing fewer intervals when costs tie:
+
+```python
+df = pl.DataFrame(
+    {
+        "start": [0, 0, 5],
+        "end": [10, 5, 10],
+        "cost": [100, 10, 10],
+    }
+)
+chosen = df.filter(
+    pi.minimum_cost_cover(
+        "start",
+        "end",
+        cost="cost",
+        target_start=0,
+        target_end=10,
+    )
+)
+
+print(chosen.rows())  # [(0, 5, 10), (5, 10, 10)]
+print(chosen["cost"].sum())  # 20
+```
+
+The two shorter intervals cost 20 together, compared with 100 for the single
+full-length interval. Costs must be non-null, nonnegative integers up to 64 bits.
+
+For both covering operations, `.over("group")` covers the same target separately
+within each group. An infeasible group raises an error.
+
+[API reference](api.md#polars_intervals.minimum_cost_cover) · [Benchmarks](cost-covering-benchmarks.md)
+
+### Date and Datetime targets
+
+Python dates work with `Date` endpoints. Python datetimes require matching
+microsecond `Datetime` columns and timezone metadata. To specify another time
+unit, pass a one-element Series with the same dtype as the endpoints:
+
+```python
+target_start = pl.Series([0], dtype=pl.Int64).cast(pl.Datetime("ns", "UTC"))
+target_end = pl.Series([100], dtype=pl.Int64).cast(pl.Datetime("ns", "UTC"))
+```
+
+See the [target requirements](api.md#polars_intervals.minimum_cover) for supported
+timezones and scalar types.
+
+## Minimum stabbing points
+
+`minimum_stabbing_points` finds the fewest points needed to hit every interval:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame(
+    {
+        "start": [0, 2, 5],
+        "end": [4, 6, 9],
+    }
+)
+result = df.select(
+    pi.minimum_stabbing_points("start", "end").alias("points"),
+)
+
+print(result["points"].to_list())  # [[3, 8]]
+```
+
+Point 3 hits the first two intervals, and point 8 hits the third. The result is
+one sorted list with the endpoint dtype. Empty input returns one empty list.
+An empty interval raises an error because it contains no point.
+
+Use grouped aggregation for one list per group:
+
+```python
+grouped = (
+    df.with_columns(pl.Series("group", ["a", "a", "b"]))
+    .group_by("group", maintain_order=True)
+    .agg(
+        pi.minimum_stabbing_points("start", "end").alias("points"),
+    )
+)
+
+print(grouped.rows())  # [('a', [3]), ('b', [8])]
+```
+
+[API reference](api.md#polars_intervals.minimum_stabbing_points) · [Benchmarks](stabbing-benchmarks.md)
+
+## Inputs
+
+Intervals include their start and exclude their end: `[start, end)`.
+Endpoints must be non-null and satisfy `start <= end`.
+
+| Endpoint type | Requirement |
+| --- | --- |
+| Integer | Matching signed or unsigned integer dtypes up to 64 bits |
+| `Date` | Both columns must be `Date` |
+| `Datetime` | Matching time unit and timezone metadata |
+
+Inputs are not cast automatically. Cast mismatched columns explicitly to a type
+that can hold every endpoint. `Time`, `Duration`, and floating-point endpoints
+are unsupported. See the [API reference](api.md) for validation details.
+
+Each query or group is solved as a whole, including all input chunks. Collecting
+with the streaming engine still requires the operation to see that collection.

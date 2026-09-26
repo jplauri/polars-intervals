@@ -1,6 +1,6 @@
 ![Minimum stabbing points: Rust core. dtype=i64, family=disjoint, order=shuffled. Runtime (ms).](assets/benchmarks/stabbing-runtime.svg)
 
-Shuffled disjoint Int64 intervals. The candidates include phase-clock overhead. Production does not. Small differences between C and production are not evidence of a different algorithm. Bands show the observed minimum–maximum range, not confidence intervals.
+Shuffled disjoint Int64 intervals. Candidate timings include phase-clock overhead, while the production timing excludes it.
 
 Source: [stabbing-windows.csv](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-windows.csv). [Download plotted values](assets/benchmarks/stabbing-runtime.csv).
 
@@ -30,6 +30,6 @@ Source: [stabbing-windows.csv](https://github.com/jplauri/polars-intervals/blob/
 | 1,000,000 | Production (no phase clocks) | 30.76 | 30.75 | 31.86 | 3 |
 | 3,000,000 | Production (no phase clocks) | 112.7 | 110.1 | 115.5 | 3 |
 
-Measurement: **Runtime (ms)**. Missing cases are omitted, never zero.
+Measurement: **Runtime (ms)**.
 
 </details>

@@ -74,12 +74,12 @@ print(selected.rows())  # [(0, 6), (6, 10)]
 
 | Function | Description |
 | --- | --- |
-| [`overlap_count`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#count-within-groups) | Count the other intervals overlapping each interval. |
+| [`overlap_count`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#count-overlaps) | Count the other intervals overlapping each interval. |
 | [`assign_lanes`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#assign-the-minimum-number-of-lanes) | Assign the fewest lanes with no overlaps within a lane. |
 | [`max_weight_non_overlapping`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#select-a-globally-maximum-weight-schedule) | Select a non-overlapping subset with maximum total weight. |
 | [`max_weight_with_capacity`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#select-with-a-simultaneous-capacity) | Maximize total weight under a simultaneous overlap limit. |
 | [`minimum_cover`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#cover-one-continuous-target) | Cover a target with the fewest intervals. |
-| [`minimum_cost_cover`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#cover-one-continuous-target) | Cover a target at minimum total cost. |
+| [`minimum_cost_cover`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#cover-at-minimum-cost) | Cover a target at minimum total cost. |
 | [`minimum_stabbing_points`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#minimum-stabbing-points) | Find the fewest points that hit every interval. |
 
 ## Contributing

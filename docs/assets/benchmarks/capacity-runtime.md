@@ -1,6 +1,6 @@
 ![Maximum-weight selection with capacity: Rust core. family=components, order=shuffled, weights=positive, k=2. Runtime (ms).](assets/benchmarks/capacity-runtime.svg)
 
-Independent components at capacity two. These are the original recorded measurements. The later cleanup run is retained separately and is not pooled into this chart. Bands show the observed minimum–maximum range, not confidence intervals.
+Independent components at capacity two, using the original recorded run.
 
 Source: [capacity-windows.csv](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-windows.csv). [Download plotted values](assets/benchmarks/capacity-runtime.csv).
 
@@ -26,6 +26,6 @@ Source: [capacity-windows.csv](https://github.com/jplauri/polars-intervals/blob/
 | 100,000 | Generic flow | 125.6 | 124.8 | 127.5 | 3 |
 | 1,000,000 | Generic flow | 1969 | 1954 | 2023 | 3 |
 
-Measurement: **Runtime (ms)**. Missing cases are omitted, never zero.
+Measurement: **Runtime (ms)**.
 
 </details>

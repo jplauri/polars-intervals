@@ -4,12 +4,9 @@
 
 ## Summary
 
-`minimum_stabbing_points` selects the minimum number of discrete points that hit every
-half-open interval. Python and Rust Polars return one `List(endpoint_dtype)` per
-collection. Grouped Python aggregation returns one list per group. The independent core
-returns `Vec<T>` using a minimal `DiscreteEndpoint` trait.
-
-Production uses packed end sorting with a direct scan for already end-sorted input.
+`minimum_stabbing_points` finds the fewest points that hit every interval.
+Production sorts packed endpoints and scans them, with a direct scan for input
+already sorted by end.
 
 ## Compared implementations
 
@@ -26,17 +23,30 @@ rejects empty/reversed intervals in original order before any sorting.
 
 Production retains **packed comparison sorting with the sorted-input fast path**.
 Directly scanning sorted endpoints avoids allocating records. Indirect sorting saves
-record storage but has less predictable memory access on shuffled inputs. Candidate code
-stays private to tests and benchmarks. No selectable production backend or sorting
-dependency is added. Optional radix sorting was not implemented. The fixed-width native
-trait preserves compact physical widths and avoids allocating two widened i128 columns
-in the existing adapter.
+record storage but has less predictable memory access on shuffled inputs. The adapter
+preserves the physical endpoint width when allocating records.
 
 Sorting takes `O(n log n)` and the greedy scan `O(n)`. Additional space is `O(n + k)`
 including `k` points. End-sorted inputs take `O(n)` time and `O(k)` output space.
 Unsorted packed storage is `2 * n * sizeof(endpoint)` bytes, plus the growing output
 vector. Sorting is in place. The Polars adapter borrows contiguous physical columns.
 Multiple chunks require contiguous input copies.
+
+### Why the greedy algorithm is exact
+
+Sort by increasing end and consider the earliest-ending uncovered interval.
+Every feasible solution must put a point `q` in that interval. Move it rightward
+to `predecessor(end)`. Any later-ending interval that contained `q` still contains
+the moved point: its start is at most `q`, and its end is at least this earliest
+end. An optimal solution therefore exists containing the greedy point. Remove
+the intervals it hits and repeat the argument on those remaining.
+
+The triggering intervals are pairwise disjoint, and any stabbing set needs at
+least one point for each of them. This also proves the interval identity:
+
+```text
+minimum stabbing number = maximum number of pairwise disjoint intervals
+```
 
 ## Results
 
@@ -68,11 +78,8 @@ is **0.403** (about 2.48x faster). Excluding identical/equal-end families, which
 sorted under permutation, the unsorted ratios are **0.988 shuffled** and **1.009
 reverse**. The detection overhead is small beside the sorted-input benefit. At 3M
 shuffled rows, packed records also clearly outperform indirect sorting. B wins some
-reverse/monotone workloads and uses fewer temporary bytes for i64. There is no claim
-that the selected implementation wins every case. Keeping the small C guard and one
-packed fallback is the measured simplicity / performance tradeoff. Three samples do not
-establish significance for small percentage differences, including differences between C
-and production.
+reverse/monotone workloads and uses fewer temporary bytes for i64. Production keeps
+C's sorted-input check and packed fallback for their performance across the full matrix.
 
 For 3M disjoint Int64 intervals, measured production peak requested heap is **33,554,432
 bytes (32 MiB)** when sorted versus **81,554,432 bytes (77.78 MiB)** when shuffled. The
@@ -196,9 +203,8 @@ Peak memory means live requested heap bytes and allocation/reallocation counts i
 separate invocation, excluding caller inputs, verification, stack, allocator metadata
 and OS RSS. These are core measurements, not process-wide plugin memory.
 
-There is no manufactured native-Polars speedup comparison. This is a sequential global
-greedy selection problem without a clean equivalent in a small number of ordinary
-dataframe expressions.
+Candidate comparisons cover Rust implementations. The release-wheel timings measure
+the plugin without a native Polars baseline.
 
 These are synthetic results from one Windows host. Three samples do not establish
 significance for small percentage differences. Candidate phase clocks add overhead that
@@ -214,9 +220,8 @@ and [environment
 metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json).
 The summary script calculates medians directly from these files.
 
-### Historical validation
-
-These checks and test counts belong to the original measurement revision.
+<details markdown="1" id="historical-validation">
+<summary>Validation at the recorded revision</summary>
 
 - `cargo fmt --check`, `cargo test --workspace --locked` (125 tests/doctests),
   `cargo clippy --workspace --all-targets --locked -- -D warnings` and strict
@@ -238,3 +243,5 @@ test-environment setup requirement, not a package dependency change.
 These synthetic results describe one Windows x86-64 host, not a cross-platform speed
 guarantee. Only the local CPython 3.14 Windows wheel is exercised here. The complete
 15-wheel release matrix remains a CI check.
+
+</details>

@@ -53,7 +53,6 @@ native counting formulations, independently for each case:
   A second seed, 10/1,000 groups, and datetime casts also favored it (24 cases).
   With one thread it won all 16 cases, by 2.19–4.22×.
   Native can win with tiny groups, all-empty input, or nested intervals.
-  These are synthetic results on one machine, not a general speed guarantee.
 - **Memory:** at 1M/3M rows, grouped peak RSS was 23–30% lower than the smallest
   native peak. Global peak RSS was 15–60% higher. Memory and timing winners can differ.
 - **Algorithm:** two sorted endpoint streams and a linear sweep replace per-row
@@ -70,10 +69,9 @@ Input sorting is outside timing. Optional datetime cases now pass logical Dateti
 columns directly to the compiled plugin. Before timing, a small sanity check compares
 Date and all Datetime units (including a timezone-aware case) with their physical
 integer equivalents, both globally and within groups. The recorded historical runs used
-explicit integer casts for datetime inputs. They do not establish any temporal-specific
-performance improvement. Saved reference binaries still receive physical endpoints to
-allow comparisons with older integer-only versions. That conversion is included in their
-timing.
+explicit integer casts for datetime inputs. Saved reference binaries still receive
+physical endpoints to allow comparisons with older integer-only versions. That conversion
+is included in their timing.
 
 The runner checks edge cases with an independent oracle and compares each timed output
 to the reference, including dtype and row order. It times complete
@@ -101,15 +99,13 @@ To compare revisions, save the old release binary before rebuilding and pass
 
 ## Limitations
 
-These measurements describe one Windows machine and synthetic data. Native baselines
-assume valid, non-null input. The plugin also validates it. Historical temporal runs
-used physical integer casts, so they do not establish a temporal-specific speedup.
+These measurements use synthetic data on one Windows machine. The temporal results
+include integer casts and do not measure direct Date/Datetime inputs.
 
 RSS is the total peak process memory in a fresh process, with input loaded before
 collection and its chunk layout restored. The query increase is a high-water-mark
 change, not exact allocated bytes. Memory runs are cold while runtime measurements are
-warmed. The pair-materializing join is bounded to two million candidates and omitted
-beyond that limit.
+warmed.
 
 ## Raw data
 

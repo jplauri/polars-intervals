@@ -4,18 +4,13 @@
 
 ## Summary
 
-`max_weight_with_capacity` selects an exact globally maximum-weight subset of half-open
-intervals, with at most `capacity` selected non-empty intervals active at any point. It
-exposes a Boolean mask through Python expressions, Rust Polars, and the
-Polars-independent core.
-
-Production uses guarded component flow, with direct fast paths and thresholded
-parallelism. See the results for the workload-dependent tradeoffs.
+`max_weight_with_capacity` selects intervals with maximum total weight while limiting
+how many overlap. Production solves independent overlap components with min-cost flow,
+using fast paths and parallel workers where they improve runtime.
 
 ## Compared implementations
 
-The benchmark compiles the production source directly into a private target. No
-benchmark API or generic graph API is exported by either library.
+The benchmark compiles the production source directly into a private target.
 
 | Candidate | Implementation |
 | --- | --- |
@@ -35,16 +30,8 @@ vertex)` heap ordering make ties deterministic. Augmentations send the path bott
 including multiple idle units when appropriate. A directly invoked network sends exactly
 k units.
 
-The generic implementation stays private for reproducibility and cross-checks. It adds
-no dependency. The only new direct package dependency is `serde`, already present
-transitively, for the plugin's capacity option. The independent core still has no
-production dependencies.
-
-A fixed-small-k DP was considered but not implemented: storing combinations of resource
-finish states would introduce an `O(n^k)` subsystem, outside the requested complexity
-budget. The DAG initial path already handles k=1 efficiently inside flow, but it does
-not eliminate network construction and compression overhead. The existing capacity-1
-scheduler remains unchanged.
+The generic implementation provides an independent cross-check. At capacity one,
+production uses the existing weighted scheduler to avoid building a flow network.
 
 ### Fast paths and parallelism
 
@@ -64,7 +51,7 @@ scoped standard-library workers when there are at least eight components and
 local masks over disjoint batches and restore original indices in batch order. There is
 no shared mutable flow network. Endpoint types in the core API therefore require `Ord +
 Copy + Sync`. Weights still convert losslessly to i128. The threshold is a practical
-policy from this machine, not a universal crossover.
+policy based on this machine.
 
 ## Results
 
@@ -308,8 +295,7 @@ uv run --no-sync python benchmarks/capacity_temporal.py > benchmarks/results/cap
 Allocation data counts successful allocations/reallocations and peak live requested
 bytes during the whole call, including output and worker buffers. It excludes inputs,
 verification, allocator metadata, stacks and process RSS. Thread/runtime allocation
-effects are included where they occur within the call. This is an allocation metric
-rather than a claim about operating-system peak RAM.
+effects are included where they occur within the call.
 
 ### Complexity and arithmetic
 
@@ -344,9 +330,8 @@ equivalent native Polars expression baseline in this report.
 - [Environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-environment.json)
 - [Temporal samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-temporal-windows.csv)
 
-### Historical validation
-
-These counts describe the original measured revision.
+<details markdown="1" id="historical-validation">
+<summary>Validation at the recorded revision</summary>
 
 - `cargo fmt --check`, `cargo test --workspace --locked` (91 tests including
   Rust doctests), and Clippy on all workspace targets with warnings denied: pass.
@@ -364,3 +349,5 @@ Rust Polars tests on this Windows host need `PYO3_PYTHON` set to the environment
 Python executable and the base Python DLL directory on `PATH`. Other platform wheel
 builds and Python 3.12/3.13 remain covered by repository CI. They were not executed
 locally. No release was published.
+
+</details>

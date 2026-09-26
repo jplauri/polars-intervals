@@ -1,6 +1,6 @@
 ![Lane assignment: buffer capacity: Rust core. family=moderate128, order=shuffled. Peak live buffer capacity (MiB).](assets/benchmarks/lanes-memory.svg)
 
-The same workload as the runtime chart. This is capacity accounting for algorithm buffers and output, excluding caller inputs. It is neither allocator instrumentation nor process RSS. Bands show the observed minimum–maximum range, not confidence intervals.
+The same workload as the runtime chart. Buffer capacity includes algorithm storage and output, excluding caller inputs, allocator overhead, and process RSS.
 
 Source: [assign-lanes-windows.csv](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-windows.csv). [Download plotted values](assets/benchmarks/lanes-memory.csv).
 
@@ -22,6 +22,6 @@ Source: [assign-lanes-windows.csv](https://github.com/jplauri/polars-intervals/b
 | 100,000 | Endpoint events | 4.96 | 4.96 | 4.96 | 9 |
 | 1,000,000 | Endpoint events | 49.59 | 49.59 | 49.59 | 9 |
 
-Measurement: **Peak live buffer capacity (MiB)**. Missing cases are omitted, never zero.
+Measurement: **Peak live buffer capacity (MiB)**.
 
 </details>

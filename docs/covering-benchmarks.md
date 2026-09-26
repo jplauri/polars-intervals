@@ -136,26 +136,18 @@ configuration selects the relevant method IDs.
 ## Limitations
 
 Raw CSV columns retain every sample's total, preprocessing (validation, clipping,
-sorting/compression), optimization (sweep/DP), and reconstruction time. Greedy selection
-writes the mask during its sweep. Its reconstruction time is zero. The weighted mask is
-reconstructed in a separate measured phase. Total time also includes temporary-buffer
-destruction and phase-clock overhead, so it need not equal the sum of phase times. Early
-failures legitimately skip later phases.
+sorting), and sweep time. Greedy selection writes the mask during its sweep, so the
+reconstruction field is zero. Total time also includes temporary-buffer destruction and
+phase-clock overhead. Early failures skip later phases.
 
 Peak live requested allocation bytes and allocation/reallocation event counts are
 measured in a **separate untimed invocation** using the system allocator. These include
 algorithm buffers and output, but exclude caller-owned inputs, oracle work, allocator
-metadata, stacks and process RSS. Measurements are serial. Neither solver introduces
-internal workers.
+metadata, stacks and process RSS. Measurements are serial.
 
-This is synthetic evidence from one Windows x86-64 machine, not a cross-platform speed
-guarantee. Short timings are sensitive to scheduler and clock noise. Use per-workload
-medians, not individual minima, to compare methods.
-
-There is no ordinary native Polars expression baseline: choosing a global subset
-requires an iterative frontier algorithm or dynamic programming with reconstruction. An
-overlap count, group aggregate, join, or sorted union is not an equivalent minimum
-cover. No misleading substitute is timed.
+These synthetic workloads were measured on one Windows x86-64 machine. Short timings
+are sensitive to scheduler and clock noise. Candidate comparisons cover Rust
+implementations, with separate end-to-end plugin timings and no native Polars baseline.
 
 ## Raw data
 
@@ -168,10 +160,8 @@ The original source hashes remain attached to the measurements. Cleanup verifica
 records the consolidated harness/adapter sources separately. The measured solver and
 candidate implementations were unchanged.
 
-### Historical validation
-
-The following counts belong to the original covering implementation and measurement
-revision.
+<details markdown="1" id="historical-validation">
+<summary>Validation at the recorded revision</summary>
 
 The completed local validation includes 99 Rust tests/doctests, 1,229 Python
 tests/doctests (also all passing against the installed external release wheel), and 49
@@ -180,3 +170,5 @@ Rustdoc with denied warnings, the uv lock check, Ruff lint/format and strict MkD
 builds pass. A release wheel and source archive were built and audited for metadata,
 license, type marker, native extension and new source files. The full 15-wheel
 cross-platform CI matrix is not a local test and was not run.
+
+</details>

@@ -123,7 +123,7 @@ def render(points, source, chart):
         fig.text(
             0.5,
             0.015,
-            "Median of recorded samples · bands show min–max, not confidence intervals",
+            "Lines show medians · bands show sample range",
             ha="center",
             fontsize=9,
             color="#444444",
@@ -138,7 +138,7 @@ def render(points, source, chart):
             f"(assets/benchmarks/{chart['id']}.svg)"
         ),
         "",
-        f"{chart['caption']} Bands show the observed minimum–maximum range, not confidence intervals.",
+        chart["caption"],
         "",
         (
             f"Source: [{Path(source['path']).name}]({REPOSITORY}{source['path']}). "
@@ -161,7 +161,7 @@ def render(points, source, chart):
     lines.extend(
         [
             "",
-            f"Measurement: **{chart['ylabel']}**. Missing cases are omitted, never zero.",
+            f"Measurement: **{chart['ylabel']}**.",
             "",
             "</details>",
             "",

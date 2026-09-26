@@ -37,4 +37,5 @@ platforms, small-sample uncertainty, and limits of the selected workloads.
 ## Raw data
 
 Link raw samples, repeat runs, environment/source hashes, and omission logs.
-Keep historical validation counts explicitly tied to their recorded revision.
+Put historical validation records in an expandable section labeled with the
+recorded revision.

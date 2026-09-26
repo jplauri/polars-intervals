@@ -1,6 +1,6 @@
 ![Overlap counting: Polars end to end. scenario=sparse, groups=1, order=shuffled, dtype=int64. Collection time (ms).](assets/benchmarks/overlap-runtime.svg)
 
-Sparse, ungrouped Int64 input from the original 24-thread Windows run. The bounded pair-materializing join and historical plugin binary are outside this counting-formulation comparison. Bands show the observed minimum–maximum range, not confidence intervals.
+Sparse, ungrouped Int64 input from the original 24-thread Windows run. The plot compares the plugin with four native counting formulations.
 
 Source: [sweep-windows.json](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/sweep-windows.json). [Download plotted values](assets/benchmarks/overlap-runtime.csv).
 
@@ -30,6 +30,6 @@ Source: [sweep-windows.json](https://github.com/jplauri/polars-intervals/blob/ma
 | 1,000,000 | Endpoint sweep | 158.7 | 153.4 | 175.7 | 9 |
 | 3,000,000 | Endpoint sweep | 529.3 | 511.7 | 601.2 | 9 |
 
-Measurement: **Collection time (ms)**. Missing cases are omitted, never zero.
+Measurement: **Collection time (ms)**.
 
 </details>

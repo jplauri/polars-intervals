@@ -5,10 +5,9 @@
 ## Summary
 
 The production default is **A: start sort + min-heap**. It balances runtime across input
-sizes and orders with low working memory at small concurrency. It is not universally
-fastest: two sorted streams win many ordered workloads, and an endpoint-event sweep wins
-some large shuffled workloads. Only A ships in the library. B and C remain private
-benchmark/test references.
+sizes and orders with low working memory at small concurrency. Two sorted streams win
+many ordered workloads, and an endpoint-event sweep wins some large shuffled workloads.
+B and C remain benchmark and test references.
 
 ## Compared implementations
 
@@ -176,17 +175,8 @@ At one million non-empty rows on this 64-bit target:
   Each `(i64, bool, usize)` event occupies 24 bytes including padding. Its final
   END events release all lanes, so the free list eventually holds the clique.
 
-A's smaller working set on ordinary concurrency and its broad runtime results justify
-the simple heap default. B and C are useful exact references and future comparison
-points, not public options or production branches. We do not infer an automatic
-crossover threshold from this synthetic matrix.
-
-These are core-algorithm measurements, not Python end-to-end benchmarks. They do not
-establish temporal-specific speedups, results on other hardware, or a universal winner.
-Synthetic families cover important extremes but do not model every real workload. Close
-timings and small-run differences should not be overinterpreted. Public lane-ID
-semantics deliberately permit future production changes while preserving optimality,
-contiguity, determinism, and original order.
+These measurements cover the Rust core on one Windows machine. Python overhead and
+temporal endpoints were not measured. The repeat run shows variation in close results.
 
 ## Raw data
 

@@ -1,6 +1,6 @@
 ![Minimum-cardinality covering: Rust core. family=chain, order=shuffled, costs=random. Runtime (ms).](assets/benchmarks/cover-runtime.svg)
 
-Shuffled touching chains from the shared covering harness. The cost distribution identifies the fixture. Minimum-cardinality covering does not optimize costs. Bands show the observed minimum–maximum range, not confidence intervals.
+Shuffled touching chains from the shared covering harness. Costs identify the fixture but do not affect minimum-cardinality selection.
 
 Source: [covering-windows.csv](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-windows.csv). [Download plotted values](assets/benchmarks/cover-runtime.csv).
 
@@ -26,6 +26,6 @@ Source: [covering-windows.csv](https://github.com/jplauri/polars-intervals/blob/
 | 100,000 | Packed with sortedness check | 4.162 | 4.12 | 4.446 | 3 |
 | 1,000,000 | Packed with sortedness check | 53.36 | 50.33 | 55.06 | 3 |
 
-Measurement: **Runtime (ms)**. Missing cases are omitted, never zero.
+Measurement: **Runtime (ms)**.
 
 </details>

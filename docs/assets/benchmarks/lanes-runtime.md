@@ -1,6 +1,6 @@
 ![Lane assignment: Rust core. family=moderate128, order=shuffled. Runtime (ms).](assets/benchmarks/lanes-runtime.svg)
 
-Shuffled input with concurrency 128, first run. This workload illustrates a case where the production choice loses at large sizes. The full report covers the wider tradeoff. Bands show the observed minimum–maximum range, not confidence intervals.
+Shuffled input with concurrency 128, first run. The endpoint-event sweep is faster at large sizes on this workload.
 
 Source: [assign-lanes-windows.csv](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-windows.csv). [Download plotted values](assets/benchmarks/lanes-runtime.csv).
 
@@ -22,6 +22,6 @@ Source: [assign-lanes-windows.csv](https://github.com/jplauri/polars-intervals/b
 | 100,000 | Endpoint events | 7.661 | 7.552 | 7.922 | 9 |
 | 1,000,000 | Endpoint events | 100.1 | 98.73 | 101.5 | 9 |
 
-Measurement: **Runtime (ms)**. Missing cases are omitted, never zero.
+Measurement: **Runtime (ms)**.
 
 </details>

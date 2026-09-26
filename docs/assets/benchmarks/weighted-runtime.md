@@ -1,6 +1,6 @@
 ![Maximum-weight non-overlapping selection: Rust core. family=moderate128, order=shuffled, weights=positive. Runtime (ms).](assets/benchmarks/weighted-runtime.svg)
 
-Positive weights and moderate overlap, first run. Random-length workloads can favor other candidates. This plot does not aggregate those workloads. Bands show the observed minimum–maximum range, not confidence intervals.
+Positive weights and moderate overlap, first run. Random-length workloads can favor other candidates.
 
 Source: [weighted-windows.csv](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-windows.csv). [Download plotted values](assets/benchmarks/weighted-runtime.csv).
 
@@ -22,6 +22,6 @@ Source: [weighted-windows.csv](https://github.com/jplauri/polars-intervals/blob/
 | 100,000 | C: endpoint events | 12.97 | 9.459 | 13.37 | 5 |
 | 1,000,000 | C: endpoint events | 169.7 | 167.4 | 211.7 | 5 |
 
-Measurement: **Runtime (ms)**. Missing cases are omitted, never zero.
+Measurement: **Runtime (ms)**.
 
 </details>

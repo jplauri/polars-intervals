@@ -1,6 +1,6 @@
 ![Minimum-cost covering: Rust core. family=chain, order=shuffled, costs=random. Runtime (ms).](assets/benchmarks/cost-cover-runtime.svg)
 
-Shuffled touching chains with random costs. The quadratic reference is measured only at 1,000 rows. Larger cases are absent, not extrapolated. Bands show the observed minimum–maximum range, not confidence intervals.
+Shuffled touching chains with random costs. The quadratic reference was measured only at 1,000 rows.
 
 Source: [covering-windows.csv](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-windows.csv). [Download plotted values](assets/benchmarks/cost-cover-runtime.csv).
 
@@ -19,6 +19,6 @@ Source: [covering-windows.csv](https://github.com/jplauri/polars-intervals/blob/
 | 1,000,000 | Segment tree | 205.3 | 201.7 | 209.4 | 3 |
 | 1,000 | Quadratic reference | 0.0738 | 0.0729 | 0.0743 | 3 |
 
-Measurement: **Runtime (ms)**. Missing cases are omitted, never zero.
+Measurement: **Runtime (ms)**.
 
 </details>
