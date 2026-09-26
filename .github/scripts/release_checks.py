@@ -10,6 +10,7 @@ import tempfile
 import tomllib
 import urllib.request
 import zipfile
+from datetime import UTC, date, datetime
 from email.parser import BytesParser
 from importlib.metadata import version as installed_version
 from pathlib import Path
@@ -221,6 +222,25 @@ def installed(checkout):
         .to_series()
     )
     require(result.dtype == pl.UInt64 and result.to_list() == [1, 1, 2, 0], "Smoke test failed.")
+    for dtype, starts, ends in [
+        (pl.Date, [date(2026, 1, 1), date(2026, 1, 2)], [date(2026, 1, 3), date(2026, 1, 4)]),
+        (
+            pl.Datetime("us", "UTC"),
+            [datetime(2026, 1, 1, 9, minute, tzinfo=UTC) for minute in (0, 30)],
+            [datetime(2026, 1, 1, 10, minute, tzinfo=UTC) for minute in (0, 30)],
+        ),
+    ]:
+        result = (
+            pl.DataFrame({"start": starts, "end": ends}, schema={"start": dtype, "end": dtype})
+            .lazy()
+            .select(pi.overlap_count("start", "end"))
+            .collect()
+            .to_series()
+        )
+        require(
+            result.dtype == pl.UInt64 and result.to_list() == [1, 1],
+            f"Temporal smoke test failed for {dtype}.",
+        )
     print(f"Testing installed artifact from {package}")
     with tempfile.TemporaryDirectory() as temporary:
         previous_directory = Path.cwd()

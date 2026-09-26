@@ -34,7 +34,8 @@ print(result["overlaps"].to_list())
 [1, 1, 2, 0]
 ```
 
-Each count excludes the row itself. Endpoints are integers, and intervals
+Each count excludes the row itself. Endpoints can be matching integer, Date,
+or Datetime columns (see [input rules](usage.md#inputs)). Intervals
 include their start but exclude their end: `[1, 3)` and `[3, 5)` do not overlap.
 The empty interval `[2, 2)` counts zero.
 

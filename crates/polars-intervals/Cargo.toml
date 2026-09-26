@@ -9,6 +9,9 @@ crate-type = ["rlib", "cdylib"]
 
 [dependencies]
 intervals-core = { path = "../intervals-core" }
-polars = { version = "0.55.2", default-features = false, features = ["dtype-i8", "dtype-i16", "dtype-u8", "dtype-u16"] }
+polars = { version = "0.55.2", default-features = false, features = ["dtype-i8", "dtype-i16", "dtype-u8", "dtype-u16", "dtype-date", "dtype-datetime"] }
 pyo3 = "0.29"
 pyo3-polars = { version = "0.28", default-features = false, features = ["derive"] }
+
+[dev-dependencies]
+proptest = "1.11"

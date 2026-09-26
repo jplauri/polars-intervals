@@ -17,8 +17,8 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
     non-empty intervals count each other.
 
     Args:
-        start: Column name or expression producing interval starts.
-        end: Column name or expression producing interval ends.
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
 
     Returns:
         pl.Expr: Non-null `UInt64` counts, one per row in input order. Use
@@ -34,9 +34,16 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
 
     Notes:
         Both inputs must have equal lengths and the same dtype: `Int8`,
-        `Int16`, `Int32`, `Int64`, `UInt8`, `UInt16`, `UInt32`, or `UInt64`.
-        No casting or scalar broadcasting is performed. Date, datetime,
-        floating-point, and other non-integer dtypes are unsupported.
+        `Int16`, `Int32`, `Int64`, `UInt8`, `UInt16`, `UInt32`, `UInt64`,
+        `Date`, or `Datetime`. Datetime supports `ms`, `us`, and `ns`, including
+        timezone-aware columns. Both the time unit and timezone metadata must
+        match exactly; naive and timezone-aware Datetime do not match.
+        Date/Datetime, temporal/integer, differing time units, and differing
+        timezones are rejected. No casting or scalar broadcasting is performed.
+        Time, Duration, floating-point, and other dtypes are unsupported.
+
+        Temporal endpoints pass their native physical integer days or timestamps
+        to the same Rust algorithm, without rounding or timezone arithmetic.
 
         Counts use the whole input collection, or each group when used with
         `.over(...)` or `group_by`. Filtering before this expression changes
@@ -80,6 +87,22 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
         ...     pi.overlap_count(pl.col("start"), pl.col("end")).alias("overlaps")
         ... )["overlaps"].to_list()
         [1, 1, 2, 0]
+
+        Datetime endpoints with a touching boundary at 10:00:
+
+        >>> from datetime import datetime
+        >>> appointments = pl.DataFrame({
+        ...     "start": [datetime(2026, 1, 1, 9), datetime(2026, 1, 1, 9, 30),
+        ...               datetime(2026, 1, 1, 10)],
+        ...     "end": [datetime(2026, 1, 1, 10), datetime(2026, 1, 1, 10, 30),
+        ...             datetime(2026, 1, 1, 11)],
+        ... })
+        >>> appointments.with_columns(
+        ...     pi.overlap_count("start", "end").alias("overlaps")
+        ... )["overlaps"].to_list()
+        [1, 2, 1]
+
+        Python `date` values similarly produce supported `pl.Date` columns.
     """
     return register_plugin_function(
         plugin_path=Path(__file__).parent,

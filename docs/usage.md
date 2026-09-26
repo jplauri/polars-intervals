@@ -107,9 +107,14 @@ Intervals are half-open: `[start, end)`. Two non-empty intervals overlap when
 
 ## Inputs
 
-Endpoints must have matching integer dtypes, contain no nulls, and satisfy
-`start <= end`. Date, datetime, and floating-point columns are not supported.
-Use the same unit for both endpoints.
+Endpoints must have matching integer, `Date`, or `Datetime` dtypes, contain no
+nulls, and satisfy `start <= end`. Both endpoints must be `Date`, or both must
+be `Datetime` with the same time unit (`ms`, `us`, or `ns`) and exactly matching
+timezone metadata. Matching timezone-aware columns are supported; naive/aware
+pairs are rejected, as are Date/Datetime, temporal/integer, and different units
+or timezones. No automatic coercion is performed. `Time`, `Duration`, and
+floating-point columns are not supported. See the [temporal example](api.md)
+in the API reference.
 
 If integer widths differ, cast both inputs explicitly:
 
