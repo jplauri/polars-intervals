@@ -38,10 +38,14 @@ empties uses lane zero, and empty input returns `[]`.
 
 ## Results
 
-Measurements were made on 2026-09-26, Windows 11 Home 10.0.26200, AMD Ryzen 9 3900X (12
-cores/24 logical processors), Rust 1.98.1, x86_64-pc-windows-msvc, default optimized
-Cargo bench profile. The algorithms are single-threaded. Two complete invocations are
-retained, each with 1,944 accepted samples: [first
+- **CPU:** AMD Ryzen 9 3900X (12 cores, 24 logical processors).
+- **OS:** Windows 11 Home, build 10.0.26200, x86-64.
+- **Rust:** 1.98.1, target `x86_64-pc-windows-msvc`.
+- **Build:** default optimized Cargo `bench` profile.
+- **Threads:** one.
+- **Samples:** two warmups and nine timed samples per case.
+
+Two complete runs are retained, each with 1,944 accepted samples: [first
 run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-windows.csv),
 [repeat](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-repeat-windows.csv).
 [Environment metadata and algorithm source

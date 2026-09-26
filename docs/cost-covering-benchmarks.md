@@ -66,11 +66,16 @@ physical endpoint slices. Multiple chunks require copying. Costs are widened onc
 
 ## Results
 
-Measured on Windows 11 x86-64, AMD Ryzen 9 3900X (12 cores / 24 threads), Rust 1.98.1,
-Python 3.14 and Polars 1.44.2, with the optimized Cargo bench profile. The shared
-covering run has 7,425 timed samples across 396 workloads and 2,475 candidate/workload
-combinations, with three repeats each. These counts cover both operations, not just the
-operation on this page.
+- **CPU:** AMD Ryzen 9 3900X (12 cores, 24 logical processors).
+- **OS:** Windows 11 Home, build 10.0.26200, x86-64.
+- **Rust:** 1.98.1, LLVM 22.1.8, target `x86_64-pc-windows-msvc`.
+- **Python / Polars:** 3.14.0 / 1.44.2 for the plugin timings.
+- **Build:** optimized Cargo `bench` profile for the core, release wheel for the plugin.
+- **Threads:** one for the core algorithms.
+- **Samples:** one warmup and three timed samples per case.
+
+The shared covering run has 7,425 timed samples across 396 workloads and 2,475
+candidate/workload combinations. These counts cover both covering operations.
 
 --8<-- "docs/assets/benchmarks/cost-cover-runtime.md"
 

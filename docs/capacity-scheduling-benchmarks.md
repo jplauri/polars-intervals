@@ -55,9 +55,16 @@ policy based on this machine.
 
 ## Results
 
-The plotted run used Windows 11, Ryzen 9 3900X, Rust 1.98.1 and the optimized Cargo
-bench profile. The historical run and cleanup distinction below also applies to this
-plot.
+- **CPU:** AMD Ryzen 9 3900X (12 cores, 24 logical processors).
+- **OS:** Windows 11 Home, build 10.0.26200, x86-64.
+- **Memory:** 31.9 GiB usable RAM.
+- **Rust:** 1.98.1, LLVM 22.1.8, target `x86_64-pc-windows-msvc`.
+- **Python / Polars:** 3.14.0 / 1.44.2 for the plugin timings.
+- **Build:** optimized Cargo `bench` profile for the core, release build for the plugin.
+- **Threads:** one for serial candidates, up to eight workers for production and parallel candidates.
+- **Samples:** three timed samples per case after an untimed verification and allocation pass.
+
+The plot uses the original recorded run. Cleanup results are reported separately below.
 
 --8<-- "docs/assets/benchmarks/capacity-runtime.md"
 
@@ -77,10 +84,8 @@ also affected the unchanged generic engine, so no speedup is claimed. [Cleanup
 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-cleanup-windows.csv)
 and the environment file record these comparisons separately.
 
-Windows 11, Ryzen 9 3900X (12 cores / 24 logical processors), about 32 GiB RAM, Rust
-1.98.1 / LLVM 22.1.8, optimized Cargo bench profile. Values below are medians of three
-timed samples, in milliseconds. These are observed tradeoffs, not universal performance
-guarantees. All table cases use positive weights and shuffled rows unless noted.
+Values below are medians in milliseconds. All table cases use positive weights and
+shuffled rows unless noted.
 
 ### Scaling with size and density
 

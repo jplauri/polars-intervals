@@ -30,8 +30,13 @@ boundaries, duplicates, self-exclusion, row order, and `UInt64` output.
 
 ## Results
 
-Measured 2026-09-25 on Windows 11, Ryzen 9 3900X, Python 3.14.0, Polars 1.44.2, 24
-threads, Rust 1.98.1 release build. Three warmups and nine samples per case.
+- **CPU:** AMD Ryzen 9 3900X (12 cores, 24 logical processors).
+- **OS:** Windows 11, build 10.0.26200, x86-64.
+- **Rust:** 1.98.1.
+- **Python / Polars:** 3.14.0 / 1.44.2.
+- **Build:** release plugin.
+- **Threads:** 24 Polars threads for the main run. The one-thread run is reported separately.
+- **Samples:** three warmups and nine timed samples per case.
 
 --8<-- "docs/assets/benchmarks/overlap-runtime.md"
 

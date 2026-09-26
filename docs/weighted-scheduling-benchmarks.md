@@ -49,12 +49,16 @@ plugin-panic message.
 
 ## Results
 
-Recorded environment: Windows 11 Home 10.0.26200, AMD Ryzen 9 3900X (12 cores, 24
-logical processors), 31.9 GiB usable RAM, Rust 1.98.1 / LLVM 22.1.8,
-`x86_64-pc-windows-msvc`. Cargo's default optimized bench profile, one thread, `i64`
-endpoints and weights, checked `i128` objectives. No custom target flags, CPU affinity,
-allocator, or new dependencies. Python 3.14.0 / Polars 1.44.2 are used only for the
-report and integration checks, not candidate timing.
+- **CPU:** AMD Ryzen 9 3900X (12 cores, 24 logical processors).
+- **OS:** Windows 11 Home, build 10.0.26200, x86-64.
+- **Memory:** 31.9 GiB usable RAM.
+- **Rust:** 1.98.1, LLVM 22.1.8, target `x86_64-pc-windows-msvc`.
+- **Python / Polars:** 3.14.0 / 1.44.2, used for reporting and integration checks only.
+- **Build:** default optimized Cargo `bench` profile, default target flags and allocator.
+- **Threads:** one, without CPU affinity settings.
+- **Samples:** two warmups and five timed samples per case.
+
+Core timings use `i64` endpoints and weights, with checked `i128` objectives.
 
 --8<-- "docs/assets/benchmarks/weighted-runtime.md"
 

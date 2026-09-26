@@ -15,9 +15,17 @@ Explain any semantic differences and why each baseline computes the same result.
 
 ## Results
 
-State the run date, hardware, toolchain, build, and thread settings. Include the
-generated chart/table snippet here, then discuss the wider matrix, repeat runs,
-losing cases, and memory. Separate core timings from end-to-end plugin timings.
+- **CPU:** model, cores, and logical processors.
+- **OS:** system, version, and architecture.
+- **Rust:** compiler version and target.
+- **Python / Polars:** versions for plugin timings, if applicable.
+- **Build:** optimization profile and relevant flags.
+- **Threads:** settings for the core and plugin runs.
+- **Samples:** warmups and timed samples per case.
+
+Add memory or other library versions where relevant. Include the generated chart/table
+snippet, then discuss the wider matrix, repeat runs, losing cases, and memory.
+Separate core timings from end-to-end plugin timings.
 
 ## Workloads and correctness
 

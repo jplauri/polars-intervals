@@ -50,11 +50,17 @@ minimum stabbing number = maximum number of pairwise disjoint intervals
 
 ## Results
 
-Measured on September 26, 2026: Ryzen 9 3900X (12 cores / 24 logical processors),
-Windows 11, Rust 1.98.1, Python 3.14.0 and Polars 1.44.2. The final measurements ran
-sequentially without concurrent compilation or tests: **2,700 core samples** over 225
-workloads and **270 release-wheel samples** over 90 workloads. Earlier development
-timing passes were discarded.
+- **CPU:** AMD Ryzen 9 3900X (12 cores, 24 logical processors).
+- **OS:** Windows 11 Home, build 10.0.26200, x86-64.
+- **Rust:** 1.98.1, LLVM 22.1.8, target `x86_64-pc-windows-msvc`.
+- **Python / Polars:** 3.14.0 / 1.44.2 for the plugin timings.
+- **Build:** optimized Cargo `bench` profile for the core, release wheel for the plugin.
+- **Threads:** one for the core algorithms, 24 Polars threads for the plugin runs.
+- **Samples:** one warmup and three timed samples per case.
+
+Runs were sequential, without concurrent compilation or tests. The recorded results
+contain **2,700 core samples** over 225 workloads and **270 release-wheel samples** over
+90 workloads.
 
 --8<-- "docs/assets/benchmarks/stabbing-runtime.md"
 
