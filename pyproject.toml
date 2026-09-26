@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "polars-intervals"
-description = "Interval overlap counts, lane assignment, and maximum-weight scheduling for Polars"
+description = "Interval algorithms for Polars"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = ["polars>=1.44.1,<1.45"]
@@ -31,6 +31,7 @@ Issues = "https://github.com/jplauri/polars-intervals/issues"
 [dependency-groups]
 dev = ["pytest==9.1.1", "ruff==0.16.8"]
 docs = ["mkdocs-material>=9.7,<10", "mkdocstrings[python]>=1,<2"]
+plots = ["matplotlib>=3.10,<4", "polars>=1.44.1,<1.45"]
 
 [tool.maturin]
 manifest-path = "crates/polars-intervals/Cargo.toml"

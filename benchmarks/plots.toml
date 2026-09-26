@@ -1,0 +1,134 @@
+# Paths are relative to the repository root. Each source is exactly one run.
+# List every independent workload dimension so charts must explicitly fix it.
+[sources.overlap]
+path = "benchmarks/results/sweep-windows.json"
+x = "rows"
+method = "method"
+dimensions = ["scenario", "groups", "order", "dtype"]
+
+[sources.lanes]
+path = "benchmarks/results/assign-lanes-windows.csv"
+x = "n"
+method = "algorithm"
+dimensions = ["family", "order"]
+
+[sources.weighted]
+path = "benchmarks/results/weighted-windows.csv"
+x = "n"
+method = "algorithm"
+dimensions = ["family", "order", "weights"]
+
+[sources.capacity]
+path = "benchmarks/results/capacity-windows.csv"
+x = "n"
+method = "algorithm"
+dimensions = ["family", "order", "weights", "k"]
+
+[sources.covering]
+path = "benchmarks/results/covering-windows.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "costs"]
+
+[sources.stabbing]
+path = "benchmarks/results/stabbing-windows.csv"
+x = "n"
+method = "method"
+dimensions = ["dtype", "family", "order"]
+
+[[charts]]
+id = "overlap-runtime"
+source = "overlap"
+title = "Overlap counting"
+scope = "Polars end to end"
+value = "ms"
+divisor = 1
+ylabel = "Collection time (ms)"
+filters = { scenario = "sparse", groups = 1, order = "shuffled", dtype = "int64" }
+methods = { plugin = "Plugin", native_expr = "Search sorted", native_parallel = "Parallel search sorted", native_asof = "As-of joins", native_sweep = "Endpoint sweep" }
+caption = "Sparse, ungrouped Int64 input from the original 24-thread Windows run. The plot compares the plugin with four native counting formulations."
+
+[[charts]]
+id = "lanes-runtime"
+source = "lanes"
+title = "Lane assignment"
+scope = "Rust core"
+value = "ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+filters = { family = "moderate128", order = "shuffled" }
+methods = { heap = "Heap (production)", two_sorts = "Two sorts", events = "Endpoint events" }
+caption = "Shuffled input with concurrency 128, first run. The endpoint-event sweep is faster at large sizes on this workload."
+
+[[charts]]
+id = "lanes-memory"
+source = "lanes"
+title = "Lane assignment: buffer capacity"
+scope = "Rust core"
+value = "buffer_bytes"
+divisor = 1048576
+ylabel = "Peak live buffer capacity (MiB)"
+yscale = "linear"
+filters = { family = "moderate128", order = "shuffled" }
+methods = { heap = "Heap (production)", two_sorts = "Two sorts", events = "Endpoint events" }
+caption = "The same workload as the runtime chart. Buffer capacity includes algorithm storage and output, excluding caller inputs, allocator overhead, and process RSS."
+
+[[charts]]
+id = "weighted-runtime"
+source = "weighted"
+title = "Maximum-weight non-overlapping selection"
+scope = "Rust core"
+value = "ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+filters = { family = "moderate128", order = "shuffled", weights = "positive" }
+methods = { A_binary = "A: binary search", B_two_orders = "B: two orders (production)", C_events = "C: endpoint events" }
+caption = "Positive weights and moderate overlap, first run. Random-length workloads can favor other candidates."
+
+[[charts]]
+id = "capacity-runtime"
+source = "capacity"
+title = "Maximum-weight selection with capacity"
+scope = "Rust core"
+value = "ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+filters = { family = "components", order = "shuffled", weights = "positive", k = 2 }
+methods = { production = "Production", components = "Serial components", whole = "Whole-instance flow", generic = "Generic flow" }
+caption = "Independent components at capacity two, using the original recorded run."
+
+[[charts]]
+id = "cover-runtime"
+source = "covering"
+title = "Minimum-cardinality covering"
+scope = "Rust core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+filters = { family = "chain", order = "shuffled", costs = "random" }
+methods = { MC-A = "Packed greedy (production)", MC-B = "Indirect greedy", MC-C = "Heap", MC-A-detect = "Packed with sortedness check" }
+caption = "Shuffled touching chains from the shared covering harness. Costs identify the fixture but do not affect minimum-cardinality selection."
+
+[[charts]]
+id = "cost-cover-runtime"
+source = "covering"
+title = "Minimum-cost covering"
+scope = "Rust core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+filters = { family = "chain", order = "shuffled", costs = "random" }
+methods = { MCC-A = "Fenwick (production)", MCC-B = "Segment tree", MCC-C = "Quadratic reference" }
+caption = "Shuffled touching chains with random costs. The quadratic reference was measured only at 1,000 rows."
+
+[[charts]]
+id = "stabbing-runtime"
+source = "stabbing"
+title = "Minimum stabbing points"
+scope = "Rust core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+filters = { dtype = "i64", family = "disjoint", order = "shuffled" }
+methods = { A = "A: packed", B = "B: indirect", C = "C: detect + packed", production = "Production (no phase clocks)" }
+caption = "Shuffled disjoint Int64 intervals. Candidate timings include phase-clock overhead, while the production timing excludes it."

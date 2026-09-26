@@ -1,4 +1,4 @@
-"""Standalone benchmark; see benchmarks/README.md for methodology and usage."""
+"""Standalone benchmark; see docs/overlap-count-benchmarks.md for methodology and usage."""
 
 import argparse
 import ctypes

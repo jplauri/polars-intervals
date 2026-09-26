@@ -1,27 +1,31 @@
 # Getting started
 
-polars-intervals counts overlaps, assigns optimal lanes, selects maximum-weight
-schedules, finds exact target covers, and selects minimum stabbing points in
-Polars. Stabbing returns one list per collection or group; the other operations
-return one value per row. All work with eager and lazy queries.
+Interval algorithms for Polars, with support for eager and lazy queries.
 
 ## Install
+
+Requires Python 3.12+.
 
 ```sh
 pip install polars-intervals
 ```
 
-For a uv project, use `uv add polars-intervals`.
-Requires Python 3.12+ and Polars `>=1.44.1,<1.45`.
-For source builds, see [Contributing](contributing.md#build-from-source).
+Or with uv: `uv add polars-intervals`.
 
 ## Your first query
+
+Count how many other intervals overlap each row:
 
 ```python
 import polars as pl
 import polars_intervals as pi
 
-df = pl.DataFrame({"start": [1, 3, 2, 2], "end": [3, 5, 4, 2]})
+df = pl.DataFrame(
+    {
+        "start": [0, 1, 2],
+        "end": [2, 3, 4],
+    }
+)
 result = (
     df.lazy()
     .with_columns(
@@ -29,23 +33,15 @@ result = (
     )
     .collect()
 )
-print(result["overlaps"].to_list())
+
+print(result["overlaps"].to_list())  # [1, 2, 1]
 ```
 
-```text
-[1, 1, 2, 0]
-```
-
-Each count excludes the row itself. Endpoints can be matching integer, Date,
-or Datetime columns (see [input rules](usage.md#inputs)). Intervals
-include their start but exclude their end: `[1, 3)` and `[3, 5)` do not overlap.
-The empty interval `[2, 2)` counts zero.
+Intervals include their start and exclude their end, so touching intervals do not overlap.
 
 ## Next steps
 
-- [Usage](usage.md): assign lanes, count within groups, and choose which rows to compare.
-- [API reference](api.md): input requirements, return types, and errors.
-- [Benchmarks](benchmarks.md): measured results and reproduction commands.
-- [Release notes](changelog.md): changes and compatibility by version.
-
-The API is early-stage and may change.
+- [Usage](usage.md): examples for each operation.
+- [API reference](api.md): parameters, return types, and input requirements.
+- [Benchmarks](benchmarks.md): comparisons and plots.
+- [Contributing](contributing.md): source builds and development.

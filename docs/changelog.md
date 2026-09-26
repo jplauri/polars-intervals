@@ -2,43 +2,19 @@
 
 ## Unreleased
 
-- Add `minimum_stabbing_points` to Python, Rust Polars, and the independent core.
-  Select a globally minimum, sorted, unique list of points hitting every discrete
-  half-open interval. Preserve integer/Date/Datetime logical dtypes and timezone
-  metadata; return one list per collection/group. Empty input returns an empty
-  list; empty intervals are infeasible with original-index errors.
-- Benchmark packed, indirect and sorted-input greedy candidates through 3M rows,
-  with all-coordinate subset and disjoint-packing oracles, proptest properties,
-  native plugin tests, phase timings, and allocation measurements.
-
-- Add exact `minimum_cover` and `minimum_cost_cover` to Python, Rust Polars, and
-  the independent core. Cover one continuous half-open scalar target with the
-  fewest intervals or minimum nonnegative integer cost (then fewest intervals).
-  Empty targets select nothing; infeasible targets raise. Scalar temporal metadata
-  is validated exactly, and groups independently cover the same target.
-- Compare packed/indirect greedy sweeps, a heap reference, Fenwick/segment-tree
-  frontier DP, and a quadratic reference in release mode. Add exhaustive subset
-  oracles, proptest invariants and metamorphic properties, native integration tests,
-  and reproducible phase/allocation measurements through one million intervals.
-
-- Add exact `max_weight_with_capacity` selection to Python, Rust Polars and the
-  independent core, with integer weights, half-open intervals, free positive
-  empty intervals, and independent group/window optimization. Capacity one uses
-  the existing weighted scheduler; general capacities use interval min-cost flow.
-- Add exact flow candidates, component comparisons, release benchmarks, exhaustive
-  and property-based optimality checks, and residual-network invariant tests.
-
-- Add exact `max_weight_non_overlapping` scheduling to Python, Rust Polars, and
-  the independent core, with a Boolean mask, integer weights and checked `i128`
-  accumulation. Supports integer/Date/Datetime endpoints, groups and empties.
-- Compare three weighted scheduling candidates with release benchmarks, an
-  independent suffix DP, brute-force enumeration and property tests.
-
-- Add `assign_lanes` to the Python expression, Rust Polars, and independent core
-  APIs, returning optimal, deterministic, contiguous `UInt32` lane IDs in row order.
-  Supports the same integer, Date, and Datetime endpoints as `overlap_count`.
-- Compare three exact algorithms in release mode; retain reproducible candidates,
-  independent optimality checks, property tests, and measured selection rationale.
+- Assign intervals to the fewest non-overlapping lanes with
+  [`assign_lanes`](usage.md#assign-the-minimum-number-of-lanes).
+- Select a schedule with maximum total weight using
+  [`max_weight_non_overlapping`](usage.md#select-a-globally-maximum-weight-schedule),
+  or allow limited overlap with
+  [`max_weight_with_capacity`](usage.md#select-with-a-simultaneous-capacity).
+- Cover a target with the fewest intervals using
+  [`minimum_cover`](usage.md#cover-one-continuous-target), or minimize its cost
+  with [`minimum_cost_cover`](usage.md#cover-at-minimum-cost).
+- Find the fewest points that hit every interval with
+  [`minimum_stabbing_points`](usage.md#minimum-stabbing-points).
+- Use matching `Date` or `Datetime` endpoints as well as integers.
+- Browse [benchmark reports and plots](benchmarks.md) for each operation.
 
 ## 0.1.0 — September 25, 2026
 
