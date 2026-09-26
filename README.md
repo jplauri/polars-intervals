@@ -1,6 +1,7 @@
 # polars-intervals
 
-Count overlapping intervals in Polars, without building a table of overlapping pairs.
+Count overlaps and assign optimal interval lanes in Polars, without building a graph
+or a table of overlapping pairs.
 
 [Usage](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md) ·
 [Benchmarks](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md) ·
@@ -54,7 +55,37 @@ Intervals are half-open: `[start, end)`. Touching intervals do not overlap,
 empty intervals count zero, and each row excludes itself. Endpoints must be
 non-null integers, `Date`, or `Datetime` with matching dtypes and `start <= end`.
 
+## Assign lanes
+
+`assign_lanes` assigns intervals to the minimum number of non-overlapping lanes.
+Use it for calendar/timeline layout, machine/resource lanes, Gantt charts, genomic
+tracks, and concurrent-job visualization.
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
+result = df.lazy().with_columns(pi.assign_lanes("start", "end").alias("lane")).collect()
+assert result["lane"].dtype == pl.UInt32
+assert result["lane"].n_unique() == 2
+```
+
+For non-empty intervals, **minimum number of lanes = maximum concurrency**.
+Touching intervals can share a lane. Empty intervals consume no capacity and
+receive lane `0`; a nonempty collection of only empty intervals uses one lane.
+Empty input returns empty output. Lane IDs are contiguous `0..k-1`, deterministic
+for identical input, and returned in original row order. No particular optimal
+coloring is promised across releases or permutations of the rows.
+
+Use `.over("group")` for independent lane assignment per group, or
+`group_by(...).agg(...)` for lists. See the
+[algorithm comparison](https://github.com/jplauri/polars-intervals/blob/master/docs/assign-lanes-benchmarks.md)
+for the measured production choice.
+
 ## Date and Datetime intervals
+
+Both `overlap_count` and `assign_lanes` accept Date and Datetime endpoints.
 
 ```python
 from datetime import datetime

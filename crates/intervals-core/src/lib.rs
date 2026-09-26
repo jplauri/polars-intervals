@@ -2,10 +2,14 @@
 //!
 //! [`overlap_counts`] counts overlaps between half-open intervals without
 //! depending on Polars or any particular endpoint type.
+//! [`assign_lanes`] assigns intervals to the minimum number of lanes.
 
 #![forbid(unsafe_code)]
 
 use std::fmt;
+
+mod lanes;
+pub use lanes::assign_lanes;
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -14,6 +18,8 @@ pub enum IntervalError {
     LengthMismatch { starts_len: usize, ends_len: usize },
     /// An interval's start exceeds its end, at the given zero-based row index.
     InvalidInterval { index: usize },
+    /// More than `u32::MAX + 1` lanes are required.
+    TooManyLanes,
 }
 
 impl fmt::Display for IntervalError {
@@ -29,6 +35,7 @@ impl fmt::Display for IntervalError {
             Self::InvalidInterval { index } => {
                 write!(f, "interval at index {index} has start greater than end")
             }
+            Self::TooManyLanes => write!(f, "lane IDs exceed the UInt32 range"),
         }
     }
 }

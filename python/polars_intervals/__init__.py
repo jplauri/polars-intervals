@@ -5,7 +5,79 @@ from pathlib import Path
 import polars as pl
 from polars.plugins import register_plugin_function
 
-__all__ = ["overlap_count"]
+__all__ = ["assign_lanes", "overlap_count"]
+
+
+def assign_lanes(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
+    """Assign intervals to the minimum number of non-overlapping lanes.
+
+    Useful for calendar/timeline layout, machine/resource lanes, Gantt charts,
+    genomic tracks, and concurrent-job visualization.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+
+    Returns:
+        pl.Expr: Non-null `UInt32` lane IDs in original row order. IDs are
+            contiguous `0..k-1`, where `k` is globally minimum for the input
+            collection (or separately for each group). Identical input gives
+            deterministic results. No particular optimal coloring or stable
+            lane numbering across releases or row permutations is promised.
+
+    Raises:
+        polars.exceptions.PolarsError: If lengths differ, logical dtypes are
+            mismatched or unsupported, endpoints contain nulls, any start
+            exceeds its end, or lane IDs exceed the UInt32 range. Reversed
+            intervals report the first invalid original row index. Validation
+            happens when the expression is evaluated.
+
+    Notes:
+        Intervals are half-open `[start, end)`: touching intervals may share a
+        lane. For non-empty intervals, minimum number of lanes = maximum
+        concurrency. Empty intervals `[x, x)` consume no capacity and receive
+        lane `0`. Nonempty input containing only empty intervals uses one lane;
+        empty input returns empty output.
+
+        Endpoint rules match `overlap_count`: both columns must have the same
+        dtype among `Int8`, `Int16`, `Int32`, `Int64`, `UInt8`, `UInt16`, `UInt32`,
+        `UInt64`, `Date`, and `Datetime`. Datetime units (`ms`, `us`, `ns`) and
+        timezone metadata must match exactly. Physical integer days/timestamps
+        preserve temporal precision without timezone arithmetic. No implicit
+        coercion, scalar broadcasting, or null filling is performed. Float,
+        Time, Duration, and other dtypes are unsupported.
+
+        Use `.over("group")` to assign lanes independently within each group,
+        or `group_by(...).agg(...)` for lists of lane IDs. Assignment needs the
+        full collection, including all chunks, even with the streaming engine.
+        Filtering before assignment changes the collection being colored.
+
+        The Rust algorithm sorts starts and reuses the earliest-ending lane
+        with a min-heap: O(n log n) sorting and O(n log max(2, k)) assignment,
+        with O(n + k) additional space. It does not construct a graph.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
+        >>> result = df.lazy().with_columns(
+        ...     pi.assign_lanes("start", "end").alias("lane")
+        ... ).collect()
+        >>> result["lane"].dtype
+        UInt32
+        >>> result["lane"].n_unique()
+        2
+        >>> result["lane"][0] == result["lane"][2]
+        True
+
+        The first and last intervals touch, so two lanes suffice for all three.
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="assign_lanes_plugin",
+        args=[start, end],
+        is_elementwise=False,
+    )
 
 
 def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:

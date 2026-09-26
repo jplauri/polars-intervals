@@ -1,0 +1,48 @@
+{
+  "date": "2026-09-26",
+  "base_commit": "b644871c1069b7453b5c137c475ebd54ce8b595c",
+  "rust": "1.98.1 (48a229cea 2026-09-01)",
+  "target": "x86_64-pc-windows-msvc",
+  "os": "Windows 11 Home 10.0.26200",
+  "cpu": "AMD Ryzen 9 3900X",
+  "cores": 12,
+  "logical_processors": 24,
+  "command": "cargo bench -p intervals-core --bench assign_lanes --locked",
+  "profile": "Cargo bench default optimized",
+  "threads": 1,
+  "endpoint_type": "i64",
+  "sizes": [
+    1000,
+    10000,
+    100000,
+    1000000
+  ],
+  "families": [
+    "disjoint",
+    "low8",
+    "moderate128",
+    "clique",
+    "nested",
+    "staircase",
+    "ties",
+    "duplicates",
+    "mixed_empty"
+  ],
+  "orders": [
+    "sorted",
+    "shuffled"
+  ],
+  "seed": 42,
+  "warmups": 2,
+  "repeats": 9,
+  "accepted_samples_per_run": 1944,
+  "memory_metric": "Peak live Vec/BinaryHeap capacity including output; excluding inputs, allocator metadata and transient reallocations",
+  "runs": [
+    "assign-lanes-windows.csv",
+    "assign-lanes-repeat-windows.csv"
+  ],
+  "source_sha256": {
+    "crates/intervals-core/benches/support/mod.rs": "5A8606CDAC5841C06D035A7939CD83A9A9D1EFB249491687BC646A429BE4A992",
+    "crates/intervals-core/src/lanes.rs": "7FB6F4C4A8E5A42573F264A3ED92040FA2AE134B4D14706BFDB5C778C9B09EB6"
+  }
+}

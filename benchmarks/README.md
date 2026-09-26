@@ -1,5 +1,19 @@
 # Benchmarks
 
+## assign_lanes
+
+Compare the start-sort/min-heap, two-sorts/free-list, and endpoint-event strategies:
+
+```sh
+cargo bench -p intervals-core --bench assign_lanes --locked > benchmarks/results/assign-lanes-local.csv
+```
+
+This standalone release benchmark validates every output against independent
+concurrency and lane-conflict checks. It covers nine families, two input orders,
+and 1K/10K/100K/1M rows, with two warmups and nine samples. See the
+[lane algorithm decision](https://github.com/jplauri/polars-intervals/blob/master/docs/assign-lanes-benchmarks.md)
+for measured results, buffer accounting, limitations, and the production choice.
+
 ## Setup
 
 Follow the [source build prerequisites](https://github.com/jplauri/polars-intervals/blob/master/CONTRIBUTING.md#build-from-source),

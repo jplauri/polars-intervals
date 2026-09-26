@@ -1,7 +1,7 @@
 //! Interval algorithms for Rust Polars, backed by `intervals-core`.
 //!
-//! [`overlap_count`] adapts integer, Date, and Datetime [`Series`] to the core.
-//! The Python package exposes the same operation as a Polars expression plugin.
+//! [`overlap_count`] and [`assign_lanes`] adapt integer, Date, and Datetime
+//! [`Series`] to the core. Python exposes both as Polars expression plugins.
 
 use polars::prelude::*;
 use std::borrow::Cow;
@@ -9,14 +9,36 @@ use std::borrow::Cow;
 #[pyo3::pymodule]
 mod _internal {}
 
-#[pyo3_polars::derive::polars_expr(output_type = UInt64)]
+// The output_type_func form also catches failures while importing field dtypes.
+// The constant output_type form can abort at the FFI boundary for a dtype whose
+// optional Polars feature is disabled (e.g. Int128), before our validation runs.
+fn count_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let [start, _] = input_pair(inputs, Algorithm::OverlapCount)?;
+    Ok(Field::new(start.name().clone(), DataType::UInt64))
+}
+
+fn lanes_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let [start, _] = input_pair(inputs, Algorithm::AssignLanes)?;
+    Ok(Field::new(start.name().clone(), DataType::UInt32))
+}
+
+fn input_pair<T>(inputs: &[T], algorithm: Algorithm) -> PolarsResult<&[T; 2]> {
+    inputs.try_into().map_err(|_| {
+        polars_err!(InvalidOperation: "{} requires exactly two inputs, got {}",
+            algorithm.name(), inputs.len())
+    })
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = count_output)]
 fn overlap_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
-    polars_ensure!(
-        inputs.len() == 2,
-        InvalidOperation: "overlap_count requires exactly two inputs, got {}",
-        inputs.len()
-    );
-    overlap_count(&inputs[0], &inputs[1])
+    let [starts, ends] = input_pair(inputs, Algorithm::OverlapCount)?;
+    overlap_count(starts, ends)
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = lanes_output)]
+fn assign_lanes_plugin(inputs: &[Series]) -> PolarsResult<Series> {
+    let [starts, ends] = input_pair(inputs, Algorithm::AssignLanes)?;
+    assign_lanes(starts, ends)
 }
 
 /// Counts other overlapping intervals in the supplied start and end columns.
@@ -56,56 +78,127 @@ fn overlap_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
 /// # Ok::<(), PolarsError>(())
 /// ```
 pub fn overlap_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+    evaluate(starts, ends, Algorithm::OverlapCount)
+}
+
+/// Assign intervals to the minimum number of non-overlapping lanes.
+///
+/// Returns a non-null `UInt32` Series named `assign_lanes`, in original row
+/// order. Lane IDs are contiguous from zero and deterministic for identical
+/// input; no particular optimal coloring is promised across releases.
+/// The minimum lane count equals maximum concurrency of non-empty intervals.
+/// Empty intervals consume no capacity and receive lane zero. An all-empty,
+/// nonempty collection uses one lane; empty input returns empty output.
+///
+/// Uses the same matching integer, Date and Datetime dtypes, half-open semantics,
+/// null rejection, physical representations, and chunk handling as [`overlap_count`].
+/// Takes `O(n log n)` time and `O(n)` additional space.
+///
+/// # Errors
+///
+/// Returns a [`PolarsError`] for unequal lengths, mismatched or unsupported
+/// logical dtypes, null endpoints, reversed intervals (with original row index),
+/// or lane IDs exceeding `u32::MAX`. There is no coercion or broadcasting.
+///
+/// # Examples
+///
+/// ```
+/// use polars::prelude::*;
+/// use polars_intervals::assign_lanes;
+/// let starts = Series::new("start".into(), [0i64, 1, 2]);
+/// let ends = Series::new("end".into(), [2i64, 3, 4]);
+/// let lanes = assign_lanes(&starts, &ends)?;
+/// assert_eq!(lanes.n_unique()?, 2);
+/// # Ok::<(), PolarsError>(())
+/// ```
+pub fn assign_lanes(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+    evaluate(starts, ends, Algorithm::AssignLanes)
+}
+
+#[derive(Clone, Copy)]
+enum Algorithm {
+    OverlapCount,
+    AssignLanes,
+}
+
+impl Algorithm {
+    fn name(self) -> &'static str {
+        match self {
+            Self::OverlapCount => "overlap_count",
+            Self::AssignLanes => "assign_lanes",
+        }
+    }
+}
+
+fn evaluate(starts: &Series, ends: &Series, algorithm: Algorithm) -> PolarsResult<Series> {
+    let name = algorithm.name();
     polars_ensure!(
         starts.len() == ends.len(),
-        ShapeMismatch: "overlap_count requires equal lengths, got {} starts and {} ends",
+        ShapeMismatch: "{} requires equal lengths, got {} starts and {} ends", name,
         starts.len(), ends.len()
     );
     polars_ensure!(
         starts.dtype() == ends.dtype(),
-        InvalidOperation: "overlap_count requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
+        InvalidOperation: "{} requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}", name,
         starts.dtype(), ends.dtype()
     );
     match starts.dtype() {
-        DataType::Int8 => count_typed(starts.i8()?, ends.i8()?),
-        DataType::Int16 => count_typed(starts.i16()?, ends.i16()?),
-        DataType::Int32 => count_typed(starts.i32()?, ends.i32()?),
-        DataType::Int64 => count_typed(starts.i64()?, ends.i64()?),
-        DataType::UInt8 => count_typed(starts.u8()?, ends.u8()?),
-        DataType::UInt16 => count_typed(starts.u16()?, ends.u16()?),
-        DataType::UInt32 => count_typed(starts.u32()?, ends.u32()?),
-        DataType::UInt64 => count_typed(starts.u64()?, ends.u64()?),
-        DataType::Date => count_typed(starts.date()?.physical(), ends.date()?.physical()),
-        DataType::Datetime(_, _) => {
-            count_typed(starts.datetime()?.physical(), ends.datetime()?.physical())
-        }
+        DataType::Int8 => evaluate_typed(starts.i8()?, ends.i8()?, algorithm),
+        DataType::Int16 => evaluate_typed(starts.i16()?, ends.i16()?, algorithm),
+        DataType::Int32 => evaluate_typed(starts.i32()?, ends.i32()?, algorithm),
+        DataType::Int64 => evaluate_typed(starts.i64()?, ends.i64()?, algorithm),
+        DataType::UInt8 => evaluate_typed(starts.u8()?, ends.u8()?, algorithm),
+        DataType::UInt16 => evaluate_typed(starts.u16()?, ends.u16()?, algorithm),
+        DataType::UInt32 => evaluate_typed(starts.u32()?, ends.u32()?, algorithm),
+        DataType::UInt64 => evaluate_typed(starts.u64()?, ends.u64()?, algorithm),
+        DataType::Date => evaluate_typed(
+            starts.date()?.physical(),
+            ends.date()?.physical(),
+            algorithm,
+        ),
+        DataType::Datetime(_, _) => evaluate_typed(
+            starts.datetime()?.physical(),
+            ends.datetime()?.physical(),
+            algorithm,
+        ),
         dtype => polars_bail!(
-            InvalidOperation: "overlap_count requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
-            dtype
+            InvalidOperation: "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
+            name, dtype
         ),
     }
 }
 
-fn count_typed<T>(starts: &ChunkedArray<T>, ends: &ChunkedArray<T>) -> PolarsResult<Series>
+fn evaluate_typed<T>(
+    starts: &ChunkedArray<T>,
+    ends: &ChunkedArray<T>,
+    algorithm: Algorithm,
+) -> PolarsResult<Series>
 where
     T: PolarsIntegerType,
     T::Native: Ord,
 {
     polars_ensure!(
         starts.null_count() == 0 && ends.null_count() == 0,
-        ComputeError: "overlap_count does not support null endpoints"
+        ComputeError: "{} does not support null endpoints", algorithm.name()
     );
     // Borrow contiguous inputs; only materialize columns spanning multiple chunks.
-    let starts = starts
-        .cont_slice()
-        .map(Cow::Borrowed)
-        .unwrap_or_else(|_| Cow::Owned(starts.into_no_null_iter().collect()));
-    let ends = ends
-        .cont_slice()
-        .map(Cow::Borrowed)
-        .unwrap_or_else(|_| Cow::Owned(ends.into_no_null_iter().collect()));
-    let counts = intervals_core::overlap_counts(&starts, &ends)
-        .map_err(|error| polars_err!(ComputeError: "{error}"))?;
-    let counts: Vec<u64> = counts.into_iter().map(|count| count as u64).collect();
-    Ok(Series::from_vec("overlap_count".into(), counts))
+    let [starts, ends] = [starts, ends].map(|column| {
+        column
+            .cont_slice()
+            .map(Cow::Borrowed)
+            .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
+    });
+    match algorithm {
+        Algorithm::OverlapCount => {
+            let counts = intervals_core::overlap_counts(&starts, &ends)
+                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            let counts: Vec<u64> = counts.into_iter().map(|count| count as u64).collect();
+            Ok(Series::from_vec(algorithm.name().into(), counts))
+        }
+        Algorithm::AssignLanes => {
+            let lanes = intervals_core::assign_lanes(&starts, &ends)
+                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(Series::from_vec(algorithm.name().into(), lanes))
+        }
+    }
 }
