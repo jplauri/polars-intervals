@@ -47,7 +47,6 @@ fn logical_list_dtype_chunks_and_empty() {
         assert_eq!(points.dtype(), &dtype.to_physical());
         assert_eq!(
             points
-                .to_physical_repr()
                 .cast(&DataType::Int64)
                 .unwrap()
                 .i64()

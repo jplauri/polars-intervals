@@ -62,9 +62,7 @@ fn measure<T: DiscreteEndpoint + Debug>(
     };
     let expected = minimum_stabbing_points(s, e).unwrap();
     verify(&expected);
-    let mut methods = ["A", "B", "C", "production"];
-    let mut memory = std::collections::BTreeMap::new();
-    for method in methods {
+    let mut methods = ["A", "B", "C", "production"].map(|method| {
         let (points, peak, count) = allocations::measure(|| {
             if method == "production" {
                 minimum_stabbing_points(s, e).unwrap()
@@ -74,11 +72,11 @@ fn measure<T: DiscreteEndpoint + Debug>(
         });
         verify(&points);
         assert_eq!(points, expected);
-        memory.insert(method, (peak, count));
-    }
+        (method, peak, count)
+    });
     for sample in 0..samples {
         shuffle(&mut methods, seed);
-        for method in methods {
+        for (method, peak, count) in methods {
             let begin = Instant::now();
             let (points, phases) = if method == "production" {
                 (
@@ -94,7 +92,6 @@ fn measure<T: DiscreteEndpoint + Debug>(
             };
             let total = begin.elapsed().as_nanos();
             assert_eq!(points, expected);
-            let (peak, count) = memory[method];
             let phases = phases
                 .map(|(v, p, s, g)| format!("{v},{p},{s},{g}"))
                 .unwrap_or_else(|| ",,,".into());

@@ -123,5 +123,31 @@
     "Core allocation counts are not native-plugin peak RSS.",
     "Local release validation covers CPython 3.14 Windows; the full 15-wheel matrix and sdist installation remain CI checks.",
     "Temporal i64 kernels share integer implementation; all units/timezones verified separately in correctness tests."
-  ]
+  ],
+  "cleanup_verification": {
+    "date_utc": "2026-09-26T17:41:17.977089+00:00",
+    "scope": "Store benchmark allocation statistics alongside each method instead of a BTreeMap; remove duplicate endpoint materialization and redundant physical conversion in tests.",
+    "production_and_candidates": "Unchanged; source hashes match the original measured sources.",
+    "historical_results": "Original raw results and source hashes retained. Updated benchmark-driver and test hashes recorded separately below.",
+    "source_sha256": {
+      "crates/intervals-core/benches/minimum_stabbing_points.rs": "9759c70686228de3a9795baa7c63a81ef364524302d37b85c1a76c0ee9f7b585",
+      "crates/intervals-core/tests/minimum_stabbing_points.rs": "cbda449f3007ec66c434dd1721bb7014be85a6ae53da1ac5b2036215687b8627",
+      "crates/polars-intervals/tests/minimum_stabbing_points.rs": "c4916d1eb379c94b00206bd51516204e5d098858e4c9e2a3e58d946a10c79a9b"
+    },
+    "release_smoke": {
+      "max_rows": 1000,
+      "samples": 540,
+      "workloads": 45,
+      "verification": "Every candidate checked against coverage and packing; keys, point counts, peak bytes and allocation counts exactly match the historical 1K results. Smoke timings are not performance evidence.",
+      "sha256": "c5ddd0876212116792650510aaa98a8f7c466d9896ffbec84cddf4faba3d4d42"
+    },
+    "checks": {
+      "rust_tests_and_doctests": 125,
+      "python_tests_and_doctests": 1295,
+      "cargo_fmt": "passed",
+      "clippy_all_targets_deny_warnings": "passed",
+      "ruff_check_and_format": "passed",
+      "uv_lock": "passed"
+    }
+  }
 }

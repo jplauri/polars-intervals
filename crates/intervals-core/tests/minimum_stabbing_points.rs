@@ -13,8 +13,8 @@ fn solve(rows: &[(i64, i64)]) -> Vec<i64> {
 }
 
 fn check(rows: &[(i64, i64)], expected: &[i64]) {
-    assert_eq!(solve(rows), expected);
     let (s, e): (Vec<_>, Vec<_>) = rows.iter().copied().unzip();
+    assert_eq!(minimum_stabbing_points(&s, &e).unwrap(), expected);
     for method in ["A", "B", "C"] {
         assert_eq!(candidates::run(&s, &e, method).unwrap().points, expected);
     }
