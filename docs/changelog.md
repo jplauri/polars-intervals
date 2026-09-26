@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add exact `max_weight_non_overlapping` scheduling to Python, Rust Polars, and
+  the independent core, with a Boolean mask, integer weights and checked `i128`
+  accumulation. Supports integer/Date/Datetime endpoints, groups and empties.
+- Compare three weighted scheduling candidates with release benchmarks, an
+  independent suffix DP, brute-force enumeration and property tests.
+
 - Add `assign_lanes` to the Python expression, Rust Polars, and independent core
   APIs, returning optimal, deterministic, contiguous `UInt32` lane IDs in row order.
   Supports the same integer, Date, and Datetime endpoints as `overlap_count`.

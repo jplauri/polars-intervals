@@ -234,6 +234,21 @@ def installed(checkout):
         and lanes[0] != lanes[1],
         "Lane assignment smoke test failed.",
     )
+    weighted = (
+        pl.DataFrame(
+            {
+                "start": [0, 0, 4, 7],
+                "end": [10, 4, 7, 10],
+                "weight": [15, 10, 10, 10],
+            }
+        )
+        .select(pi.max_weight_non_overlapping("start", "end", weight="weight"))
+        .to_series()
+    )
+    require(
+        weighted.dtype == pl.Boolean and weighted.to_list() == [False, True, True, True],
+        "Weighted scheduling smoke test failed.",
+    )
     for dtype, starts, ends in [
         (pl.Date, [date(2026, 1, 1), date(2026, 1, 2)], [date(2026, 1, 3), date(2026, 1, 4)]),
         (
@@ -263,6 +278,16 @@ def installed(checkout):
         require(
             lanes.dtype == pl.UInt32 and set(lanes.to_list()) == {0, 1},
             f"Temporal lane assignment smoke test failed for {dtype}.",
+        )
+        weighted = (
+            pl.DataFrame({"start": starts, "end": ends}, schema={"start": dtype, "end": dtype})
+            .with_columns(pl.Series("weight", [10, 20], dtype=pl.UInt64))
+            .select(pi.max_weight_non_overlapping("start", "end", weight="weight"))
+            .to_series()
+        )
+        require(
+            weighted.dtype == pl.Boolean and weighted.to_list() == [False, True],
+            f"Temporal weighted scheduling smoke test failed for {dtype}.",
         )
     print(f"Testing installed artifact from {package}")
     with tempfile.TemporaryDirectory() as temporary:

@@ -1,0 +1,66 @@
+{
+  "date": "2026-09-26",
+  "base_commit": "f1ee0e680f4e3af18a2b5cae5f72ee96cbdad6f7",
+  "source_commit": "78864e24bb52f47111b3e0484d9e2b48a005c529",
+  "rust": "1.98.1 (48a229cea 2026-09-01)",
+  "llvm": "22.1.8",
+  "target": "x86_64-pc-windows-msvc",
+  "os": "Windows 11 Home 10.0.26200",
+  "cpu": "AMD Ryzen 9 3900X",
+  "cores": 12,
+  "logical_processors": 24,
+  "usable_ram_kib": 33475628,
+  "command": "cargo bench -p intervals-core --bench max_weight_non_overlapping --locked",
+  "profile": "Cargo bench default optimized",
+  "threads": 1,
+  "endpoint_type": "i64",
+  "weight_type": "i64",
+  "accumulator": "i128",
+  "sizes": [
+    1000,
+    10000,
+    100000,
+    1000000
+  ],
+  "families": [
+    "disjoint",
+    "low8",
+    "moderate128",
+    "dense",
+    "nested",
+    "staircase",
+    "duplicates",
+    "equal_endpoints",
+    "touching",
+    "empty",
+    "random_lengths"
+  ],
+  "orders": [
+    "finish_sorted",
+    "shuffled"
+  ],
+  "weight_distributions": [
+    "positive",
+    "mixed",
+    "zeros",
+    "ties",
+    "wide",
+    "expensive"
+  ],
+  "seed": 42,
+  "warmups": 2,
+  "repeats": 5,
+  "workloads_per_run": 528,
+  "accepted_samples_per_run": 7920,
+  "memory_metric": "Peak live Vec capacity including output, excluding inputs, allocator metadata, stack and correctness oracle",
+  "allocation_metric": "Count of nonzero-capacity Vec buffers; no allocator instrumentation",
+  "runs": [
+    "weighted-windows.csv",
+    "weighted-repeat-windows.csv"
+  ],
+  "source_sha256": {
+    "crates/intervals-core/src/weighted.rs": "980BF55F77882093335CA6A5C0E21D049270E9FAD8FCC3EFEE7531E3FFD15920",
+    "crates/intervals-core/benches/max_weight_non_overlapping.rs": "FCBDB57765C36CFA2AFD09DE9384D0D8F221557BA556937A3A411EB9A6AC40B4",
+    "crates/intervals-core/benches/support/weighted.rs": "912C51749C6F584AA6D5DC923D8C8E0B75E8B11A1045D963FBF5AF2437C1E6F3"
+  }
+}

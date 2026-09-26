@@ -5,7 +5,81 @@ from pathlib import Path
 import polars as pl
 from polars.plugins import register_plugin_function
 
-__all__ = ["assign_lanes", "overlap_count"]
+__all__ = ["assign_lanes", "max_weight_non_overlapping", "overlap_count"]
+
+
+def max_weight_non_overlapping(
+    start: str | pl.Expr, end: str | pl.Expr, *, weight: str | pl.Expr
+) -> pl.Expr:
+    """Select a globally maximum-weight subset of mutually non-overlapping intervals.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+        weight: Column name or expression producing signed or unsigned integer weights.
+
+    Returns:
+        pl.Expr: Non-null Boolean mask, one value per original row. True selects
+            a row in one globally optimal subset. Empty input returns an empty
+            mask. Identical inputs give deterministic results; a particular
+            optimal subset on ties is not promised across releases or row permutations.
+
+    Raises:
+        polars.exceptions.PolarsError: For unequal lengths, null endpoints or
+            weights, unsupported dtypes, mismatched endpoint dtypes, reversed
+            intervals (reporting the original row index), or i128 objective overflow.
+            Validation occurs when evaluated. No implicit casting or broadcasting.
+
+    Notes:
+        Intervals are half-open `[start, end)`: touching endpoints are compatible.
+        Empty intervals `[x, x)` conflict with nothing; every positive empty row
+        is selected, including duplicates at the same coordinate. Negative and
+        zero-weight rows are omitted. The empty subset is allowed with value 0,
+        so all-negative input returns all False.
+
+        Weights accept Int8/16/32/64 and UInt8/16/32/64 only. Accumulation uses
+        checked i128 arithmetic without passing through floating point. Float,
+        Decimal, Boolean, temporal and other weight dtypes are rejected.
+        Floating-point weights may be considered in a separate design.
+
+        Endpoint support matches `overlap_count`: matching integer dtypes up
+        to 64 bits, Date, or Datetime with exactly matching time unit and timezone
+        metadata. Physical integer days/timestamps preserve temporal precision.
+
+        Use directly in `df.filter(...)`, or `.over("group")` to solve each
+        group independently. `group_by(...).agg(...)` returns lists of Boolean
+        values. All chunks belong to the same instance. The full collection is
+        required even with the streaming engine; filtering before optimization
+        changes the instance being solved.
+
+        The exact Rust dynamic program sorts by finish and start, sweeps
+        compatible predecessors, and reconstructs the optimal subset in
+        O(n log n) time and O(n) additional space. This is a global optimization,
+        not a per-row decision or a greedy selection by weight or finish time.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({
+        ...     "start": [0, 0, 4, 7], "end": [10, 4, 7, 10],
+        ...     "revenue": [15, 10, 10, 10],
+        ... })
+        >>> selected = df.filter(
+        ...     pi.max_weight_non_overlapping("start", "end", weight="revenue")
+        ... )
+        >>> selected["revenue"].sum()
+        30
+        >>> selected["start"].to_list()
+        [0, 4, 7]
+
+        The three shorter intervals beat the single largest-weight interval (15).
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="max_weight_non_overlapping_plugin",
+        args=[start, end, weight],
+        is_elementwise=False,
+    )
 
 
 def assign_lanes(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
