@@ -1,5 +1,8 @@
 //! Exact benchmark candidates, deliberately separate from the production kernel.
+#[path = "random.rs"]
+mod random;
 use intervals_core::IntervalError;
+pub use random::{random, shuffle};
 use std::time::{Duration, Instant};
 
 #[derive(Default)]
@@ -286,19 +289,6 @@ pub fn naive<T: Ord>(starts: &[T], ends: &[T]) -> Vec<usize> {
         }
     }
     depths
-}
-
-pub fn random(state: &mut u64) -> u64 {
-    *state ^= *state << 13;
-    *state ^= *state >> 7;
-    *state ^= *state << 17;
-    *state
-}
-
-pub fn shuffle<T>(rows: &mut [T], seed: &mut u64) {
-    for i in (1..rows.len()).rev() {
-        rows.swap(i, random(seed) as usize % (i + 1));
-    }
 }
 
 pub const SCENARIOS: [&str; 20] = [

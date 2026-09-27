@@ -4,19 +4,15 @@ mod allocations;
 mod candidates;
 #[path = "../tests/support/coverage.rs"]
 mod oracle;
+#[path = "support/random.rs"]
+mod random;
+use random::{random, shuffle};
 
 use std::hint::black_box;
 use std::time::Instant;
 
 #[global_allocator]
 static ALLOCATOR: allocations::Allocator = allocations::Allocator;
-
-fn random(state: &mut u64) -> u64 {
-    *state ^= *state << 13;
-    *state ^= *state >> 7;
-    *state ^= *state << 17;
-    *state
-}
 
 fn data(family: &str, n: usize) -> Vec<(i64, i64)> {
     let mut state = 20260927;
@@ -135,10 +131,7 @@ fn main() {
                 }
                 if order == "shuffled" {
                     let mut state = 20260927;
-                    for i in (1..n).rev() {
-                        let j = random(&mut state) as usize % (i + 1);
-                        rows.swap(i, j);
-                    }
+                    shuffle(&mut rows, &mut state);
                 }
                 let (s, e): (Vec<_>, Vec<_>) = rows.into_iter().unzip();
                 let budgets: &[usize] = if n == 1_000 {
