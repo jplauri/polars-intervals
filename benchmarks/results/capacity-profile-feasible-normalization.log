@@ -1,0 +1,21 @@
+256 exhaustive random instances verified for all exact candidates
+verified/measured n=1000 m=16 k=4 disjoint/constant/sorted
+verified/measured n=1000 m=16 k=4 disjoint/bottleneck/sorted
+verified/measured n=1000 m=16 k=4 disjoint/increasing/sorted
+verified/measured n=1000 m=16 k=4 disjoint/decreasing/sorted
+verified/measured n=1000 m=16 k=4 disjoint/sawtooth/sorted
+verified/measured n=1000 m=16 k=4 disjoint/small_changes/sorted
+verified/measured n=1000 m=16 k=4 disjoint/zero_gaps/sorted
+verified/measured n=1000 m=16 k=4 disjoint/high/sorted
+verified/measured n=10000 m=1 k=4 disjoint/high/shuffled_profile
+verified/measured n=10000 m=4 k=4 disjoint/high/shuffled_profile
+verified/measured n=10000 m=16 k=4 disjoint/high/shuffled_profile
+verified/measured n=10000 m=100 k=4 disjoint/high/shuffled_profile
+verified/measured n=10000 m=1000 k=4 disjoint/high/shuffled_profile
+verified/measured n=10000 m=10000 k=4 disjoint/high/shuffled_profile
+verified/measured n=10000 m=16 k=4 disjoint/high/sorted
+verified/measured n=10000 m=16 k=4 disjoint/constant/sorted
+verified/measured n=100000 m=16 k=4 disjoint/high/sorted
+verified/measured n=100000 m=16 k=4 disjoint/constant/sorted
+verified/measured n=1000000 m=16 k=4 disjoint/high/sorted
+verified/measured n=1000000 m=16 k=4 disjoint/constant/sorted

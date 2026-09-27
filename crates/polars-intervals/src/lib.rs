@@ -12,9 +12,14 @@ use std::borrow::Cow;
 
 mod cover;
 pub use cover::{minimum_cost_cover, minimum_cover};
+mod profile;
+pub use profile::max_weight_with_capacity_profile;
 
 #[pyo3::pymodule]
-mod _internal {}
+mod _internal {
+    #[pymodule_export]
+    use super::profile::max_weight_with_capacity_profile_py;
+}
 
 // The output_type_func form also catches failures while importing field dtypes.
 // The constant output_type form can abort at the FFI boundary for a dtype whose

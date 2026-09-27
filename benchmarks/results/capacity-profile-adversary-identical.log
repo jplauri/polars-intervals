@@ -1,0 +1,13 @@
+256 exhaustive random instances verified for all exact candidates
+verified/measured n=1000 m=16 k=4 identical/constant/sorted
+verified/measured n=1000 m=16 k=4 identical/bottleneck/sorted
+verified/measured n=1000 m=16 k=4 identical/increasing/sorted
+verified/measured n=1000 m=16 k=4 identical/decreasing/sorted
+verified/measured n=1000 m=16 k=4 identical/sawtooth/sorted
+verified/measured n=1000 m=16 k=4 identical/small_changes/sorted
+verified/measured n=1000 m=16 k=4 identical/zero_gaps/sorted
+verified/measured n=1000 m=16 k=4 identical/high/sorted
+verified/measured n=1000 m=16 k=256 identical/sawtooth/sorted
+verified/measured n=1000 m=100 k=256 identical/sawtooth/sorted
+verified/measured n=1000 m=16 k=1000 identical/sawtooth/sorted
+verified/measured n=1000 m=100 k=1000 identical/sawtooth/sorted

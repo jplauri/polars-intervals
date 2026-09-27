@@ -1,0 +1,3 @@
+256 exhaustive random instances verified for all exact candidates
+verified/measured n=10000 m=1000 k=4 moderate/small_changes/sorted
+verified/measured n=10000 m=10000 k=4 moderate/small_changes/sorted

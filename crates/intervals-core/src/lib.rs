@@ -20,6 +20,8 @@ mod weighted;
 pub use weighted::max_weight_non_overlapping;
 mod capacity;
 pub use capacity::max_weight_with_capacity;
+mod capacity_profile;
+pub use capacity_profile::max_weight_with_capacity_profile;
 mod cover;
 pub use cover::{minimum_cost_cover, minimum_cover};
 mod stabbing;
@@ -45,6 +47,19 @@ pub enum IntervalError {
     },
     /// The optimal objective exceeds the `i128` accumulator range.
     WeightOverflow,
+    /// Capacity-profile start and end columns have different lengths.
+    ProfileLengthMismatch { starts_len: usize, ends_len: usize },
+    /// There must be one capacity per profile segment.
+    CapacityLengthMismatch {
+        segments_len: usize,
+        capacities_len: usize,
+    },
+    /// A capacity-profile segment starts after it ends.
+    InvalidProfileInterval { index: usize },
+    /// Nonempty profile rows overlap, so their capacity is ambiguous.
+    OverlappingProfile { first: usize, second: usize },
+    /// Capacity must be nonnegative, including on empty profile rows.
+    NegativeCapacity { index: usize },
     /// The target starts after it ends.
     InvalidTarget,
     /// No subset continuously covers the target.
@@ -85,6 +100,32 @@ impl fmt::Display for IntervalError {
                 "interval and weight lengths differ: {intervals_len} intervals, {weights_len} weights"
             ),
             Self::WeightOverflow => write!(f, "maximum weight exceeds the i128 accumulator range"),
+            Self::ProfileLengthMismatch {
+                starts_len,
+                ends_len,
+            } => write!(
+                f,
+                "profile start and end lengths differ: {starts_len} starts, {ends_len} ends"
+            ),
+            Self::CapacityLengthMismatch {
+                segments_len,
+                capacities_len,
+            } => write!(
+                f,
+                "profile and capacity lengths differ: {segments_len} segments, {capacities_len} capacities"
+            ),
+            Self::InvalidProfileInterval { index } => write!(
+                f,
+                "profile interval at index {index} has start greater than end"
+            ),
+            Self::OverlappingProfile { first, second } => write!(
+                f,
+                "profile intervals at indices {first} and {second} overlap; capacity is ambiguous"
+            ),
+            Self::NegativeCapacity { index } => write!(
+                f,
+                "capacity at index {index} is negative; capacities must be nonnegative"
+            ),
             Self::InvalidTarget => write!(f, "target start is greater than target end"),
             Self::InfeasibleCover => write!(
                 f,

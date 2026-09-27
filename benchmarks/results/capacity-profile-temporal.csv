@@ -1,0 +1,241 @@
+n,m,pattern,dtype,algorithm,sample,ns,objective
+1000,1,constant,Int64,profile,0,309100,3808
+1000,1,constant,Int64,profile,1,270900,3808
+1000,1,constant,Int64,profile,2,225200,3808
+1000,1,constant,Int64,scalar,0,482700,3808
+1000,1,constant,Int64,scalar,1,525600,3808
+1000,1,constant,Int64,scalar,2,333900,3808
+1000,1,constant,Date,profile,0,253800,3808
+1000,1,constant,Date,profile,1,217500,3808
+1000,1,constant,Date,profile,2,210400,3808
+1000,1,constant,Date,scalar,0,469100,3808
+1000,1,constant,Date,scalar,1,362800,3808
+1000,1,constant,Date,scalar,2,351100,3808
+1000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,0,254300,3808
+1000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,1,264600,3808
+1000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,2,247100,3808
+1000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,0,373100,3808
+1000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,1,375400,3808
+1000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,2,370000,3808
+1000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,251600,3808
+1000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,246500,3808
+1000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,243900,3808
+1000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,0,438800,3808
+1000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,1,389200,3808
+1000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,2,456700,3808
+1000,32,varying,Int64,profile,0,333700,4528
+1000,32,varying,Int64,profile,1,338200,4528
+1000,32,varying,Int64,profile,2,328300,4528
+1000,32,varying,Date,profile,0,349200,4528
+1000,32,varying,Date,profile,1,315700,4528
+1000,32,varying,Date,profile,2,311700,4528
+1000,32,varying,"Datetime(time_unit='us', time_zone=None)",profile,0,322200,4528
+1000,32,varying,"Datetime(time_unit='us', time_zone=None)",profile,1,325200,4528
+1000,32,varying,"Datetime(time_unit='us', time_zone=None)",profile,2,316100,4528
+1000,32,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,320800,4528
+1000,32,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,353800,4528
+1000,32,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,344100,4528
+1000,1,high,Int64,profile,0,164300,16404
+1000,1,high,Int64,profile,1,84200,16404
+1000,1,high,Int64,profile,2,111600,16404
+1000,1,high,Int64,scalar,0,232600,16404
+1000,1,high,Int64,scalar,1,233700,16404
+1000,1,high,Int64,scalar,2,375500,16404
+1000,1,high,Date,profile,0,82200,16404
+1000,1,high,Date,profile,1,82000,16404
+1000,1,high,Date,profile,2,81000,16404
+1000,1,high,Date,scalar,0,236400,16404
+1000,1,high,Date,scalar,1,247600,16404
+1000,1,high,Date,scalar,2,393200,16404
+1000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,0,136500,16404
+1000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,1,160400,16404
+1000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,2,106800,16404
+1000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,0,365300,16404
+1000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,1,337200,16404
+1000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,2,291000,16404
+1000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,125800,16404
+1000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,153100,16404
+1000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,110000,16404
+1000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,0,362200,16404
+1000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,1,251100,16404
+1000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,2,296900,16404
+10000,1,constant,Int64,profile,0,2015700,38122
+10000,1,constant,Int64,profile,1,2100200,38122
+10000,1,constant,Int64,profile,2,1962600,38122
+10000,1,constant,Int64,scalar,0,2174500,38122
+10000,1,constant,Int64,scalar,1,2321200,38122
+10000,1,constant,Int64,scalar,2,2151100,38122
+10000,1,constant,Date,profile,0,1907800,38122
+10000,1,constant,Date,profile,1,1685600,38122
+10000,1,constant,Date,profile,2,1657000,38122
+10000,1,constant,Date,scalar,0,1969700,38122
+10000,1,constant,Date,scalar,1,1960000,38122
+10000,1,constant,Date,scalar,2,1814900,38122
+10000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,0,1982900,38122
+10000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,1,1876100,38122
+10000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,2,1826800,38122
+10000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,0,2507100,38122
+10000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,1,2161100,38122
+10000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,2,2163100,38122
+10000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,2016800,38122
+10000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,1914800,38122
+10000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,1967800,38122
+10000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,0,2249800,38122
+10000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,1,2105800,38122
+10000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,2,2006600,38122
+10000,313,varying,Int64,profile,0,3206600,46051
+10000,313,varying,Int64,profile,1,3217300,46051
+10000,313,varying,Int64,profile,2,3260400,46051
+10000,313,varying,Date,profile,0,3040400,46051
+10000,313,varying,Date,profile,1,3177600,46051
+10000,313,varying,Date,profile,2,3207700,46051
+10000,313,varying,"Datetime(time_unit='us', time_zone=None)",profile,0,3329200,46051
+10000,313,varying,"Datetime(time_unit='us', time_zone=None)",profile,1,3369300,46051
+10000,313,varying,"Datetime(time_unit='us', time_zone=None)",profile,2,3478600,46051
+10000,313,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,3312300,46051
+10000,313,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,3270900,46051
+10000,313,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,3375600,46051
+10000,1,high,Int64,profile,0,501200,164872
+10000,1,high,Int64,profile,1,558500,164872
+10000,1,high,Int64,profile,2,529900,164872
+10000,1,high,Int64,scalar,0,743600,164872
+10000,1,high,Int64,scalar,1,781100,164872
+10000,1,high,Int64,scalar,2,839300,164872
+10000,1,high,Date,profile,0,387700,164872
+10000,1,high,Date,profile,1,349800,164872
+10000,1,high,Date,profile,2,389300,164872
+10000,1,high,Date,scalar,0,570900,164872
+10000,1,high,Date,scalar,1,461600,164872
+10000,1,high,Date,scalar,2,476800,164872
+10000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,0,578700,164872
+10000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,1,716800,164872
+10000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,2,577500,164872
+10000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,0,788100,164872
+10000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,1,810900,164872
+10000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,2,840200,164872
+10000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,822300,164872
+10000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,706000,164872
+10000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,596600,164872
+10000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,0,686600,164872
+10000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,1,652600,164872
+10000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,2,1120100,164872
+100000,1,constant,Int64,profile,0,7933500,381250
+100000,1,constant,Int64,profile,1,7760500,381250
+100000,1,constant,Int64,profile,2,8202600,381250
+100000,1,constant,Int64,scalar,0,9155900,381250
+100000,1,constant,Int64,scalar,1,9151200,381250
+100000,1,constant,Int64,scalar,2,9078300,381250
+100000,1,constant,Date,profile,0,7250700,381250
+100000,1,constant,Date,profile,1,7187900,381250
+100000,1,constant,Date,profile,2,7618000,381250
+100000,1,constant,Date,scalar,0,6828800,381250
+100000,1,constant,Date,scalar,1,7149200,381250
+100000,1,constant,Date,scalar,2,7906700,381250
+100000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,0,8205000,381250
+100000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,1,7923500,381250
+100000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,2,7497600,381250
+100000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,0,6772100,381250
+100000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,1,6824300,381250
+100000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,2,6957800,381250
+100000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,6705100,381250
+100000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,7016000,381250
+100000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,6674100,381250
+100000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,0,6858400,381250
+100000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,1,6769600,381250
+100000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,2,7069000,381250
+100000,3125,varying,Int64,profile,0,14280000,460853
+100000,3125,varying,Int64,profile,1,14313900,460853
+100000,3125,varying,Int64,profile,2,14248000,460853
+100000,3125,varying,Date,profile,0,13274800,460853
+100000,3125,varying,Date,profile,1,13082400,460853
+100000,3125,varying,Date,profile,2,12866600,460853
+100000,3125,varying,"Datetime(time_unit='us', time_zone=None)",profile,0,13899300,460853
+100000,3125,varying,"Datetime(time_unit='us', time_zone=None)",profile,1,13741100,460853
+100000,3125,varying,"Datetime(time_unit='us', time_zone=None)",profile,2,14353200,460853
+100000,3125,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,14184900,460853
+100000,3125,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,14461800,460853
+100000,3125,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,14551500,460853
+100000,1,high,Int64,profile,0,3648600,1650000
+100000,1,high,Int64,profile,1,3730500,1650000
+100000,1,high,Int64,profile,2,4189000,1650000
+100000,1,high,Int64,scalar,0,4241000,1650000
+100000,1,high,Int64,scalar,1,4015600,1650000
+100000,1,high,Int64,scalar,2,4500900,1650000
+100000,1,high,Date,profile,0,3006200,1650000
+100000,1,high,Date,profile,1,3053400,1650000
+100000,1,high,Date,profile,2,2698900,1650000
+100000,1,high,Date,scalar,0,3376200,1650000
+100000,1,high,Date,scalar,1,3090400,1650000
+100000,1,high,Date,scalar,2,2923900,1650000
+100000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,0,3700000,1650000
+100000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,1,3326000,1650000
+100000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,2,3780600,1650000
+100000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,0,4141200,1650000
+100000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,1,3802100,1650000
+100000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,2,3666200,1650000
+100000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,3452000,1650000
+100000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,3641200,1650000
+100000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,3381900,1650000
+100000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,0,3992900,1650000
+100000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,1,3895200,1650000
+100000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,2,3856100,1650000
+1000000,1,constant,Int64,profile,0,72534000,3812500
+1000000,1,constant,Int64,profile,1,79562600,3812500
+1000000,1,constant,Int64,profile,2,77564900,3812500
+1000000,1,constant,Int64,scalar,0,92538100,3812500
+1000000,1,constant,Int64,scalar,1,88752400,3812500
+1000000,1,constant,Int64,scalar,2,67155600,3812500
+1000000,1,constant,Date,profile,0,56543300,3812500
+1000000,1,constant,Date,profile,1,55942100,3812500
+1000000,1,constant,Date,profile,2,56812000,3812500
+1000000,1,constant,Date,scalar,0,52049100,3812500
+1000000,1,constant,Date,scalar,1,53656700,3812500
+1000000,1,constant,Date,scalar,2,53553700,3812500
+1000000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,0,71871500,3812500
+1000000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,1,71045700,3812500
+1000000,1,constant,"Datetime(time_unit='us', time_zone=None)",profile,2,70777500,3812500
+1000000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,0,65487500,3812500
+1000000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,1,66708100,3812500
+1000000,1,constant,"Datetime(time_unit='us', time_zone=None)",scalar,2,68197500,3812500
+1000000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,67503900,3812500
+1000000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,67594700,3812500
+1000000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,67880700,3812500
+1000000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,0,66516900,3812500
+1000000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,1,67319500,3812500
+1000000,1,constant,"Datetime(time_unit='ns', time_zone='UTC')",scalar,2,65818900,3812500
+1000000,31250,varying,Int64,profile,0,160231000,4609265
+1000000,31250,varying,Int64,profile,1,159362800,4609265
+1000000,31250,varying,Int64,profile,2,166533000,4609265
+1000000,31250,varying,Date,profile,0,146998900,4609265
+1000000,31250,varying,Date,profile,1,145890200,4609265
+1000000,31250,varying,Date,profile,2,146406700,4609265
+1000000,31250,varying,"Datetime(time_unit='us', time_zone=None)",profile,0,160077300,4609265
+1000000,31250,varying,"Datetime(time_unit='us', time_zone=None)",profile,1,163022500,4609265
+1000000,31250,varying,"Datetime(time_unit='us', time_zone=None)",profile,2,159771600,4609265
+1000000,31250,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,159262000,4609265
+1000000,31250,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,158949300,4609265
+1000000,31250,varying,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,162123500,4609265
+1000000,1,high,Int64,profile,0,46717900,16500000
+1000000,1,high,Int64,profile,1,45097800,16500000
+1000000,1,high,Int64,profile,2,47869000,16500000
+1000000,1,high,Int64,scalar,0,43958400,16500000
+1000000,1,high,Int64,scalar,1,43923500,16500000
+1000000,1,high,Int64,scalar,2,41341500,16500000
+1000000,1,high,Date,profile,0,31177700,16500000
+1000000,1,high,Date,profile,1,32103400,16500000
+1000000,1,high,Date,profile,2,31136800,16500000
+1000000,1,high,Date,scalar,0,30688200,16500000
+1000000,1,high,Date,scalar,1,29633400,16500000
+1000000,1,high,Date,scalar,2,30349000,16500000
+1000000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,0,42588000,16500000
+1000000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,1,43267300,16500000
+1000000,1,high,"Datetime(time_unit='us', time_zone=None)",profile,2,43278100,16500000
+1000000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,0,40723100,16500000
+1000000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,1,41226500,16500000
+1000000,1,high,"Datetime(time_unit='us', time_zone=None)",scalar,2,40994500,16500000
+1000000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,0,42165600,16500000
+1000000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,1,42007900,16500000
+1000000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",profile,2,41969400,16500000
+1000000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,0,41044800,16500000
+1000000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,1,40944900,16500000
+1000000,1,high,"Datetime(time_unit='ns', time_zone='UTC')",scalar,2,40623900,16500000

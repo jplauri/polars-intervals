@@ -14,6 +14,8 @@
 
 ::: polars_intervals.max_weight_with_capacity
 
+::: polars_intervals.max_weight_with_capacity_profile
+
 ::: polars_intervals.minimum_cover
 
 ::: polars_intervals.minimum_cost_cover
