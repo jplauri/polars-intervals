@@ -80,8 +80,8 @@ where
     let mut predecessors = vec![0; order.len()];
     {
         // Store finish-order positions, then sweep them in independent start order.
-        // This second sort replaces one binary search per interval. Drop its
-        // buffer before allocating the DP scores to keep peak memory bounded.
+        // This second sort replaces one binary search per interval. Drop both
+        // temporary buffers before allocating the DP scores to limit peak memory.
         let mut by_start: Vec<_> = (0..order.len()).collect();
         by_start.sort_unstable_by_key(|&j| (starts[order[j]], ends[order[j]], order[j]));
         let mut p = 0;
@@ -93,6 +93,7 @@ where
             predecessors[j] = p;
         }
     }
+    drop(sorted_ends);
     let mut optimum = vec![0i128; order.len() + 1];
     for (j, &i) in order.iter().enumerate() {
         let include = optimum[predecessors[j]]

@@ -52,8 +52,11 @@ pub fn containment_counts<T: Ord + Copy>(
         .iter()
         .map(|end| coords.binary_search(end).unwrap())
         .collect();
+    let coordinate_count = coords.len();
+    // Ranks replace the coordinates; release that scratch buffer before the tree.
+    drop(coords);
     records.sort_unstable_by(|a, b| b.0.cmp(&a.0).then(a.1.cmp(&b.1)).then(a.2.cmp(&b.2)));
-    let mut tree = Fenwick::new(coords.len());
+    let mut tree = Fenwick::new(coordinate_count);
     for group in records.chunk_by(|a, b| a.0 == b.0) {
         // At query time the tree contains exactly all rows with start >= this
         // start, including the entire tie group, irrespective of end ordering.

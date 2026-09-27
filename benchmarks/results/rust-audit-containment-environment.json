@@ -1,0 +1,71 @@
+{
+  "purpose": "Measure the containment coordinate-buffer lifetime change against the exact prior production function.",
+  "classification": "C: measured peak-allocation reduction; no runtime speedup claim.",
+  "measured_at_utc": "2026-09-27T09:42:01.0774137Z",
+  "baseline_commit": "1d19b08d8423d45fcce2168ca09380aee8938be3",
+  "post_measurement_change": "The allocator helper's cfg(test) import was moved inside its test for harness=false Clippy compatibility. Non-test code is unchanged; source hashes below describe the measured source.",
+  "compiler": "rustc 1.98.1 (48a229cea 2026-09-01), LLVM 22.1.8",
+  "target": "x86_64-pc-windows-msvc",
+  "edition": "2024",
+  "build": "Both implementations compiled into one executable with opt-level=3, debug-assertions=off, overflow-checks=off; other rustc defaults. No target-cpu override or LTO.",
+  "cpu": "AMD Ryzen 9 3900X, 12 cores / 24 logical processors",
+  "os": "Windows 11 Home, build 10.0.26200",
+  "threads": 1,
+  "endpoints": [
+    "i32",
+    "i64"
+  ],
+  "row_counts": [
+    1000,
+    100000,
+    1000000
+  ],
+  "scenarios": [
+    "disjoint",
+    "nested",
+    "duplicates",
+    "equal_starts",
+    "equal_ends",
+    "sparse",
+    "dense",
+    "broad",
+    "crossing",
+    "empty",
+    "mixed",
+    "sorted",
+    "reverse",
+    "shuffled"
+  ],
+  "workload_count": 84,
+  "samples_per_variant_per_workload": 9,
+  "total_timed_samples": 1512,
+  "warmups": "One allocation measurement invocation plus two unreported timed invocations of each variant per workload.",
+  "order": "Before/after order randomized each sample with the existing portable PRNG; seed 20260927.",
+  "correctness": "Both versions checked against the existing naive oracle on 100 rows per scenario; full output equality asserted for every timed and allocation-measured invocation.",
+  "timing_scope": "Entire core API call including allocations, validation, compression, sorting, sweep, and destruction of scratch buffers. Input generation, verification, output destruction and CSV writing excluded. Inputs and returned output use black_box.",
+  "memory_scope": "Existing benchmark System allocator wrapper, separate untimed invocation. Peak live requested allocation bytes, including output, excluding inputs, expected output, allocator metadata and RSS. No allocations created before the measurement scope are freed inside it.",
+  "result": "For 1M unique i64 ends, 48000008 to 40000008 peak requested bytes (16.67% reduction); unique i32 ends, 36000008 to 32000008 (11.11%). Four allocation calls before and after. Duplicate-only inputs save only 16 peak bytes because earlier compression is the peak.",
+  "runtime_result": "Inconclusive; median of 84 workload median after/before ratios 1.00315. 1M-row workload ratios ranged 0.96890 to 1.04151. No runtime speedup claimed.",
+  "limitations": "One machine and one process run. OS scheduling noise remains; builds and other audit benchmarks were paused during timing. Core API workload only; plugin/Python end-to-end timing, process RSS, retained memory, binary size, and compile time not measured.",
+  "raw_samples": "benchmarks/results/rust-audit-containment-samples.csv",
+  "summary": "benchmarks/results/rust-audit-containment-summary.csv",
+  "source_sha256": {
+    "target/audit/containment-before.rs": "dcb6b1c2e9713420244901d52c68827b18ec8ec18815fae9abbbf8621c6f5d58",
+    "crates/intervals-core/src/containment.rs": "d679356fad238a018a962d2a5666c38830b0490a7b24fc1f7b54695f7254305f",
+    "benchmarks/results/rust-audit-containment-harness.rs": "05f264c7926baed20589a76512e5779dfc03eab2b83eeb902a7a0a5dd04e3862",
+    "crates/intervals-core/benches/support/containment.rs": "22c260af60cb53afa364039a60cf16a7a184bf60e5a90daf040bb32046d02f91",
+    "crates/intervals-core/benches/support/allocations.rs": "ab127de9743dda9a3840d7188506cd2d68c9ecae1aa91d772f817b74ac6eb77d"
+  },
+  "reproduce_powershell": [
+    "New-Item -ItemType Directory -Path target/audit -Force | Out-Null",
+    "git show 1d19b08d8423d45fcce2168ca09380aee8938be3:crates/intervals-core/src/containment.rs | Set-Content -Encoding utf8 target/audit/containment-before.rs",
+    "Copy-Item -LiteralPath benchmarks/results/rust-audit-containment-harness.rs -Destination target/audit/containment-measure.rs",
+    "rustc --edition=2024 -C opt-level=3 -C debug-assertions=off -C overflow-checks=off target/audit/containment-measure.rs -o target/audit/containment-measure.exe",
+    "target/audit/containment-measure.exe target/audit/containment-replay.csv"
+  ],
+  "references": [
+    "https://doc.rust-lang.org/std/mem/fn.drop.html",
+    "https://doc.rust-lang.org/std/marker/trait.Copy.html",
+    "https://nnethercote.github.io/perf-book/heap-allocations.html"
+  ]
+}
