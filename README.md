@@ -56,6 +56,18 @@ A contains B when `A.start <= B.start` and `B.end <= A.end`, excluding
 the same row. Duplicates count one another. Empty intervals follow these
 same endpoint inequalities: `[0, 5)` contains `[5, 5)`.
 
+### Measure nesting depth
+
+```python
+df = pl.DataFrame({"start": [0, 2, 2, 3], "end": [10, 8, 8, 7]})
+df.with_columns(pi.nesting_depth("start", "end").alias("depth"))
+# depth: [0, 1, 1, 2]
+```
+
+Return the length of the longest strict containment chain above each interval.
+Outermost intervals have depth zero; identical intervals never add a level.
+See [strict endpoint semantics and grouped examples](docs/usage.md#nesting-depth).
+
 ### Maximize coverage with a budget
 
 ```python
@@ -101,6 +113,7 @@ print(selected.rows())  # [(0, 6), (6, 10)]
 | --- | --- |
 | [`overlap_count`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#count-overlaps) | Count the other intervals overlapping each interval. |
 | [`containment_count`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#count-containment) | Count the other intervals contained by each interval. |
+| [`nesting_depth`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#nesting-depth) | Length of the longest strict containment chain above each interval. |
 | [`assign_lanes`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#assign-the-minimum-number-of-lanes) | Assign the fewest lanes with no overlaps within a lane. |
 | [`max_weight_non_overlapping`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#select-a-globally-maximum-weight-schedule) | Select a non-overlapping subset with maximum total weight. |
 | [`max_weight_with_capacity`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#select-with-a-simultaneous-capacity) | Maximize total weight under a simultaneous overlap limit. |

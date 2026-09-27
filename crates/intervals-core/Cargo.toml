@@ -38,3 +38,7 @@ harness = false
 [[bench]]
 name = "max_weight_with_capacity_profile"
 harness = false
+
+[[bench]]
+name = "nesting_depth"
+harness = false

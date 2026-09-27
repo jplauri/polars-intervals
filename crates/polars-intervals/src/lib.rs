@@ -1,6 +1,6 @@
 //! Interval algorithms for Rust Polars, backed by `intervals-core`.
 //!
-//! [`overlap_count`], [`containment_count`], [`assign_lanes`],
+//! [`overlap_count`], [`containment_count`], [`nesting_depth`], [`assign_lanes`],
 //! [`max_weight_non_overlapping`] and
 //! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
 //! to the core and Python expressions.
@@ -31,6 +31,11 @@ fn count_output(inputs: &[Field]) -> PolarsResult<Field> {
 
 fn containment_output(inputs: &[Field]) -> PolarsResult<Field> {
     let [start, _] = input_pair(inputs, "containment_count")?;
+    Ok(Field::new(start.name().clone(), DataType::UInt64))
+}
+
+fn nesting_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let [start, _] = input_pair(inputs, "nesting_depth")?;
     Ok(Field::new(start.name().clone(), DataType::UInt64))
 }
 
@@ -135,6 +140,12 @@ fn containment_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
     containment_count(starts, ends)
 }
 
+#[pyo3_polars::derive::polars_expr(output_type_func = nesting_output)]
+fn nesting_depth_plugin(inputs: &[Series]) -> PolarsResult<Series> {
+    let [starts, ends] = input_pair(inputs, "nesting_depth")?;
+    nesting_depth(starts, ends)
+}
+
 #[pyo3_polars::derive::polars_expr(output_type_func = lanes_output)]
 fn assign_lanes_plugin(inputs: &[Series]) -> PolarsResult<Series> {
     let [starts, ends] = input_pair(inputs, "assign_lanes")?;
@@ -228,6 +239,45 @@ fn max_weight_with_capacity_plugin(
 /// ```
 pub fn containment_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     evaluate(starts, ends, Algorithm::ContainmentCount)
+}
+
+/// Return the length of the longest strict containment chain above each interval.
+///
+/// Outermost intervals have depth zero. `A` strictly contains `B` exactly when
+/// `A.start <= B.start && B.end <= A.end && (A.start < B.start || B.end < A.end)`.
+/// Identical geometries share a depth and never add a level to one another;
+/// equal starts or equal ends alone still permit strict containment. Empty
+/// intervals follow this endpoint predicate: `[0, 5)` strictly contains `[5, 5)`,
+/// while identical `[5, 5)` rows do not strictly contain one another.
+///
+/// Returns a non-null `UInt64` Series named `nesting_depth`, in original row
+/// order. All chunks form one collection; each Python window/group is solved
+/// independently. Unlike [`containment_count`], this measures a longest chain,
+/// not the number of contained rows or containers. Several incomparable
+/// containers can all contain one interval whose depth is only one.
+/// See [`intervals_core::nesting_depths`] for the production algorithm; worst-case
+/// time is `O(n log n)` and additional space is `O(n)`.
+///
+/// # Errors
+///
+/// Rejects unequal lengths, null endpoints, unsupported or mismatched logical
+/// dtypes, and `start > end`, reporting the first original row index. Supports
+/// 8/16/32/64-bit signed/unsigned integers, Date, and Datetime with exactly
+/// matching units/timezones, using physical endpoints without coercion or
+/// scalar broadcasting. Empty input returns empty output.
+///
+/// # Examples
+///
+/// ```
+/// use polars::prelude::*;
+/// let starts = Series::new("start".into(), [0i64, 2, 2, 3]);
+/// let ends = Series::new("end".into(), [10i64, 8, 8, 7]);
+/// let depths = polars_intervals::nesting_depth(&starts, &ends)?;
+/// assert_eq!(depths.u64()?.into_no_null_iter().collect::<Vec<_>>(), [0, 1, 1, 2]);
+/// # Ok::<(), PolarsError>(())
+/// ```
+pub fn nesting_depth(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+    evaluate(starts, ends, Algorithm::NestingDepth)
 }
 
 /// Counts other overlapping intervals in the supplied start and end columns.
@@ -428,6 +478,7 @@ enum Algorithm<'a> {
     Stabbing,
     OverlapCount,
     ContainmentCount,
+    NestingDepth,
     AssignLanes,
     MaxWeight(&'a [i128]),
     Capacity(&'a [i128], usize),
@@ -442,6 +493,7 @@ impl Algorithm<'_> {
             Self::Stabbing => "minimum_stabbing_points",
             Self::OverlapCount => "overlap_count",
             Self::ContainmentCount => "containment_count",
+            Self::NestingDepth => "nesting_depth",
             Self::AssignLanes => "assign_lanes",
             Self::MaxWeight(_) => "max_weight_non_overlapping",
             Self::Capacity(_, _) => "max_weight_with_capacity",
@@ -520,11 +572,11 @@ where
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;
             Ok(ChunkedArray::<T>::from_vec(algorithm.name().into(), points).into_series())
         }
-        Algorithm::OverlapCount | Algorithm::ContainmentCount => {
-            let counts = if matches!(algorithm, Algorithm::ContainmentCount) {
-                intervals_core::containment_counts(&starts, &ends)
-            } else {
-                intervals_core::overlap_counts(&starts, &ends)
+        Algorithm::OverlapCount | Algorithm::ContainmentCount | Algorithm::NestingDepth => {
+            let counts = match algorithm {
+                Algorithm::ContainmentCount => intervals_core::containment_counts(&starts, &ends),
+                Algorithm::NestingDepth => intervals_core::nesting_depths(&starts, &ends),
+                _ => intervals_core::overlap_counts(&starts, &ends),
             }
             .map_err(|error| polars_err!(ComputeError: "{error}"))?;
             let counts: Vec<u64> = counts.into_iter().map(|count| count as u64).collect();

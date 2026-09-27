@@ -16,6 +16,7 @@ __all__ = [
     "minimum_cost_cover",
     "minimum_cover",
     "minimum_stabbing_points",
+    "nesting_depth",
     "overlap_count",
 ]
 
@@ -764,6 +765,76 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
     return register_plugin_function(
         plugin_path=Path(__file__).parent,
         function_name="overlap_count_plugin",
+        args=[start, end],
+        is_elementwise=False,
+    )
+
+
+def nesting_depth(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
+    """Return the length of the longest strict containment chain above each interval.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+
+    Returns:
+        pl.Expr: Non-null UInt64 depth for each original row, in deterministic row
+            order. Outermost intervals have depth 0. Empty input returns empty output.
+
+    Raises:
+        polars.exceptions.PolarsError: For null endpoints, unequal lengths,
+            unsupported or mismatched logical dtypes, or start greater than end.
+            Reversed intervals report the first original zero-based row in the group.
+
+    Notes:
+        A strictly contains B exactly when ``A.start <= B.start`` and
+        ``B.end <= A.end`` and at least one inequality is strict. Thus identical
+        intervals never chain through each other and always receive equal depths.
+        Equal starts with different ends, or equal ends with different starts,
+        can form strict containment chains.
+
+        Empty intervals follow the same endpoint predicate, not informal set
+        containment: [0, 5) strictly contains [5, 5), giving depths [0, 1].
+        Identical empty intervals such as [3, 3), [3, 3) both have depth 0.
+
+        This differs from ``containment_count``, which counts other rows contained
+        by each row, including duplicates. Counting containers is also different:
+        [0, 8) and [2, 10) both contain [4, 5), but cannot contain each other, so
+        the innermost interval has two containers and nesting depth only 1.
+
+        Supports Int8/16/32/64, UInt8/16/32/64, Date, and Datetime ms/us/ns,
+        including matching timezones. Logical dtypes must match exactly; no
+        coercion or scalar broadcasting occurs. Temporal endpoints use their
+        physical integer values without timezone arithmetic.
+
+        Each select computes globally across all chunks. With ``.over("group")``,
+        each group is solved independently and results retain row alignment.
+        Group aggregation returns a list of depths per group. The complete
+        collection is required, including with the streaming engine.
+
+        The exact Rust dynamic program sorts packed records by start ascending
+        and end descending, then maintains a monotone frontier of the greatest
+        ending endpoint achievable at each chain length. It takes O(n log n)
+        time and O(n) additional space. Identical geometry is processed atomically
+        to prevent duplicate rows from creating extra levels.
+
+    Examples:
+        >>> df = pl.DataFrame({"start": [0, 1, 2, 3], "end": [10, 9, 8, 7]})
+        >>> df.with_columns(nesting_depth("start", "end").alias("depth"))["depth"].to_list()
+        [0, 1, 2, 3]
+        >>> equal_starts = pl.DataFrame({"start": [1, 1, 1], "end": [10, 8, 5]})
+        >>> equal_starts.select(nesting_depth("start", "end")).to_series().to_list()
+        [0, 1, 2]
+        >>> duplicates = pl.DataFrame({"start": [0, 2, 2, 3], "end": [10, 8, 8, 7]})
+        >>> duplicates.select(nesting_depth("start", "end")).to_series().to_list()
+        [0, 1, 1, 2]
+        >>> empties = pl.DataFrame({"start": [0, 5, 5], "end": [5, 5, 5]})
+        >>> empties.select(nesting_depth("start", "end")).to_series().to_list()
+        [0, 1, 1]
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="nesting_depth_plugin",
         args=[start, end],
         is_elementwise=False,
     )

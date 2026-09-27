@@ -1,0 +1,144 @@
+{
+  "recorded_at_utc": "2026-09-27T15:22:35.591008+00:00",
+  "platform_scope": "Local CPython 3.14 Windows x86_64 wheel and source distribution. The CI 15-wheel cross-platform matrix and publishing guards were not executed locally; nothing was published.",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "uv": "uv 0.11.3 (45da18ac3 2026-04-01 x86_64-pc-windows-msvc)",
+  "release_versions": {
+    "version": "0.1.0",
+    "rust_toolchain": "1.98.1"
+  },
+  "build": {
+    "command": "uv build --python D:/polars-intervals/.venv/Scripts/python.exe --wheel --sdist --config-setting=build-args=--locked --out-dir target/nesting-dist",
+    "environment": {
+      "PYO3_PYTHON": "D:/polars-intervals/.venv/Scripts/python.exe",
+      "CARGO_TARGET_DIR": "D:/polars-intervals/target"
+    },
+    "exit_code": 0,
+    "wheel_build_release_seconds": 420
+  },
+  "dev_requirements": {
+    "command": "uv export --locked --only-group dev --no-emit-project --no-hashes --output-file C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f/test-requirements.txt",
+    "sha256": "8c8a3e95677394da553eaa5bd312bdd6b1ab33557e41726327313054228cb278",
+    "exit_code": 0
+  },
+  "artifacts": [
+    {
+      "path": "target/nesting-dist/polars_intervals-0.1.0-cp314-cp314-win_amd64.whl",
+      "bytes": 5884131,
+      "sha256": "b5a5cf5108c030f66d2db9c159bd6ed350aa9f5eefae64f0defc12a222918c3f"
+    },
+    {
+      "path": "target/nesting-dist/polars_intervals-0.1.0.tar.gz",
+      "bytes": 147707,
+      "sha256": "638a935070232c662e2a520fb15f2604c06210c0adc91e5fe32b8fec33a1eaff"
+    }
+  ],
+  "installations": [
+    {
+      "kind": "wheel",
+      "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+      "executable": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f\\wheel-env\\Scripts\\python.exe",
+      "polars": "1.44.2",
+      "imported_package": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f\\wheel-env\\Lib\\site-packages\\polars_intervals\\__init__.py",
+      "command": "C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f/wheel-env/Scripts/python.exe -I D:/polars-intervals/.github/scripts/release_checks.py installed --checkout D:/polars-intervals",
+      "working_directory": "C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f",
+      "tests_passed": 1975,
+      "pytest_seconds": 8.49,
+      "exit_code": 0,
+      "includes_installed_package_doctests": true,
+      "includes_native_nesting_depth_smoke": true
+    },
+    {
+      "kind": "minimum_polars_wheel",
+      "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+      "executable": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f\\minimum-env\\Scripts\\python.exe",
+      "polars": "1.44.1",
+      "imported_package": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f\\minimum-env\\Lib\\site-packages\\polars_intervals\\__init__.py",
+      "command": "C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f/minimum-env/Scripts/python.exe -I D:/polars-intervals/.github/scripts/release_checks.py installed --checkout D:/polars-intervals",
+      "working_directory": "C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f",
+      "tests_passed": 1975,
+      "pytest_seconds": 9.17,
+      "exit_code": 0,
+      "includes_installed_package_doctests": true,
+      "includes_native_nesting_depth_smoke": true
+    },
+    {
+      "kind": "sdist",
+      "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+      "executable": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f\\sdist-env\\Scripts\\python.exe",
+      "polars": "1.44.2",
+      "imported_package": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f\\sdist-env\\Lib\\site-packages\\polars_intervals\\__init__.py",
+      "command": "C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f/sdist-env/Scripts/python.exe -I D:/polars-intervals/.github/scripts/release_checks.py installed --checkout D:/polars-intervals",
+      "working_directory": "C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f",
+      "tests_passed": 1975,
+      "pytest_seconds": 7.21,
+      "exit_code": 0,
+      "includes_installed_package_doctests": true,
+      "includes_native_nesting_depth_smoke": true
+    }
+  ],
+  "sdist_install": {
+    "command": "uv pip install --python C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f/sdist-env/Scripts/python.exe --config-setting=build-args=--locked --requirement C:/Users/juhol/AppData/Local/Temp/pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f/test-requirements.txt polars==1.44.2 D:/polars-intervals/target/nesting-dist/polars_intervals-0.1.0.tar.gz",
+    "environment": {
+      "PYO3_PYTHON": "D:/polars-intervals/.venv/Scripts/python.exe",
+      "CARGO_TARGET_DIR": "D:/polars-intervals/target"
+    },
+    "built_from_source": true,
+    "build_seconds": 237,
+    "exit_code": 0
+  },
+  "checks": [
+    {
+      "command": ".venv/Scripts/python.exe .github/scripts/release_checks.py versions",
+      "exit_code": 0
+    },
+    {
+      "command": ".venv/Scripts/python.exe -m pytest .github/scripts -q",
+      "tests_passed": 49,
+      "pytest_seconds": 1.81,
+      "exit_code": 0
+    },
+    {
+      "command": "uvx --from twine==7.0.0 twine check --strict target/nesting-dist/polars_intervals-0.1.0-cp314-cp314-win_amd64.whl target/nesting-dist/polars_intervals-0.1.0.tar.gz",
+      "exit_code": 0,
+      "both_artifacts_passed": true
+    },
+    {
+      "check": "release_checks.check_metadata on wheel METADATA and sdist PKG-INFO",
+      "passed": true,
+      "covers": [
+        "name",
+        "version",
+        "Requires-Python",
+        "license expression",
+        "Markdown content type",
+        "README exact match"
+      ]
+    },
+    {
+      "check": "wheel contents",
+      "passed": true,
+      "covers": [
+        "current Python API",
+        "py.typed",
+        "native pyd",
+        "LICENSE exact match"
+      ]
+    },
+    {
+      "check": "sdist contains current source and locked inputs",
+      "passed": true,
+      "files": [
+        "Cargo.lock",
+        "rust-toolchain.toml",
+        "LICENSE",
+        "crates/intervals-core/src/nesting.rs",
+        "crates/intervals-core/tests/nesting.rs",
+        "crates/intervals-core/tests/nesting_candidates.rs",
+        "crates/intervals-core/benches/support/nesting_depth.rs",
+        "crates/polars-intervals/tests/nesting_depth.rs",
+        "python/polars_intervals/__init__.py"
+      ]
+    }
+  ]
+}

@@ -36,6 +36,67 @@ x = "n"
 method = "method"
 dimensions = ["dtype", "family", "order"]
 
+[sources.nesting]
+path = "benchmarks/results/nesting-kernels-windows.csv"
+x = "n"
+method = "method"
+dimensions = ["dtype", "scenario", "groups"]
+
+[sources.nesting_polars]
+path = "benchmarks/results/nesting-polars-windows.csv"
+x = "n"
+method = "dtype"
+dimensions = ["groups", "family", "order", "candidate"]
+
+[[charts]]
+id = "nesting-shallow-runtime"
+source = "nesting"
+title = "Nesting depth: shallow families"
+scope = "Rust core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+filters = { dtype = "i64", scenario = "depth_4", groups = 1 }
+methods = { A_packed_fenwick = "Packed Fenwick", B_indirect_fenwick = "Indirect Fenwick", C_packed_segment = "Segment tree", D_append_frontier = "Frontier + append" }
+caption = "Shuffled disjoint families of five nested geometries (maximum depth 4). Five release samples per size on one Windows desktop; candidate totals include phase clocks."
+
+[[charts]]
+id = "nesting-deep-runtime"
+source = "nesting"
+title = "Nesting depth: one deep chain"
+scope = "Rust core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+filters = { dtype = "i64", scenario = "chain", groups = 1 }
+methods = { A_packed_fenwick = "Packed Fenwick", B_indirect_fenwick = "Indirect Fenwick", C_packed_segment = "Segment tree", D_frontier = "Frontier", D_append_frontier = "Frontier + append" }
+caption = "A shuffled strict chain with maximum depth n−1. Directly appending an eligible deepest-chain endpoint avoids a binary search for each new level."
+
+[[charts]]
+id = "nesting-memory"
+source = "nesting"
+title = "Nesting depth: deep-chain memory"
+scope = "Rust core"
+value = "peak_bytes"
+divisor = 1048576
+ylabel = "Peak requested heap (MiB)"
+yscale = "linear"
+filters = { dtype = "i64", scenario = "chain", groups = 1 }
+methods = { A_packed_fenwick = "Packed Fenwick", B_indirect_fenwick = "Indirect Fenwick", C_packed_segment = "Segment tree", D_append_frontier = "Frontier + append" }
+caption = "One separate allocation measurement per case, repeated in five timing rows (the table's sample count). Includes output; excludes inputs, allocator overhead and process RSS. Frontier capacity grows geometrically with depth and can exceed Fenwick memory on deep chains."
+
+[[charts]]
+id = "nesting-temporal"
+source = "nesting_polars"
+title = "Nesting depth: integer and temporal endpoints"
+scope = "Polars end to end"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Collection time (ms)"
+filters = { groups = 1, family = "low8", order = "shuffled", candidate = "plugin" }
+methods = { Int64 = "Int64", Date = "Date", "Datetime(us)" = "Datetime(us)" }
+caption = "Shuffled families with maximum depth 7 through an installed release wheel, five samples after warmup. Timing includes lazy optimization/planning, collection and Series retrieval; fixture construction, casts, expression construction and exact validation are excluded."
+
 [[charts]]
 id = "overlap-runtime"
 source = "overlap"
