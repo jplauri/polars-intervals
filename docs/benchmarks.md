@@ -6,6 +6,7 @@ Explore benchmarks for each available operation below.
 | --- | --- |
 | [Overlap counting](overlap-count-benchmarks.md) | Count the other intervals overlapping each interval. |
 | [Containment counting](containment-benchmarks.md) | Count the other intervals contained by each row. |
+| [Nesting depth](nesting-depth-benchmarks.md) | Longest strict containment chain above each row. |
 | [Lane assignment](assign-lanes-benchmarks.md) | Assign the fewest lanes without overlaps within a lane. |
 | [Weighted scheduling](weighted-scheduling-benchmarks.md) | Select a non-overlapping subset with maximum total weight. |
 | [Capacity scheduling](capacity-scheduling-benchmarks.md) | Maximize total weight under an overlap limit. |

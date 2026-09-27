@@ -222,6 +222,15 @@ def installed(checkout):
         .to_series()
     )
     require(result.dtype == pl.UInt64 and result.to_list() == [1, 1, 2, 0], "Smoke test failed.")
+    depth = (
+        pl.DataFrame({"start": [0, 2, 2, 5], "end": [10, 5, 5, 5]})
+        .select(pi.nesting_depth("start", "end"))
+        .to_series()
+    )
+    require(
+        depth.dtype == pl.UInt64 and depth.null_count() == 0 and depth.to_list() == [0, 1, 1, 2],
+        "Nesting depth native plugin smoke test failed.",
+    )
     print(f"Testing installed artifact from {package}")
     with tempfile.TemporaryDirectory() as temporary, chdir(temporary):
         result = pytest.main(

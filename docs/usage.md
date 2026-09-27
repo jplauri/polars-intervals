@@ -109,6 +109,89 @@ time and `O(n)` additional space without enumerating containment pairs.
 See [benchmark details](containment-benchmarks.md) for measurements and native
 Polars alternatives.
 
+## Nesting depth
+
+Return the length of the longest strict containment chain above each interval.
+**Outermost intervals have depth 0.** Each strict containment step adds one.
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 2, 4, 6], "end": [20, 15, 10, 8]})
+result = df.with_columns(pi.nesting_depth("start", "end").alias("depth"))
+# depth: [0, 1, 2, 3]
+```
+
+`A` strictly contains `B` exactly when:
+
+```text
+A.start <= B.start and B.end <= A.end
+and (A.start < B.start or B.end < A.end)
+```
+
+Equal starts or equal ends can therefore form a chain. Identical geometries
+cannot: every duplicate receives the same depth and never creates an extra level.
+
+| Input intervals, in row order | Depths |
+| --- | --- |
+| `[1,10)`, `[1,8)`, `[1,5)` | `0, 1, 2` |
+| `[0,10)`, `[2,10)`, `[5,10)` | `0, 1, 2` |
+| `[0,10)`, `[2,8)`, `[2,8)`, `[3,7)` | `0, 1, 1, 2` |
+| `[0,10)`, `[0,10)`, `[2,8)` | `0, 0, 1` |
+| `[0,5)`, `[5,5)` | `0, 1` |
+| `[3,3)`, `[3,3)` | `0, 0` |
+
+Empty intervals use the **endpoint predicate**, including at an outer interval's
+right endpoint. Thus `[0,5)` strictly contains `[5,5)` even though intervals use
+half-open notation. Identical empty intervals do not contain one another strictly.
+Crossings such as `[0,5)`, `[3,8)`, `[6,10)` all have depth zero.
+
+Nesting depth differs from `containment_count`, which counts rows **inside** each
+interval and includes duplicate geometries. It also differs from the number of
+strict containers **above** a row: `[0,8)`, `[2,10)`, `[3,11)` all contain `[4,5)`,
+but are mutually incomparable. The small row has three strict containers and
+depth **1**. Depth measures a longest chain, not the number of containing rows.
+
+The non-null `UInt64` output is deterministic and aligned to original row order,
+including across multiple chunks. Empty input returns empty output. Eager
+`select`/`with_columns` and lazy queries work. Each window is independent:
+
+```python
+grouped = pl.DataFrame({"group": ["a", "b", "a", "b"], "start": [0, 2, 2, 4], "end": [10, 8, 8, 6]})
+result = (
+    grouped.lazy()
+    .with_columns(pi.nesting_depth("start", "end").over("group").alias("depth"))
+    .collect()
+)
+# depth: [0, 0, 1, 1]
+```
+
+`group_by("group").agg(pi.nesting_depth("start", "end"))` returns one depth list
+per group, in that group's input order. Filtering before evaluation changes the
+participating intervals; filtering afterward preserves the calculated depths.
+
+Endpoint dtypes must match exactly: signed/unsigned 8/16/32/64-bit integers,
+Date, or Datetime ms/us/ns, including matching timezone metadata. Nulls, unequal
+lengths and `start > end` are rejected with no implicit coercion or broadcasting.
+Reversed intervals report the first original zero-based row within the collection.
+Temporal values use the existing physical integer representation without endpoint
+arithmetic. The Polars-independent Rust API is
+`intervals_core::nesting_depths(&starts, &ends)`; Rust Polars exposes
+`polars_intervals::nesting_depth(&starts, &ends)`.
+
+The production kernel sorts packed records by start ascending, end descending,
+then original index. A monotone vector records the greatest achievable ending
+endpoint at each chain length. It uses binary search to find a predecessor,
+or appends directly when the deepest chain can extend. Exact duplicate geometries
+share one query and update. Total time is `O(n log n)` and additional space is
+`O(n)`, with only `O(max_depth + 1)` frontier entries. No containment pairs or
+coordinate compression are needed. The production code uses the standard sort
+without an additional sorted-input scan.
+See the
+[algorithm design and measured candidate comparison](nesting-depth-benchmarks.md)
+for memory tradeoffs and the sorted-input investigation.
+
 ## Count overlaps
 
 `overlap_count` counts how many other intervals overlap each row.

@@ -1,0 +1,30 @@
+{
+  "timestamp_utc": "2026-09-27T15:31:25.345852+00:00",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f\\wheel-env\\Scripts\\python.exe",
+  "working_directory": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f",
+  "arguments": [
+    "D:/polars-intervals/benchmarks/nesting_depth.py",
+    "--output",
+    "D:/polars-intervals/benchmarks/results/nesting-polars-windows.csv"
+  ],
+  "polars": "1.44.2",
+  "threads": 4,
+  "POLARS_MAX_THREADS": "4",
+  "plugin": "C:\\Users\\juhol\\AppData\\Local\\Temp\\pi-nesting-release-d60e83e6e0c24a389a68d3d48b84ca3f\\wheel-env\\Lib\\site-packages\\polars_intervals\\__init__.py",
+  "native_sha256": {
+    "_internal.cp314-win_amd64.pyd": "86a48f37e921b206d5dfc87a6a43d032e93b03f27b47ac187f0ebe3e109ef93a"
+  },
+  "runner_sha256": "a7cad62dbdf7e8f9748ec17bf88f6b36e2333996dc95352967e5a73b9da65d43",
+  "cases": 160,
+  "warmups": 1,
+  "samples": 5,
+  "seed": 731,
+  "timed_scope": "lazy optimization/planning, collect and result Series retrieval; no fixture construction, casting, expression construction or validation",
+  "baseline": "No equivalent small composition of native expressions identified; no speedup claim.",
+  "memory": "Not measured here; core allocation measurements are separate.",
+  "completed_utc": "2026-09-27T15:31:57.549081+00:00",
+  "validated_samples": 800,
+  "exit_code": 0
+}

@@ -1,0 +1,47 @@
+{
+  "started_utc": "2026-09-27T15:06:04.1848861Z",
+  "command": "cargo bench -p intervals-core --bench nesting_depth --locked",
+  "flags": {
+    "NESTING_SAMPLES": 5,
+    "NESTING_METHODS": "A_packed_fenwick,D_frontier,D_append_frontier,D_sorted_append_frontier,production",
+    "NESTING_SIZES": "1000000,3000000",
+    "NESTING_SCENARIOS": "chain,equal_ends,depth_4,dense,crossing,sorted,reverse,nearly,shuffled",
+    "NESTING_CSV": "benchmarks/results/nesting-production-windows.csv"
+  },
+  "profile": "release (default opt-level=3), no concurrent repository builds or benchmark jobs",
+  "cpu": "AMD Ryzen 9 3900X 12-Core Processor            ",
+  "logical_cpus": 24,
+  "memory_bytes": 34279043072,
+  "os": "Microsoft Windows NT 10.0.26200.0",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\r\nbinary: rustc\r\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\r\ncommit-date: 2026-09-01\r\nhost: x86_64-pc-windows-msvc\r\nrelease: 1.98.1\r\nLLVM version: 22.1.8",
+  "git_commit": "a48b47c97c2015f57a7d8b31578304a4db7f7732",
+  "git_dirty": true,
+  "seed": 42,
+  "correctness": "Every candidate matches a quadratic explicit-predicate oracle for each 100-row family; all full arrays compared before and after every timed run; separate 512-case proptest candidate and tree traces.",
+  "samples_per_case": 5,
+  "measurement": "Sequential single-thread candidate calls; rotated method order; release; durations nanoseconds. DP/scatter fused. Coordinate rank output allocation included in compression; frontier output allocation in output_init. Input generation and equality checking excluded.",
+  "memory": "Separate untimed allocator pass; peak concurrently live requested bytes and allocation/reallocation count; includes output and excludes input, oracle, and comparisons. Not process RSS.",
+  "sources": [
+    {
+      "sha256": "4B3CF54101D3CBE9723C04EDE014937945ACD6DA26F5A24240AFE3D1CE1FAE40",
+      "path": "crates/intervals-core/benches/nesting_depth.rs"
+    },
+    {
+      "sha256": "1FD08CBD2E537458E647B84C71F203B25BA7480FE186BFE415F19A338B0EB868",
+      "path": "crates/intervals-core/benches/support/nesting_depth.rs"
+    },
+    {
+      "sha256": "A6ADEAB442AE00FCE6E180AC65109E85805451D44580EF936C6E2C4F2DB501B9",
+      "path": "crates/intervals-core/benches/support/allocations.rs"
+    },
+    {
+      "sha256": "4490EE7AA5D731D38CEF11E1B7CE966C9ABFE0A8428600B86D4FDC377FFE7463",
+      "path": "crates/intervals-core/src/nesting.rs"
+    }
+  ],
+  "production": "Final packed frontier with append fast path; no explicit sorted scan. Production is timed without internal phase clocks; production phase CSV fields are empty (unmeasured).",
+  "completed_utc": "2026-09-27T15:07:55.671187Z",
+  "exit_code": 0,
+  "sample_count": 450,
+  "case_count": 90
+}

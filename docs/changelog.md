@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add [`nesting_depth`](usage.md#nesting-depth): exact, row-aligned longest strict
+  containment chain depth, with outermost depth zero and duplicate geometries
+  sharing the same level. Supports grouped integer, Date and Datetime endpoints.
+
 - Select a globally maximum-weight subset under a piecewise-constant capacity
   profile with [`max_weight_with_capacity_profile`](usage.md#select-with-a-capacity-profile),
   an eager API backed by exact native flow optimization, accepting a separate

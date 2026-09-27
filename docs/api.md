@@ -6,6 +6,8 @@
 
 ::: polars_intervals.containment_count
 
+::: polars_intervals.nesting_depth
+
 ::: polars_intervals.overlap_count
 
 ::: polars_intervals.assign_lanes
