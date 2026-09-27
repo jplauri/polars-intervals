@@ -39,6 +39,19 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 Use `uv run --locked ruff format .` to format Python code.
 CI also verifies built distributions when code or build inputs change.
 
+On Windows, the direct Python binding requires the selected Python DLL on the
+runtime search path when running Rust tests. In PowerShell, prepare the shell
+after `uv sync --locked`:
+
+```powershell
+$env:PYO3_PYTHON = (Resolve-Path .venv/Scripts/python.exe).Path
+$pythonRuntime = & $env:PYO3_PYTHON -c 'import sys; print(sys.base_prefix)'
+$env:PATH = "$pythonRuntime;$env:PATH"
+$env:CARGO_BUILD_JOBS = "2"
+```
+
+The last setting also matches release CI and bounds compilation memory usage.
+
 ## Documentation
 
 Edit pages in `docs/` and API docstrings in `python/polars_intervals/`.

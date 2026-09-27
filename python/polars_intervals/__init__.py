@@ -1,4 +1,4 @@
-"""Rust-backed interval expressions for Polars."""
+"""Rust-backed interval expressions and optimization functions for Polars."""
 
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -12,11 +12,130 @@ __all__ = [
     "max_k_coverage",
     "max_weight_non_overlapping",
     "max_weight_with_capacity",
+    "max_weight_with_capacity_profile",
     "minimum_cost_cover",
     "minimum_cover",
     "minimum_stabbing_points",
     "overlap_count",
 ]
+
+
+def max_weight_with_capacity_profile(
+    jobs: pl.DataFrame,
+    capacity_profile: pl.DataFrame,
+    *,
+    start: str = "start",
+    end: str = "end",
+    weight: str = "weight",
+    profile_start: str = "start",
+    profile_end: str = "end",
+    capacity: str = "capacity",
+) -> pl.Series:
+    """Select a globally maximum-weight subset under a piecewise-constant capacity.
+
+    Args:
+        jobs: Eager DataFrame containing fixed job intervals and integer weights.
+        capacity_profile: Independent eager DataFrame of capacity segments.
+        start: Job start column name.
+        end: Job end column name.
+        weight: Job weight column name.
+        profile_start: Capacity segment start column name.
+        profile_end: Capacity segment end column name.
+        capacity: Nonnegative integer capacity column name.
+
+    Returns:
+        pl.Series: Non-null Boolean Series named ``selected``, aligned to the
+            original rows of ``jobs``. True selects a row in a globally optimal
+            subset. Identical inputs are deterministic; choices under objective
+            ties are unspecified across releases or job row permutations.
+
+    Raises:
+        TypeError: If either input is not an eager DataFrame or a column name is
+            not a string. Collect LazyFrames explicitly before calling.
+        polars.exceptions.PolarsError: For missing columns, nulls, unsupported or
+            mismatched dtypes, reversed intervals, overlapping profile segments,
+            negative capacities, or checked i128 objective overflow.
+
+    Notes:
+        Jobs and profile rows are half-open ``[start, end)``. Each selected
+        non-empty job consumes one unit of capacity throughout its lifetime.
+        Profile rows may be unsorted. Overlapping non-empty segments are
+        rejected; touching segments are allowed. Gaps and time outside the
+        supplied profile have capacity zero. Valid empty profile rows have no
+        effect, but all their values are still validated.
+
+        Endpoint columns must have exactly matching Int8/16/32/64, UInt8/16/32/64,
+        Date, or Datetime dtypes, including Datetime unit and timezone metadata.
+        Weights and capacities accept signed/unsigned integers up to 64 bits;
+        floats, Decimal and implicit casts are rejected. Objectives accumulate
+        exactly in checked i128. Capacity may be clamped to the number of
+        relevant non-empty jobs: no subset can use more capacity than that.
+
+        Positive empty jobs consume no capacity and are always selected, even
+        with an empty profile. Nonpositive weights are omitted. An empty subset
+        is allowed. A profile constant at k throughout the relevant job horizon
+        uses the existing ``max_weight_with_capacity(..., capacity=k)`` kernel;
+        k=1 reaches the specialized non-overlapping weighted scheduler.
+
+        This eager function calls the native Rust optimizer directly with two
+        independent collections, including all their chunks. It does not hide a
+        LazyFrame collection or perform optimization in Python. Global exact
+        optimization uses a compact timeline flow network whose size depends
+        on breakpoints, never on elapsed Date/Datetime ticks.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> jobs = pl.DataFrame({
+        ...     "start": [9, 9, 12, 14], "end": [18, 12, 14, 18],
+        ...     "weight": [100, 60, 70, 80],
+        ... })
+        >>> profile = pl.DataFrame({
+        ...     "start": [9, 12, 14], "end": [12, 14, 18], "capacity": [3, 1, 4],
+        ... })
+        >>> selected = pi.max_weight_with_capacity_profile(jobs, profile)
+        >>> selected.to_list()
+        [True, True, False, True]
+        >>> jobs.filter(selected)["weight"].sum()
+        240
+    """
+    from polars_intervals._internal import max_weight_with_capacity_profile as solve
+
+    if not isinstance(jobs, pl.DataFrame) or not isinstance(capacity_profile, pl.DataFrame):
+        raise TypeError("jobs and capacity_profile must be eager Polars DataFrames")
+    if not all(
+        isinstance(name, str) for name in (start, end, weight, profile_start, profile_end, capacity)
+    ):
+        raise TypeError("column names must be strings")
+    columns = (
+        jobs[start],
+        jobs[end],
+        jobs[weight],
+        capacity_profile[profile_start],
+        capacity_profile[profile_end],
+        capacity_profile[capacity],
+    )
+    # Reject unsupported Arrow types before PySeries imports them: optional
+    # Polars features (e.g. categorical/object) may panic at the FFI boundary.
+    # Rust independently validates supported Series and performs all optimization.
+    integers = (pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64)
+    for column, role in ((columns[2], "weight"), (columns[5], "capacity")):
+        if column.dtype not in integers:
+            raise pl.exceptions.InvalidOperationError(
+                "max_weight_with_capacity_profile requires an 8-, 16-, 32-, or 64-bit "
+                f"integer {role} dtype, got {column.dtype}"
+            )
+    for column in (columns[0], columns[1], columns[3], columns[4]):
+        if (
+            column.dtype not in integers
+            and column.dtype != pl.Date
+            and not isinstance(column.dtype, pl.Datetime)
+        ):
+            raise pl.exceptions.InvalidOperationError(
+                "max_weight_with_capacity_profile requires an 8-, 16-, 32-, or 64-bit "
+                f"integer dtype, Date, or Datetime, got {column.dtype}"
+            )
+    return solve(*columns)
 
 
 def max_k_coverage(start: str | pl.Expr, end: str | pl.Expr, *, k: int) -> pl.Expr:

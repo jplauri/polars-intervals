@@ -1,0 +1,22 @@
+256 exhaustive random instances verified for all exact candidates
+verified/measured n=1000 m=16 k=4 dense/constant/sorted
+verified/measured n=1000 m=16 k=4 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=4 dense/increasing/sorted
+verified/measured n=1000 m=16 k=4 dense/decreasing/sorted
+verified/measured n=1000 m=16 k=4 dense/sawtooth/sorted
+verified/measured n=1000 m=16 k=4 dense/small_changes/sorted
+verified/measured n=1000 m=16 k=4 dense/zero_gaps/sorted
+verified/measured n=1000 m=16 k=4 dense/high/sorted
+verified/measured n=1000 m=16 k=1 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=2 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=4 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=8 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=16 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=64 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=256 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=1000 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=1000000000 dense/bottleneck/sorted
+verified/measured n=1000 m=16 k=256 dense/sawtooth/sorted
+verified/measured n=1000 m=100 k=256 dense/sawtooth/sorted
+verified/measured n=1000 m=16 k=1000 dense/sawtooth/sorted
+verified/measured n=1000 m=100 k=1000 dense/sawtooth/sorted

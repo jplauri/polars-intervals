@@ -1,0 +1,18 @@
+256 exhaustive random instances verified for all exact candidates
+verified/measured n=1000 m=16 k=4 components/constant/sorted
+verified/measured n=1000 m=16 k=4 components/bottleneck/sorted
+verified/measured n=1000 m=16 k=4 components/increasing/sorted
+verified/measured n=1000 m=16 k=4 components/decreasing/sorted
+verified/measured n=1000 m=16 k=4 components/sawtooth/sorted
+verified/measured n=1000 m=16 k=4 components/small_changes/sorted
+verified/measured n=1000 m=16 k=4 components/zero_gaps/sorted
+verified/measured n=1000 m=16 k=4 components/high/sorted
+verified/measured n=10000 m=1000 k=4 components/small_changes/shuffled_jobs
+verified/measured n=10000 m=1000 k=4 components/small_changes/shuffled_profile
+verified/measured n=10000 m=1000 k=4 components/small_changes/both_shuffled
+verified/measured n=10000 m=16 k=4 components/high/sorted
+verified/measured n=10000 m=16 k=4 components/small_changes/sorted
+verified/measured n=100000 m=16 k=4 components/high/sorted
+verified/measured n=100000 m=16 k=4 components/small_changes/sorted
+verified/measured n=1000000 m=16 k=4 components/high/sorted
+verified/measured n=1000000 m=16 k=4 components/small_changes/sorted

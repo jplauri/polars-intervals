@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Select a globally maximum-weight subset under a piecewise-constant capacity
+  profile with [`max_weight_with_capacity_profile`](usage.md#select-with-a-capacity-profile),
+  an eager two-DataFrame API backed by exact native flow optimization.
+
 - Add `max_k_coverage`: exact maximum union measure with a scalar interval
   budget, using the fewest intervals among maximum-coverage solutions.
 

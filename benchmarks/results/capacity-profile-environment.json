@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-09-27T10:13:48.2302038Z",
+  "git_head": "195438cdd799c4e1f7cca69dcfa7047f22b5a91e",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "python": "Python 3.14.0",
+  "os": "Microsoft Windows 10.0.26200",
+  "architecture": "X64",
+  "processor": {
+    "Name": "AMD Ryzen 9 3900X 12-Core Processor            ",
+    "NumberOfCores": 12,
+    "NumberOfLogicalProcessors": 24
+  },
+  "memory_bytes": 34279043072,
+  "profile": "cargo bench optimized",
+  "samples": 3,
+  "random_seed": 42,
+  "normalization": "packed and indirect",
+  "input_exclusion": "input dataset construction and verification excluded; AoS-to-SoA conversion included for production/CSR/scalar",
+  "allocation_metric": "peak requested heap bytes excluding inputs and verification; untimed isolated pass, not RSS",
+  "primary_runs": "Complete. Final core: 9699 samples across 187 workloads and 20 candidate/policy labels; final installed-native temporal: 240 samples. No repository builds/tests ran concurrently. Earlier controlled slices informed production choices and are separately described.",
+  "run_descriptions": {
+    "capacity-profile-crossover.csv": "Development slice: original transshipment production, forced compact A, generic A/B/C; 10K jobs and 1K/10K profile changes",
+    "capacity-profile-components.csv": "Original serial production and forced compact global/serial/parallel A",
+    "capacity-profile-zero.csv": "Before global-zero dispatch; equivalent scalar-zero comparison",
+    "capacity-profile-feasible-normalization.csv": "Packed versus direct-index profile sorting and all-feasible sweep",
+    "capacity-profile-adversary-dense.csv": "Raw compact A/C, original budget-only selector (csr_budget), independently tightened selector (csr_tight)",
+    "capacity-profile-adversary-identical.csv": "Same selector counterexample with identical intervals",
+    "capacity-profile-core.csv": "Final production code, full release matrix; adaptive A/C plus guarded capacity tightening, all production fast paths and parallel component policy",
+    "capacity-profile-temporal.csv": "Final release wheel built from sdist, installed outside checkout; Int64, Date, Datetime[us], Datetime[ns,UTC], 1K/10K/100K/1M jobs; Polars 1.44.2 and Python 3.14.0"
+  },
+  "final_core_run": {
+    "started_utc": "2026-09-27T10:58:20.5647877Z",
+    "finished_utc": "2026-09-27T11:08:19.1230766Z",
+    "exit_code": 0
+  },
+  "final_run_options": {
+    "PROFILE_BENCH_MAX_N": 1000000,
+    "PROFILE_BENCH_MIN_N": 0,
+    "PROFILE_BENCH_MIN_M": 0,
+    "PROFILE_BENCH_SAMPLES": 3,
+    "PROFILE_BENCH_FAMILY": "unset (all)",
+    "PROFILE_BENCH_METHODS": "unset (all)"
+  },
+  "source_snapshot": "Working tree feature atop git_head; exact source files identified below by SHA256",
+  "source_sha256": {
+    "crates/intervals-core/src/capacity_profile.rs": "c0fb4f997f6ae69f943c96e117ecd947de3dad08e6c043a14ade25dea94ab9f1",
+    "crates/intervals-core/src/capacity.rs": "ff68400bc227ed60e17abfdeb4047c3da4ea817dd628eb464b5b744e99cb2890",
+    "crates/intervals-core/src/lib.rs": "778f2e8ec7981b29bf1b4b5a9b6b56c4d775a81227f788fb747673c9cd052e7d",
+    "crates/intervals-core/benches/max_weight_with_capacity_profile.rs": "18b7b06017a62decdc52d47f7e438f5f7d7d1ab298ddb4ba13be7196a6564da9",
+    "crates/intervals-core/benches/support/profile_candidates.rs": "bdfdccf99a8c689cef9624d082637cbee84813b3008fd76140b56fa750f8fca2",
+    "crates/intervals-core/Cargo.toml": "5aada0e4f5b7f36fece10ae488481d0b7d28a45311e877a7c05cbc9017d9ee97",
+    "Cargo.lock": "1bc5b0379d7c77b43a9352e85798d262e4d1a23f1ab86258044ce177994cc14a",
+    "benchmarks/capacity_profile_temporal.py": "167eb612e9a827fc7ee87c820d31ccdbb8a47e0f68bbce4a54a970d897b487b5"
+  },
+  "validation": "253 Rust tests/doctests, 1834 Python tests/doctests in checkout and installed release wheel on Polars 1.44.1 and 1.44.2; fmt, Clippy all targets with denied warnings, Rustdoc, uv lock, Ruff, Twine strict and source/wheel consistency passed. Timed benchmark output validity/feasibility/objective assertions all passed."
+}

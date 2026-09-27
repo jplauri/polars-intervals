@@ -1,7 +1,8 @@
 # Usage
 
-Pass column names or Polars expressions to use interval operations in eager or
-lazy queries. See the [API reference](api.md) for full parameter and return types.
+Most interval operations take column names or Polars expressions for eager or
+lazy queries. Capacity-profile selection takes two eager DataFrames and returns
+a Series. See the [API reference](api.md) for full parameter and return types.
 
 ## Select maximum coverage with a budget
 
@@ -304,6 +305,69 @@ rules apply. Capacity must be a nonnegative integer, and empty intervals use
 no capacity.
 
 [API reference](api.md#polars_intervals.max_weight_with_capacity) · [Benchmarks](capacity-scheduling-benchmarks.md)
+
+## Select with a capacity profile
+
+Select a globally maximum-weight subset of fixed intervals subject to a
+piecewise-constant capacity profile:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+# Integer hours keep this example compact; matching Date/Datetime columns work too.
+jobs = pl.DataFrame(
+    {"start": [9, 10, 11, 14], "end": [13, 12, 15, 17], "weight": [100, 60, 130, 90]}
+)
+profile = pl.DataFrame({"start": [9, 12, 14], "end": [12, 14, 18], "capacity": [3, 1, 4]})
+selected = pi.max_weight_with_capacity_profile(jobs, profile)
+print(selected.to_list())  # [False, True, True, True]
+result = jobs.filter(selected)
+```
+
+The capacity is three from 09–12, one from 12–14, and four from 14–18.
+The jobs worth 100 and 130 both cross the noon bottleneck, so only one can
+survive it. The selected subset has total weight 280. Optimization is global
+and exact; sorting jobs by weight and greedily accepting them is not equivalent.
+
+This is a normal eager package function because the two tables have independent
+row counts. It returns a non-null Boolean Series named `selected`, aligned with
+the original job rows. Use `start`, `end`, `weight`, `profile_start`,
+`profile_end`, and `capacity` keyword arguments to choose other column names.
+For lazy inputs, explicitly collect each input first; this function does not
+hide materialization inside an expression or perform optimization in Python.
+
+- Jobs and profile rows are half-open `[start, end)`. Touching segments are valid.
+- Profile rows may be unsorted. Overlapping non-empty rows are rejected as
+  ambiguous, even if their capacities agree or are zero.
+- Gaps and times outside the supplied profile have zero capacity. A non-empty
+  job crossing any such region cannot be selected.
+- Valid zero-length profile rows have no effect. Adjacent segments with the
+  same capacity may be coalesced internally.
+- All four endpoint columns must have exactly the same supported logical dtype:
+  signed/unsigned 8/16/32/64-bit integer, Date, or Datetime. Datetime units
+  (`ms`, `us`, `ns`) and timezone metadata must match exactly.
+- Weights and capacities are non-null signed/unsigned integers up to 64 bits.
+  Negative capacities, floats, Decimal, Int128 columns, null endpoints, and
+  reversed intervals are rejected. There are no implicit casts.
+- Objective arithmetic uses checked `i128`. Positive empty jobs are always
+  selected and consume no capacity, including outside the profile. Nonpositive
+  jobs are omitted. Identical inputs produce identical masks; choices between
+  tied optimal subsets are not guaranteed across releases.
+- Capacity above the number of positive non-empty candidate jobs is clamped
+  internally: no selection can exceed that concurrency, so the optimum is unchanged.
+
+A profile constant at `k` across the relevant job horizon has the same optimum
+as `max_weight_with_capacity(..., capacity=k)` and dispatches to that existing
+kernel. Capacity one consequently reaches `max_weight_non_overlapping`.
+Empty/zero profiles and instances where all positive jobs fit avoid flow.
+The compact timeline contains endpoints, never every elapsed Date/Datetime tick.
+See the [design, proofs, complexity, and measurements](capacity-profile-benchmarks.md)
+for the production solver and component fast paths.
+
+The Rust Polars API takes six `&Series` arguments in job start/end/weight,
+profile start/end/capacity order. The Polars-independent core API takes six
+slices in that same order; endpoint types need ordering, copying, and `Sync`.
 
 ## Cover one continuous target
 

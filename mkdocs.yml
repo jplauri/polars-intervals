@@ -29,6 +29,7 @@ nav:
       - Lane assignment: assign-lanes-benchmarks.md
       - Weighted scheduling: weighted-scheduling-benchmarks.md
       - Capacity scheduling: capacity-scheduling-benchmarks.md
+      - Capacity profiles: capacity-profile-benchmarks.md
       - Minimum covering: covering-benchmarks.md
       - Minimum-cost covering: cost-covering-benchmarks.md
       - Minimum stabbing points: stabbing-benchmarks.md

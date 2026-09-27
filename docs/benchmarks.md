@@ -9,6 +9,7 @@ Explore benchmarks for each available operation below.
 | [Lane assignment](assign-lanes-benchmarks.md) | Assign the fewest lanes without overlaps within a lane. |
 | [Weighted scheduling](weighted-scheduling-benchmarks.md) | Select a non-overlapping subset with maximum total weight. |
 | [Capacity scheduling](capacity-scheduling-benchmarks.md) | Maximize total weight under an overlap limit. |
+| [Capacity profiles](capacity-profile-benchmarks.md) | Exact selection under capacity that changes over time. |
 | [Minimum covering](covering-benchmarks.md) | Cover a target with the fewest intervals. |
 | [Minimum-cost covering](cost-covering-benchmarks.md) | Cover a target at minimum total cost. |
 | [Minimum stabbing points](stabbing-benchmarks.md) | Find the fewest points that hit every interval. |
