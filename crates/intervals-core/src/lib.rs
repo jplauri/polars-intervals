@@ -2,6 +2,7 @@
 //!
 //! [`overlap_counts`] counts overlaps between half-open intervals without
 //! depending on Polars or any particular endpoint type.
+//! [`containment_counts`] counts other intervals contained by each row.
 //! [`assign_lanes`] assigns intervals to the minimum number of lanes.
 //! [`max_weight_non_overlapping`] selects an exact maximum-weight schedule.
 //! [`minimum_cover`] and [`minimum_cost_cover`] cover one continuous target exactly.
@@ -11,6 +12,8 @@
 
 use std::fmt;
 
+mod containment;
+pub use containment::containment_counts;
 mod lanes;
 pub use lanes::assign_lanes;
 mod weighted;

@@ -1,0 +1,36 @@
+{
+  "started_utc": "2026-09-26T19:35:08.4385435Z",
+  "completed_utc": "2026-09-26T19:37:40.7049809Z",
+  "command": "cargo bench -p intervals-core --bench containment --locked",
+  "profile": "release (default opt-level=3)",
+  "cpu": "AMD Ryzen 9 3900X 12-Core Processor            ",
+  "logical_cpus": 24,
+  "os": "Microsoft Windows NT 10.0.26200.0",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+  "git_commit": "925033f9990b47f473d9debb2779b4533e63f24f",
+  "git_dirty": true,
+  "sizes": [
+    1000,
+    10000,
+    100000,
+    1000000,
+    3000000
+  ],
+  "samples_per_case": 5,
+  "seed": 42,
+  "memory": "simultaneously live Vec capacity bytes including output, excluding inputs; not RSS",
+  "sources": [
+    {
+      "Path": "D:\\polars-intervals\\crates\\intervals-core\\src\\containment.rs",
+      "Hash": "AF03BD2A66BD7358CBC509C2E6F2B549A1D56CF87ED107EDBDEE90B8444D6864"
+    },
+    {
+      "Path": "D:\\polars-intervals\\crates\\intervals-core\\benches\\support\\mod.rs",
+      "Hash": "CA49E9DB5B44BAA7B414EDCEF3A0CDD4A37B82B248044413B40B9EA76360E230"
+    },
+    {
+      "Path": "D:\\polars-intervals\\crates\\intervals-core\\benches\\containment.rs",
+      "Hash": "5D2154F2BF49AE02A9345E63503F89DAB10C8349AA9433B4D3F4E3F3835339BC"
+    }
+  ]
+}

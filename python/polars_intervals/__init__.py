@@ -8,6 +8,7 @@ from polars.plugins import register_plugin_function
 
 __all__ = [
     "assign_lanes",
+    "containment_count",
     "max_weight_non_overlapping",
     "max_weight_with_capacity",
     "minimum_cost_cover",
@@ -576,6 +577,83 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
     return register_plugin_function(
         plugin_path=Path(__file__).parent,
         function_name="overlap_count_plugin",
+        args=[start, end],
+        is_elementwise=False,
+    )
+
+
+def containment_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
+    """Count how many other intervals are contained by each row.
+
+    A contains B iff `A.start <= B.start` and `B.end <= A.end`, with self
+    excluded. Intervals are represented as half-open `[start, end)`, but
+    containment uses exactly these non-strict endpoint inequalities.
+
+    Duplicate rows count one another: each of m identical rows counts m - 1.
+    Empty intervals follow the same predicate: `[0, 5)` contains `[5, 5)`;
+    identical `[3, 3)` rows contain each other. An empty outer interval only
+    contains empty intervals at its own coordinate.
+
+    Unlike `overlap_count`, crossing intervals do not count one another.
+    For A = `[0, 10)`, B = `[2, 5)`, C = `[4, 12)`, A has overlap count 2
+    and containment count 1.
+
+    Args:
+        start: Column name or expression producing interval starts.
+        end: Column name or expression producing interval ends.
+
+    Returns:
+        pl.Expr: Non-null `UInt64` counts, one per original input row.
+            Empty input with a supported dtype returns empty output.
+
+    Raises:
+        polars.exceptions.PolarsError: If lengths differ, logical dtypes do
+            not match exactly, endpoints are null, dtypes are unsupported,
+            or any start exceeds its end. Invalid intervals report the first
+            zero-based index within the input collection (or group).
+
+    Notes:
+        Supports `Int8`, `Int16`, `Int32`, `Int64`, `UInt8`, `UInt16`,
+        `UInt32`, `UInt64`, `Date`, and `Datetime` (ms/us/ns, including
+        timezone-aware types). Datetime units and timezones must match.
+        No silent coercion, scalar broadcasting, or null skipping is performed.
+
+        Counts are exact over the entire input collection, across chunks.
+        Use `.over("group")` to count separately within each group while
+        preserving row order. `group_by(...).agg(...)` returns lists of counts.
+        Filtering before counting changes the collection; filtering afterwards
+        only removes result rows. Streaming still requires the full collection.
+
+        The Rust core sorts packed records by descending start, compresses end
+        coordinates, and counts with a Fenwick tree. It inserts each complete
+        equal-start group before querying inclusive end prefixes and subtracting
+        self. Time is O(n log n), auxiliary memory is O(n), without enumerating
+        containment pairs.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({"start": [0, 2, 4], "end": [10, 5, 12]})
+        >>> df.with_columns(
+        ...     pi.containment_count("start", "end").alias("contained")
+        ... )["contained"].to_list()
+        [1, 0, 0]
+        >>> df.lazy().select(
+        ...     pi.containment_count(pl.col("start"), pl.col("end"))
+        ... ).collect().to_series().dtype
+        UInt64
+        >>> grouped = pl.DataFrame({
+        ...     "group": ["a", "b", "a", "b"],
+        ...     "start": [0, 0, 2, 5], "end": [10, 4, 5, 5],
+        ... })
+        >>> grouped.select(
+        ...     pi.containment_count("start", "end").over("group")
+        ... ).to_series().to_list()
+        [1, 0, 0, 0]
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="containment_count_plugin",
         args=[start, end],
         is_elementwise=False,
     )

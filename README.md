@@ -44,6 +44,18 @@ print(result["overlaps"].to_list())  # [1, 2, 1]
 
 Intervals include their start and exclude their end, so touching intervals do not overlap.
 
+### Count contained intervals
+
+```python
+df = pl.DataFrame({"start": [0, 2, 4], "end": [10, 5, 12]})
+df.with_columns(pi.containment_count("start", "end").alias("contained"))
+# contained: [1, 0, 0]
+```
+
+A contains B when `A.start <= B.start` and `B.end <= A.end`, excluding
+the same row. Duplicates count one another. Empty intervals follow these
+same endpoint inequalities: `[0, 5)` contains `[5, 5)`.
+
 ### Cover a target
 
 Select the fewest intervals needed to cover `[0, 10)`:
@@ -75,6 +87,7 @@ print(selected.rows())  # [(0, 6), (6, 10)]
 | Function | Description |
 | --- | --- |
 | [`overlap_count`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#count-overlaps) | Count the other intervals overlapping each interval. |
+| [`containment_count`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#count-containment) | Count the other intervals contained by each interval. |
 | [`assign_lanes`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#assign-the-minimum-number-of-lanes) | Assign the fewest lanes with no overlaps within a lane. |
 | [`max_weight_non_overlapping`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#select-a-globally-maximum-weight-schedule) | Select a non-overlapping subset with maximum total weight. |
 | [`max_weight_with_capacity`](https://github.com/jplauri/polars-intervals/blob/master/docs/usage.md#select-with-a-simultaneous-capacity) | Maximize total weight under a simultaneous overlap limit. |

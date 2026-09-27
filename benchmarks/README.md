@@ -13,6 +13,7 @@ release plugin. Summary and plotting scripts only read saved results.
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
 | [`overlap_count.py`](overlap_count.py) | End-to-end benchmark | Generated workloads → timing samples, RSS and environment in JSON | [Overlap counting](../docs/overlap-count-benchmarks.md) |
+| [`containment_count.py`](containment_count.py) | End-to-end benchmark | Generated workloads → samples, native plans and pair-count safety skips in JSON | [Containment counting](../docs/containment-benchmarks.md) |
 | [`weighted_summary.py`](weighted_summary.py) | Report generator | Candidate CSV argument → runtime ratios and tables on stdout | [Weighted scheduling](../docs/weighted-scheduling-benchmarks.md) |
 | [`capacity_summary.py`](capacity_summary.py) | Report generator | Candidate CSV arguments (default: recorded run) → median timing/allocation CSV on stdout | [Capacity scheduling](../docs/capacity-scheduling-benchmarks.md) |
 | [`capacity_temporal.py`](capacity_temporal.py) | End-to-end benchmark | Integer/temporal cliques → raw timing CSV on stdout | [Capacity scheduling](../docs/capacity-scheduling-benchmarks.md) |

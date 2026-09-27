@@ -1,6 +1,7 @@
 //! Interval algorithms for Rust Polars, backed by `intervals-core`.
 //!
-//! [`overlap_count`], [`assign_lanes`], [`max_weight_non_overlapping`] and
+//! [`overlap_count`], [`containment_count`], [`assign_lanes`],
+//! [`max_weight_non_overlapping`] and
 //! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
 //! to the core and Python expressions.
 //! [`minimum_cover`] and [`minimum_cost_cover`] select exact continuous target covers.
@@ -20,6 +21,11 @@ mod _internal {}
 // optional Polars feature is disabled, before our validation runs.
 fn count_output(inputs: &[Field]) -> PolarsResult<Field> {
     let [start, _] = input_pair(inputs, "overlap_count")?;
+    Ok(Field::new(start.name().clone(), DataType::UInt64))
+}
+
+fn containment_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let [start, _] = input_pair(inputs, "containment_count")?;
     Ok(Field::new(start.name().clone(), DataType::UInt64))
 }
 
@@ -79,6 +85,12 @@ fn input_pair<'a, T>(inputs: &'a [T], name: &str) -> PolarsResult<&'a [T; 2]> {
 fn overlap_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
     let [starts, ends] = input_pair(inputs, "overlap_count")?;
     overlap_count(starts, ends)
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = containment_output)]
+fn containment_count_plugin(inputs: &[Series]) -> PolarsResult<Series> {
+    let [starts, ends] = input_pair(inputs, "containment_count")?;
+    containment_count(starts, ends)
 }
 
 #[pyo3_polars::derive::polars_expr(output_type_func = lanes_output)]
@@ -143,6 +155,37 @@ fn max_weight_with_capacity_plugin(
         |_| polars_err!(InvalidOperation: "capacity must be nonnegative and fit in usize"),
     )?;
     max_weight_with_capacity(starts, ends, weights, capacity)
+}
+
+/// Counts how many other intervals are contained by each row.
+///
+/// Containment means `a.start <= b.start && b.end <= a.end`, with self excluded.
+/// Duplicate rows count each other. Half-open empty intervals follow exactly
+/// the same endpoint predicate: `[0, 5)` contains `[5, 5)`.
+///
+/// Returns a non-null `UInt64` Series named `containment_count`, in original
+/// row order across all chunks. Takes `O(n log n)` time and `O(n)` extra space.
+///
+/// # Errors
+///
+/// Rejects unequal lengths, null endpoints, and `start > end` (reporting the
+/// first original row index). Logical dtypes must match exactly, including
+/// Datetime unit and timezone. Supports 8/16/32/64-bit signed/unsigned integers,
+/// Date, and Datetime; physical integers are extracted only after validation.
+/// No coercion or scalar broadcasting is performed.
+///
+/// # Examples
+///
+/// ```
+/// use polars::prelude::*;
+/// let starts = Series::new("start".into(), [0i64, 2, 4]);
+/// let ends = Series::new("end".into(), [10i64, 5, 12]);
+/// let counts = polars_intervals::containment_count(&starts, &ends)?;
+/// assert_eq!(counts.u64()?.into_no_null_iter().collect::<Vec<_>>(), [1, 0, 0]);
+/// # Ok::<(), PolarsError>(())
+/// ```
+pub fn containment_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+    evaluate(starts, ends, Algorithm::ContainmentCount)
 }
 
 /// Counts other overlapping intervals in the supplied start and end columns.
@@ -341,6 +384,7 @@ fn integer_values(values: &Series) -> PolarsResult<Vec<i128>> {
 enum Algorithm<'a> {
     Stabbing,
     OverlapCount,
+    ContainmentCount,
     AssignLanes,
     MaxWeight(&'a [i128]),
     Capacity(&'a [i128], usize),
@@ -353,6 +397,7 @@ impl Algorithm<'_> {
         match self {
             Self::Stabbing => "minimum_stabbing_points",
             Self::OverlapCount => "overlap_count",
+            Self::ContainmentCount => "containment_count",
             Self::AssignLanes => "assign_lanes",
             Self::MaxWeight(_) => "max_weight_non_overlapping",
             Self::Capacity(_, _) => "max_weight_with_capacity",
@@ -426,9 +471,13 @@ where
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;
             Ok(ChunkedArray::<T>::from_vec(algorithm.name().into(), points).into_series())
         }
-        Algorithm::OverlapCount => {
-            let counts = intervals_core::overlap_counts(&starts, &ends)
-                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+        Algorithm::OverlapCount | Algorithm::ContainmentCount => {
+            let counts = if matches!(algorithm, Algorithm::ContainmentCount) {
+                intervals_core::containment_counts(&starts, &ends)
+            } else {
+                intervals_core::overlap_counts(&starts, &ends)
+            }
+            .map_err(|error| polars_err!(ComputeError: "{error}"))?;
             let counts: Vec<u64> = counts.into_iter().map(|count| count as u64).collect();
             Ok(Series::from_vec(algorithm.name().into(), counts))
         }
