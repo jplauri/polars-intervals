@@ -10,7 +10,7 @@ import tempfile
 import tomllib
 import urllib.request
 import zipfile
-from datetime import UTC, date, datetime
+from contextlib import chdir
 from email.parser import BytesParser
 from importlib.metadata import version as installed_version
 from pathlib import Path
@@ -222,129 +222,19 @@ def installed(checkout):
         .to_series()
     )
     require(result.dtype == pl.UInt64 and result.to_list() == [1, 1, 2, 0], "Smoke test failed.")
-    lanes = (
-        pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
-        .select(pi.assign_lanes("start", "end"))
-        .to_series()
-    )
-    require(
-        lanes.dtype == pl.UInt32
-        and lanes.n_unique() == 2
-        and lanes[0] == lanes[2]
-        and lanes[0] != lanes[1],
-        "Lane assignment smoke test failed.",
-    )
-    weighted = (
-        pl.DataFrame(
-            {
-                "start": [0, 0, 4, 7],
-                "end": [10, 4, 7, 10],
-                "weight": [15, 10, 10, 10],
-            }
-        )
-        .select(pi.max_weight_non_overlapping("start", "end", weight="weight"))
-        .to_series()
-    )
-    require(
-        weighted.dtype == pl.Boolean and weighted.to_list() == [False, True, True, True],
-        "Weighted scheduling smoke test failed.",
-    )
-    capacity_frame = pl.DataFrame(
-        {"start": [0, 0, 0, 2], "end": [5, 5, 5, 2], "weight": [9, 7, 5, 3]}
-    )
-    for capacity, expected in [(0, [False, False, False, True]), (2, [True, True, False, True])]:
-        mask = capacity_frame.select(
-            pi.max_weight_with_capacity("start", "end", weight="weight", capacity=capacity)
-        ).to_series()
-        require(
-            mask.dtype == pl.Boolean and mask.to_list() == expected, "Capacity smoke test failed."
-        )
-    for dtype, starts, ends in [
-        (pl.Date, [date(2026, 1, 1), date(2026, 1, 2)], [date(2026, 1, 3), date(2026, 1, 4)]),
-        (
-            pl.Datetime("us", "UTC"),
-            [datetime(2026, 1, 1, 9, minute, tzinfo=UTC) for minute in (0, 30)],
-            [datetime(2026, 1, 1, 10, minute, tzinfo=UTC) for minute in (0, 30)],
-        ),
-    ]:
-        result = (
-            pl.DataFrame({"start": starts, "end": ends}, schema={"start": dtype, "end": dtype})
-            .lazy()
-            .select(pi.overlap_count("start", "end"))
-            .collect()
-            .to_series()
-        )
-        require(
-            result.dtype == pl.UInt64 and result.to_list() == [1, 1],
-            f"Temporal smoke test failed for {dtype}.",
-        )
-        lanes = (
-            pl.DataFrame({"start": starts, "end": ends}, schema={"start": dtype, "end": dtype})
-            .lazy()
-            .select(pi.assign_lanes("start", "end"))
-            .collect()
-            .to_series()
-        )
-        require(
-            lanes.dtype == pl.UInt32 and set(lanes.to_list()) == {0, 1},
-            f"Temporal lane assignment smoke test failed for {dtype}.",
-        )
-        weighted = (
-            pl.DataFrame({"start": starts, "end": ends}, schema={"start": dtype, "end": dtype})
-            .with_columns(pl.Series("weight", [10, 20], dtype=pl.UInt64))
-            .select(pi.max_weight_non_overlapping("start", "end", weight="weight"))
-            .to_series()
-        )
-        require(
-            weighted.dtype == pl.Boolean and weighted.to_list() == [False, True],
-            f"Temporal weighted scheduling smoke test failed for {dtype}.",
-        )
-        capacity_mask = (
-            pl.DataFrame({"start": starts, "end": ends}, schema={"start": dtype, "end": dtype})
-            .with_columns(pl.Series("weight", [10, 20], dtype=pl.UInt64))
-            .select(pi.max_weight_with_capacity("start", "end", weight="weight", capacity=2))
-            .to_series()
-        )
-        require(
-            capacity_mask.dtype == pl.Boolean and capacity_mask.to_list() == [True, True],
-            f"Temporal capacity smoke test failed for {dtype}.",
-        )
-    coverage = (
-        pl.DataFrame({"start": [0, -5, 6], "end": [10, 4, 15]})
-        .select(pi.max_k_coverage("start", "end", k=2))
-        .to_series()
-    )
-    require(
-        coverage.dtype == pl.Boolean and coverage.to_list() == [False, True, True],
-        "Maximum k-coverage smoke test failed.",
-    )
-    stabbing = (
-        pl.DataFrame({"start": [0, 2, 5], "end": [4, 6, 9]})
-        .select(pi.minimum_stabbing_points("start", "end"))
-        .to_series()
-    )
-    require(
-        stabbing.dtype == pl.List(pl.Int64) and stabbing.to_list() == [[3, 8]],
-        "Minimum stabbing points smoke test failed.",
-    )
     print(f"Testing installed artifact from {package}")
-    with tempfile.TemporaryDirectory() as temporary:
-        previous_directory = Path.cwd()
-        try:
-            os.chdir(temporary)
-            result = pytest.main(
-                [
-                    "--rootdir",
-                    temporary,
-                    "--import-mode=importlib",
-                    "--doctest-modules",
-                    str(package),
-                    str(checkout / "tests"),
-                    "-q",
-                ]
-            )
-        finally:
-            os.chdir(previous_directory)
+    with tempfile.TemporaryDirectory() as temporary, chdir(temporary):
+        result = pytest.main(
+            [
+                "--rootdir",
+                temporary,
+                "--import-mode=importlib",
+                "--doctest-modules",
+                str(package),
+                str(checkout / "tests"),
+                "-q",
+            ]
+        )
     raise SystemExit(result)
 
 

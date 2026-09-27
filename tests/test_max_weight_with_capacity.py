@@ -7,16 +7,7 @@ import polars as pl
 import polars_intervals as pi
 import pytest
 
-INTEGERS = [pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64]
-ENDPOINTS = [
-    *INTEGERS,
-    pl.Date,
-    *(
-        pl.Datetime(unit, zone)
-        for unit in ("ms", "us", "ns")
-        for zone in (None, "UTC", "Europe/Helsinki")
-    ),
-]
+from .dtypes import ENDPOINT_DTYPES, INTEGER_DTYPES
 
 
 def expression(k):
@@ -76,8 +67,8 @@ def test_eager_lazy_filter_empty_and_deterministic(rows, k):
         )
 
 
-@pytest.mark.parametrize("endpoint", ENDPOINTS, ids=str)
-@pytest.mark.parametrize("weight", INTEGERS, ids=str)
+@pytest.mark.parametrize("endpoint", ENDPOINT_DTYPES, ids=str)
+@pytest.mark.parametrize("weight", INTEGER_DTYPES, ids=str)
 @pytest.mark.parametrize("k", [0, 1, 2])
 def test_dtypes_chunks_shuffled_slices_streaming(endpoint, weight, k):
     rows = [(0, 10, 15), (0, 4, 10), (4, 7, 10), (7, 10, 10), (1, 9, 25), (2, 2, 8)]
@@ -129,7 +120,7 @@ def test_window_and_grouped_execution(dtype, k):
 
 
 @pytest.mark.parametrize("k", [0, 1, 2])
-@pytest.mark.parametrize("dtype", ENDPOINTS, ids=str)
+@pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
 def test_invalid_and_null_endpoints(k, dtype):
     frame = pl.DataFrame({"start": [2, 0, 5], "end": [2, 1, 4], "weight": [1, 0, -1]}).with_columns(
         pl.col("start", "end").cast(dtype)
@@ -142,7 +133,7 @@ def test_invalid_and_null_endpoints(k, dtype):
 
 
 @pytest.mark.parametrize("k", [0, 1, 2])
-@pytest.mark.parametrize("dtype", INTEGERS, ids=str)
+@pytest.mark.parametrize("dtype", INTEGER_DTYPES, ids=str)
 def test_null_weights(k, dtype):
     frame = pl.DataFrame({"start": [0], "end": [1], "weight": pl.Series([None], dtype=dtype)})
     with pytest.raises(pl.exceptions.PolarsError, match="null weights"):

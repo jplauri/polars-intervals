@@ -1,41 +1,15 @@
 use polars::prelude::*;
 use polars_intervals::assign_lanes;
 
+mod support;
+use support::{endpoint_dtypes, typed_series};
+
 #[test]
 fn supported_types_chunks_slices_and_core_agreement() {
-    let mut dtypes = vec![
-        DataType::Int8,
-        DataType::Int16,
-        DataType::Int32,
-        DataType::Int64,
-        DataType::UInt8,
-        DataType::UInt16,
-        DataType::UInt32,
-        DataType::UInt64,
-        DataType::Date,
-    ];
-    for unit in [
-        TimeUnit::Milliseconds,
-        TimeUnit::Microseconds,
-        TimeUnit::Nanoseconds,
-    ] {
-        for zone in [None, Some("UTC"), Some("Europe/Helsinki")] {
-            dtypes.push(DataType::Datetime(
-                unit,
-                TimeZone::opt_try_new(zone).unwrap(),
-            ));
-        }
-    }
     let raw_starts = [3i64, 0, 1, 1, 4, 1, 8];
     let raw_ends = [6i64, 5, 2, 2, 4, 1, 9];
-    for dtype in dtypes {
-        let convert = |raw: &[i64]| {
-            let series = Series::new("endpoint".into(), raw);
-            match &dtype {
-                DataType::Datetime(unit, zone) => series.into_datetime(*unit, zone.clone()),
-                _ => series.cast(&dtype).unwrap(),
-            }
-        };
+    for dtype in endpoint_dtypes() {
+        let convert = |values: &[i64]| typed_series(values, &dtype);
         let mut starts = convert(&raw_starts[..2]);
         starts.append(&convert(&raw_starts[2..])).unwrap();
         let mut ends = convert(&raw_ends[..4]);

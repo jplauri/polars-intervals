@@ -1,0 +1,95 @@
+{
+  "date_utc": "2026-09-27T09:40:33.3030414Z",
+  "baseline_revision": "1d19b08d8423d45fcce2168ca09380aee8938be3",
+  "post_measurement_change": "The allocator helper's cfg(test) import was moved inside its test for harness=false Clippy compatibility. Non-test code is unchanged; source hashes below describe the measured source.",
+  "source_sha256": {
+    "target/rust-audit-weighted/before.rs": "6b24fc5d4688c07ec6de0f80336459b14ced4b68be2aef020b6d356b198eff6e",
+    "crates/intervals-core/src/weighted.rs": "f98dbfa16904808e12a8dd098bae1d6d10d56b8d99b7cae500a7a153ddda8e98",
+    "crates/intervals-core/benches/support/allocations.rs": "ab127de9743dda9a3840d7188506cd2d68c9ecae1aa91d772f817b74ac6eb77d",
+    "crates/intervals-core/benches/support/weighted.rs": "aa0c7c884a69d70b220fe555b6d5f9dd11b53a178c80e2019eeaf3948963b0f1",
+    "benchmarks/results/rust-audit-weighted-harness.rs": "32b7c75426172337683620d5189713059051b5b5eb170dbfbca7ddff2c0060da",
+    "target/rust-audit-weighted/weighted-audit.exe": "35c32efcc6e0d9a48440db2694bffbea74f2ba7985c6f4f06882024c9aa6d207"
+  },
+  "compiler": [
+    "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "binary: rustc",
+    "commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985",
+    "commit-date: 2026-09-01",
+    "host: x86_64-pc-windows-msvc",
+    "release: 1.98.1",
+    "LLVM version: 22.1.8"
+  ],
+  "cpu": "AMD Ryzen 9 3900X 12-Core Processor",
+  "operating_system": "Microsoft Windows 11 Home 10.0.26200",
+  "target": "x86_64-pc-windows-msvc",
+  "optimization": "rustc -O (opt-level 3), edition 2024; default target CPU; no LTO flags; default codegen units; debug assertions disabled",
+  "dependencies_and_features": "Standalone core source and existing benchmark helpers; standard library only; no optional features or dependency changes",
+  "change": "Drop the sorted endpoint Vec after its final use and before allocating DP scores; preserve initial allocation and comparison order",
+  "workloads": {
+    "n": [
+      1000,
+      100000,
+      1000000
+    ],
+    "family": [
+      "disjoint",
+      "moderate128",
+      "random_lengths"
+    ],
+    "order": [
+      "finish_sorted",
+      "shuffled"
+    ],
+    "weights": [
+      "positive",
+      "mixed"
+    ],
+    "endpoint_type": "i64",
+    "weight_type": "i64",
+    "initial_seed": 42,
+    "note": "Existing weighted benchmark fixtures on a bounded subset; seed evolves across workloads, so these are not identical rows to the full historical harness run"
+  },
+  "measurement": {
+    "workloads": 36,
+    "repeats": 2,
+    "warmups_per_version_and_case": 2,
+    "timed_samples_per_version_and_case_per_repeat": 5,
+    "total_saved_samples": 720,
+    "method_order": "deterministically shuffled before each sample using existing helper",
+    "timed_region": "Entire algorithm call including temporary buffer destruction; excludes input setup, verification and destruction of returned output mask",
+    "memory": "Separate untimed allocator pass; peak simultaneously live requested heap bytes, including output, excluding caller inputs, allocator metadata and OS RSS",
+    "allocation_counter": "Same final shared allocation helper for before and after in one executable; counter disabled during runtime samples",
+    "oracle": "Existing independent start-ordered suffix optimum plus feasibility/empty-interval verification after every allocation and timed run",
+    "execution": "Sequential on host; no concurrent cargo builds or other agent benchmark workloads; no CPU affinity pinning"
+  },
+  "outcome": {
+    "all_oracle_checks_passed": true,
+    "positive_1000000_before_peak_bytes": 41000016,
+    "positive_1000000_after_peak_bytes": 33000016,
+    "peak_bytes_reduction": 8000000,
+    "peak_reduction_percent": 19.51218750743902,
+    "allocations_before": 6,
+    "allocations_after": 6,
+    "timing_claim": "No runtime speedup claimed; per-case median after/before geometric means were 0.99969 and 1.00243 across the two runs; within-case timing spread was material"
+  },
+  "omissions": [
+    "No Polars/Python end-to-end timing; change is confined to the pure core kernel",
+    "No RSS measurement; requested heap bytes are not RSS",
+    "No compile-time or binary-size comparison",
+    "No exhaustive geometry/distribution matrix or alternate endpoint types",
+    "Two preliminary scope-based runs were not accepted for the final source; retained only in target/rust-audit-weighted/scope-run*.csv"
+  ],
+  "reproduction": [
+    "New-Item -ItemType Directory -Path target/rust-audit-weighted -Force | Out-Null",
+    "Copy-Item -LiteralPath benchmarks/results/rust-audit-weighted-harness.rs -Destination target/rust-audit-weighted/main.rs",
+    "git show 1d19b08:crates/intervals-core/src/weighted.rs | Set-Content -LiteralPath target/rust-audit-weighted/before.rs -Encoding utf8NoBOM",
+    "rustc --edition 2024 -O -A dead_code target/rust-audit-weighted/main.rs -o target/rust-audit-weighted/weighted-audit.exe",
+    "& ./target/rust-audit-weighted/weighted-audit.exe > target/rust-audit-weighted/replay1.csv",
+    "& ./target/rust-audit-weighted/weighted-audit.exe > target/rust-audit-weighted/replay2.csv"
+  ],
+  "raw_samples": [
+    "rust-audit-weighted-run1.csv",
+    "rust-audit-weighted-run2.csv"
+  ],
+  "summary": "rust-audit-weighted-summary.csv; median/min/max nanoseconds per workload and run; exact before/after versions from the same binary"
+}

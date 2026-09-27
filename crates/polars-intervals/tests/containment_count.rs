@@ -3,12 +3,7 @@ use polars_intervals::containment_count;
 
 fn with_dtype(values: &Series, dtype: &DataType) -> Series {
     match dtype {
-        DataType::Datetime(unit, zone) => values
-            .i64()
-            .unwrap()
-            .clone()
-            .into_datetime(*unit, zone.clone())
-            .into_series(),
+        DataType::Datetime(unit, zone) => values.clone().into_datetime(*unit, zone.clone()),
         _ => values.cast(dtype).unwrap(),
     }
 }
