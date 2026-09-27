@@ -7,6 +7,8 @@ import polars_intervals as pi
 import pytest
 from polars.testing import assert_series_equal
 
+from .dtypes import ENDPOINT_DTYPES
+
 
 @pytest.mark.parametrize("context", ["select", "with_columns", "lazy_select", "lazy_with_columns"])
 @pytest.mark.parametrize(
@@ -45,16 +47,7 @@ def test_named_semantics(context, starts, ends, expected):
     assert_series_equal(result["count"], pl.Series("count", expected, dtype=pl.UInt64))
 
 
-@pytest.mark.parametrize(
-    "dtype",
-    [pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64, pl.Date]
-    + [
-        pl.Datetime(unit, zone)
-        for unit in ["ms", "us", "ns"]
-        for zone in [None, "UTC", "Europe/Helsinki"]
-    ],
-    ids=str,
-)
+@pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
 def test_supported_dtypes_including_empty_input(dtype):
     frame = pl.DataFrame({"start": [0, 1, 1, 5], "end": [10, 5, 5, 5]}).cast(dtype)
     for data, expected in [(frame, [3, 2, 2, 0]), (frame.head(0), [])]:

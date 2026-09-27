@@ -13,6 +13,8 @@ import polars_intervals as pi
 import pytest
 from polars.testing import assert_frame_equal, assert_series_equal
 
+from .dtypes import ENDPOINT_DTYPES, INTEGER_DTYPES
+
 
 @pytest.mark.parametrize("context", ["select", "with_columns"])
 @pytest.mark.parametrize(
@@ -85,11 +87,7 @@ def test_expressions_and_mixed_arguments_preserve_row_order(start, end):
     assert_series_equal(result["count"], pl.Series("count", [1, 1, 2, 2, 0], dtype=pl.UInt64))
 
 
-@pytest.mark.parametrize(
-    "dtype",
-    [pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64],
-    ids=str,
-)
+@pytest.mark.parametrize("dtype", INTEGER_DTYPES, ids=str)
 def test_all_supported_integer_dtypes(dtype):
     frame = pl.DataFrame(
         {"start": [1, 2, 2, 3, 6], "end": [9, 5, 5, 3, 7]},
@@ -203,14 +201,7 @@ def test_rejects_unequal_expression_lengths_without_broadcasting(start):
 
 
 @pytest.fixture(
-    params=[
-        pl.Date,
-        *(
-            pl.Datetime(unit, zone)
-            for unit in ("ms", "us", "ns")
-            for zone in (None, "UTC", "Europe/Helsinki")
-        ),
-    ],
+    params=[dtype for dtype in ENDPOINT_DTYPES if dtype.is_temporal()],
     ids=str,
 )
 def temporal_frame(request):

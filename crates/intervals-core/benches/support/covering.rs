@@ -236,9 +236,7 @@ pub fn weighted<T: Ord + Copy>(
     let optimization_ns = begin.elapsed().as_nanos();
     let begin = Instant::now();
     let mut mask = vec![false; starts.len()];
-    let result = if coordinates.last() == Some(&right)
-        && production::reconstruct(&solution.back, &mut mask)
-    {
+    let result = if production::reconstruct(&solution.back, &mut mask) {
         Ok(mask)
     } else {
         Err(IntervalError::InfeasibleCover)

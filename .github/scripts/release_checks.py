@@ -10,6 +10,7 @@ import tempfile
 import tomllib
 import urllib.request
 import zipfile
+from contextlib import chdir
 from email.parser import BytesParser
 from importlib.metadata import version as installed_version
 from pathlib import Path
@@ -222,23 +223,18 @@ def installed(checkout):
     )
     require(result.dtype == pl.UInt64 and result.to_list() == [1, 1, 2, 0], "Smoke test failed.")
     print(f"Testing installed artifact from {package}")
-    with tempfile.TemporaryDirectory() as temporary:
-        previous_directory = Path.cwd()
-        try:
-            os.chdir(temporary)
-            result = pytest.main(
-                [
-                    "--rootdir",
-                    temporary,
-                    "--import-mode=importlib",
-                    "--doctest-modules",
-                    str(package),
-                    str(checkout / "tests"),
-                    "-q",
-                ]
-            )
-        finally:
-            os.chdir(previous_directory)
+    with tempfile.TemporaryDirectory() as temporary, chdir(temporary):
+        result = pytest.main(
+            [
+                "--rootdir",
+                temporary,
+                "--import-mode=importlib",
+                "--doctest-modules",
+                str(package),
+                str(checkout / "tests"),
+                "-q",
+            ]
+        )
     raise SystemExit(result)
 
 

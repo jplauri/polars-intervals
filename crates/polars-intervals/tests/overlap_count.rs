@@ -2,6 +2,9 @@ use polars::prelude::*;
 use polars_intervals::overlap_count;
 use proptest::prelude::*;
 
+mod support;
+use support::{INTEGER_DTYPES, endpoint_dtypes, typed_series};
+
 fn assert_counts(starts: &Series, ends: &Series, expected: &[u64]) {
     let counts = overlap_count(starts, ends).unwrap();
     assert_eq!(counts.name().as_str(), "overlap_count");
@@ -30,20 +33,9 @@ fn all_supported_integer_types_match_core() {
         .collect();
     assert_eq!(expected, [1, 3, 2, 2, 0, 0, 0]);
 
-    for dtype in [
-        DataType::Int8,
-        DataType::Int16,
-        DataType::Int32,
-        DataType::Int64,
-        DataType::UInt8,
-        DataType::UInt16,
-        DataType::UInt32,
-        DataType::UInt64,
-    ] {
-        let starts = Series::new("starts".into(), raw_starts)
-            .cast(&dtype)
-            .unwrap();
-        let ends = Series::new("ends".into(), raw_ends).cast(&dtype).unwrap();
+    for dtype in INTEGER_DTYPES {
+        let starts = typed_series(&raw_starts, &dtype);
+        let ends = typed_series(&raw_ends, &dtype);
         assert_counts(&starts, &ends, &expected);
         assert_counts(&starts.slice(1, 4), &ends.slice(1, 4), &[2, 2, 2, 0]);
         assert_counts(&starts.slice(0, 0), &ends.slice(0, 0), &[]);
@@ -208,20 +200,10 @@ fn rejects_reversed_intervals_at_integer_extremes() {
 }
 
 fn temporal_dtypes() -> Vec<DataType> {
-    let mut dtypes = vec![DataType::Date];
-    for unit in [
-        TimeUnit::Milliseconds,
-        TimeUnit::Microseconds,
-        TimeUnit::Nanoseconds,
-    ] {
-        for zone in [None, Some("UTC"), Some("Europe/Helsinki")] {
-            dtypes.push(DataType::Datetime(
-                unit,
-                TimeZone::opt_try_new(zone).unwrap(),
-            ));
-        }
-    }
-    dtypes
+    endpoint_dtypes()
+        .into_iter()
+        .filter(DataType::is_temporal)
+        .collect()
 }
 
 fn with_dtype(values: Series, dtype: &DataType) -> Series {
