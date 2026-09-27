@@ -7,20 +7,11 @@ use std::time::Instant;
 mod allocations;
 #[path = "support/covering.rs"]
 mod candidates;
+#[path = "support/random.rs"]
+mod random;
+use random::{random, shuffle};
 #[global_allocator]
 static ALLOCATOR: allocations::Allocator = allocations::Allocator;
-
-fn random(seed: &mut u64) -> u64 {
-    *seed ^= *seed << 13;
-    *seed ^= *seed >> 7;
-    *seed ^= *seed << 17;
-    *seed
-}
-fn shuffle<T>(values: &mut [T], seed: &mut u64) {
-    for i in (1..values.len()).rev() {
-        values.swap(i, random(seed) as usize % (i + 1));
-    }
-}
 
 fn workload(
     n: usize,

@@ -6,8 +6,11 @@ mod candidates;
 #[path = "../src/capacity.rs"]
 #[allow(dead_code)] // test-only invariant helpers in the directly included source
 mod capacity;
+#[path = "support/random.rs"]
+mod random;
 #[path = "support/capacity_reference.rs"]
 mod reference;
+use random::{random, shuffle};
 
 use intervals_core::{IntervalError, max_weight_non_overlapping};
 use std::hint::black_box;
@@ -15,18 +18,6 @@ use std::time::Instant;
 
 #[global_allocator]
 static ALLOCATOR: allocations::Allocator = allocations::Allocator;
-
-fn random(state: &mut u64) -> u64 {
-    *state ^= *state << 13;
-    *state ^= *state >> 7;
-    *state ^= *state << 17;
-    *state
-}
-fn shuffle<T>(rows: &mut [T], state: &mut u64) {
-    for i in (1..rows.len()).rev() {
-        rows.swap(i, random(state) as usize % (i + 1));
-    }
-}
 
 fn data(n: usize, family: &str, distribution: &str) -> (Vec<i64>, Vec<i64>, Vec<i64>) {
     let mut state = 42;

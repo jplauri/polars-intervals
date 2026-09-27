@@ -3,24 +3,16 @@
 mod allocations;
 #[path = "support/profile_candidates.rs"]
 mod candidates;
+#[path = "support/random.rs"]
+mod random;
 use candidates::{Job, Measurement, Segment};
+use random::{random, shuffle};
 use std::hint::black_box;
 use std::time::Instant;
 
 #[global_allocator]
 static ALLOCATOR: allocations::Allocator = allocations::Allocator;
 
-fn random(state: &mut u64) -> u64 {
-    *state ^= *state << 13;
-    *state ^= *state >> 7;
-    *state ^= *state << 17;
-    *state
-}
-fn shuffle<T>(rows: &mut [T], state: &mut u64) {
-    for i in (1..rows.len()).rev() {
-        rows.swap(i, random(state) as usize % (i + 1));
-    }
-}
 fn run(name: &str, jobs: &[Job], profile: &[Segment]) -> Measurement {
     if name.starts_with("csr") {
         return run_csr(name, jobs, profile);
