@@ -121,19 +121,13 @@ pub fn packed<T: Ord + Copy, C: Counter>(
     out.sorting = tick.elapsed();
     let tick = Instant::now();
     let mut tree = C::new(coords.len());
-    let mut first = 0;
-    while first < records.len() {
-        let mut last = first + 1;
-        while last < records.len() && records[last].0 == records[first].0 {
-            last += 1;
-        }
-        for &(_, _, i) in &records[first..last] {
+    for group in records.chunk_by(|a, b| a.0 == b.0) {
+        for &(_, _, i) in group {
             tree.add(out.counts[i]);
         }
-        for &(_, _, i) in &records[first..last] {
+        for &(_, _, i) in group {
             out.counts[i] = tree.prefix(out.counts[i] + 1) - 1;
         }
-        first = last;
     }
     out.sweep = tick.elapsed();
     out.bytes = records.capacity() * size_of::<(T, T, usize)>()
@@ -166,19 +160,13 @@ pub fn indirect<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Result<Measurement, 
     out.sorting = tick.elapsed();
     let tick = Instant::now();
     let mut tree = Fenwick::new(coords.len());
-    let mut first = 0;
-    while first < indices.len() {
-        let mut last = first + 1;
-        while last < indices.len() && starts[indices[last]] == starts[indices[first]] {
-            last += 1;
-        }
-        for &i in &indices[first..last] {
+    for group in indices.chunk_by(|&a, &b| starts[a] == starts[b]) {
+        for &i in group {
             tree.add(out.counts[i]);
         }
-        for &i in &indices[first..last] {
+        for &i in group {
             out.counts[i] = tree.prefix(out.counts[i] + 1) - 1;
         }
-        first = last;
     }
     out.sweep = tick.elapsed();
     out.bytes = indices.capacity() * size_of::<usize>()

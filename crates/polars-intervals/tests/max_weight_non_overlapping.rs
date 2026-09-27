@@ -1,45 +1,18 @@
 use polars::prelude::*;
 use polars_intervals::max_weight_non_overlapping as solve;
 
+mod support;
+use support::{INTEGER_DTYPES, endpoint_dtypes, typed_series};
+
 #[test]
 fn integer_and_temporal_endpoints_with_all_weight_widths() {
-    let integers = [
-        DataType::Int8,
-        DataType::Int16,
-        DataType::Int32,
-        DataType::Int64,
-        DataType::UInt8,
-        DataType::UInt16,
-        DataType::UInt32,
-        DataType::UInt64,
-    ];
-    let mut endpoints = integers.to_vec();
-    endpoints.push(DataType::Date);
-    for unit in [
-        TimeUnit::Milliseconds,
-        TimeUnit::Microseconds,
-        TimeUnit::Nanoseconds,
-    ] {
-        for zone in [None, Some("UTC"), Some("Europe/Helsinki")] {
-            endpoints.push(DataType::Datetime(
-                unit,
-                TimeZone::opt_try_new(zone).unwrap(),
-            ));
-        }
-    }
-    for endpoint in endpoints {
-        let convert = |raw: &[i64]| {
-            let series = Series::new("endpoint".into(), raw);
-            match &endpoint {
-                DataType::Datetime(unit, zone) => series.into_datetime(*unit, zone.clone()),
-                _ => series.cast(&endpoint).unwrap(),
-            }
-        };
+    for endpoint in endpoint_dtypes() {
+        let convert = |values: &[i64]| typed_series(values, &endpoint);
         let mut s = convert(&[0, 0]);
         s.append(&convert(&[4, 7, 2])).unwrap();
         let mut e = convert(&[10]);
         e.append(&convert(&[4, 7, 10, 2])).unwrap();
-        for dtype in &integers {
+        for dtype in &INTEGER_DTYPES {
             let mut w = Series::new("w".into(), [15i64, 10, 10])
                 .cast(dtype)
                 .unwrap();

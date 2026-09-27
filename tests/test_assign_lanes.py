@@ -7,22 +7,7 @@ import polars as pl
 import polars_intervals as pi
 import pytest
 
-ENDPOINT_DTYPES = [
-    pl.Int8,
-    pl.Int16,
-    pl.Int32,
-    pl.Int64,
-    pl.UInt8,
-    pl.UInt16,
-    pl.UInt32,
-    pl.UInt64,
-    pl.Date,
-    *(
-        pl.Datetime(unit, zone)
-        for unit in ("ms", "us", "ns")
-        for zone in (None, "UTC", "Europe/Helsinki")
-    ),
-]
+from .dtypes import ENDPOINT_DTYPES
 
 
 def assert_coloring(frame, lanes):

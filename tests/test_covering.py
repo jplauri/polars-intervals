@@ -2,22 +2,13 @@
 
 from datetime import UTC, date, datetime, timedelta, timezone
 from decimal import Decimal
-from itertools import product
 from random import Random
 
 import polars as pl
 import polars_intervals as pi
 import pytest
 
-INTEGERS = [pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64]
-ENDPOINTS = [
-    *INTEGERS,
-    pl.Date,
-    *(
-        pl.Datetime(unit, zone)
-        for unit, zone in product(("ms", "us", "ns"), (None, "UTC", "Europe/Helsinki"))
-    ),
-]
+from .dtypes import ENDPOINT_DTYPES, INTEGER_DTYPES
 
 
 def expression(weighted, left=0, right=10, start="start", end="end", cost="cost"):
@@ -93,7 +84,7 @@ def test_oracle_eager_lazy_filter(rows, left, right, weighted):
 
 
 @pytest.mark.parametrize("weighted", [False, True])
-@pytest.mark.parametrize("dtype", ENDPOINTS, ids=str)
+@pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
 def test_types_chunks_streaming_groups(dtype, weighted):
     df = pl.DataFrame({"start": [5, 0, 0, 3], "end": [10, 10, 5, 3], "cost": [10, 100, 10, 0]})
     df = df.with_columns(pl.col("start", "end").cast(dtype))
@@ -118,7 +109,7 @@ def test_types_chunks_streaming_groups(dtype, weighted):
         grouped.filter(pl.col("end").to_physical() < 10).select(expr.over("group"))
 
 
-@pytest.mark.parametrize("cost_type", INTEGERS, ids=str)
+@pytest.mark.parametrize("cost_type", INTEGER_DTYPES, ids=str)
 def test_cost_dtypes_and_expression_arguments(cost_type):
     df = pl.DataFrame({"s": [0, 0, 5], "length": [10, 5, 5], "c": [100, 10, 10]})
     df = df.with_columns(pl.col("c").cast(cost_type))

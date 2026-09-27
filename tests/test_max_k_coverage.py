@@ -8,22 +8,7 @@ import polars as pl
 import polars_intervals as pi
 import pytest
 
-DTYPES = [
-    pl.Int8,
-    pl.Int16,
-    pl.Int32,
-    pl.Int64,
-    pl.UInt8,
-    pl.UInt16,
-    pl.UInt32,
-    pl.UInt64,
-    pl.Date,
-    *(
-        pl.Datetime(unit, zone)
-        for unit in ("ms", "us", "ns")
-        for zone in (None, "UTC", "Europe/Helsinki")
-    ),
-]
+from .dtypes import ENDPOINT_DTYPES
 
 
 def expr(k):
@@ -78,7 +63,7 @@ def test_eager_lazy_filter_and_determinism(rows, k):
     assert frame.lazy().filter(expr(k)).collect().equals(frame.filter(mask))
 
 
-@pytest.mark.parametrize("dtype", DTYPES, ids=str)
+@pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
 @pytest.mark.parametrize("k", [0, 1, 2, 8])
 def test_logical_dtypes_multiple_chunks_and_shuffle(dtype, k):
     frame = pl.DataFrame({"start": [6, 0, 5, 0, 3], "end": [15, 10, 5, 4, 12]}).cast(dtype)

@@ -1,39 +1,13 @@
 use polars::prelude::*;
 use polars_intervals::minimum_stabbing_points;
 
+mod support;
+use support::{endpoint_dtypes, typed_series};
+
 #[test]
 fn logical_list_dtype_chunks_and_empty() {
-    let mut dtypes = vec![
-        DataType::Int8,
-        DataType::Int16,
-        DataType::Int32,
-        DataType::Int64,
-        DataType::UInt8,
-        DataType::UInt16,
-        DataType::UInt32,
-        DataType::UInt64,
-        DataType::Date,
-    ];
-    for unit in [
-        TimeUnit::Milliseconds,
-        TimeUnit::Microseconds,
-        TimeUnit::Nanoseconds,
-    ] {
-        for zone in [None, Some("UTC"), Some("Europe/Helsinki")] {
-            dtypes.push(DataType::Datetime(
-                unit,
-                TimeZone::opt_try_new(zone).unwrap(),
-            ));
-        }
-    }
-    for dtype in dtypes {
-        let convert = |values: &[i64]| {
-            let s = Series::new("endpoint".into(), values);
-            match &dtype {
-                DataType::Datetime(unit, zone) => s.into_datetime(*unit, zone.clone()),
-                _ => s.cast(&dtype).unwrap(),
-            }
-        };
+    for dtype in endpoint_dtypes() {
+        let convert = |values: &[i64]| typed_series(values, &dtype);
         let mut s = convert(&[5]);
         s.append(&convert(&[0, 2])).unwrap();
         let mut e = convert(&[9, 4]);

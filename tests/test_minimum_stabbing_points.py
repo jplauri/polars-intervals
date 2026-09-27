@@ -8,22 +8,7 @@ import polars_intervals as pi
 import pytest
 from polars.testing import assert_frame_equal
 
-DTYPES = [
-    pl.Int8,
-    pl.Int16,
-    pl.Int32,
-    pl.Int64,
-    pl.UInt8,
-    pl.UInt16,
-    pl.UInt32,
-    pl.UInt64,
-    pl.Date,
-    *[
-        pl.Datetime(unit, zone)
-        for unit in ("ms", "us", "ns")
-        for zone in (None, "UTC", "Europe/Helsinki")
-    ],
-]
+from .dtypes import ENDPOINT_DTYPES
 
 
 def frame(starts, ends, dtype=pl.Int64):
@@ -34,7 +19,7 @@ def points_expr():
     return pi.minimum_stabbing_points("start", "end").alias("points")
 
 
-@pytest.mark.parametrize("dtype", DTYPES)
+@pytest.mark.parametrize("dtype", ENDPOINT_DTYPES)
 def test_select_lazy_chunks_shuffled_and_empty(dtype):
     df = frame([5, 0, 2], [9, 4, 6], dtype)
     expected = pl.DataFrame({"points": [pl.Series([3, 8]).cast(dtype)]})
@@ -50,7 +35,7 @@ def test_select_lazy_chunks_shuffled_and_empty(dtype):
         assert_frame_equal(source.clear().lazy().select(expr).collect(), empty)
 
 
-@pytest.mark.parametrize("dtype", DTYPES)
+@pytest.mark.parametrize("dtype", ENDPOINT_DTYPES)
 def test_group_aggregation_and_window(dtype):
     df = frame([0, 0, 2, 2, 5], [4, 2, 6, 4, 9], dtype).with_columns(
         pl.Series("group", ["a", "b", "a", "b", "a"])

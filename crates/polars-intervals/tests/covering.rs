@@ -1,6 +1,9 @@
 use polars::prelude::*;
 use polars_intervals::{minimum_cost_cover, minimum_cover};
 
+mod support;
+use support::{INTEGER_DTYPES, endpoint_dtypes, typed_series};
+
 fn scalar(series: &Series, index: usize) -> Scalar {
     Scalar::new(
         series.dtype().clone(),
@@ -10,38 +13,8 @@ fn scalar(series: &Series, index: usize) -> Scalar {
 
 #[test]
 fn endpoints_costs_chunks_and_scalars() {
-    let integers = [
-        DataType::Int8,
-        DataType::Int16,
-        DataType::Int32,
-        DataType::Int64,
-        DataType::UInt8,
-        DataType::UInt16,
-        DataType::UInt32,
-        DataType::UInt64,
-    ];
-    let mut endpoints = integers.to_vec();
-    endpoints.push(DataType::Date);
-    for unit in [
-        TimeUnit::Milliseconds,
-        TimeUnit::Microseconds,
-        TimeUnit::Nanoseconds,
-    ] {
-        for zone in [None, Some("UTC"), Some("Europe/Helsinki")] {
-            endpoints.push(DataType::Datetime(
-                unit,
-                TimeZone::opt_try_new(zone).unwrap(),
-            ));
-        }
-    }
-    for dtype in endpoints {
-        let convert = |values: &[i64]| {
-            let s = Series::new("endpoint".into(), values);
-            match &dtype {
-                DataType::Datetime(unit, zone) => s.into_datetime(*unit, zone.clone()),
-                _ => s.cast(&dtype).unwrap(),
-            }
-        };
+    for dtype in endpoint_dtypes() {
+        let convert = |values: &[i64]| typed_series(values, &dtype);
         let mut s = convert(&[0]);
         s.append(&convert(&[0, 5, 3])).unwrap();
         let mut e = convert(&[10, 5]);
@@ -56,7 +29,7 @@ fn endpoints_costs_chunks_and_scalars() {
                 .collect::<Vec<_>>(),
             [true, false, false, false]
         );
-        for cost_type in &integers {
+        for cost_type in &INTEGER_DTYPES {
             let w = Series::new("cost".into(), [100i64, 10, 10, 0])
                 .cast(cost_type)
                 .unwrap();
