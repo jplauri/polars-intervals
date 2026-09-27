@@ -36,6 +36,11 @@ struct Score {
     count: usize,
 }
 
+// Independent bits: the prefix accepts its last interval; the forced-last
+// state extends psi instead of the disjoint phi prefix.
+const TAKE_LAST: u8 = 1;
+const USE_OVERLAP: u8 = 2;
+
 impl Score {
     fn better_than(self, other: Self) -> bool {
         self.measure > other.measure || (self.measure == other.measure && self.count < other.count)
@@ -212,40 +217,66 @@ fn solve<T: CoverageEndpoint>(
                     forced_previous[p + 1].add(r.end.widened() - records[p].end.widened());
                 if overlap.better_than(take) {
                     take = overlap;
-                    row[i] = 2; // forced-last uses psi, rather than disjoint phi
+                    row[i] = USE_OVERLAP;
                 }
             }
             forced[i + 1] = take;
             current[i + 1] = current[i];
             if take.better_than(current[i]) {
                 current[i + 1] = take;
-                row[i] |= 1; // prefix accepts its last interval
+                row[i] |= TAKE_LAST;
             }
         }
         decisions.push(row);
         std::mem::swap(&mut previous, &mut current);
         std::mem::swap(&mut forced_previous, &mut forced);
     }
-    let (mut prefix, mut budget, mut must_take) = (n, k, false);
+    reconstruct(records, phi, &decisions, mask);
+    previous[n]
+}
+
+fn reconstruct<T>(
+    records: &[Interval<T>],
+    phi: &[usize],
+    decisions: &[Vec<u8>],
+    mask: &mut [bool],
+) {
+    let (mut prefix, mut budget, mut must_take) = (records.len(), decisions.len(), false);
     while prefix > 0 && budget > 0 {
         let i = prefix - 1;
         let decision = decisions[budget - 1][i];
-        if !must_take && decision & 1 == 0 {
+        if !must_take && decision & TAKE_LAST == 0 {
             prefix -= 1;
             continue;
         }
         mask[records[i].row] = true;
-        must_take = decision & 2 != 0;
+        must_take = decision & USE_OVERLAP != 0;
         prefix = phi[i] + usize::from(must_take);
         budget -= 1;
     }
-    previous[n]
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use proptest::prelude::*;
+
+    // Independent unit-cell oracle for this module's small integer generator.
+    fn grid_objective(starts: &[i64], ends: &[i64], mask: &[bool]) -> Score {
+        let measure = (-8..12)
+            .filter(|&point| {
+                starts
+                    .iter()
+                    .zip(ends)
+                    .zip(mask)
+                    .any(|((&start, &end), &selected)| selected && start <= point && point < end)
+            })
+            .count() as i128;
+        Score {
+            measure,
+            count: mask.iter().filter(|&&selected| selected).count(),
+        }
+    }
 
     #[test]
     fn objective_comparison() {
@@ -280,30 +311,35 @@ mod tests {
 
     proptest! {
         #[test]
-        fn skyline_and_sweep_invariants(pairs in prop::collection::vec((-8i64..=12,-8i64..=12),0..=30)) {
-            let (s,e): (Vec<_>,Vec<_>) = pairs.iter().map(|&(a,b)|(a.min(b),a.max(b))).unzip();
-            let r = skyline(&s,&e);
-            prop_assert!(r.windows(2).all(|w|w[0].start<w[1].start && w[0].end<w[1].end));
-            for (&s,&e) in s.iter().zip(&e) {
-                prop_assert!(s==e || r.iter().any(|v|v.start<=s && e<=v.end));
+        fn skyline_and_sweep_invariants(
+            pairs in prop::collection::vec((-8i64..=12, -8i64..=12), 0..=30),
+        ) {
+            let (starts, ends): (Vec<_>, Vec<_>) = pairs.iter()
+                .map(|&(a, b)| (a.min(b), a.max(b)))
+                .unzip();
+            let records = skyline(&starts, &ends);
+            prop_assert!(records.windows(2)
+                .all(|w| w[0].start < w[1].start && w[0].end < w[1].end));
+            for (&start, &end) in starts.iter().zip(&ends) {
+                prop_assert!(start == end || records.iter().any(|r| r.start <= start && end <= r.end));
             }
-            let p = predecessors(&r);
-            for i in 0..r.len() {
-                prop_assert_eq!(p[i],(0..i).filter(|&j|r[j].end<=r[i].start).count());
-                let psi = (0..i).find(|&j|r[j].start<r[i].start && r[i].start<r[j].end);
-                prop_assert_eq!(psi,if p[i]<i {Some(p[i])} else {None});
+            let phi = predecessors(&records);
+            for (i, interval) in records.iter().enumerate() {
+                let disjoint = (0..i).filter(|&j| records[j].end <= interval.start).count();
+                let psi = (0..i).find(|&j| {
+                    records[j].start < interval.start && interval.start < records[j].end
+                });
+                prop_assert_eq!(phi[i], disjoint);
+                prop_assert_eq!(psi, (phi[i] < i).then_some(phi[i]));
             }
             // Exercise the production DP directly, bypassing every fast path.
             for k in 0..=4 {
-                let mut mask = vec![false;s.len()];
-                let stored = solve(&r,&p,k,&mut mask);
-                prop_assert!(mask.iter().filter(|&&b|b).count()<=k);
-                let public = max_k_coverage(&s,&e,k).unwrap();
-                let value = |m: &[bool]| {
-                    ((-8..12).filter(|&x|s.iter().zip(&e).zip(m).any(|((&s,&e),&b)|b && s<=x && x<e)).count(),m.iter().filter(|&&b|b).count())
-                };
-                prop_assert_eq!(value(&mask),value(&public));
-                prop_assert_eq!((stored.measure,stored.count),(value(&mask).0 as i128,value(&mask).1));
+                let mut mask = vec![false; starts.len()];
+                let stored = solve(&records, &phi, k, &mut mask);
+                let public = max_k_coverage(&starts, &ends, k).unwrap();
+                prop_assert!(mask.iter().filter(|&&selected| selected).count() <= k);
+                prop_assert_eq!(stored, grid_objective(&starts, &ends, &mask));
+                prop_assert_eq!(stored, grid_objective(&starts, &ends, &public));
             }
         }
     }

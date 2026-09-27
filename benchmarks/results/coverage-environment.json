@@ -1,7 +1,6 @@
 {
   "recorded_utc": "2026-09-27T06:28:42.681175+00:00",
   "base_commit": "19e9e2147422902064fb08e7881c89be01c7f947",
-  "working_tree": "Uncommitted feature; exact measured source hashes below.",
   "cpu": {
     "Name": "AMD Ryzen 9 3900X 12-Core Processor            ",
     "NumberOfCores": 12,
@@ -102,7 +101,6 @@
   },
   "result_sha256": {
     "coverage-core.csv": "6102bc3f77ec6872f442a53b0b49152e47e9e92feebdc6812beaf53bd6fc5493",
-    "coverage-summary.csv": "3aacaf1fe877597b3911fafff5a486f5eb645ee13e20b1781da4a2f513558b29",
     "coverage-temporal.csv": "9049b8e2a834efec54a182af76643d049e1b5960069323b3d805be8194ebcd56"
   },
   "artifact_sha256": {
@@ -114,5 +112,23 @@
     "Heap-request accounting is not OS peak RSS.",
     "Local wheel checks cover CPython 3.14 Windows; the full 15-wheel platform matrix and source installation remain CI checks.",
     "No equivalent native-Polars exact baseline found."
-  ]
+  ],
+  "measured_source_commit": "1abc5450b868cf68b7a88571b6dc3092a7c63171",
+  "measurement_note": "Raw timings and source/artifact hashes describe the measured source commit before readability polish. The recurrence, memory layout and experimental kernels are unchanged; timings were not rerun for named decision bits and extracted reconstruction.",
+  "post_measurement_polish": {
+    "changes": [
+      "Named reconstruction decision bits and extracted traceback from objective computation.",
+      "Made the internal grid oracle and predecessor invariant checks readable.",
+      "Removed the derived median CSV; regenerate it with benchmarks/coverage_summary.py."
+    ],
+    "source_sha256": {
+      "crates/intervals-core/src/coverage.rs": "b699fed9768bcedd3c2ed3d9575ce42b1208258dfa00d8c6778f320727ba326a"
+    },
+    "validation": {
+      "rust_tests_and_doctests": 214,
+      "python_tests_and_doctests": 1560,
+      "external_wheel_tests_and_doctests": 1560,
+      "checks": "All required local checks rerun after polish, including Rustdoc, strict MkDocs, wheel/sdist metadata/source inclusion, and strict Twine. Raw timing samples remain those of measured_source_commit."
+    }
+  }
 }

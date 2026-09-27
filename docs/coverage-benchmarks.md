@@ -234,9 +234,19 @@ and 11,082 candidate/workload combinations. The installed-plugin run contains
 **1,296 samples** over 432 workloads. All correctness gates passed.
 
 - [Core raw samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-core.csv)
-- [Core medians](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-summary.csv)
 - [Installed-plugin raw samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-temporal.csv)
 - [Environment, source/artifact hashes and validation](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-environment.json)
+
+Generate medians from the raw samples instead of maintaining a second results file:
+
+```sh
+python benchmarks/coverage_summary.py > target/coverage-summary.csv
+```
+
+The measured source is preserved in commit `1abc545`. Subsequent polish names
+the decision bits and separates reconstruction from objective computation;
+the recurrence, memory layout and candidate kernels are unchanged. The recorded
+timings precede that readability refactor.
 
 ### Layout and reconstruction comparison
 
