@@ -3,6 +3,70 @@
 Pass column names or Polars expressions to use interval operations in eager or
 lazy queries. See the [API reference](api.md) for full parameter and return types.
 
+## Count containment
+
+Count how many other intervals are contained by each row:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 2, 4], "end": [10, 5, 12]})
+result = df.with_columns(pi.containment_count("start", "end").alias("contained"))
+# contained: [1, 0, 0]
+```
+
+Containment is defined by **both** `A.start <= B.start` and `B.end <= A.end`,
+with self excluded. Intervals retain the half-open representation `[start, end)`.
+The endpoint predicate applies even to empty intervals.
+
+```text
+A [0,10)
+B   [2,5)
+C       [4,12)
+
+overlap_count(A)      = 2
+containment_count(A)  = 1
+```
+
+| Case | Containment behavior |
+| --- | --- |
+| m identical rows | Each counts the other m - 1 rows |
+| `[0, 10)` and `[5, 5)` | The outer row contains the empty row |
+| `[0, 5)` and `[5, 5)` | The outer row contains the empty row at its right endpoint |
+| Two `[3, 3)` rows | Each contains the other |
+| `[2, 2)` and `[3, 3)` | Neither contains the other |
+| `[0, 5)` and `[5, 10)` | Neither contains the other |
+| `[0, 5)` and `[3, 8)` | They overlap, but neither contains the other |
+
+Containment endpoints may be signed or unsigned 8/16/32/64-bit integers, Date,
+or Datetime with ms/us/ns units and optional timezones. Logical dtypes must match
+exactly, including datetime unit and timezone. Nulls, unequal lengths and
+`start > end` are rejected without coercion or scalar broadcasting.
+
+The result is a non-null `UInt64` expression aligned to the original rows across
+all chunks. Empty input returns empty output. Both eager and lazy queries work.
+For group-local counts, use:
+
+```python
+result = (
+    df.lazy()
+    .with_columns(pi.containment_count("start", "end").over("group").alias("contained"))
+    .collect()
+)
+```
+
+Here `df` must also contain a `group` column. `group_by("group").agg(...)`
+returns one list of counts per group. Filtering before counting changes which
+intervals participate; filtering after counting preserves the computed counts.
+
+The exact algorithm is an offline 2D dominance sweep: packed records sorted by
+descending start, compressed ends, and inclusive Fenwick prefix sums. All rows
+with the same start are inserted before their queries. It takes `O(n log n)`
+time and `O(n)` additional space without enumerating containment pairs.
+See [benchmark details](containment-benchmarks.md) for measurements and native
+Polars alternatives.
+
 ## Count overlaps
 
 `overlap_count` counts how many other intervals overlap each row.

@@ -8,6 +8,10 @@ license = "MIT"
 proptest = "1.11"
 
 [[bench]]
+name = "containment"
+harness = false
+
+[[bench]]
 name = "assign_lanes"
 harness = false
 

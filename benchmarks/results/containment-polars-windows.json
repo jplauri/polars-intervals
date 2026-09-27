@@ -1,0 +1,5440 @@
+{
+  "environment": {
+    "timestamp_utc": "2026-09-26T19:37:44.115222+00:00",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.0",
+    "polars": "1.44.2",
+    "logical_cpus": 24,
+    "processor": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+    "polars_threads": 24,
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+    "git_commit": "925033f9990b47f473d9debb2779b4533e63f24f",
+    "git_dirty": true,
+    "engine": "in-memory",
+    "kernel_profile": "release",
+    "plugin_path": "C:\\Users\\juhol\\AppData\\Local\\Temp\\polars-containment-wheel-20260926\\Lib\\site-packages\\polars_intervals\\__init__.py",
+    "warmups": 1,
+    "repeats": 5,
+    "seed": 42,
+    "source_sha256": {
+      "D:\\polars-intervals\\benchmarks\\containment_count.py": "714167dafee3c9359caf5ff16c52d36d5ce9643be06d2f87258903d8eee8d48b",
+      "crates\\intervals-core\\src\\containment.rs": "af03bd2a66bd7358cbc509c2e6f2b549a1d56cf87ed107edbdee90b8444d6864",
+      "crates\\intervals-core\\benches\\support\\mod.rs": "ca49e9db5b44baa7b414edcef3a0cdd4a37b82b248044413b40b9ea76360e230"
+    }
+  },
+  "pair_limit": 2000000,
+  "results": [
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 1000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2076,
+          "samples_ms": [
+            0.3158,
+            0.1493,
+            0.2598,
+            0.1767,
+            0.2076
+          ]
+        },
+        "rank": {
+          "median_ms": 1.6178,
+          "samples_ms": [
+            1.7709,
+            1.6178,
+            1.6075,
+            1.8381,
+            1.6121
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1.7835,
+          "samples_ms": [
+            1.9783,
+            1.7835,
+            1.6377,
+            1.8372,
+            1.7108
+          ]
+        },
+        "join": {
+          "median_ms": 1.1829,
+          "samples_ms": [
+            1.0773,
+            1.0626,
+            1.2399,
+            1.2006,
+            1.1829
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 1d68771f-25ae-413f-88d6-cde22230e7bd]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 1d68771f-25ae-413f-88d6-cde22230e7bd]\n          END IEJOIN JOIN"
+      },
+      "scenario": "disjoint",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 10000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.6621,
+          "samples_ms": [
+            0.6621,
+            0.8498,
+            0.7312,
+            0.5671,
+            0.4904
+          ]
+        },
+        "rank": {
+          "median_ms": 6.8526,
+          "samples_ms": [
+            7.573,
+            7.4931,
+            6.7485,
+            6.8526,
+            6.7752
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.5969,
+          "samples_ms": [
+            7.5969,
+            8.0712,
+            7.908,
+            7.4781,
+            7.3197
+          ]
+        },
+        "join": {
+          "median_ms": 3.4639,
+          "samples_ms": [
+            3.4639,
+            3.9065,
+            3.5965,
+            3.0843,
+            3.0068
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 18d8a395-6960-4089-ab01-dde9f7439a3e]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 18d8a395-6960-4089-ab01-dde9f7439a3e]\n          END IEJOIN JOIN"
+      },
+      "scenario": "disjoint",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 100000,
+      "timings": {
+        "plugin": {
+          "median_ms": 6.0371,
+          "samples_ms": [
+            5.7577,
+            5.7939,
+            7.5293,
+            6.0371,
+            7.5717
+          ]
+        },
+        "rank": {
+          "median_ms": 65.378,
+          "samples_ms": [
+            59.3009,
+            65.378,
+            69.7706,
+            76.4122,
+            61.9564
+          ]
+        },
+        "rank_by": {
+          "median_ms": 72.5137,
+          "samples_ms": [
+            64.7473,
+            72.5137,
+            77.968,
+            77.029,
+            72.2873
+          ]
+        },
+        "join": {
+          "median_ms": 20.3188,
+          "samples_ms": [
+            19.5232,
+            20.3188,
+            22.265,
+            20.9915,
+            19.1449
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: fd274508-544d-41de-bac0-74319b9eb0ed]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: fd274508-544d-41de-bac0-74319b9eb0ed]\n          END IEJOIN JOIN"
+      },
+      "scenario": "disjoint",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 1000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 73.326,
+          "samples_ms": [
+            73.2383,
+            72.9016,
+            74.255,
+            73.326,
+            85.3725
+          ]
+        },
+        "rank": {
+          "median_ms": 882.0103,
+          "samples_ms": [
+            843.6163,
+            888.3353,
+            886.0474,
+            882.0103,
+            729.6782
+          ]
+        },
+        "rank_by": {
+          "median_ms": 915.1798,
+          "samples_ms": [
+            937.5559,
+            921.749,
+            915.1798,
+            853.8936,
+            859.1109
+          ]
+        },
+        "join": {
+          "median_ms": 259.3694,
+          "samples_ms": [
+            245.081,
+            258.9238,
+            259.3694,
+            264.1867,
+            260.0227
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: c9276465-9adc-4774-ac9b-dd5e77d3592f]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: c9276465-9adc-4774-ac9b-dd5e77d3592f]\n          END IEJOIN JOIN"
+      },
+      "scenario": "disjoint",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 3000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 279.3305,
+          "samples_ms": [
+            274.586,
+            274.4014,
+            279.6268,
+            279.3305,
+            289.4071
+          ]
+        },
+        "rank": {
+          "median_ms": 2623.2352,
+          "samples_ms": [
+            2777.7033,
+            2872.3786,
+            2588.2296,
+            2623.2352,
+            2507.0215
+          ]
+        },
+        "rank_by": {
+          "median_ms": 3056.4296,
+          "samples_ms": [
+            3125.3254,
+            2907.4816,
+            3056.4296,
+            2725.3974,
+            3149.6849
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 3000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "disjoint",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499500,
+      "join_rows_including_self": 500500,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2272,
+          "samples_ms": [
+            0.2272,
+            0.1842,
+            0.2663,
+            0.1752,
+            0.3572
+          ]
+        },
+        "rank": {
+          "median_ms": 2.0541,
+          "samples_ms": [
+            2.0123,
+            2.0541,
+            2.6275,
+            1.9252,
+            2.3703
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2.3946,
+          "samples_ms": [
+            2.2801,
+            2.8595,
+            2.5007,
+            2.3257,
+            2.3946
+          ]
+        },
+        "join": {
+          "median_ms": 5.4155,
+          "samples_ms": [
+            5.4772,
+            5.4414,
+            5.4155,
+            4.6043,
+            5.3897
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 16afcb4a-9bfe-4cf4-8d82-3f1d2edeb7b9]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 16afcb4a-9bfe-4cf4-8d82-3f1d2edeb7b9]\n          END IEJOIN JOIN"
+      },
+      "scenario": "nested",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 49995000,
+      "join_rows_including_self": 50005000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.6731,
+          "samples_ms": [
+            0.6852,
+            0.6454,
+            0.6009,
+            0.6731,
+            0.7026
+          ]
+        },
+        "rank": {
+          "median_ms": 8.1291,
+          "samples_ms": [
+            8.7273,
+            7.5491,
+            8.1291,
+            8.7826,
+            8.0108
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.3846,
+          "samples_ms": [
+            8.3416,
+            8.3846,
+            8.2593,
+            8.8498,
+            9.2853
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 50005000
+        }
+      },
+      "native_plans": {},
+      "scenario": "nested",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4999950000,
+      "join_rows_including_self": 5000050000,
+      "timings": {
+        "plugin": {
+          "median_ms": 5.896,
+          "samples_ms": [
+            5.8206,
+            5.5634,
+            6.1497,
+            5.896,
+            6.3467
+          ]
+        },
+        "rank": {
+          "median_ms": 74.6488,
+          "samples_ms": [
+            83.5448,
+            72.7807,
+            74.6488,
+            74.1086,
+            75.2513
+          ]
+        },
+        "rank_by": {
+          "median_ms": 84.2132,
+          "samples_ms": [
+            87.2371,
+            89.1856,
+            84.2132,
+            79.3183,
+            77.7368
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 5000050000
+        }
+      },
+      "native_plans": {},
+      "scenario": "nested",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499999500000,
+      "join_rows_including_self": 500000500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 77.2452,
+          "samples_ms": [
+            77.2452,
+            76.4426,
+            77.1796,
+            78.1988,
+            78.3352
+          ]
+        },
+        "rank": {
+          "median_ms": 1049.4558,
+          "samples_ms": [
+            1065.9335,
+            1089.6897,
+            1005.0494,
+            1049.4558,
+            1014.2297
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1106.0467,
+          "samples_ms": [
+            1106.0467,
+            1099.9973,
+            1095.6527,
+            1118.7353,
+            1112.9414
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 500000500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "nested",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4499998500000,
+      "join_rows_including_self": 4500001500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 286.0505,
+          "samples_ms": [
+            286.0505,
+            283.9898,
+            291.2804,
+            286.7648,
+            275.2851
+          ]
+        },
+        "rank": {
+          "median_ms": 3182.4871,
+          "samples_ms": [
+            3141.1753,
+            3146.9323,
+            3182.4871,
+            3289.4657,
+            3185.1826
+          ]
+        },
+        "rank_by": {
+          "median_ms": 3369.1669,
+          "samples_ms": [
+            3283.8229,
+            3357.7269,
+            3369.1669,
+            3392.6402,
+            3392.6531
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 4500001500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "nested",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 999000,
+      "join_rows_including_self": 1000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2976,
+          "samples_ms": [
+            0.3544,
+            0.2311,
+            0.3535,
+            0.1524,
+            0.2976
+          ]
+        },
+        "rank": {
+          "median_ms": 1.2104,
+          "samples_ms": [
+            1.2104,
+            1.5338,
+            1.0079,
+            1.2274,
+            1.2021
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1.3323,
+          "samples_ms": [
+            1.3323,
+            1.3505,
+            1.2765,
+            1.112,
+            1.5889
+          ]
+        },
+        "join": {
+          "median_ms": 9.0291,
+          "samples_ms": [
+            9.0291,
+            8.3191,
+            9.122,
+            9.0008,
+            9.1935
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 25a07484-dac5-47c7-ac9c-76a297bbc4ef]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 25a07484-dac5-47c7-ac9c-76a297bbc4ef]\n          END IEJOIN JOIN"
+      },
+      "scenario": "duplicates",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 99990000,
+      "join_rows_including_self": 100000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.318,
+          "samples_ms": [
+            0.3628,
+            0.3254,
+            0.2879,
+            0.222,
+            0.318
+          ]
+        },
+        "rank": {
+          "median_ms": 2.1406,
+          "samples_ms": [
+            2.0521,
+            2.2302,
+            2.1406,
+            2.0689,
+            2.4069
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2.4466,
+          "samples_ms": [
+            2.4466,
+            2.7659,
+            2.8729,
+            2.3235,
+            2.3848
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "duplicates",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 9999900000,
+      "join_rows_including_self": 10000000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 2.5046,
+          "samples_ms": [
+            2.2538,
+            2.5305,
+            2.6432,
+            2.2313,
+            2.5046
+          ]
+        },
+        "rank": {
+          "median_ms": 8.9095,
+          "samples_ms": [
+            9.0684,
+            8.3258,
+            8.8994,
+            10.1391,
+            8.9095
+          ]
+        },
+        "rank_by": {
+          "median_ms": 11.3859,
+          "samples_ms": [
+            11.0891,
+            12.1152,
+            11.3859,
+            11.1769,
+            11.9823
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "duplicates",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 999999000000,
+      "join_rows_including_self": 1000000000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 22.2429,
+          "samples_ms": [
+            25.9178,
+            22.515,
+            22.2429,
+            21.9678,
+            21.9524
+          ]
+        },
+        "rank": {
+          "median_ms": 61.704,
+          "samples_ms": [
+            58.6638,
+            69.9868,
+            59.6693,
+            70.7458,
+            61.704
+          ]
+        },
+        "rank_by": {
+          "median_ms": 79.3933,
+          "samples_ms": [
+            77.798,
+            81.8133,
+            80.5271,
+            79.3933,
+            77.0246
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 1000000000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "duplicates",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 8999997000000,
+      "join_rows_including_self": 9000000000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 65.7687,
+          "samples_ms": [
+            64.3281,
+            68.7399,
+            65.7687,
+            66.8132,
+            65.6147
+          ]
+        },
+        "rank": {
+          "median_ms": 182.8975,
+          "samples_ms": [
+            181.3041,
+            197.1019,
+            179.7505,
+            182.8975,
+            206.5206
+          ]
+        },
+        "rank_by": {
+          "median_ms": 263.5271,
+          "samples_ms": [
+            234.8161,
+            266.8114,
+            241.0593,
+            263.5271,
+            277.1958
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 9000000000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "duplicates",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499500,
+      "join_rows_including_self": 500500,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2338,
+          "samples_ms": [
+            0.2146,
+            0.2338,
+            0.3413,
+            0.2107,
+            0.2577
+          ]
+        },
+        "rank": {
+          "median_ms": 2.2408,
+          "samples_ms": [
+            2.2408,
+            2.2809,
+            1.914,
+            2.0732,
+            2.4047
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2.1253,
+          "samples_ms": [
+            2.0342,
+            2.0356,
+            2.1591,
+            2.1253,
+            2.2072
+          ]
+        },
+        "join": {
+          "median_ms": 4.3928,
+          "samples_ms": [
+            4.8803,
+            4.2735,
+            4.777,
+            4.3677,
+            4.3928
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 7ebb095d-d709-4b2b-8488-f5b4d0b72ee0]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 7ebb095d-d709-4b2b-8488-f5b4d0b72ee0]\n          END IEJOIN JOIN"
+      },
+      "scenario": "equal_starts",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 49995000,
+      "join_rows_including_self": 50005000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.5671,
+          "samples_ms": [
+            0.5671,
+            0.4716,
+            0.5541,
+            0.5998,
+            0.711
+          ]
+        },
+        "rank": {
+          "median_ms": 7.8407,
+          "samples_ms": [
+            7.5484,
+            7.6366,
+            9.1111,
+            7.8407,
+            8.1421
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.1074,
+          "samples_ms": [
+            8.7115,
+            8.0636,
+            8.5408,
+            8.1074,
+            7.5722
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 50005000
+        }
+      },
+      "native_plans": {},
+      "scenario": "equal_starts",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4999950000,
+      "join_rows_including_self": 5000050000,
+      "timings": {
+        "plugin": {
+          "median_ms": 5.6746,
+          "samples_ms": [
+            5.6746,
+            5.5356,
+            5.7719,
+            5.478,
+            5.8961
+          ]
+        },
+        "rank": {
+          "median_ms": 75.0579,
+          "samples_ms": [
+            72.7486,
+            75.0579,
+            75.7703,
+            74.6746,
+            78.2674
+          ]
+        },
+        "rank_by": {
+          "median_ms": 83.2043,
+          "samples_ms": [
+            85.8647,
+            81.7826,
+            84.0002,
+            83.2043,
+            82.8047
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 5000050000
+        }
+      },
+      "native_plans": {},
+      "scenario": "equal_starts",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499999500000,
+      "join_rows_including_self": 500000500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 65.4161,
+          "samples_ms": [
+            66.0897,
+            70.7102,
+            64.0115,
+            62.2442,
+            65.4161
+          ]
+        },
+        "rank": {
+          "median_ms": 1019.2873,
+          "samples_ms": [
+            1019.2873,
+            1005.7465,
+            1051.3625,
+            1074.1015,
+            979.9323
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1072.8394,
+          "samples_ms": [
+            1078.5505,
+            1072.8394,
+            1091.7778,
+            1030.0145,
+            1067.2155
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 500000500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "equal_starts",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4499998500000,
+      "join_rows_including_self": 4500001500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 213.9489,
+          "samples_ms": [
+            202.4547,
+            206.164,
+            213.9489,
+            220.241,
+            220.1571
+          ]
+        },
+        "rank": {
+          "median_ms": 3381.2914,
+          "samples_ms": [
+            3420.8459,
+            3381.2914,
+            3204.5753,
+            3594.014,
+            3310.3831
+          ]
+        },
+        "rank_by": {
+          "median_ms": 3568.9865,
+          "samples_ms": [
+            3680.8447,
+            3568.9865,
+            3589.4099,
+            3495.411,
+            3317.0964
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 4500001500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "equal_starts",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499500,
+      "join_rows_including_self": 500500,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2764,
+          "samples_ms": [
+            0.3091,
+            0.1887,
+            0.2764,
+            0.1652,
+            0.3103
+          ]
+        },
+        "rank": {
+          "median_ms": 1.8394,
+          "samples_ms": [
+            1.8863,
+            1.6712,
+            1.8394,
+            1.7243,
+            2.2845
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1.654,
+          "samples_ms": [
+            2.34,
+            1.654,
+            1.5716,
+            1.6301,
+            2.1442
+          ]
+        },
+        "join": {
+          "median_ms": 4.5178,
+          "samples_ms": [
+            4.7878,
+            4.3355,
+            4.5178,
+            4.5021,
+            4.7089
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 6e1a4b39-c453-4d05-9fd9-ffc19e3a2b89]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 6e1a4b39-c453-4d05-9fd9-ffc19e3a2b89]\n          END IEJOIN JOIN"
+      },
+      "scenario": "equal_ends",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 49995000,
+      "join_rows_including_self": 50005000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.3304,
+          "samples_ms": [
+            0.3419,
+            0.3575,
+            0.2988,
+            0.3304,
+            0.2973
+          ]
+        },
+        "rank": {
+          "median_ms": 2.9606,
+          "samples_ms": [
+            2.834,
+            3.6574,
+            2.5659,
+            3.3752,
+            2.9606
+          ]
+        },
+        "rank_by": {
+          "median_ms": 3.3377,
+          "samples_ms": [
+            3.7775,
+            3.3377,
+            2.9765,
+            3.8866,
+            3.2009
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 50005000
+        }
+      },
+      "native_plans": {},
+      "scenario": "equal_ends",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4999950000,
+      "join_rows_including_self": 5000050000,
+      "timings": {
+        "plugin": {
+          "median_ms": 2.4885,
+          "samples_ms": [
+            2.3102,
+            2.4885,
+            2.5139,
+            2.3846,
+            2.566
+          ]
+        },
+        "rank": {
+          "median_ms": 10.3475,
+          "samples_ms": [
+            10.808,
+            10.8545,
+            10.3475,
+            10.1699,
+            10.3463
+          ]
+        },
+        "rank_by": {
+          "median_ms": 12.9434,
+          "samples_ms": [
+            13.6831,
+            12.8748,
+            11.7988,
+            12.9434,
+            13.0086
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 5000050000
+        }
+      },
+      "native_plans": {},
+      "scenario": "equal_ends",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499999500000,
+      "join_rows_including_self": 500000500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 22.098,
+          "samples_ms": [
+            23.8591,
+            23.3518,
+            21.7541,
+            21.9982,
+            22.098
+          ]
+        },
+        "rank": {
+          "median_ms": 88.2635,
+          "samples_ms": [
+            82.1213,
+            103.6768,
+            88.2635,
+            81.3448,
+            88.3458
+          ]
+        },
+        "rank_by": {
+          "median_ms": 96.7527,
+          "samples_ms": [
+            101.7889,
+            92.7779,
+            129.3111,
+            96.7527,
+            96.4897
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 500000500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "equal_ends",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4499998500000,
+      "join_rows_including_self": 4500001500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 68.48,
+          "samples_ms": [
+            65.2477,
+            66.4157,
+            71.4633,
+            68.48,
+            70.7268
+          ]
+        },
+        "rank": {
+          "median_ms": 296.1613,
+          "samples_ms": [
+            296.1613,
+            269.1775,
+            288.9521,
+            324.6475,
+            357.8705
+          ]
+        },
+        "rank_by": {
+          "median_ms": 339.4754,
+          "samples_ms": [
+            355.8091,
+            346.5333,
+            339.4754,
+            327.4299,
+            318.4976
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 4500001500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "equal_ends",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 467,
+      "join_rows_including_self": 1467,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2903,
+          "samples_ms": [
+            0.2903,
+            0.2244,
+            0.4087,
+            0.2853,
+            0.3919
+          ]
+        },
+        "rank": {
+          "median_ms": 2.1756,
+          "samples_ms": [
+            2.277,
+            2.3094,
+            2.1644,
+            2.1756,
+            2.0413
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2.1856,
+          "samples_ms": [
+            2.0686,
+            2.396,
+            2.6885,
+            2.1856,
+            2.1698
+          ]
+        },
+        "join": {
+          "median_ms": 1.8341,
+          "samples_ms": [
+            2.0853,
+            1.3832,
+            1.8341,
+            1.7335,
+            1.8855
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: fea0c136-f8a4-45f8-8cd5-3fd8866e62f4]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: fea0c136-f8a4-45f8-8cd5-3fd8866e62f4]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 5046,
+      "join_rows_including_self": 15046,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.299,
+          "samples_ms": [
+            1.4665,
+            1.7332,
+            1.299,
+            1.2474,
+            1.1002
+          ]
+        },
+        "rank": {
+          "median_ms": 7.8026,
+          "samples_ms": [
+            7.6242,
+            7.2146,
+            7.8026,
+            27.0308,
+            8.2867
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.5364,
+          "samples_ms": [
+            8.3964,
+            8.418,
+            8.8146,
+            8.5364,
+            9.3176
+          ]
+        },
+        "join": {
+          "median_ms": 4.1161,
+          "samples_ms": [
+            4.1161,
+            4.515,
+            4.0336,
+            4.0628,
+            4.1312
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: a879e4d0-48f9-4f09-bd83-aa349e19f6ab]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: a879e4d0-48f9-4f09-bd83-aa349e19f6ab]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 51227,
+      "join_rows_including_self": 151227,
+      "timings": {
+        "plugin": {
+          "median_ms": 13.0904,
+          "samples_ms": [
+            12.9778,
+            12.9468,
+            18.1501,
+            13.0904,
+            16.2827
+          ]
+        },
+        "rank": {
+          "median_ms": 55.0231,
+          "samples_ms": [
+            54.9567,
+            53.3786,
+            55.0231,
+            61.9161,
+            56.0632
+          ]
+        },
+        "rank_by": {
+          "median_ms": 60.0574,
+          "samples_ms": [
+            62.8471,
+            57.2105,
+            59.2858,
+            60.0574,
+            60.2994
+          ]
+        },
+        "join": {
+          "median_ms": 23.9156,
+          "samples_ms": [
+            25.0452,
+            23.2247,
+            26.3093,
+            23.9156,
+            23.9138
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 1417f4de-8f3e-45c6-af28-f8cc1b26fde9]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 1417f4de-8f3e-45c6-af28-f8cc1b26fde9]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 508456,
+      "join_rows_including_self": 1508456,
+      "timings": {
+        "plugin": {
+          "median_ms": 218.6613,
+          "samples_ms": [
+            273.4947,
+            288.6396,
+            187.4745,
+            178.8867,
+            218.6613
+          ]
+        },
+        "rank": {
+          "median_ms": 654.9009,
+          "samples_ms": [
+            665.3035,
+            654.9009,
+            628.8575,
+            667.1997,
+            638.1801
+          ]
+        },
+        "rank_by": {
+          "median_ms": 660.7893,
+          "samples_ms": [
+            660.7893,
+            631.4539,
+            694.9696,
+            656.2611,
+            708.6519
+          ]
+        },
+        "join": {
+          "median_ms": 357.0285,
+          "samples_ms": [
+            341.882,
+            437.6218,
+            342.0605,
+            366.0636,
+            357.0285
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: d96c85e8-4a6b-4415-8054-43a453a8af19]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: d96c85e8-4a6b-4415-8054-43a453a8af19]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 1529398,
+      "join_rows_including_self": 4529398,
+      "timings": {
+        "plugin": {
+          "median_ms": 1018.4767,
+          "samples_ms": [
+            1127.9921,
+            1011.4378,
+            1018.4767,
+            1016.2323,
+            1042.0574
+          ]
+        },
+        "rank": {
+          "median_ms": 2089.4574,
+          "samples_ms": [
+            2057.6522,
+            2123.3948,
+            2057.4185,
+            2103.6201,
+            2089.4574
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2188.1991,
+          "samples_ms": [
+            2269.6066,
+            2151.1009,
+            2281.3981,
+            2164.7851,
+            2188.1991
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 4529398
+        }
+      },
+      "native_plans": {},
+      "scenario": "sparse",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 127045,
+      "join_rows_including_self": 128045,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.3684,
+          "samples_ms": [
+            0.3639,
+            0.4051,
+            0.386,
+            0.2818,
+            0.3684
+          ]
+        },
+        "rank": {
+          "median_ms": 2.1872,
+          "samples_ms": [
+            2.6531,
+            2.1872,
+            2.3777,
+            1.9444,
+            2.0237
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2.2364,
+          "samples_ms": [
+            2.4066,
+            2.2364,
+            1.9902,
+            2.447,
+            2.1661
+          ]
+        },
+        "join": {
+          "median_ms": 2.7053,
+          "samples_ms": [
+            2.7344,
+            2.7053,
+            2.597,
+            2.884,
+            2.689
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 9c72de33-a9bb-4efa-af07-2e869d41429b]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 9c72de33-a9bb-4efa-af07-2e869d41429b]\n          END IEJOIN JOIN"
+      },
+      "scenario": "dense",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 12487335,
+      "join_rows_including_self": 12497335,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.1633,
+          "samples_ms": [
+            1.2268,
+            1.2548,
+            1.1174,
+            1.0244,
+            1.1633
+          ]
+        },
+        "rank": {
+          "median_ms": 7.3069,
+          "samples_ms": [
+            7.3069,
+            7.6634,
+            6.3754,
+            6.8797,
+            7.5017
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.4891,
+          "samples_ms": [
+            7.4891,
+            7.4447,
+            7.5199,
+            7.5959,
+            6.9535
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 12497335
+        }
+      },
+      "native_plans": {},
+      "scenario": "dense",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 1252972088,
+      "join_rows_including_self": 1253072088,
+      "timings": {
+        "plugin": {
+          "median_ms": 10.7874,
+          "samples_ms": [
+            10.7065,
+            10.4453,
+            10.7874,
+            12.1146,
+            11.371
+          ]
+        },
+        "rank": {
+          "median_ms": 38.429,
+          "samples_ms": [
+            38.3699,
+            38.6985,
+            38.429,
+            37.9993,
+            41.4757
+          ]
+        },
+        "rank_by": {
+          "median_ms": 40.3494,
+          "samples_ms": [
+            41.5755,
+            39.5933,
+            39.7866,
+            40.3494,
+            47.6666
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 1253072088
+        }
+      },
+      "native_plans": {},
+      "scenario": "dense",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 125344079657,
+      "join_rows_including_self": 125345079657,
+      "timings": {
+        "plugin": {
+          "median_ms": 114.5028,
+          "samples_ms": [
+            112.4787,
+            111.6983,
+            114.6305,
+            124.332,
+            114.5028
+          ]
+        },
+        "rank": {
+          "median_ms": 325.623,
+          "samples_ms": [
+            323.6646,
+            401.9786,
+            353.9205,
+            321.7512,
+            325.623
+          ]
+        },
+        "rank_by": {
+          "median_ms": 349.8189,
+          "samples_ms": [
+            350.8182,
+            359.497,
+            330.8033,
+            344.5109,
+            349.8189
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 125345079657
+        }
+      },
+      "native_plans": {},
+      "scenario": "dense",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 1128413117663,
+      "join_rows_including_self": 1128416117663,
+      "timings": {
+        "plugin": {
+          "median_ms": 412.895,
+          "samples_ms": [
+            418.9943,
+            410.1361,
+            433.2939,
+            410.2401,
+            412.895
+          ]
+        },
+        "rank": {
+          "median_ms": 944.2312,
+          "samples_ms": [
+            944.2312,
+            937.5861,
+            940.1625,
+            974.3401,
+            944.5826
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1006.909,
+          "samples_ms": [
+            1023.0834,
+            992.9045,
+            1093.0397,
+            1006.909,
+            1000.3839
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 1128416117663
+        }
+      },
+      "native_plans": {},
+      "scenario": "dense",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 94950,
+      "join_rows_including_self": 95950,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2677,
+          "samples_ms": [
+            0.4257,
+            0.3669,
+            0.2677,
+            0.2191,
+            0.2466
+          ]
+        },
+        "rank": {
+          "median_ms": 2.0084,
+          "samples_ms": [
+            2.5794,
+            1.9381,
+            1.9798,
+            2.1591,
+            2.0084
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1.9713,
+          "samples_ms": [
+            2.7086,
+            1.934,
+            1.9713,
+            1.8719,
+            2.019
+          ]
+        },
+        "join": {
+          "median_ms": 1.9764,
+          "samples_ms": [
+            2.8758,
+            1.9555,
+            2.0267,
+            1.9764,
+            1.8993
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 3dd98021-6b5c-45da-849a-d658ca7225b3]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 3dd98021-6b5c-45da-849a-d658ca7225b3]\n          END IEJOIN JOIN"
+      },
+      "scenario": "broad",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 9499500,
+      "join_rows_including_self": 9509500,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.9385,
+          "samples_ms": [
+            0.9385,
+            0.8091,
+            1.2613,
+            1.1198,
+            0.91
+          ]
+        },
+        "rank": {
+          "median_ms": 7.1527,
+          "samples_ms": [
+            7.4454,
+            7.194,
+            7.1527,
+            7.0717,
+            7.0574
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.6525,
+          "samples_ms": [
+            7.2969,
+            7.6859,
+            7.4406,
+            7.6525,
+            8.0657
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 9509500
+        }
+      },
+      "native_plans": {},
+      "scenario": "broad",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 949995000,
+      "join_rows_including_self": 950095000,
+      "timings": {
+        "plugin": {
+          "median_ms": 9.5755,
+          "samples_ms": [
+            9.4871,
+            9.5551,
+            9.5755,
+            9.6768,
+            10.3666
+          ]
+        },
+        "rank": {
+          "median_ms": 68.7655,
+          "samples_ms": [
+            65.9579,
+            70.1089,
+            68.7655,
+            71.3065,
+            66.2611
+          ]
+        },
+        "rank_by": {
+          "median_ms": 68.19,
+          "samples_ms": [
+            70.7874,
+            68.19,
+            66.9906,
+            65.3181,
+            68.9528
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 950095000
+        }
+      },
+      "native_plans": {},
+      "scenario": "broad",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 94999950000,
+      "join_rows_including_self": 95000950000,
+      "timings": {
+        "plugin": {
+          "median_ms": 123.9776,
+          "samples_ms": [
+            123.9776,
+            128.7018,
+            123.5805,
+            122.3417,
+            124.6336
+          ]
+        },
+        "rank": {
+          "median_ms": 878.6066,
+          "samples_ms": [
+            875.6507,
+            945.275,
+            916.3737,
+            856.5144,
+            878.6066
+          ]
+        },
+        "rank_by": {
+          "median_ms": 916.0063,
+          "samples_ms": [
+            916.0063,
+            908.6981,
+            918.6194,
+            848.5707,
+            966.7881
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 95000950000
+        }
+      },
+      "native_plans": {},
+      "scenario": "broad",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 854999850000,
+      "join_rows_including_self": 855002850000,
+      "timings": {
+        "plugin": {
+          "median_ms": 447.6444,
+          "samples_ms": [
+            490.6724,
+            449.4116,
+            447.6444,
+            447.3518,
+            445.0915
+          ]
+        },
+        "rank": {
+          "median_ms": 3029.4351,
+          "samples_ms": [
+            2907.2799,
+            3206.2345,
+            3029.4351,
+            3193.5197,
+            2662.1929
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2883.2251,
+          "samples_ms": [
+            2879.2169,
+            2872.4682,
+            3071.6988,
+            2883.2251,
+            2912.2657
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 855002850000
+        }
+      },
+      "native_plans": {},
+      "scenario": "broad",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 1000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.198,
+          "samples_ms": [
+            0.2702,
+            0.1778,
+            0.1963,
+            0.198,
+            0.2581
+          ]
+        },
+        "rank": {
+          "median_ms": 1.7108,
+          "samples_ms": [
+            2.5868,
+            1.7108,
+            1.5738,
+            1.6793,
+            2.0725
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1.9873,
+          "samples_ms": [
+            2.0123,
+            1.9077,
+            2.2022,
+            1.9873,
+            1.959
+          ]
+        },
+        "join": {
+          "median_ms": 1.2688,
+          "samples_ms": [
+            1.1468,
+            1.2609,
+            1.2723,
+            1.2688,
+            1.3033
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: f1ae2db5-7a7c-490c-8c96-85675d4632cc]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: f1ae2db5-7a7c-490c-8c96-85675d4632cc]\n          END IEJOIN JOIN"
+      },
+      "scenario": "crossing",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 10000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.61,
+          "samples_ms": [
+            0.6029,
+            0.6328,
+            0.61,
+            0.5839,
+            0.6155
+          ]
+        },
+        "rank": {
+          "median_ms": 7.3674,
+          "samples_ms": [
+            7.8505,
+            6.9542,
+            8.4133,
+            7.3674,
+            7.0646
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.0689,
+          "samples_ms": [
+            7.6585,
+            8.4117,
+            8.4024,
+            8.0689,
+            7.2643
+          ]
+        },
+        "join": {
+          "median_ms": 3.2807,
+          "samples_ms": [
+            3.4,
+            2.893,
+            3.382,
+            3.2562,
+            3.2807
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: bbf81cb1-bf08-48c1-aeab-8565ad2053e5]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: bbf81cb1-bf08-48c1-aeab-8565ad2053e5]\n          END IEJOIN JOIN"
+      },
+      "scenario": "crossing",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 100000,
+      "timings": {
+        "plugin": {
+          "median_ms": 5.9856,
+          "samples_ms": [
+            6.023,
+            5.8817,
+            5.6641,
+            6.4127,
+            5.9856
+          ]
+        },
+        "rank": {
+          "median_ms": 63.6429,
+          "samples_ms": [
+            60.9647,
+            61.2482,
+            65.487,
+            63.6429,
+            66.5942
+          ]
+        },
+        "rank_by": {
+          "median_ms": 67.3163,
+          "samples_ms": [
+            66.2564,
+            65.3034,
+            70.2075,
+            73.1633,
+            67.3163
+          ]
+        },
+        "join": {
+          "median_ms": 20.3689,
+          "samples_ms": [
+            20.8364,
+            19.4467,
+            20.3689,
+            18.8602,
+            20.8242
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: c6fbb53a-055e-454c-85df-8bf2ba308d1d]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: c6fbb53a-055e-454c-85df-8bf2ba308d1d]\n          END IEJOIN JOIN"
+      },
+      "scenario": "crossing",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 1000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 75.817,
+          "samples_ms": [
+            82.1267,
+            80.5766,
+            73.445,
+            73.4814,
+            75.817
+          ]
+        },
+        "rank": {
+          "median_ms": 876.789,
+          "samples_ms": [
+            882.8294,
+            876.789,
+            850.6291,
+            791.8859,
+            938.5287
+          ]
+        },
+        "rank_by": {
+          "median_ms": 919.7647,
+          "samples_ms": [
+            924.8669,
+            907.8252,
+            949.0557,
+            919.7647,
+            902.0328
+          ]
+        },
+        "join": {
+          "median_ms": 247.6678,
+          "samples_ms": [
+            240.4087,
+            254.6439,
+            255.3899,
+            239.9653,
+            247.6678
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 76492376-efbe-49e4-a9e0-348bdd509336]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 76492376-efbe-49e4-a9e0-348bdd509336]\n          END IEJOIN JOIN"
+      },
+      "scenario": "crossing",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 0,
+      "join_rows_including_self": 3000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 285.5492,
+          "samples_ms": [
+            285.5492,
+            288.6483,
+            277.4428,
+            298.3239,
+            277.7462
+          ]
+        },
+        "rank": {
+          "median_ms": 2538.8264,
+          "samples_ms": [
+            2533.8141,
+            2444.6196,
+            3074.3228,
+            2559.9735,
+            2538.8264
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2795.5809,
+          "samples_ms": [
+            2823.4327,
+            2776.682,
+            3084.0769,
+            2795.5809,
+            2790.048
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 3000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "crossing",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 14640,
+      "join_rows_including_self": 15640,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2453,
+          "samples_ms": [
+            0.248,
+            0.2331,
+            0.2657,
+            0.2222,
+            0.2453
+          ]
+        },
+        "rank": {
+          "median_ms": 1.3964,
+          "samples_ms": [
+            1.4116,
+            1.294,
+            1.3964,
+            1.9316,
+            1.2048
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1.5523,
+          "samples_ms": [
+            1.6009,
+            1.398,
+            1.4613,
+            1.8192,
+            1.5523
+          ]
+        },
+        "join": {
+          "median_ms": 1.6071,
+          "samples_ms": [
+            1.6071,
+            1.6204,
+            1.5406,
+            1.7026,
+            1.4105
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 6dfd2fef-6964-4063-b858-6ea51a8184ff]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 6dfd2fef-6964-4063-b858-6ea51a8184ff]\n          END IEJOIN JOIN"
+      },
+      "scenario": "empty",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 1552512,
+      "join_rows_including_self": 1562512,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.9817,
+          "samples_ms": [
+            0.9823,
+            1.0057,
+            0.8728,
+            0.9817,
+            0.826
+          ]
+        },
+        "rank": {
+          "median_ms": 3.8541,
+          "samples_ms": [
+            3.5865,
+            4.1901,
+            3.8825,
+            3.8253,
+            3.8541
+          ]
+        },
+        "rank_by": {
+          "median_ms": 4.0484,
+          "samples_ms": [
+            4.0484,
+            3.6753,
+            4.1833,
+            3.7975,
+            4.2697
+          ]
+        },
+        "join": {
+          "median_ms": 16.5437,
+          "samples_ms": [
+            16.5437,
+            14.9268,
+            16.6574,
+            15.0175,
+            16.7386
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 0646cc45-8719-4c97-a4b0-1bfbb23d9261]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 0646cc45-8719-4c97-a4b0-1bfbb23d9261]\n          END IEJOIN JOIN"
+      },
+      "scenario": "empty",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 156150016,
+      "join_rows_including_self": 156250016,
+      "timings": {
+        "plugin": {
+          "median_ms": 8.3126,
+          "samples_ms": [
+            10.3498,
+            9.5429,
+            7.8699,
+            8.3126,
+            8.0003
+          ]
+        },
+        "rank": {
+          "median_ms": 26.3695,
+          "samples_ms": [
+            94.9763,
+            42.7379,
+            26.3695,
+            19.8273,
+            20.0445
+          ]
+        },
+        "rank_by": {
+          "median_ms": 22.0066,
+          "samples_ms": [
+            22.66,
+            24.2396,
+            22.0066,
+            21.0225,
+            20.6345
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 156250016
+        }
+      },
+      "native_plans": {},
+      "scenario": "empty",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 15624000000,
+      "join_rows_including_self": 15625000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 85.0266,
+          "samples_ms": [
+            85.0266,
+            84.4065,
+            85.9387,
+            86.768,
+            84.6475
+          ]
+        },
+        "rank": {
+          "median_ms": 179.4838,
+          "samples_ms": [
+            179.4838,
+            178.0641,
+            180.9786,
+            178.1286,
+            189.6227
+          ]
+        },
+        "rank_by": {
+          "median_ms": 205.7429,
+          "samples_ms": [
+            205.7429,
+            191.5953,
+            207.8612,
+            196.8244,
+            217.5546
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 15625000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "empty",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 140622000000,
+      "join_rows_including_self": 140625000000,
+      "timings": {
+        "plugin": {
+          "median_ms": 305.9486,
+          "samples_ms": [
+            306.3165,
+            305.9486,
+            307.4217,
+            301.5294,
+            304.577
+          ]
+        },
+        "rank": {
+          "median_ms": 618.7414,
+          "samples_ms": [
+            596.8146,
+            626.4173,
+            634.7027,
+            612.9475,
+            618.7414
+          ]
+        },
+        "rank_by": {
+          "median_ms": 658.662,
+          "samples_ms": [
+            658.662,
+            662.0789,
+            671.4032,
+            643.5943,
+            620.835
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 140625000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "empty",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 20547,
+      "join_rows_including_self": 21547,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.237,
+          "samples_ms": [
+            0.2943,
+            0.2821,
+            0.2133,
+            0.2272,
+            0.237
+          ]
+        },
+        "rank": {
+          "median_ms": 1.7731,
+          "samples_ms": [
+            2.0562,
+            1.8333,
+            1.6279,
+            1.7731,
+            1.3932
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1.9401,
+          "samples_ms": [
+            2.0802,
+            2.394,
+            1.7075,
+            1.722,
+            1.9401
+          ]
+        },
+        "join": {
+          "median_ms": 1.7445,
+          "samples_ms": [
+            1.8569,
+            1.4724,
+            1.6614,
+            1.8462,
+            1.7445
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 10b34ed7-ea51-48d4-a8dd-0b933490b8bb]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 10b34ed7-ea51-48d4-a8dd-0b933490b8bb]\n          END IEJOIN JOIN"
+      },
+      "scenario": "mixed",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 2143051,
+      "join_rows_including_self": 2153051,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.9753,
+          "samples_ms": [
+            0.95,
+            1.0512,
+            0.9912,
+            0.9234,
+            0.9753
+          ]
+        },
+        "rank": {
+          "median_ms": 3.8582,
+          "samples_ms": [
+            3.6865,
+            3.946,
+            3.8582,
+            3.8953,
+            3.7221
+          ]
+        },
+        "rank_by": {
+          "median_ms": 3.9084,
+          "samples_ms": [
+            3.747,
+            4.1177,
+            3.9858,
+            3.7764,
+            3.9084
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 2153051
+        }
+      },
+      "native_plans": {},
+      "scenario": "mixed",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 215232065,
+      "join_rows_including_self": 215332065,
+      "timings": {
+        "plugin": {
+          "median_ms": 9.5466,
+          "samples_ms": [
+            11.5403,
+            9.2317,
+            9.5466,
+            9.459,
+            10.1867
+          ]
+        },
+        "rank": {
+          "median_ms": 18.2734,
+          "samples_ms": [
+            17.962,
+            18.4478,
+            18.2734,
+            17.7224,
+            20.6225
+          ]
+        },
+        "rank_by": {
+          "median_ms": 20.6061,
+          "samples_ms": [
+            19.6826,
+            20.6061,
+            20.6507,
+            19.4042,
+            21.6693
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 215332065
+        }
+      },
+      "native_plans": {},
+      "scenario": "mixed",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 21532203125,
+      "join_rows_including_self": 21533203125,
+      "timings": {
+        "plugin": {
+          "median_ms": 97.5065,
+          "samples_ms": [
+            97.5065,
+            96.4085,
+            95.8437,
+            100.6081,
+            101.1993
+          ]
+        },
+        "rank": {
+          "median_ms": 169.3505,
+          "samples_ms": [
+            162.1401,
+            169.3505,
+            165.4828,
+            177.6112,
+            171.5496
+          ]
+        },
+        "rank_by": {
+          "median_ms": 184.0752,
+          "samples_ms": [
+            175.9426,
+            185.7877,
+            184.0752,
+            188.6189,
+            179.8575
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 21533203125
+        }
+      },
+      "native_plans": {},
+      "scenario": "mixed",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 193795828125,
+      "join_rows_including_self": 193798828125,
+      "timings": {
+        "plugin": {
+          "median_ms": 366.0116,
+          "samples_ms": [
+            366.5636,
+            366.0116,
+            359.4482,
+            370.031,
+            356.9741
+          ]
+        },
+        "rank": {
+          "median_ms": 556.1097,
+          "samples_ms": [
+            544.1469,
+            570.7932,
+            526.8404,
+            556.1097,
+            594.1825
+          ]
+        },
+        "rank_by": {
+          "median_ms": 585.1189,
+          "samples_ms": [
+            575.1357,
+            597.0347,
+            585.1189,
+            589.7876,
+            582.8102
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 193798828125
+        }
+      },
+      "native_plans": {},
+      "scenario": "mixed",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499500,
+      "join_rows_including_self": 500500,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.3269,
+          "samples_ms": [
+            0.3313,
+            0.2322,
+            0.3269,
+            0.2275,
+            0.35
+          ]
+        },
+        "rank": {
+          "median_ms": 2.1491,
+          "samples_ms": [
+            2.1491,
+            1.9182,
+            2.0934,
+            2.1788,
+            2.5756
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2.2139,
+          "samples_ms": [
+            2.5165,
+            2.5639,
+            2.2139,
+            2.0226,
+            1.992
+          ]
+        },
+        "join": {
+          "median_ms": 4.8165,
+          "samples_ms": [
+            4.8165,
+            4.8008,
+            4.9353,
+            4.9633,
+            4.5771
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: d126a012-24f6-4163-bc9f-5424a071896d]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: d126a012-24f6-4163-bc9f-5424a071896d]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sorted",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 49995000,
+      "join_rows_including_self": 50005000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.64,
+          "samples_ms": [
+            0.6071,
+            0.4681,
+            0.64,
+            0.6604,
+            0.6605
+          ]
+        },
+        "rank": {
+          "median_ms": 7.9028,
+          "samples_ms": [
+            8.0715,
+            7.1708,
+            8.1248,
+            7.5452,
+            7.9028
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.1427,
+          "samples_ms": [
+            8.1033,
+            7.779,
+            8.7669,
+            8.6841,
+            8.1427
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 50005000
+        }
+      },
+      "native_plans": {},
+      "scenario": "sorted",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4999950000,
+      "join_rows_including_self": 5000050000,
+      "timings": {
+        "plugin": {
+          "median_ms": 6.006,
+          "samples_ms": [
+            5.6141,
+            6.0743,
+            5.8265,
+            6.0257,
+            6.006
+          ]
+        },
+        "rank": {
+          "median_ms": 73.314,
+          "samples_ms": [
+            72.2678,
+            72.5396,
+            76.9621,
+            73.314,
+            75.9489
+          ]
+        },
+        "rank_by": {
+          "median_ms": 82.7816,
+          "samples_ms": [
+            76.6943,
+            79.1548,
+            82.7816,
+            83.4545,
+            83.9595
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 5000050000
+        }
+      },
+      "native_plans": {},
+      "scenario": "sorted",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499999500000,
+      "join_rows_including_self": 500000500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 76.6358,
+          "samples_ms": [
+            76.7069,
+            72.3254,
+            82.5859,
+            76.6358,
+            74.0498
+          ]
+        },
+        "rank": {
+          "median_ms": 1034.9445,
+          "samples_ms": [
+            950.245,
+            1048.3013,
+            1037.7045,
+            1034.9445,
+            979.6768
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1081.0813,
+          "samples_ms": [
+            1085.7695,
+            1066.1101,
+            1088.5815,
+            1081.0813,
+            1025.1683
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 500000500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "sorted",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4499998500000,
+      "join_rows_including_self": 4500001500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 287.8175,
+          "samples_ms": [
+            288.1318,
+            278.8324,
+            290.8746,
+            278.1571,
+            287.8175
+          ]
+        },
+        "rank": {
+          "median_ms": 3143.0424,
+          "samples_ms": [
+            3143.0424,
+            3123.1343,
+            3452.3286,
+            3169.3134,
+            3013.3649
+          ]
+        },
+        "rank_by": {
+          "median_ms": 3345.9878,
+          "samples_ms": [
+            3264.4899,
+            3359.1434,
+            3387.2323,
+            3273.8051,
+            3345.9878
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 4500001500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "sorted",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499500,
+      "join_rows_including_self": 500500,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.291,
+          "samples_ms": [
+            0.3275,
+            0.2259,
+            0.2759,
+            0.291,
+            0.3815
+          ]
+        },
+        "rank": {
+          "median_ms": 2.1952,
+          "samples_ms": [
+            1.9995,
+            2.3124,
+            2.1952,
+            2.1968,
+            1.9725
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2.3789,
+          "samples_ms": [
+            2.8787,
+            2.3789,
+            2.3325,
+            2.0658,
+            2.5605
+          ]
+        },
+        "join": {
+          "median_ms": 5.1757,
+          "samples_ms": [
+            5.4075,
+            5.1757,
+            5.1155,
+            4.7506,
+            5.1955
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 7b3cce75-a7c6-4597-8026-37bc18f7f1b6]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 7b3cce75-a7c6-4597-8026-37bc18f7f1b6]\n          END IEJOIN JOIN"
+      },
+      "scenario": "reverse",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 49995000,
+      "join_rows_including_self": 50005000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.6587,
+          "samples_ms": [
+            0.6587,
+            0.7585,
+            0.7095,
+            0.6123,
+            0.5899
+          ]
+        },
+        "rank": {
+          "median_ms": 8.788,
+          "samples_ms": [
+            9.0413,
+            8.788,
+            9.1664,
+            8.6633,
+            8.4121
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.99,
+          "samples_ms": [
+            10.0365,
+            9.1207,
+            8.7291,
+            8.99,
+            8.2627
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 50005000
+        }
+      },
+      "native_plans": {},
+      "scenario": "reverse",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4999950000,
+      "join_rows_including_self": 5000050000,
+      "timings": {
+        "plugin": {
+          "median_ms": 6.0986,
+          "samples_ms": [
+            5.9281,
+            6.0986,
+            6.2162,
+            6.0967,
+            6.1895
+          ]
+        },
+        "rank": {
+          "median_ms": 76.2781,
+          "samples_ms": [
+            73.574,
+            76.2781,
+            72.8243,
+            80.0254,
+            88.262
+          ]
+        },
+        "rank_by": {
+          "median_ms": 81.6342,
+          "samples_ms": [
+            80.8284,
+            79.1118,
+            81.6342,
+            92.2524,
+            85.996
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 5000050000
+        }
+      },
+      "native_plans": {},
+      "scenario": "reverse",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499999500000,
+      "join_rows_including_self": 500000500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 74.9246,
+          "samples_ms": [
+            74.7379,
+            75.1825,
+            74.1001,
+            74.9246,
+            78.0322
+          ]
+        },
+        "rank": {
+          "median_ms": 1013.0851,
+          "samples_ms": [
+            1008.8314,
+            1013.0851,
+            1100.5738,
+            931.4455,
+            1100.6331
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1060.6803,
+          "samples_ms": [
+            1096.0095,
+            1017.2343,
+            1100.6612,
+            1060.6803,
+            1039.6259
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 500000500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "reverse",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4499998500000,
+      "join_rows_including_self": 4500001500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 285.5942,
+          "samples_ms": [
+            286.0118,
+            283.2226,
+            286.7337,
+            285.5942,
+            285.4451
+          ]
+        },
+        "rank": {
+          "median_ms": 3166.0139,
+          "samples_ms": [
+            3166.0139,
+            3117.7299,
+            3171.305,
+            3153.1366,
+            3219.7597
+          ]
+        },
+        "rank_by": {
+          "median_ms": 3399.807,
+          "samples_ms": [
+            3359.4409,
+            3479.3431,
+            3414.1581,
+            3298.8891,
+            3399.807
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 4500001500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "reverse",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499500,
+      "join_rows_including_self": 500500,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.2475,
+          "samples_ms": [
+            0.2475,
+            0.1731,
+            0.3359,
+            0.2064,
+            0.367
+          ]
+        },
+        "rank": {
+          "median_ms": 2.2233,
+          "samples_ms": [
+            2.2918,
+            2.0392,
+            2.2407,
+            2.2202,
+            2.2233
+          ]
+        },
+        "rank_by": {
+          "median_ms": 2.321,
+          "samples_ms": [
+            2.7249,
+            2.1697,
+            2.321,
+            2.2615,
+            2.4169
+          ]
+        },
+        "join": {
+          "median_ms": 5.6271,
+          "samples_ms": [
+            5.8826,
+            4.8895,
+            4.9119,
+            5.7931,
+            5.6271
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 33aef4bc-4968-4a09-8558-479861f1ee6a]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 33aef4bc-4968-4a09-8558-479861f1ee6a]\n          END IEJOIN JOIN"
+      },
+      "scenario": "shuffled",
+      "n": 1000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 49995000,
+      "join_rows_including_self": 50005000,
+      "timings": {
+        "plugin": {
+          "median_ms": 0.9925,
+          "samples_ms": [
+            1.0639,
+            0.9942,
+            0.974,
+            0.9925,
+            0.9486
+          ]
+        },
+        "rank": {
+          "median_ms": 7.7758,
+          "samples_ms": [
+            7.7758,
+            7.7173,
+            8.0266,
+            8.1892,
+            7.7599
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.4828,
+          "samples_ms": [
+            8.3999,
+            8.7544,
+            8.8588,
+            8.4828,
+            8.3139
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 50005000
+        }
+      },
+      "native_plans": {},
+      "scenario": "shuffled",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4999950000,
+      "join_rows_including_self": 5000050000,
+      "timings": {
+        "plugin": {
+          "median_ms": 12.3974,
+          "samples_ms": [
+            11.8329,
+            12.8095,
+            13.6441,
+            12.3974,
+            11.987
+          ]
+        },
+        "rank": {
+          "median_ms": 82.8665,
+          "samples_ms": [
+            75.8384,
+            82.8665,
+            83.168,
+            93.0698,
+            77.1359
+          ]
+        },
+        "rank_by": {
+          "median_ms": 84.1354,
+          "samples_ms": [
+            80.0657,
+            81.96,
+            86.0153,
+            84.9346,
+            84.1354
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 5000050000
+        }
+      },
+      "native_plans": {},
+      "scenario": "shuffled",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 499999500000,
+      "join_rows_including_self": 500000500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 187.1829,
+          "samples_ms": [
+            189.7314,
+            174.5474,
+            179.3741,
+            189.5923,
+            187.1829
+          ]
+        },
+        "rank": {
+          "median_ms": 1054.3812,
+          "samples_ms": [
+            888.8993,
+            1086.9982,
+            900.2439,
+            1095.0318,
+            1054.3812
+          ]
+        },
+        "rank_by": {
+          "median_ms": 1092.5997,
+          "samples_ms": [
+            1071.3949,
+            1082.155,
+            1092.5997,
+            1133.7332,
+            1105.6079
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 500000500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "shuffled",
+      "n": 1000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 4499998500000,
+      "join_rows_including_self": 4500001500000,
+      "timings": {
+        "plugin": {
+          "median_ms": 1133.5428,
+          "samples_ms": [
+            1141.5709,
+            1138.2546,
+            1104.6665,
+            1105.8476,
+            1133.5428
+          ]
+        },
+        "rank": {
+          "median_ms": 3197.3199,
+          "samples_ms": [
+            3029.5037,
+            3743.2664,
+            3108.8648,
+            3766.8294,
+            3197.3199
+          ]
+        },
+        "rank_by": {
+          "median_ms": 3356.7882,
+          "samples_ms": [
+            3347.6723,
+            3356.7882,
+            3354.2501,
+            3415.5215,
+            3384.3123
+          ]
+        }
+      },
+      "skipped": {
+        "join": {
+          "reason": "intermediate row safety limit",
+          "rows": 4500001500000
+        }
+      },
+      "native_plans": {},
+      "scenario": "shuffled",
+      "n": 3000000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 5046,
+      "join_rows_including_self": 15046,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.7423,
+          "samples_ms": [
+            2.6027,
+            1.5833,
+            1.7423,
+            1.7211,
+            1.8571
+          ]
+        },
+        "rank": {
+          "median_ms": 7.6705,
+          "samples_ms": [
+            9.2499,
+            7.6705,
+            7.3936,
+            7.5249,
+            7.8146
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.0734,
+          "samples_ms": [
+            8.443,
+            8.4915,
+            8.0734,
+            8.0336,
+            7.1933
+          ]
+        },
+        "bands": {
+          "median_ms": 5.1497,
+          "samples_ms": [
+            5.5494,
+            5.1778,
+            5.1497,
+            4.9448,
+            4.3436
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: e0ae8c35-3960-4f9b-bacf-42292da7a877]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: e0ae8c35-3960-4f9b-bacf-42292da7a877]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 5145,
+      "join_rows_including_self": 15145,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.8289,
+          "samples_ms": [
+            1.7091,
+            1.8699,
+            1.8562,
+            1.6809,
+            1.8289
+          ]
+        },
+        "rank": {
+          "median_ms": 4.5414,
+          "samples_ms": [
+            4.9556,
+            4.5414,
+            4.4749,
+            4.2115,
+            4.7058
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.4806,
+          "samples_ms": [
+            7.5069,
+            7.4806,
+            6.9669,
+            6.8125,
+            7.9546
+          ]
+        },
+        "bands": {
+          "median_ms": 5.2011,
+          "samples_ms": [
+            4.7167,
+            5.3219,
+            5.2011,
+            4.8453,
+            5.2963
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: cae6312f-5c2a-4e4d-8db0-ab02bf093714]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: cae6312f-5c2a-4e4d-8db0-ab02bf093714]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 10,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 5129,
+      "join_rows_including_self": 15129,
+      "timings": {
+        "plugin": {
+          "median_ms": 2.2951,
+          "samples_ms": [
+            2.4329,
+            2.2149,
+            2.3476,
+            2.0154,
+            2.2951
+          ]
+        },
+        "rank": {
+          "median_ms": 4.2803,
+          "samples_ms": [
+            4.6322,
+            3.7531,
+            4.243,
+            4.2803,
+            5.4033
+          ]
+        },
+        "rank_by": {
+          "median_ms": 6.8026,
+          "samples_ms": [
+            7.419,
+            6.7292,
+            6.8208,
+            6.8026,
+            6.5914
+          ]
+        },
+        "bands": {
+          "median_ms": 5.0214,
+          "samples_ms": [
+            4.9444,
+            5.4219,
+            5.0214,
+            4.6082,
+            5.3262
+          ]
+        },
+        "equality": {
+          "median_ms": 11.0092,
+          "samples_ms": [
+            10.7462,
+            11.4358,
+            11.1363,
+            10.9665,
+            11.0092
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: ae029355-5c64-4220-ba12-7fd233809d02]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: ae029355-5c64-4220-ba12-7fd233809d02]\n          END IEJOIN JOIN",
+        "equality": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          FILTER (col(\"end_right\") <= col(\"end\")) & (col(\"start\") <= col(\"start_right\"))\n          FROM\n            simple \u03c0 5/5 [\"row\", \"end_right\", \"end\", ... 2 other columns]\n              INNER JOIN:\n              LEFT PLAN ON: [col(\"group\")]\n                CACHE[id: 4ed159f6-f05b-40c8-ae10-0c0eff21ce5c]\n                  ROW INDEX name: row, offset: 0\n                    DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n              RIGHT PLAN ON: [col(\"group\")]\n                simple \u03c0 3/3 [\"start\", \"end\", \"group\"]\n                  CACHE[id: 4ed159f6-f05b-40c8-ae10-0c0eff21ce5c]\n              END INNER JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 100,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 4327,
+      "join_rows_including_self": 14327,
+      "timings": {
+        "plugin": {
+          "median_ms": 7.7471,
+          "samples_ms": [
+            9.0522,
+            8.3154,
+            7.5062,
+            7.7471,
+            7.4359
+          ]
+        },
+        "rank": {
+          "median_ms": 4.6253,
+          "samples_ms": [
+            4.9333,
+            4.4864,
+            4.2835,
+            4.6253,
+            4.928
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.7549,
+          "samples_ms": [
+            8.4757,
+            7.7549,
+            7.8433,
+            7.2491,
+            7.4551
+          ]
+        },
+        "bands": {
+          "median_ms": 4.4596,
+          "samples_ms": [
+            5.0854,
+            4.902,
+            4.4128,
+            4.2537,
+            4.4596
+          ]
+        },
+        "equality": {
+          "median_ms": 3.6254,
+          "samples_ms": [
+            3.6254,
+            3.9341,
+            3.1725,
+            3.6217,
+            3.6951
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 8a57d2d8-c6db-48db-929a-4435e638b17d]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 8a57d2d8-c6db-48db-929a-4435e638b17d]\n          END IEJOIN JOIN",
+        "equality": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          FILTER (col(\"end_right\") <= col(\"end\")) & (col(\"start\") <= col(\"start_right\"))\n          FROM\n            simple \u03c0 5/5 [\"row\", \"end_right\", \"end\", ... 2 other columns]\n              INNER JOIN:\n              LEFT PLAN ON: [col(\"group\")]\n                CACHE[id: b23224a0-1d7c-48ee-aa8b-a1213780fd15]\n                  ROW INDEX name: row, offset: 0\n                    DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n              RIGHT PLAN ON: [col(\"group\")]\n                simple \u03c0 3/3 [\"start\", \"end\", \"group\"]\n                  CACHE[id: b23224a0-1d7c-48ee-aa8b-a1213780fd15]\n              END INNER JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 1000,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 51227,
+      "join_rows_including_self": 151227,
+      "timings": {
+        "plugin": {
+          "median_ms": 17.471,
+          "samples_ms": [
+            17.471,
+            15.533,
+            21.5952,
+            21.1988,
+            15.5106
+          ]
+        },
+        "rank": {
+          "median_ms": 61.2629,
+          "samples_ms": [
+            58.9424,
+            65.0666,
+            62.7607,
+            61.2629,
+            58.7124
+          ]
+        },
+        "rank_by": {
+          "median_ms": 67.6832,
+          "samples_ms": [
+            64.5636,
+            73.0455,
+            67.6832,
+            65.6215,
+            71.6745
+          ]
+        },
+        "bands": {
+          "median_ms": 30.8,
+          "samples_ms": [
+            26.778,
+            39.3094,
+            33.7897,
+            29.7797,
+            30.8
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: aea40bfb-6fe2-4105-8298-9ee86d123422]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: aea40bfb-6fe2-4105-8298-9ee86d123422]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 51036,
+      "join_rows_including_self": 151036,
+      "timings": {
+        "plugin": {
+          "median_ms": 11.5659,
+          "samples_ms": [
+            11.5831,
+            11.3492,
+            11.5659,
+            10.7292,
+            11.7085
+          ]
+        },
+        "rank": {
+          "median_ms": 17.4659,
+          "samples_ms": [
+            17.4659,
+            16.8264,
+            17.5153,
+            16.4774,
+            17.8303
+          ]
+        },
+        "rank_by": {
+          "median_ms": 51.9347,
+          "samples_ms": [
+            50.6041,
+            52.2447,
+            50.4432,
+            56.7642,
+            51.9347
+          ]
+        },
+        "bands": {
+          "median_ms": 27.5413,
+          "samples_ms": [
+            25.0842,
+            23.6221,
+            27.5413,
+            31.586,
+            29.5457
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 1000000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: d7d0e952-1d7e-4453-8a44-f294a83acdbe]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: d7d0e952-1d7e-4453-8a44-f294a83acdbe]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 10,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 50974,
+      "join_rows_including_self": 150974,
+      "timings": {
+        "plugin": {
+          "median_ms": 10.27,
+          "samples_ms": [
+            10.4578,
+            9.9999,
+            11.1547,
+            10.27,
+            9.6248
+          ]
+        },
+        "rank": {
+          "median_ms": 16.3852,
+          "samples_ms": [
+            16.545,
+            14.9244,
+            16.3852,
+            16.3639,
+            19.3268
+          ]
+        },
+        "rank_by": {
+          "median_ms": 42.6333,
+          "samples_ms": [
+            47.5324,
+            42.5142,
+            43.872,
+            41.7668,
+            42.6333
+          ]
+        },
+        "bands": {
+          "median_ms": 27.9854,
+          "samples_ms": [
+            28.8835,
+            29.1485,
+            26.563,
+            27.9854,
+            25.9274
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 63a08f78-a961-4f17-8eae-1f11607a8e24]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 63a08f78-a961-4f17-8eae-1f11607a8e24]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 100,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 50413,
+      "join_rows_including_self": 150413,
+      "timings": {
+        "plugin": {
+          "median_ms": 14.6439,
+          "samples_ms": [
+            14.6439,
+            13.6016,
+            14.751,
+            16.0406,
+            14.4603
+          ]
+        },
+        "rank": {
+          "median_ms": 13.8365,
+          "samples_ms": [
+            13.8059,
+            13.8365,
+            13.8523,
+            12.9713,
+            14.3617
+          ]
+        },
+        "rank_by": {
+          "median_ms": 35.2261,
+          "samples_ms": [
+            35.2261,
+            34.353,
+            35.7992,
+            34.7133,
+            35.4581
+          ]
+        },
+        "bands": {
+          "median_ms": 25.8454,
+          "samples_ms": [
+            25.8428,
+            31.0714,
+            25.8454,
+            25.5273,
+            26.8466
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 25137900-4843-4dab-9a08-7f7a3767aed0]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 25137900-4843-4dab-9a08-7f7a3767aed0]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 1000,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 12487335,
+      "join_rows_including_self": 12497335,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.746,
+          "samples_ms": [
+            1.6877,
+            1.9967,
+            2.0422,
+            1.598,
+            1.746
+          ]
+        },
+        "rank": {
+          "median_ms": 7.1205,
+          "samples_ms": [
+            7.1205,
+            6.9606,
+            7.1563,
+            6.8477,
+            7.274
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.3463,
+          "samples_ms": [
+            7.3463,
+            7.3059,
+            7.275,
+            7.8374,
+            7.461
+          ]
+        }
+      },
+      "skipped": {
+        "bands": {
+          "reason": "intermediate row safety limit",
+          "rows": 12497335
+        },
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "dense",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 1246893,
+      "join_rows_including_self": 1256893,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.8592,
+          "samples_ms": [
+            1.7571,
+            1.8592,
+            1.7144,
+            1.9294,
+            2.0137
+          ]
+        },
+        "rank": {
+          "median_ms": 4.6468,
+          "samples_ms": [
+            4.6468,
+            5.5665,
+            4.2354,
+            4.4294,
+            4.8259
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.9463,
+          "samples_ms": [
+            8.1435,
+            7.5796,
+            8.0401,
+            7.2037,
+            7.9463
+          ]
+        },
+        "bands": {
+          "median_ms": 16.3645,
+          "samples_ms": [
+            16.3645,
+            16.0322,
+            15.9493,
+            25.7237,
+            18.3476
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 521bb22e-ebbb-4c77-b67e-0237ee768312]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 521bb22e-ebbb-4c77-b67e-0237ee768312]\n          END IEJOIN JOIN"
+      },
+      "scenario": "dense",
+      "n": 10000,
+      "groups": 10,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 123547,
+      "join_rows_including_self": 133547,
+      "timings": {
+        "plugin": {
+          "median_ms": 2.4052,
+          "samples_ms": [
+            2.1592,
+            2.3618,
+            2.6454,
+            2.8083,
+            2.4052
+          ]
+        },
+        "rank": {
+          "median_ms": 4.5874,
+          "samples_ms": [
+            5.3632,
+            4.4281,
+            4.5874,
+            4.3771,
+            4.9543
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.0155,
+          "samples_ms": [
+            7.3872,
+            6.8879,
+            6.5595,
+            7.0155,
+            7.0198
+          ]
+        },
+        "bands": {
+          "median_ms": 6.1681,
+          "samples_ms": [
+            5.9866,
+            6.0049,
+            6.3933,
+            6.1681,
+            6.373
+          ]
+        },
+        "equality": {
+          "median_ms": 13.4713,
+          "samples_ms": [
+            13.8697,
+            13.1934,
+            13.4713,
+            13.63,
+            13.1079
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: b0548e8e-6da7-4c05-b3da-0c5bfe5b9be3]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: b0548e8e-6da7-4c05-b3da-0c5bfe5b9be3]\n          END IEJOIN JOIN",
+        "equality": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          FILTER (col(\"end_right\") <= col(\"end\")) & (col(\"start\") <= col(\"start_right\"))\n          FROM\n            simple \u03c0 5/5 [\"row\", \"end_right\", \"end\", ... 2 other columns]\n              INNER JOIN:\n              LEFT PLAN ON: [col(\"group\")]\n                CACHE[id: 472ee2fd-dbca-40eb-bf8b-f43c455dcfb8]\n                  ROW INDEX name: row, offset: 0\n                    DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n              RIGHT PLAN ON: [col(\"group\")]\n                simple \u03c0 3/3 [\"start\", \"end\", \"group\"]\n                  CACHE[id: 472ee2fd-dbca-40eb-bf8b-f43c455dcfb8]\n              END INNER JOIN"
+      },
+      "scenario": "dense",
+      "n": 10000,
+      "groups": 100,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 11188,
+      "join_rows_including_self": 21188,
+      "timings": {
+        "plugin": {
+          "median_ms": 7.2216,
+          "samples_ms": [
+            7.2198,
+            9.5037,
+            7.1956,
+            7.2413,
+            7.2216
+          ]
+        },
+        "rank": {
+          "median_ms": 4.877,
+          "samples_ms": [
+            5.029,
+            5.2248,
+            4.877,
+            4.5524,
+            4.6995
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.4744,
+          "samples_ms": [
+            8.4744,
+            8.6578,
+            8.7383,
+            7.4604,
+            7.3324
+          ]
+        },
+        "bands": {
+          "median_ms": 5.4217,
+          "samples_ms": [
+            5.5033,
+            5.4217,
+            5.6667,
+            4.8272,
+            5.344
+          ]
+        },
+        "equality": {
+          "median_ms": 3.9428,
+          "samples_ms": [
+            4.1528,
+            4.6197,
+            3.9428,
+            3.6884,
+            3.7047
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: e9530ee2-5d9e-4633-bb56-a1cad26ebc94]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: e9530ee2-5d9e-4633-bb56-a1cad26ebc94]\n          END IEJOIN JOIN",
+        "equality": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          FILTER (col(\"end_right\") <= col(\"end\")) & (col(\"start\") <= col(\"start_right\"))\n          FROM\n            simple \u03c0 5/5 [\"row\", \"end_right\", \"end\", ... 2 other columns]\n              INNER JOIN:\n              LEFT PLAN ON: [col(\"group\")]\n                CACHE[id: 87f82a9f-9a78-4e30-9031-54b52141ae62]\n                  ROW INDEX name: row, offset: 0\n                    DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n              RIGHT PLAN ON: [col(\"group\")]\n                simple \u03c0 3/3 [\"start\", \"end\", \"group\"]\n                  CACHE[id: 87f82a9f-9a78-4e30-9031-54b52141ae62]\n              END INNER JOIN"
+      },
+      "scenario": "dense",
+      "n": 10000,
+      "groups": 1000,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 1252972088,
+      "join_rows_including_self": 1253072088,
+      "timings": {
+        "plugin": {
+          "median_ms": 14.4314,
+          "samples_ms": [
+            13.4987,
+            24.0347,
+            14.4314,
+            17.1652,
+            13.6946
+          ]
+        },
+        "rank": {
+          "median_ms": 42.576,
+          "samples_ms": [
+            41.5701,
+            43.8689,
+            47.4864,
+            42.1957,
+            42.576
+          ]
+        },
+        "rank_by": {
+          "median_ms": 44.6555,
+          "samples_ms": [
+            43.8835,
+            45.4651,
+            44.3081,
+            44.7856,
+            44.6555
+          ]
+        }
+      },
+      "skipped": {
+        "bands": {
+          "reason": "intermediate row safety limit",
+          "rows": 1253072088
+        },
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "dense",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 125291194,
+      "join_rows_including_self": 125391194,
+      "timings": {
+        "plugin": {
+          "median_ms": 11.6184,
+          "samples_ms": [
+            11.5471,
+            11.6184,
+            11.7178,
+            11.5725,
+            12.9572
+          ]
+        },
+        "rank": {
+          "median_ms": 16.1414,
+          "samples_ms": [
+            16.1414,
+            16.0055,
+            16.6611,
+            16.0195,
+            16.7291
+          ]
+        },
+        "rank_by": {
+          "median_ms": 44.762,
+          "samples_ms": [
+            43.4811,
+            49.3861,
+            44.762,
+            48.7116,
+            44.6358
+          ]
+        }
+      },
+      "skipped": {
+        "bands": {
+          "reason": "intermediate row safety limit",
+          "rows": 125391194
+        },
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 1000000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "dense",
+      "n": 100000,
+      "groups": 10,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 12515429,
+      "join_rows_including_self": 12615429,
+      "timings": {
+        "plugin": {
+          "median_ms": 11.2874,
+          "samples_ms": [
+            11.8691,
+            11.2874,
+            10.5792,
+            10.8845,
+            12.3484
+          ]
+        },
+        "rank": {
+          "median_ms": 14.722,
+          "samples_ms": [
+            15.146,
+            14.722,
+            14.0862,
+            13.76,
+            16.2934
+          ]
+        },
+        "rank_by": {
+          "median_ms": 41.847,
+          "samples_ms": [
+            42.273,
+            44.5705,
+            41.847,
+            41.5464,
+            41.8367
+          ]
+        }
+      },
+      "skipped": {
+        "bands": {
+          "reason": "intermediate row safety limit",
+          "rows": 12615429
+        },
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "dense",
+      "n": 100000,
+      "groups": 100,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 1241174,
+      "join_rows_including_self": 1341174,
+      "timings": {
+        "plugin": {
+          "median_ms": 14.3385,
+          "samples_ms": [
+            17.0956,
+            14.3385,
+            15.3766,
+            13.8992,
+            14.0667
+          ]
+        },
+        "rank": {
+          "median_ms": 13.9155,
+          "samples_ms": [
+            14.7188,
+            13.9837,
+            13.9155,
+            13.1397,
+            13.745
+          ]
+        },
+        "rank_by": {
+          "median_ms": 34.8034,
+          "samples_ms": [
+            40.9539,
+            34.4205,
+            35.4585,
+            33.7447,
+            34.8034
+          ]
+        },
+        "bands": {
+          "median_ms": 34.8092,
+          "samples_ms": [
+            36.6028,
+            34.8092,
+            35.5676,
+            34.3074,
+            33.7479
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 59267863-ed9f-49c9-8d33-1332b11b3ce1]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 59267863-ed9f-49c9-8d33-1332b11b3ce1]\n          END IEJOIN JOIN"
+      },
+      "scenario": "dense",
+      "n": 100000,
+      "groups": 1000,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 2143051,
+      "join_rows_including_self": 2153051,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.7237,
+          "samples_ms": [
+            1.4687,
+            1.7237,
+            1.5704,
+            1.8286,
+            1.8305
+          ]
+        },
+        "rank": {
+          "median_ms": 4.1748,
+          "samples_ms": [
+            4.1748,
+            4.6716,
+            4.0403,
+            3.8826,
+            4.2255
+          ]
+        },
+        "rank_by": {
+          "median_ms": 4.4601,
+          "samples_ms": [
+            4.5569,
+            4.2208,
+            4.5217,
+            4.4601,
+            3.9443
+          ]
+        }
+      },
+      "skipped": {
+        "bands": {
+          "reason": "intermediate row safety limit",
+          "rows": 2153051
+        },
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "mixed",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 205470,
+      "join_rows_including_self": 215470,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.6498,
+          "samples_ms": [
+            1.6498,
+            1.5543,
+            1.836,
+            1.5711,
+            1.7908
+          ]
+        },
+        "rank": {
+          "median_ms": 4.7189,
+          "samples_ms": [
+            5.0697,
+            4.2503,
+            5.1786,
+            4.3068,
+            4.7189
+          ]
+        },
+        "rank_by": {
+          "median_ms": 6.1004,
+          "samples_ms": [
+            6.1004,
+            5.742,
+            6.1229,
+            5.4666,
+            6.4993
+          ]
+        },
+        "bands": {
+          "median_ms": 7.0242,
+          "samples_ms": [
+            7.0883,
+            7.7211,
+            6.9095,
+            7.0242,
+            6.7925
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 02c4f7ff-d480-4ddf-8747-a78b60e2186c]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 02c4f7ff-d480-4ddf-8747-a78b60e2186c]\n          END IEJOIN JOIN"
+      },
+      "scenario": "mixed",
+      "n": 10000,
+      "groups": 10,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 14700,
+      "join_rows_including_self": 24700,
+      "timings": {
+        "plugin": {
+          "median_ms": 2.2854,
+          "samples_ms": [
+            2.0381,
+            2.2862,
+            2.0352,
+            2.7065,
+            2.2854
+          ]
+        },
+        "rank": {
+          "median_ms": 4.9172,
+          "samples_ms": [
+            4.2327,
+            4.7898,
+            4.9172,
+            18.1406,
+            4.9311
+          ]
+        },
+        "rank_by": {
+          "median_ms": 6.7838,
+          "samples_ms": [
+            6.7577,
+            7.3979,
+            6.2887,
+            6.7838,
+            6.9046
+          ]
+        },
+        "bands": {
+          "median_ms": 5.5452,
+          "samples_ms": [
+            5.5452,
+            5.3996,
+            5.6357,
+            4.9925,
+            5.6412
+          ]
+        },
+        "equality": {
+          "median_ms": 11.1026,
+          "samples_ms": [
+            10.339,
+            11.1026,
+            11.5783,
+            11.9185,
+            10.8926
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 0bcf78f6-531c-4386-bd8f-edc53a74d0b6]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 0bcf78f6-531c-4386-bd8f-edc53a74d0b6]\n          END IEJOIN JOIN",
+        "equality": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          FILTER (col(\"end_right\") <= col(\"end\")) & (col(\"start\") <= col(\"start_right\"))\n          FROM\n            simple \u03c0 5/5 [\"row\", \"end_right\", \"end\", ... 2 other columns]\n              INNER JOIN:\n              LEFT PLAN ON: [col(\"group\")]\n                CACHE[id: 7ebdf7c0-4ef6-4373-97b3-1bb99575619b]\n                  ROW INDEX name: row, offset: 0\n                    DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n              RIGHT PLAN ON: [col(\"group\")]\n                simple \u03c0 3/3 [\"start\", \"end\", \"group\"]\n                  CACHE[id: 7ebdf7c0-4ef6-4373-97b3-1bb99575619b]\n              END INNER JOIN"
+      },
+      "scenario": "mixed",
+      "n": 10000,
+      "groups": 100,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 3000,
+      "join_rows_including_self": 13000,
+      "timings": {
+        "plugin": {
+          "median_ms": 7.3293,
+          "samples_ms": [
+            9.318,
+            7.1893,
+            7.3293,
+            7.6448,
+            7.1321
+          ]
+        },
+        "rank": {
+          "median_ms": 5.2728,
+          "samples_ms": [
+            5.3467,
+            4.7055,
+            5.5813,
+            5.2728,
+            4.7378
+          ]
+        },
+        "rank_by": {
+          "median_ms": 8.1041,
+          "samples_ms": [
+            8.1041,
+            9.1588,
+            8.5266,
+            7.5381,
+            7.5897
+          ]
+        },
+        "bands": {
+          "median_ms": 5.0464,
+          "samples_ms": [
+            4.8639,
+            6.0527,
+            5.0464,
+            5.1239,
+            4.8105
+          ]
+        },
+        "equality": {
+          "median_ms": 3.8541,
+          "samples_ms": [
+            3.6555,
+            4.5067,
+            3.7524,
+            4.2906,
+            3.8541
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 71bd1b21-ae5c-494d-9683-bb185c67dca9]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 71bd1b21-ae5c-494d-9683-bb185c67dca9]\n          END IEJOIN JOIN",
+        "equality": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          FILTER (col(\"end_right\") <= col(\"end\")) & (col(\"start\") <= col(\"start_right\"))\n          FROM\n            simple \u03c0 5/5 [\"row\", \"end_right\", \"end\", ... 2 other columns]\n              INNER JOIN:\n              LEFT PLAN ON: [col(\"group\")]\n                CACHE[id: 6249a71d-d632-4e32-83b2-6daecdc2f3f9]\n                  ROW INDEX name: row, offset: 0\n                    DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n              RIGHT PLAN ON: [col(\"group\")]\n                simple \u03c0 3/3 [\"start\", \"end\", \"group\"]\n                  CACHE[id: 6249a71d-d632-4e32-83b2-6daecdc2f3f9]\n              END INNER JOIN"
+      },
+      "scenario": "mixed",
+      "n": 10000,
+      "groups": 1000,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 215232065,
+      "join_rows_including_self": 215332065,
+      "timings": {
+        "plugin": {
+          "median_ms": 11.1762,
+          "samples_ms": [
+            11.2874,
+            10.8924,
+            11.1762,
+            11.0434,
+            11.8447
+          ]
+        },
+        "rank": {
+          "median_ms": 20.5328,
+          "samples_ms": [
+            20.5328,
+            22.0342,
+            21.3717,
+            20.1889,
+            19.7578
+          ]
+        },
+        "rank_by": {
+          "median_ms": 22.5678,
+          "samples_ms": [
+            22.5678,
+            24.6699,
+            22.7516,
+            22.3897,
+            21.8541
+          ]
+        }
+      },
+      "skipped": {
+        "bands": {
+          "reason": "intermediate row safety limit",
+          "rows": 215332065
+        },
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "mixed",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 21430510,
+      "join_rows_including_self": 21530510,
+      "timings": {
+        "plugin": {
+          "median_ms": 10.6425,
+          "samples_ms": [
+            10.6425,
+            10.0148,
+            10.272,
+            12.3436,
+            11.4456
+          ]
+        },
+        "rank": {
+          "median_ms": 12.6316,
+          "samples_ms": [
+            23.2843,
+            12.4295,
+            12.6316,
+            11.9781,
+            12.9389
+          ]
+        },
+        "rank_by": {
+          "median_ms": 23.6592,
+          "samples_ms": [
+            22.8054,
+            27.2864,
+            23.6592,
+            23.262,
+            26.594
+          ]
+        }
+      },
+      "skipped": {
+        "bands": {
+          "reason": "intermediate row safety limit",
+          "rows": 21530510
+        },
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 1000000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "mixed",
+      "n": 100000,
+      "groups": 10,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 2054700,
+      "join_rows_including_self": 2154700,
+      "timings": {
+        "plugin": {
+          "median_ms": 7.8259,
+          "samples_ms": [
+            8.178,
+            7.3436,
+            7.9194,
+            7.8229,
+            7.8259
+          ]
+        },
+        "rank": {
+          "median_ms": 13.7286,
+          "samples_ms": [
+            14.7651,
+            14.1846,
+            13.7048,
+            13.019,
+            13.7286
+          ]
+        },
+        "rank_by": {
+          "median_ms": 26.0812,
+          "samples_ms": [
+            27.8881,
+            25.6419,
+            26.0812,
+            26.8776,
+            25.8159
+          ]
+        }
+      },
+      "skipped": {
+        "bands": {
+          "reason": "intermediate row safety limit",
+          "rows": 2154700
+        },
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {},
+      "scenario": "mixed",
+      "n": 100000,
+      "groups": 100,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 147000,
+      "join_rows_including_self": 247000,
+      "timings": {
+        "plugin": {
+          "median_ms": 14.2954,
+          "samples_ms": [
+            20.9676,
+            16.0696,
+            12.8532,
+            14.2954,
+            13.7225
+          ]
+        },
+        "rank": {
+          "median_ms": 15.5549,
+          "samples_ms": [
+            14.5495,
+            15.5549,
+            16.2455,
+            16.1278,
+            15.4254
+          ]
+        },
+        "rank_by": {
+          "median_ms": 34.2237,
+          "samples_ms": [
+            34.172,
+            36.2278,
+            32.9336,
+            34.2834,
+            34.2237
+          ]
+        },
+        "bands": {
+          "median_ms": 28.957,
+          "samples_ms": [
+            28.8545,
+            29.7452,
+            30.2863,
+            28.957,
+            28.4821
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 10000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: a86a01b7-280e-419b-a37e-c837fdb8ae8c]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: a86a01b7-280e-419b-a37e-c837fdb8ae8c]\n          END IEJOIN JOIN"
+      },
+      "scenario": "mixed",
+      "n": 100000,
+      "groups": 1000,
+      "dtype": "Int64",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 5046,
+      "join_rows_including_self": 15046,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.0584,
+          "samples_ms": [
+            1.1781,
+            1.0543,
+            1.0584,
+            1.0424,
+            1.1084
+          ]
+        },
+        "rank": {
+          "median_ms": 7.2479,
+          "samples_ms": [
+            7.8828,
+            7.2479,
+            6.8048,
+            7.0384,
+            7.3051
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.1444,
+          "samples_ms": [
+            7.5954,
+            6.9439,
+            6.8606,
+            7.1444,
+            8.0063
+          ]
+        },
+        "join": {
+          "median_ms": 4.0527,
+          "samples_ms": [
+            4.172,
+            3.9732,
+            3.7112,
+            4.0527,
+            4.51
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: e2d4282a-8d53-4c66-9c03-e865e8921d3a]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: e2d4282a-8d53-4c66-9c03-e865e8921d3a]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Date",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 5129,
+      "join_rows_including_self": 15129,
+      "timings": {
+        "plugin": {
+          "median_ms": 2.3043,
+          "samples_ms": [
+            2.7706,
+            2.3043,
+            2.2562,
+            2.4731,
+            2.3028
+          ]
+        },
+        "rank": {
+          "median_ms": 4.9927,
+          "samples_ms": [
+            4.891,
+            4.2923,
+            5.0847,
+            4.9927,
+            5.2134
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.2892,
+          "samples_ms": [
+            7.2892,
+            6.9494,
+            7.2707,
+            7.6272,
+            7.3268
+          ]
+        },
+        "bands": {
+          "median_ms": 5.7223,
+          "samples_ms": [
+            5.7223,
+            5.0739,
+            5.5119,
+            5.7362,
+            6.1202
+          ]
+        },
+        "equality": {
+          "median_ms": 8.9193,
+          "samples_ms": [
+            8.4959,
+            9.7355,
+            8.9193,
+            8.605,
+            11.0062
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 7ec79d1c-94a2-4696-9b2b-694725482b7e]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000003\") - col(\"__POLARS_CSER_0x100000004\")) + col(\"__POLARS_CSER_0x100000010\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000007\") - col(\"__POLARS_CSER_0x100000004\")) + col(\"__POLARS_CSER_0x100000010\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000007\").max() - col(\"__POLARS_CSER_0x100000004\")) + 1)).alias(\"__POLARS_CSER_0x100000010\"), col(\"__POLARS_CSER_0x100000004\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000007\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().cast(Int64).min().alias(\"__POLARS_CSER_0x100000004\"), col(\"end\").to_physical().cast(Int64).alias(\"__POLARS_CSER_0x100000007\"), col(\"start\").to_physical().cast(Int64).alias(\"__POLARS_CSER_0x100000003\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 7ec79d1c-94a2-4696-9b2b-694725482b7e]\n          END IEJOIN JOIN",
+        "equality": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          FILTER (col(\"end_right\") <= col(\"end\")) & (col(\"start\") <= col(\"start_right\"))\n          FROM\n            simple \u03c0 5/5 [\"row\", \"end_right\", \"end\", ... 2 other columns]\n              INNER JOIN:\n              LEFT PLAN ON: [col(\"group\")]\n                CACHE[id: dfcd3585-40a0-438c-a78a-9c43c95c7c8f]\n                  ROW INDEX name: row, offset: 0\n                    DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n              RIGHT PLAN ON: [col(\"group\")]\n                simple \u03c0 3/3 [\"start\", \"end\", \"group\"]\n                  CACHE[id: dfcd3585-40a0-438c-a78a-9c43c95c7c8f]\n              END INNER JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 100,
+      "dtype": "Date",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 51227,
+      "join_rows_including_self": 151227,
+      "timings": {
+        "plugin": {
+          "median_ms": 11.7903,
+          "samples_ms": [
+            12.1297,
+            11.9213,
+            11.6431,
+            11.5085,
+            11.7903
+          ]
+        },
+        "rank": {
+          "median_ms": 55.212,
+          "samples_ms": [
+            55.1255,
+            56.7958,
+            55.212,
+            55.8251,
+            54.0363
+          ]
+        },
+        "rank_by": {
+          "median_ms": 58.2631,
+          "samples_ms": [
+            58.2631,
+            56.0389,
+            57.73,
+            61.7104,
+            63.2528
+          ]
+        },
+        "join": {
+          "median_ms": 20.7246,
+          "samples_ms": [
+            22.3394,
+            20.6864,
+            20.1361,
+            20.7246,
+            21.9806
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 8e17a452-3ac2-45e0-9f6c-9089dc711269]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 8e17a452-3ac2-45e0-9f6c-9089dc711269]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Date",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 50974,
+      "join_rows_including_self": 150974,
+      "timings": {
+        "plugin": {
+          "median_ms": 11.6656,
+          "samples_ms": [
+            11.6656,
+            11.6041,
+            12.8437,
+            13.0164,
+            9.7163
+          ]
+        },
+        "rank": {
+          "median_ms": 14.8875,
+          "samples_ms": [
+            15.692,
+            14.0948,
+            16.2076,
+            14.7523,
+            14.8875
+          ]
+        },
+        "rank_by": {
+          "median_ms": 43.6927,
+          "samples_ms": [
+            43.6927,
+            41.5655,
+            48.4683,
+            45.5662,
+            41.7188
+          ]
+        },
+        "bands": {
+          "median_ms": 27.3222,
+          "samples_ms": [
+            25.396,
+            26.8048,
+            27.3222,
+            28.8267,
+            27.7131
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 31b2a2c2-4513-4ff7-bd80-b97968a0511b]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000003\") - col(\"__POLARS_CSER_0x100000004\")) + col(\"__POLARS_CSER_0x100000010\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000007\") - col(\"__POLARS_CSER_0x100000004\")) + col(\"__POLARS_CSER_0x100000010\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000007\").max() - col(\"__POLARS_CSER_0x100000004\")) + 1)).alias(\"__POLARS_CSER_0x100000010\"), col(\"__POLARS_CSER_0x100000004\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000007\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().cast(Int64).min().alias(\"__POLARS_CSER_0x100000004\"), col(\"end\").to_physical().cast(Int64).alias(\"__POLARS_CSER_0x100000007\"), col(\"start\").to_physical().cast(Int64).alias(\"__POLARS_CSER_0x100000003\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 31b2a2c2-4513-4ff7-bd80-b97968a0511b]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 100,
+      "dtype": "Date",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 5046,
+      "join_rows_including_self": 15046,
+      "timings": {
+        "plugin": {
+          "median_ms": 1.1129,
+          "samples_ms": [
+            1.1129,
+            1.0117,
+            1.0583,
+            1.1274,
+            1.1477
+          ]
+        },
+        "rank": {
+          "median_ms": 7.3081,
+          "samples_ms": [
+            7.6848,
+            7.3179,
+            7.2019,
+            6.9937,
+            7.3081
+          ]
+        },
+        "rank_by": {
+          "median_ms": 7.9804,
+          "samples_ms": [
+            8.182,
+            7.7516,
+            7.3479,
+            8.1087,
+            7.9804
+          ]
+        },
+        "join": {
+          "median_ms": 4.0845,
+          "samples_ms": [
+            3.899,
+            4.1988,
+            3.8396,
+            4.0845,
+            4.3433
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 5f438332-fcf3-4890-80d4-fe8bbb5cbb8c]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 5f438332-fcf3-4890-80d4-fe8bbb5cbb8c]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 1,
+      "dtype": "Datetime(time_unit='us', time_zone='UTC')",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 5129,
+      "join_rows_including_self": 15129,
+      "timings": {
+        "plugin": {
+          "median_ms": 2.5596,
+          "samples_ms": [
+            2.4591,
+            2.4433,
+            2.5596,
+            2.5757,
+            2.5955
+          ]
+        },
+        "rank": {
+          "median_ms": 4.3284,
+          "samples_ms": [
+            4.3284,
+            4.1375,
+            4.4115,
+            3.991,
+            5.1643
+          ]
+        },
+        "rank_by": {
+          "median_ms": 6.9072,
+          "samples_ms": [
+            7.0801,
+            6.7183,
+            6.9072,
+            6.2596,
+            7.031
+          ]
+        },
+        "bands": {
+          "median_ms": 5.4772,
+          "samples_ms": [
+            5.7256,
+            4.9889,
+            14.7051,
+            5.0739,
+            5.4772
+          ]
+        },
+        "equality": {
+          "median_ms": 11.1756,
+          "samples_ms": [
+            11.3307,
+            10.5589,
+            10.4143,
+            12.1607,
+            11.1756
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: fed714ce-8269-4848-9ca3-e078ae364845]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: fed714ce-8269-4848-9ca3-e078ae364845]\n          END IEJOIN JOIN",
+        "equality": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          FILTER (col(\"end_right\") <= col(\"end\")) & (col(\"start\") <= col(\"start_right\"))\n          FROM\n            simple \u03c0 5/5 [\"row\", \"end_right\", \"end\", ... 2 other columns]\n              INNER JOIN:\n              LEFT PLAN ON: [col(\"group\")]\n                CACHE[id: f0353a6f-215a-46c2-ac72-0f7d64e180f0]\n                  ROW INDEX name: row, offset: 0\n                    DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n              RIGHT PLAN ON: [col(\"group\")]\n                simple \u03c0 3/3 [\"start\", \"end\", \"group\"]\n                  CACHE[id: f0353a6f-215a-46c2-ac72-0f7d64e180f0]\n              END INNER JOIN"
+      },
+      "scenario": "sparse",
+      "n": 10000,
+      "groups": 100,
+      "dtype": "Datetime(time_unit='us', time_zone='UTC')",
+      "window": true
+    },
+    {
+      "pairs_excluding_self": 51227,
+      "join_rows_including_self": 151227,
+      "timings": {
+        "plugin": {
+          "median_ms": 13.3887,
+          "samples_ms": [
+            13.0257,
+            12.8557,
+            13.3887,
+            13.5529,
+            14.2996
+          ]
+        },
+        "rank": {
+          "median_ms": 57.4282,
+          "samples_ms": [
+            55.7048,
+            65.2,
+            57.0538,
+            59.551,
+            57.4282
+          ]
+        },
+        "rank_by": {
+          "median_ms": 61.5999,
+          "samples_ms": [
+            57.563,
+            62.525,
+            61.5999,
+            57.5687,
+            64.7619
+          ]
+        },
+        "join": {
+          "median_ms": 23.7126,
+          "samples_ms": [
+            23.3334,
+            23.7126,
+            25.4536,
+            22.5543,
+            25.9477
+          ]
+        }
+      },
+      "skipped": {},
+      "native_plans": {
+        "join": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: 9ef7112b-9250-461e-8f71-8808067ce8c4]\n              ROW INDEX name: row, offset: 0\n                DF [\"start\", \"end\", \"group\"]; PROJECT[\"end\", \"start\"] 2/3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: 9ef7112b-9250-461e-8f71-8808067ce8c4]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 1,
+      "dtype": "Datetime(time_unit='us', time_zone='UTC')",
+      "window": false
+    },
+    {
+      "pairs_excluding_self": 50974,
+      "join_rows_including_self": 150974,
+      "timings": {
+        "plugin": {
+          "median_ms": 10.2427,
+          "samples_ms": [
+            10.4387,
+            10.0928,
+            10.2427,
+            10.0318,
+            10.4459
+          ]
+        },
+        "rank": {
+          "median_ms": 14.1727,
+          "samples_ms": [
+            14.0812,
+            14.1727,
+            14.5583,
+            13.779,
+            15.3711
+          ]
+        },
+        "rank_by": {
+          "median_ms": 44.7052,
+          "samples_ms": [
+            46.6143,
+            46.9042,
+            44.7052,
+            41.8346,
+            41.9925
+          ]
+        },
+        "bands": {
+          "median_ms": 28.945,
+          "samples_ms": [
+            30.9207,
+            34.8985,
+            27.0603,
+            24.8637,
+            28.945
+          ]
+        }
+      },
+      "skipped": {
+        "equality": {
+          "reason": "intermediate row safety limit",
+          "rows": 100000000
+        }
+      },
+      "native_plans": {
+        "bands": "simple \u03c0 1/1 [\"count\"]\n  SORT BY [col(\"row\")]\n    simple \u03c0 2/2 [\"count\", \"row\"]\n      AGGREGATE[maintain_order: false]\n        [(len().cast(UInt64) - 1).alias(\"count\")] BY [col(\"row\")]\n        FROM\n        simple \u03c0 1/1 [\"row\"]\n          IEJOIN JOIN:\n          LEFT PLAN ON: [col(\"end\"), col(\"start\")]\n            CACHE[id: a81d8ccc-848a-43b2-a6b4-01d991cf8a9e]\n              simple \u03c0 3/3 [\"row\", \"end\", \"start\"]\n                simple \u03c0 4/4 [\"row\", \"start\", \"end\", \"group\"]\n                   WITH_COLUMNS:\n                   [((col(\"__POLARS_CSER_0x100000002\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"start\"), ((col(\"__POLARS_CSER_0x100000005\") - col(\"__POLARS_CSER_0x100000003\")) + col(\"__POLARS_CSER_0x10000000e\")).alias(\"end\")] \n                    simple \u03c0 8/8 [\"row\", \"start\", \"end\", \"group\", ... 4 other columns]\n                       WITH_COLUMNS:\n                       [((col(\"group\").rank().cast(Int64) - 1) * ((col(\"__POLARS_CSER_0x100000005\").max() - col(\"__POLARS_CSER_0x100000003\")) + 1)).alias(\"__POLARS_CSER_0x10000000e\"), col(\"__POLARS_CSER_0x100000003\"), col(\"__POLARS_CSER_0x100000002\"), col(\"__POLARS_CSER_0x100000005\")] \n                         WITH_COLUMNS:\n                         [col(\"start\").to_physical().min().alias(\"__POLARS_CSER_0x100000003\"), col(\"end\").to_physical().alias(\"__POLARS_CSER_0x100000005\"), col(\"start\").to_physical().alias(\"__POLARS_CSER_0x100000002\")] \n                          ROW INDEX name: row, offset: 0\n                            DF [\"start\", \"end\", \"group\"]; PROJECT */3 COLUMNS\n          RIGHT PLAN ON: [col(\"end\"), col(\"start\")]\n            simple \u03c0 2/2 [\"start\", \"end\"]\n              CACHE[id: a81d8ccc-848a-43b2-a6b4-01d991cf8a9e]\n          END IEJOIN JOIN"
+      },
+      "scenario": "sparse",
+      "n": 100000,
+      "groups": 100,
+      "dtype": "Datetime(time_unit='us', time_zone='UTC')",
+      "window": true
+    }
+  ]
+}

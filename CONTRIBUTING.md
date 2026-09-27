@@ -72,5 +72,9 @@ For the Rust API reference, set `RUSTDOCFLAGS` to `-D warnings` and run
 | `benchmarks` | Benchmark runners, reporting tools, and saved results |
 | `docs` | Documentation site and release guide |
 
+The generic `intervals_core::containment_counts(&starts, &ends)` API has no
+production dependencies. `polars_intervals::containment_count(&starts, &ends)`
+uses the shared integer, Date, and Datetime extraction path.
+
 For publishing instructions, see the
 [release guide](https://github.com/jplauri/polars-intervals/blob/master/docs/releasing.md).

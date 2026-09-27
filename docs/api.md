@@ -2,6 +2,8 @@
 
 ::: polars_intervals.minimum_stabbing_points
 
+::: polars_intervals.containment_count
+
 ::: polars_intervals.overlap_count
 
 ::: polars_intervals.assign_lanes

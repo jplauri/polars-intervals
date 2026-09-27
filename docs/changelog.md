@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Count other contained intervals per row with
+  [`containment_count`](usage.md#count-containment), including duplicates,
+  empty intervals, grouped windows, and matching integer/Date/Datetime endpoints.
+
 - Assign intervals to the fewest non-overlapping lanes with
   [`assign_lanes`](usage.md#assign-the-minimum-number-of-lanes).
 - Select a schedule with maximum total weight using

@@ -25,6 +25,7 @@ nav:
   - Benchmarks:
       - Overview: benchmarks.md
       - Overlap counting: overlap-count-benchmarks.md
+      - Containment counting: containment-benchmarks.md
       - Lane assignment: assign-lanes-benchmarks.md
       - Weighted scheduling: weighted-scheduling-benchmarks.md
       - Capacity scheduling: capacity-scheduling-benchmarks.md
