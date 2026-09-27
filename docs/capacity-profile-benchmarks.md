@@ -257,20 +257,19 @@ Measurements use Windows x64, an AMD Ryzen 9 3900X (12 cores/24 logical CPUs),
 repository builds or tests ran concurrently with the controlled slices.
 Values below are medians of three timed samples, excluding the separate
 allocation pass. Memory is decimal MB of requested heap, not RSS. Raw CSVs and
-environment metadata are authoritative. The first tables are controlled
-development slices that informed the final implementation; the final matrix
-below reruns every retained candidate against the finished production code.
+environment metadata are authoritative. Development measurements below explain
+the production choices; the final matrix records the completed implementation.
+
+### Development decisions
 
 | Controlled workload | Forced A | C | Implication |
 | --- | ---: | ---: | --- |
-| 10K moderate jobs, 1K changes between 4/5 | CSR 380.54 ms, 504 augmentations | Generic 39.65 ms, 32 augmentations | C has a useful distinct regime |
-| 10K moderate jobs, 10K changes between 4/5 | CSR 3870.91 ms, 5004 augmentations | Generic 41.07 ms, 32 augmentations | About 94 times faster in this case |
 | 1K dense jobs, 16 segments with one capacity-1 bottleneck and capacity 1000 elsewhere | CSR 290.49 ms, 1755 augmentations | CSR 165.29 ms, 1000 augmentations | Guarded tightening plus adaptive choice: 0.513 ms, one augmentation |
 | 1K dense jobs, 100 alternating capacity 1/1000 segments | CSR 182.58 ms, 1149 augmentations | CSR 163.22 ms, 1000 augmentations | Guarded tightening plus adaptive choice: 0.510 ms, one augmentation |
 
-The last two cases show why choosing only from raw supply counts is insufficient.
-They motivated the proved capacity bounds rather than a fragile special-case
-threshold. `capacity-profile-adversary-*.csv` labels the original supply-only
+These cases motivated the capacity bounds: raw supply counts alone do not
+predict how much unused flow can traverse bottlenecks.
+`capacity-profile-adversary-*.csv` labels the original supply-only
 selector `csr_budget` and the independently tightened benchmark candidate
 `csr_tight`. Both remain benchmark-only for reproducing the decision.
 
@@ -278,30 +277,11 @@ selector `csr_budget` and the independently tightened benchmark candidate
 | --- | ---: | ---: | ---: |
 | 1K jobs | 1.936 ms | 0.660 ms | 0.642 ms |
 | 10K jobs | 22.252 ms | 6.385 ms | 2.330 ms |
-| 100K jobs | intentionally omitted | 65.862 ms | 20.240 ms |
-| 1M jobs | intentionally omitted | 680.915 ms | 226.015 ms |
 
-The 1M component run requested 125.37 MB peak heap for serial solving and
-127.61 MB for scoped parallel solving. Threading is retained at 16,384 candidate
-rows and at least eight components, with at most eight workers; smaller inputs
-stay serial. Large global constrained
-graphs were intentionally omitted after measuring their smaller-scale trend.
-
-Other measured decisions:
-
-- A general all-positive-feasible sweep on 1K disjoint jobs with capacities
-  alternating 4/5 reduced forced CSR time from 0.899 ms to 0.119 ms.
-- A zero profile only partly covering 1M job endpoints originally took
-  147.04 ms through general preprocessing; the scalar zero path took 11.09 ms.
-  The final implementation recognizes globally zero profiles directly.
-- On shuffled 10K profile rows, packed normalization took 329.3 microseconds
-  versus 367.7 microseconds for indirect sorting. At 1K rows it took 25.2 versus
-  33.7 microseconds. Indirect sorting saved 160 KB at 10K rows. The final matrix
-  confirms that packed sorting wins on shuffled profiles; the sorted-profile
-  result is more nuanced, as reported below.
-
-These decision slices preceded final adaptive production dispatch; their
-`production` columns describe that earlier baseline.
+Larger constrained global graphs were omitted after measuring this trend;
+the final component scaling table below reaches 1M jobs. These development
+slices precede final adaptive dispatch: their raw `production` columns describe
+the earlier baseline. All raw samples remain available.
 
 ### Final production matrix
 
@@ -338,8 +318,9 @@ The final 1M forced serial/parallel peaks are 125.372/127.608 MB; these exclude
 some public-wrapper preprocessing and must not be mistaken for the public
 143.333 MB peak. Parallelism is useful for substantial separated workloads;
 the 1K result demonstrates its overhead on small inputs. The conservative
-16,384-row threshold keeps the 10K public call serial. Per-component graph
-storage is released before constructing the next graph on each worker.
+16,384-row threshold keeps the 10K public call serial. Parallel solving also
+requires at least eight components and uses at most eight workers. Each worker
+releases its component graph before constructing the next.
 
 ### Measured fast paths
 
@@ -355,9 +336,10 @@ Impossible-job filtering is not free: on the 1K disjoint no-zero workload,
 forcing that preprocessing increased raw CSR time from 0.888 to 0.937 ms.
 Its large gain when jobs cross gaps supports retaining the compact prefix
 filter. The all-positive sweep removes the entire network on feasible inputs.
-The global-zero check reduces the earlier 147 ms preprocessing case to about
-9 ms; positive empty jobs remain selected. Empty-job inputs also appear in
-the timed matrix, but sub-microsecond differences are not useful decisions.
+The global-zero check reduces the 147 ms preprocessing case recorded in
+`capacity-profile-zero.csv` to about 9 ms; positive empty jobs remain selected.
+Empty-job inputs also appear in the timed matrix, but sub-microsecond
+differences are not useful decisions.
 
 | Constant profile | Profile API | Existing scalar | Forced general CSR A |
 | --- | ---: | ---: | ---: |
@@ -391,9 +373,9 @@ and maintenance work without changing the constrained solver bottleneck.
 
 The temporal harness uses a release wheel built from the source distribution,
 installed outside the checkout with Python 3.14 and Polars 1.44.2. Each group
-contains up to 32 mutually overlapping jobs, so sorting weights within each
-clique gives an independent exact objective oracle. Variable capacities cycle
-through 2/4/6/8, with zero gaps between groups. Date and timestamp values are
+contains up to 32 mutually overlapping jobs, so summing the largest weights
+within each clique gives an independent exact objective oracle. Variable
+capacities cycle through 2/4/6/8, with zero gaps between groups. Date and timestamp values are
 translated to real calendar ranges; timeline size depends only on endpoints.
 
 | One million jobs | Constant profile | Scalar constant | High profile | Variable profile |
