@@ -330,12 +330,38 @@ The jobs worth 100 and 130 both cross the noon bottleneck, so only one can
 survive it. The selected subset has total weight 280. Optimization is global
 and exact; sorting jobs by weight and greedily accepting them is not equivalent.
 
-This is a normal eager package function because the two tables have independent
-row counts. It returns a non-null Boolean Series named `selected`, aligned with
-the original job rows. Use `start`, `end`, `weight`, `profile_start`,
-`profile_end`, and `capacity` keyword arguments to choose other column names.
+This eager package function accepts one or two DataFrames. Separate frames can
+have independent row counts. It returns a non-null Boolean Series named
+`selected`, aligned with the original job rows. Use `start`, `end`, `weight`,
+`profile_start`, `profile_end`, and `capacity` to choose other column names.
 For lazy inputs, explicitly collect each input first; this function does not
 hide materialization inside an expression or perform optimization in Python.
+
+Omitting `capacity_profile`, or passing `None`, reads the profile columns from
+`jobs`:
+
+```python
+combined = pl.DataFrame(
+    {
+        "start": [9, 10, 11],
+        "end": [13, 12, 15],
+        "weight": [100, 60, 130],
+        "cap_start": [9, 12, 14],
+        "cap_end": [12, 14, 18],
+        "capacity": [3, 1, 4],
+    }
+)
+selected = pi.max_weight_with_capacity_profile(
+    combined,
+    profile_start="cap_start",
+    profile_end="cap_end",
+)
+print(selected.to_list())  # [False, True, True]
+```
+
+The job and profile columns still describe independent interval sets. Rows are
+not paired: each job uses the capacity function across its entire lifetime,
+regardless of which profile segment shares its row index.
 
 - Jobs and profile rows are half-open `[start, end)`. Touching segments are valid.
 - Profile rows may be unsorted. Overlapping non-empty rows are rejected as

@@ -1,4 +1,4 @@
-"""The eager two-frame API, exercised through the installed native extension."""
+"""The eager profile API, exercised through the installed native extension."""
 
 from datetime import UTC, date, datetime
 from random import Random
@@ -197,6 +197,28 @@ def test_custom_columns_and_original_row_alignment():
     assert mask.to_list() == [True, False, True]
 
 
+@pytest.mark.parametrize("profile_args", [(), (None,)])
+def test_single_frame_profile_preserves_original_row_alignment(profile_args):
+    jobs, profile = frames([(5, 10, 7), (0, 10, 11), (0, 5, 8)], [(0, 4, 2), (4, 6, 1), (6, 10, 2)])
+    combined = jobs.hstack(profile.rename({"start": "cap_start", "end": "cap_end"}))
+    mask = pi.max_weight_with_capacity_profile(
+        combined, *profile_args, profile_start="cap_start", profile_end="cap_end"
+    )
+    assert mask.equals(pi.max_weight_with_capacity_profile(jobs, profile))
+    assert combined.with_columns(mask)["selected"].to_list() == [True, False, True]
+    assert_optimal(jobs, profile, mask)
+
+
+def test_single_frame_default_columns_and_explicit_empty_profile():
+    jobs, profile = frames([(0, 5, 8), (5, 10, 9)], [(0, 5, 1), (5, 10, 0)])
+    combined = jobs.with_columns(profile["capacity"])
+    assert pi.max_weight_with_capacity_profile(combined).to_list() == [True, False]
+    assert pi.max_weight_with_capacity_profile(combined, profile.clear()).to_list() == [
+        False,
+        False,
+    ]
+
+
 def test_variable_profile_across_full_unsigned_endpoint_range():
     maximum = 2**64 - 1
     jobs, profile = frames(
@@ -362,13 +384,21 @@ def test_optional_polars_dtypes_rejected_before_native_import(dtype, role, colum
 
 def test_eager_only_and_missing_columns():
     jobs, profile = frames([(0, 1, 1)], [(0, 1, 1)])
-    for inputs in ((jobs.lazy(), profile), (jobs, profile.lazy()), ([], profile)):
+    for inputs in (
+        (jobs.lazy(), profile),
+        (jobs, profile.lazy()),
+        ([], profile),
+        (jobs.lazy(),),
+        ([],),
+    ):
         with pytest.raises(TypeError, match="eager Polars DataFrames"):
             pi.max_weight_with_capacity_profile(*inputs)
     with pytest.raises(TypeError, match="column names"):
         pi.max_weight_with_capacity_profile(jobs, profile, start=pl.col("start"))
     with pytest.raises(pl.exceptions.ColumnNotFoundError):
         pi.max_weight_with_capacity_profile(jobs, profile, profile_start="missing")
+    with pytest.raises(pl.exceptions.ColumnNotFoundError):
+        pi.max_weight_with_capacity_profile(jobs)
 
 
 @pytest.mark.parametrize("dtype", [pl.Int64, pl.UInt64])

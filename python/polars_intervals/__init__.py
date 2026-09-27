@@ -22,7 +22,7 @@ __all__ = [
 
 def max_weight_with_capacity_profile(
     jobs: pl.DataFrame,
-    capacity_profile: pl.DataFrame,
+    capacity_profile: pl.DataFrame | None = None,
     *,
     start: str = "start",
     end: str = "end",
@@ -35,7 +35,8 @@ def max_weight_with_capacity_profile(
 
     Args:
         jobs: Eager DataFrame containing fixed job intervals and integer weights.
-        capacity_profile: Independent eager DataFrame of capacity segments.
+        capacity_profile: Eager DataFrame of capacity segments. If omitted or
+            None, read the profile columns from ``jobs``.
         start: Job start column name.
         end: Job end column name.
         weight: Job weight column name.
@@ -77,11 +78,13 @@ def max_weight_with_capacity_profile(
         uses the existing ``max_weight_with_capacity(..., capacity=k)`` kernel;
         k=1 reaches the specialized non-overlapping weighted scheduler.
 
-        This eager function calls the native Rust optimizer directly with two
-        independent collections, including all their chunks. It does not hide a
-        LazyFrame collection or perform optimization in Python. Global exact
-        optimization uses a compact timeline flow network whose size depends
-        on breakpoints, never on elapsed Date/Datetime ticks.
+        Job and profile intervals are independent collections, even when their
+        columns share one DataFrame; they are not paired by row. This eager
+        function calls the native Rust optimizer directly with both collections,
+        including all their chunks. It does not hide a LazyFrame collection or
+        perform optimization in Python. Global exact optimization uses a compact
+        timeline flow network whose size depends on breakpoints, never on elapsed
+        Date/Datetime ticks.
 
     Examples:
         >>> import polars as pl
@@ -101,6 +104,8 @@ def max_weight_with_capacity_profile(
     """
     from polars_intervals._internal import max_weight_with_capacity_profile as solve
 
+    if capacity_profile is None:
+        capacity_profile = jobs
     if not isinstance(jobs, pl.DataFrame) or not isinstance(capacity_profile, pl.DataFrame):
         raise TypeError("jobs and capacity_profile must be eager Polars DataFrames")
     if not all(
