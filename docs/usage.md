@@ -3,6 +3,47 @@
 Pass column names or Polars expressions to use interval operations in eager or
 lazy queries. See the [API reference](api.md) for full parameter and return types.
 
+## Select maximum coverage with a budget
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, -5, 6], "end": [10, 4, 15]})
+selected = df.filter(pi.max_k_coverage("start", "end", k=2))
+# [-5,4) and [6,15): 18 units of coverage.
+```
+
+Select at most `k` intervals whose union has maximum total measure. Among
+maximum-coverage solutions, use the fewest intervals. The Boolean expression
+also works in `select`, `with_columns`, lazy queries, and `.over("group")`;
+each group independently gets the same scalar budget.
+
+Intervals are half-open `[start,end)`. Empty intervals never contribute and are
+never selected. Empty input returns an empty Boolean mask; `k=0` returns all
+False after validation. `k>=n` attains the complete union but still omits
+redundant rows. Results are deterministic for identical input and preserve row
+order; no particular optimum mask is guaranteed when both objectives tie.
+
+Endpoints must have exactly matching integer, Date or Datetime dtypes,
+including Datetime unit and timezone. Nulls and reversed intervals are rejected;
+no implicit coercion occurs. Exact physical distance uses integer units, days
+for Date and ms/us/ns ticks for Datetime, even across timezone transitions.
+
+Two tempting greedy rules fail:
+
+- Longest-first: `A=[0,10)`, `B=[-5,4)`, `C=[6,15)`, `k=2`.
+  `A+B` or `A+C` covers 15, but `B+C` covers 18.
+- Top-k by length: `A=[0,10)`, `B=[1,11)`, `C=[10,18)`, `k=2`.
+  The two length-10 intervals cover only 11; `A+C` covers 18.
+
+The implementation uses the exact Li et al. offline dynamic program, not a
+greedy approximation. Worst-case time is `O(n log n + min(k,n)n)` and space
+is `O(n + min(k,n)n)`, with rolling objective rows and compact decisions.
+Validated zero/one budgets take `O(n)`; a sufficient budget uses a minimum
+full-union cover after sorting. See the [design and benchmarks](coverage-benchmarks.md)
+for proofs, literature citations, measured variants and memory scaling.
+
 ## Count containment
 
 Count how many other intervals are contained by each row:

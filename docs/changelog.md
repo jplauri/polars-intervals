@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `max_k_coverage`: exact maximum union measure with a scalar interval
+  budget, using the fewest intervals among maximum-coverage solutions.
+
 - Count other contained intervals per row with
   [`containment_count`](usage.md#count-containment), including duplicates,
   empty intervals, grouped windows, and matching integer/Date/Datetime endpoints.

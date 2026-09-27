@@ -32,6 +32,7 @@ nav:
       - Minimum covering: covering-benchmarks.md
       - Minimum-cost covering: cost-covering-benchmarks.md
       - Minimum stabbing points: stabbing-benchmarks.md
+      - Maximum k-coverage: coverage-benchmarks.md
       - Running and publishing: benchmarking.md
   - Release notes: changelog.md
   - Development:

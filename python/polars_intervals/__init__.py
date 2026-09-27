@@ -9,6 +9,7 @@ from polars.plugins import register_plugin_function
 __all__ = [
     "assign_lanes",
     "containment_count",
+    "max_k_coverage",
     "max_weight_non_overlapping",
     "max_weight_with_capacity",
     "minimum_cost_cover",
@@ -16,6 +17,68 @@ __all__ = [
     "minimum_stabbing_points",
     "overlap_count",
 ]
+
+
+def max_k_coverage(start: str | pl.Expr, end: str | pl.Expr, *, k: int) -> pl.Expr:
+    """Select at most `k` intervals whose union has maximum total measure.
+
+    Among maximum-coverage solutions, use the fewest intervals.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression with exactly the same logical dtype.
+        k: Nonnegative integer budget (Boolean is rejected).
+
+    Returns:
+        pl.Expr: Non-null Boolean mask, one value per original row. True selects
+            the row in one globally optimal solution. Identical inputs give a
+            deterministic result; no particular mask is promised under remaining ties.
+
+    Raises:
+        TypeError: If k is not an integer or is Boolean.
+        ValueError: If k is negative or exceeds the platform usize range.
+        polars.exceptions.PolarsError: For null endpoints, unequal lengths,
+            unsupported or mismatched logical dtypes, or start greater than end.
+            Reversed intervals report the original zero-based row within the group.
+
+    Notes:
+        Intervals are half-open [start, end). Empty intervals are valid and never
+        selected. Empty input returns an empty mask; k=0 returns all False after
+        validation. Each window/group independently uses the same scalar budget.
+        Supports Int8/16/32/64, UInt8/16/32/64, Date, and Datetime ms/us/ns,
+        including matching timezones. No coercion is performed. Measure is exact
+        physical distance: days for Date, column ticks for Datetime, using i128
+        internally. A large budget still excludes redundant intervals.
+
+        Uses Li et al.'s exact offline two-state dynamic program, with containment
+        pruning, a linear predecessor sweep, rolling objective rows and compact
+        reconstruction decisions. Worst-case time O(n log n + min(k,n) n), space
+        O(n + min(k,n) n). Validated k=0/1 takes O(n); a sufficient budget returns
+        a minimum full-union cover after sorting in O(n log n).
+
+        Longest-first is not exact: for [0,10), [-5,4), [6,15), k=2, the last
+        two cover 18, whereas either pair containing the longest covers only 15.
+        Top-k lengths also fails: [0,10) and [1,11) cover 11, while [0,10)
+        and the shorter [10,18) cover 18.
+
+    Examples:
+        >>> df = pl.DataFrame({"start": [0, -5, 6], "end": [10, 4, 15]})
+        >>> df.filter(max_k_coverage("start", "end", k=2))["start"].to_list()
+        [-5, 6]
+    """
+    import sys
+
+    if not isinstance(k, int) or isinstance(k, bool):
+        raise TypeError("k must be a nonnegative integer")
+    if not 0 <= k <= 2 * sys.maxsize + 1:
+        raise ValueError("k must be nonnegative and fit in the platform usize range")
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="max_k_coverage_plugin",
+        args=[start, end],
+        kwargs={"k": str(k)},
+        is_elementwise=False,
+    )
 
 
 def minimum_stabbing_points(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
