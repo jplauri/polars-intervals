@@ -24,6 +24,8 @@ mod cover;
 pub use cover::{minimum_cost_cover, minimum_cover};
 mod stabbing;
 pub use stabbing::{DiscreteEndpoint, minimum_stabbing_points};
+mod coverage;
+pub use coverage::{CoverageEndpoint, max_k_coverage};
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

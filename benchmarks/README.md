@@ -12,6 +12,8 @@ release plugin. Summary and plotting scripts only read saved results.
 
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
+| [`coverage_summary.py`](coverage_summary.py) | Report generator | Core candidate CSV → median runtime and allocation CSV | [Maximum k-coverage](../docs/coverage-benchmarks.md) |
+| [`coverage_temporal.py`](coverage_temporal.py) | End-to-end benchmark | Integer/temporal fixtures → raw timing CSV | [Maximum k-coverage](../docs/coverage-benchmarks.md) |
 | [`overlap_count.py`](overlap_count.py) | End-to-end benchmark | Generated workloads → timing samples, RSS and environment in JSON | [Overlap counting](../docs/overlap-count-benchmarks.md) |
 | [`containment_count.py`](containment_count.py) | End-to-end benchmark | Generated workloads → samples, native plans and pair-count safety skips in JSON | [Containment counting](../docs/containment-benchmarks.md) |
 | [`weighted_summary.py`](weighted_summary.py) | Report generator | Candidate CSV argument → runtime ratios and tables on stdout | [Weighted scheduling](../docs/weighted-scheduling-benchmarks.md) |

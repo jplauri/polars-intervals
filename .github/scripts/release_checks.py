@@ -309,6 +309,15 @@ def installed(checkout):
             capacity_mask.dtype == pl.Boolean and capacity_mask.to_list() == [True, True],
             f"Temporal capacity smoke test failed for {dtype}.",
         )
+    coverage = (
+        pl.DataFrame({"start": [0, -5, 6], "end": [10, 4, 15]})
+        .select(pi.max_k_coverage("start", "end", k=2))
+        .to_series()
+    )
+    require(
+        coverage.dtype == pl.Boolean and coverage.to_list() == [False, True, True],
+        "Maximum k-coverage smoke test failed.",
+    )
     stabbing = (
         pl.DataFrame({"start": [0, 2, 5], "end": [4, 6, 9]})
         .select(pi.minimum_stabbing_points("start", "end"))

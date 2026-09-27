@@ -56,6 +56,19 @@ A contains B when `A.start <= B.start` and `B.end <= A.end`, excluding
 the same row. Duplicates count one another. Empty intervals follow these
 same endpoint inequalities: `[0, 5)` contains `[5, 5)`.
 
+### Maximize coverage with a budget
+
+```python
+df = pl.DataFrame({"start": [0, -5, 6], "end": [10, 4, 15]})
+selected = df.filter(pi.max_k_coverage("start", "end", k=2))
+# Selects [-5, 4) and [6, 15): union measure 18.
+```
+
+Select at most `k` intervals whose union has maximum total measure. Among
+maximum-coverage solutions, use the fewest intervals. The result is an exact,
+deterministic Boolean mask in original row order; empty intervals are never
+selected. See the [design and benchmarks](docs/coverage-benchmarks.md).
+
 ### Cover a target
 
 Select the fewest intervals needed to cover `[0, 10)`:

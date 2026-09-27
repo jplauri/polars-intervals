@@ -34,6 +34,43 @@ fn lanes_output(inputs: &[Field]) -> PolarsResult<Field> {
     Ok(Field::new(start.name().clone(), DataType::UInt32))
 }
 
+fn coverage_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let [start, _] = input_pair(inputs, "max_k_coverage")?;
+    Ok(Field::new(start.name().clone(), DataType::Boolean))
+}
+
+#[derive(serde::Deserialize)]
+struct CoverageOptions {
+    k: String,
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = coverage_output)]
+fn max_k_coverage_plugin(inputs: &[Series], kwargs: CoverageOptions) -> PolarsResult<Series> {
+    let [starts, ends] = input_pair(inputs, "max_k_coverage")?;
+    let k = kwargs
+        .k
+        .parse::<usize>()
+        .map_err(|_| polars_err!(InvalidOperation: "k must be nonnegative and fit in usize"))?;
+    max_k_coverage(starts, ends, k)
+}
+
+/// Select at most `k` intervals whose union has maximum total physical measure.
+///
+/// Among maximum-coverage solutions, use the fewest intervals. Returns a non-null
+/// Boolean Series in original row order. Empty intervals are never selected.
+/// Uses matching integer, Date, and Datetime logical dtypes, including timezone
+/// metadata; exact physical days/ticks are widened before subtraction.
+/// Each supplied collection is solved globally, across all chunks. See
+/// [`intervals_core::max_k_coverage`] for the algorithm, complexity and ties.
+///
+/// # Errors
+///
+/// Rejects unequal lengths, null endpoints, mismatched/unsupported logical dtypes
+/// and reversed intervals, preserving original row indices even when `k=0`.
+pub fn max_k_coverage(starts: &Series, ends: &Series, k: usize) -> PolarsResult<Series> {
+    evaluate(starts, ends, Algorithm::Coverage(k))
+}
+
 fn stabbing_output(inputs: &[Field]) -> PolarsResult<Field> {
     let [start, _] = input_pair(inputs, "minimum_stabbing_points")?;
     Ok(Field::new(
@@ -382,6 +419,7 @@ fn integer_values(values: &Series) -> PolarsResult<Vec<i128>> {
 
 #[derive(Clone, Copy)]
 enum Algorithm<'a> {
+    Coverage(usize),
     Stabbing,
     OverlapCount,
     ContainmentCount,
@@ -395,6 +433,7 @@ enum Algorithm<'a> {
 impl Algorithm<'_> {
     fn name(self) -> &'static str {
         match self {
+            Self::Coverage(_) => "max_k_coverage",
             Self::Stabbing => "minimum_stabbing_points",
             Self::OverlapCount => "overlap_count",
             Self::ContainmentCount => "containment_count",
@@ -452,7 +491,7 @@ fn evaluate_typed<T>(
 ) -> PolarsResult<Series>
 where
     T: PolarsIntegerType,
-    T::Native: intervals_core::DiscreteEndpoint + TryFrom<i128>,
+    T::Native: intervals_core::DiscreteEndpoint + intervals_core::CoverageEndpoint + TryFrom<i128>,
 {
     polars_ensure!(
         starts.null_count() == 0 && ends.null_count() == 0,
@@ -466,6 +505,11 @@ where
             .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
     });
     match algorithm {
+        Algorithm::Coverage(k) => {
+            let mask = intervals_core::max_k_coverage(&starts, &ends, k)
+                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(Series::new(algorithm.name().into(), mask))
+        }
         Algorithm::Stabbing => {
             let points = intervals_core::minimum_stabbing_points(&starts, &ends)
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;

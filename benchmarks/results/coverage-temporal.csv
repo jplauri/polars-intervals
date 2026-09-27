@@ -1,0 +1,1297 @@
+family,order,dtype,n,k,sample,total_ns,measure,count
+disjoint,sorted,Int64,1000,0,0,295900,0,0
+disjoint,sorted,Int64,1000,0,1,272900,0,0
+disjoint,sorted,Int64,1000,0,2,241100,0,0
+disjoint,sorted,Int64,1000,1,0,161200,7,1
+disjoint,sorted,Int64,1000,1,1,137200,7,1
+disjoint,sorted,Int64,1000,1,2,120800,7,1
+disjoint,sorted,Int64,1000,2,0,272900,14,2
+disjoint,sorted,Int64,1000,2,1,225400,14,2
+disjoint,sorted,Int64,1000,2,2,238900,14,2
+disjoint,sorted,Int64,1000,8,0,259000,56,8
+disjoint,sorted,Int64,1000,8,1,199200,56,8
+disjoint,sorted,Int64,1000,8,2,175000,56,8
+disjoint,sorted,Int64,1000,32,0,281700,224,32
+disjoint,sorted,Int64,1000,32,1,327900,224,32
+disjoint,sorted,Int64,1000,32,2,323000,224,32
+disjoint,sorted,Int64,1000,64,0,415800,448,64
+disjoint,sorted,Int64,1000,64,1,356200,448,64
+disjoint,sorted,Int64,1000,64,2,364400,448,64
+disjoint,sorted,Date,1000,0,0,156900,0,0
+disjoint,sorted,Date,1000,0,1,160100,0,0
+disjoint,sorted,Date,1000,0,2,176400,0,0
+disjoint,sorted,Date,1000,1,0,156100,7,1
+disjoint,sorted,Date,1000,1,1,139300,7,1
+disjoint,sorted,Date,1000,1,2,137000,7,1
+disjoint,sorted,Date,1000,2,0,143900,14,2
+disjoint,sorted,Date,1000,2,1,133800,14,2
+disjoint,sorted,Date,1000,2,2,183900,14,2
+disjoint,sorted,Date,1000,8,0,241700,56,8
+disjoint,sorted,Date,1000,8,1,224700,56,8
+disjoint,sorted,Date,1000,8,2,179600,56,8
+disjoint,sorted,Date,1000,32,0,253100,224,32
+disjoint,sorted,Date,1000,32,1,297200,224,32
+disjoint,sorted,Date,1000,32,2,273600,224,32
+disjoint,sorted,Date,1000,64,0,360600,448,64
+disjoint,sorted,Date,1000,64,1,337200,448,64
+disjoint,sorted,Date,1000,64,2,320500,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,0,164000,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,1,127300,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,2,113800,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,0,157700,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,1,128400,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,2,113100,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,0,149800,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,1,261700,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,2,197200,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,0,218500,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,1,196200,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,2,199600,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,0,260900,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,1,287100,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,2,281500,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,0,360300,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,1,360100,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,2,382700,448,64
+disjoint,shuffled,Int64,1000,0,0,143900,0,0
+disjoint,shuffled,Int64,1000,0,1,136500,0,0
+disjoint,shuffled,Int64,1000,0,2,152800,0,0
+disjoint,shuffled,Int64,1000,1,0,129300,7,1
+disjoint,shuffled,Int64,1000,1,1,119000,7,1
+disjoint,shuffled,Int64,1000,1,2,117100,7,1
+disjoint,shuffled,Int64,1000,2,0,312600,14,2
+disjoint,shuffled,Int64,1000,2,1,212500,14,2
+disjoint,shuffled,Int64,1000,2,2,170800,14,2
+disjoint,shuffled,Int64,1000,8,0,191000,56,8
+disjoint,shuffled,Int64,1000,8,1,172400,56,8
+disjoint,shuffled,Int64,1000,8,2,167800,56,8
+disjoint,shuffled,Int64,1000,32,0,306000,224,32
+disjoint,shuffled,Int64,1000,32,1,296900,224,32
+disjoint,shuffled,Int64,1000,32,2,297400,224,32
+disjoint,shuffled,Int64,1000,64,0,365200,448,64
+disjoint,shuffled,Int64,1000,64,1,350900,448,64
+disjoint,shuffled,Int64,1000,64,2,348300,448,64
+disjoint,shuffled,Date,1000,0,0,144400,0,0
+disjoint,shuffled,Date,1000,0,1,164400,0,0
+disjoint,shuffled,Date,1000,0,2,133700,0,0
+disjoint,shuffled,Date,1000,1,0,235800,7,1
+disjoint,shuffled,Date,1000,1,1,148200,7,1
+disjoint,shuffled,Date,1000,1,2,127300,7,1
+disjoint,shuffled,Date,1000,2,0,164200,14,2
+disjoint,shuffled,Date,1000,2,1,159000,14,2
+disjoint,shuffled,Date,1000,2,2,152000,14,2
+disjoint,shuffled,Date,1000,8,0,210800,56,8
+disjoint,shuffled,Date,1000,8,1,185200,56,8
+disjoint,shuffled,Date,1000,8,2,176700,56,8
+disjoint,shuffled,Date,1000,32,0,318200,224,32
+disjoint,shuffled,Date,1000,32,1,304000,224,32
+disjoint,shuffled,Date,1000,32,2,262400,224,32
+disjoint,shuffled,Date,1000,64,0,364500,448,64
+disjoint,shuffled,Date,1000,64,1,344200,448,64
+disjoint,shuffled,Date,1000,64,2,350200,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,0,135000,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,1,155100,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,2,167800,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,0,146900,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,1,159500,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,2,135200,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,0,257900,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,1,204300,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,2,172100,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,0,241800,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,1,225400,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,2,191000,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,0,305900,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,1,272000,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,2,302200,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,0,370300,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,1,352000,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,2,348800,448,64
+staircase,sorted,Int64,1000,0,0,164800,0,0
+staircase,sorted,Int64,1000,0,1,122200,0,0
+staircase,sorted,Int64,1000,0,2,109900,0,0
+staircase,sorted,Int64,1000,1,0,139200,17,1
+staircase,sorted,Int64,1000,1,1,120100,17,1
+staircase,sorted,Int64,1000,1,2,111600,17,1
+staircase,sorted,Int64,1000,2,0,274100,34,2
+staircase,sorted,Int64,1000,2,1,184500,34,2
+staircase,sorted,Int64,1000,2,2,181300,34,2
+staircase,sorted,Int64,1000,8,0,190000,136,8
+staircase,sorted,Int64,1000,8,1,174800,136,8
+staircase,sorted,Int64,1000,8,2,160300,136,8
+staircase,sorted,Int64,1000,32,0,362500,544,32
+staircase,sorted,Int64,1000,32,1,325200,544,32
+staircase,sorted,Int64,1000,32,2,313700,544,32
+staircase,sorted,Int64,1000,64,0,452300,1088,64
+staircase,sorted,Int64,1000,64,1,415100,1088,64
+staircase,sorted,Int64,1000,64,2,421900,1088,64
+staircase,sorted,Date,1000,0,0,157600,0,0
+staircase,sorted,Date,1000,0,1,125700,0,0
+staircase,sorted,Date,1000,0,2,146900,0,0
+staircase,sorted,Date,1000,1,0,162000,17,1
+staircase,sorted,Date,1000,1,1,115400,17,1
+staircase,sorted,Date,1000,1,2,136500,17,1
+staircase,sorted,Date,1000,2,0,164000,34,2
+staircase,sorted,Date,1000,2,1,147500,34,2
+staircase,sorted,Date,1000,2,2,135900,34,2
+staircase,sorted,Date,1000,8,0,206300,136,8
+staircase,sorted,Date,1000,8,1,173600,136,8
+staircase,sorted,Date,1000,8,2,161700,136,8
+staircase,sorted,Date,1000,32,0,320900,544,32
+staircase,sorted,Date,1000,32,1,314100,544,32
+staircase,sorted,Date,1000,32,2,387100,544,32
+staircase,sorted,Date,1000,64,0,485000,1088,64
+staircase,sorted,Date,1000,64,1,444800,1088,64
+staircase,sorted,Date,1000,64,2,470100,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,0,134300,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,1,115600,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,2,107000,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,0,184400,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,1,153800,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,2,132400,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,0,279900,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,1,217800,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,2,196600,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,0,216200,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,1,221200,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,2,219900,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,0,324700,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,1,281200,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,2,263700,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,0,427000,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,1,420900,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,2,475100,1088,64
+staircase,shuffled,Int64,1000,0,0,222700,0,0
+staircase,shuffled,Int64,1000,0,1,230500,0,0
+staircase,shuffled,Int64,1000,0,2,241900,0,0
+staircase,shuffled,Int64,1000,1,0,179600,17,1
+staircase,shuffled,Int64,1000,1,1,162400,17,1
+staircase,shuffled,Int64,1000,1,2,158000,17,1
+staircase,shuffled,Int64,1000,2,0,197700,34,2
+staircase,shuffled,Int64,1000,2,1,215200,34,2
+staircase,shuffled,Int64,1000,2,2,215400,34,2
+staircase,shuffled,Int64,1000,8,0,190700,136,8
+staircase,shuffled,Int64,1000,8,1,219700,136,8
+staircase,shuffled,Int64,1000,8,2,231100,136,8
+staircase,shuffled,Int64,1000,32,0,312100,544,32
+staircase,shuffled,Int64,1000,32,1,330100,544,32
+staircase,shuffled,Int64,1000,32,2,303700,544,32
+staircase,shuffled,Int64,1000,64,0,481600,1088,64
+staircase,shuffled,Int64,1000,64,1,562300,1088,64
+staircase,shuffled,Int64,1000,64,2,492300,1088,64
+staircase,shuffled,Date,1000,0,0,179900,0,0
+staircase,shuffled,Date,1000,0,1,137700,0,0
+staircase,shuffled,Date,1000,0,2,123900,0,0
+staircase,shuffled,Date,1000,1,0,159600,17,1
+staircase,shuffled,Date,1000,1,1,136300,17,1
+staircase,shuffled,Date,1000,1,2,128000,17,1
+staircase,shuffled,Date,1000,2,0,184700,34,2
+staircase,shuffled,Date,1000,2,1,165900,34,2
+staircase,shuffled,Date,1000,2,2,193500,34,2
+staircase,shuffled,Date,1000,8,0,241800,136,8
+staircase,shuffled,Date,1000,8,1,224700,136,8
+staircase,shuffled,Date,1000,8,2,325300,136,8
+staircase,shuffled,Date,1000,32,0,344600,544,32
+staircase,shuffled,Date,1000,32,1,345200,544,32
+staircase,shuffled,Date,1000,32,2,313200,544,32
+staircase,shuffled,Date,1000,64,0,541800,1088,64
+staircase,shuffled,Date,1000,64,1,511100,1088,64
+staircase,shuffled,Date,1000,64,2,498200,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,0,155000,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,1,134000,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,2,122600,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,0,159500,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,1,135400,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,2,124700,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,0,174200,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,1,179200,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,2,160000,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,0,197100,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,1,187000,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,2,182000,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,0,357400,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,1,323000,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,2,299800,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,0,502100,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,1,459200,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,2,441500,1088,64
+identical,sorted,Int64,1000,0,0,132700,0,0
+identical,sorted,Int64,1000,0,1,112800,0,0
+identical,sorted,Int64,1000,0,2,108700,0,0
+identical,sorted,Int64,1000,1,0,118500,7,1
+identical,sorted,Int64,1000,1,1,110300,7,1
+identical,sorted,Int64,1000,1,2,109000,7,1
+identical,sorted,Int64,1000,2,0,144700,7,1
+identical,sorted,Int64,1000,2,1,141200,7,1
+identical,sorted,Int64,1000,2,2,145400,7,1
+identical,sorted,Int64,1000,8,0,164400,7,1
+identical,sorted,Int64,1000,8,1,123200,7,1
+identical,sorted,Int64,1000,8,2,120700,7,1
+identical,sorted,Int64,1000,32,0,255300,7,1
+identical,sorted,Int64,1000,32,1,148300,7,1
+identical,sorted,Int64,1000,32,2,123600,7,1
+identical,sorted,Int64,1000,64,0,158200,7,1
+identical,sorted,Int64,1000,64,1,160900,7,1
+identical,sorted,Int64,1000,64,2,132000,7,1
+identical,sorted,Date,1000,0,0,263600,0,0
+identical,sorted,Date,1000,0,1,154000,0,0
+identical,sorted,Date,1000,0,2,169300,0,0
+identical,sorted,Date,1000,1,0,145800,7,1
+identical,sorted,Date,1000,1,1,146000,7,1
+identical,sorted,Date,1000,1,2,137700,7,1
+identical,sorted,Date,1000,2,0,150700,7,1
+identical,sorted,Date,1000,2,1,128500,7,1
+identical,sorted,Date,1000,2,2,151000,7,1
+identical,sorted,Date,1000,8,0,155700,7,1
+identical,sorted,Date,1000,8,1,149200,7,1
+identical,sorted,Date,1000,8,2,147400,7,1
+identical,sorted,Date,1000,32,0,151000,7,1
+identical,sorted,Date,1000,32,1,162400,7,1
+identical,sorted,Date,1000,32,2,151000,7,1
+identical,sorted,Date,1000,64,0,134400,7,1
+identical,sorted,Date,1000,64,1,121300,7,1
+identical,sorted,Date,1000,64,2,126000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,0,260000,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,1,154400,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,0,2,146900,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,0,148200,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,1,133700,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,1,2,116100,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,0,142000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,1,132200,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,2,2,139800,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,0,135300,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,1,151900,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,8,2,129300,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,0,126900,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,1,118700,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,32,2,116900,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,0,149400,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,1,132000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000,64,2,119800,7,1
+identical,shuffled,Int64,1000,0,0,141900,0,0
+identical,shuffled,Int64,1000,0,1,214500,0,0
+identical,shuffled,Int64,1000,0,2,166700,0,0
+identical,shuffled,Int64,1000,1,0,158600,7,1
+identical,shuffled,Int64,1000,1,1,134400,7,1
+identical,shuffled,Int64,1000,1,2,138700,7,1
+identical,shuffled,Int64,1000,2,0,146200,7,1
+identical,shuffled,Int64,1000,2,1,142800,7,1
+identical,shuffled,Int64,1000,2,2,123500,7,1
+identical,shuffled,Int64,1000,8,0,145400,7,1
+identical,shuffled,Int64,1000,8,1,135700,7,1
+identical,shuffled,Int64,1000,8,2,124000,7,1
+identical,shuffled,Int64,1000,32,0,157700,7,1
+identical,shuffled,Int64,1000,32,1,135800,7,1
+identical,shuffled,Int64,1000,32,2,122600,7,1
+identical,shuffled,Int64,1000,64,0,162800,7,1
+identical,shuffled,Int64,1000,64,1,211800,7,1
+identical,shuffled,Int64,1000,64,2,163500,7,1
+identical,shuffled,Date,1000,0,0,141100,0,0
+identical,shuffled,Date,1000,0,1,312800,0,0
+identical,shuffled,Date,1000,0,2,213500,0,0
+identical,shuffled,Date,1000,1,0,262000,7,1
+identical,shuffled,Date,1000,1,1,162300,7,1
+identical,shuffled,Date,1000,1,2,174000,7,1
+identical,shuffled,Date,1000,2,0,138800,7,1
+identical,shuffled,Date,1000,2,1,128700,7,1
+identical,shuffled,Date,1000,2,2,127100,7,1
+identical,shuffled,Date,1000,8,0,180000,7,1
+identical,shuffled,Date,1000,8,1,160700,7,1
+identical,shuffled,Date,1000,8,2,142800,7,1
+identical,shuffled,Date,1000,32,0,157000,7,1
+identical,shuffled,Date,1000,32,1,149700,7,1
+identical,shuffled,Date,1000,32,2,164300,7,1
+identical,shuffled,Date,1000,64,0,145000,7,1
+identical,shuffled,Date,1000,64,1,131600,7,1
+identical,shuffled,Date,1000,64,2,125100,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,0,154000,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,1,137100,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,0,2,124700,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,0,152800,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,1,136000,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,1,2,125800,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,0,160500,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,1,166000,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,2,2,160800,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,0,138600,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,1,130900,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,8,2,128000,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,0,241100,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,1,174200,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,32,2,153700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,0,156400,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,1,170300,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000,64,2,158700,7,1
+disjoint,sorted,Int64,10000,0,0,140900,0,0
+disjoint,sorted,Int64,10000,0,1,156600,0,0
+disjoint,sorted,Int64,10000,0,2,136200,0,0
+disjoint,sorted,Int64,10000,1,0,145000,7,1
+disjoint,sorted,Int64,10000,1,1,138200,7,1
+disjoint,sorted,Int64,10000,1,2,158200,7,1
+disjoint,sorted,Int64,10000,2,0,750600,14,2
+disjoint,sorted,Int64,10000,2,1,829000,14,2
+disjoint,sorted,Int64,10000,2,2,846500,14,2
+disjoint,sorted,Int64,10000,8,0,1382100,56,8
+disjoint,sorted,Int64,10000,8,1,1104500,56,8
+disjoint,sorted,Int64,10000,8,2,1015900,56,8
+disjoint,sorted,Int64,10000,32,0,1670400,224,32
+disjoint,sorted,Int64,10000,32,1,1777000,224,32
+disjoint,sorted,Int64,10000,32,2,1797000,224,32
+disjoint,sorted,Int64,10000,64,0,3474200,448,64
+disjoint,sorted,Int64,10000,64,1,3457500,448,64
+disjoint,sorted,Int64,10000,64,2,3313600,448,64
+disjoint,sorted,Date,10000,0,0,170300,0,0
+disjoint,sorted,Date,10000,0,1,138800,0,0
+disjoint,sorted,Date,10000,0,2,156100,0,0
+disjoint,sorted,Date,10000,1,0,203400,7,1
+disjoint,sorted,Date,10000,1,1,175100,7,1
+disjoint,sorted,Date,10000,1,2,152100,7,1
+disjoint,sorted,Date,10000,2,0,701800,14,2
+disjoint,sorted,Date,10000,2,1,786200,14,2
+disjoint,sorted,Date,10000,2,2,1083900,14,2
+disjoint,sorted,Date,10000,8,0,793800,56,8
+disjoint,sorted,Date,10000,8,1,796500,56,8
+disjoint,sorted,Date,10000,8,2,753100,56,8
+disjoint,sorted,Date,10000,32,0,1621500,224,32
+disjoint,sorted,Date,10000,32,1,1545300,224,32
+disjoint,sorted,Date,10000,32,2,1497600,224,32
+disjoint,sorted,Date,10000,64,0,3067900,448,64
+disjoint,sorted,Date,10000,64,1,3260600,448,64
+disjoint,sorted,Date,10000,64,2,3021400,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,0,147200,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,1,195900,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,2,174900,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,0,152700,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,1,164600,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,2,145700,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,0,746500,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,1,677300,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,2,764800,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,0,936800,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,1,864100,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,2,827800,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,0,1746900,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,1,1741900,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,2,1524900,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,0,2961800,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,1,3069000,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,2,3012500,448,64
+disjoint,shuffled,Int64,10000,0,0,245200,0,0
+disjoint,shuffled,Int64,10000,0,1,192800,0,0
+disjoint,shuffled,Int64,10000,0,2,184100,0,0
+disjoint,shuffled,Int64,10000,1,0,197100,7,1
+disjoint,shuffled,Int64,10000,1,1,202000,7,1
+disjoint,shuffled,Int64,10000,1,2,200400,7,1
+disjoint,shuffled,Int64,10000,2,0,1052600,14,2
+disjoint,shuffled,Int64,10000,2,1,1302300,14,2
+disjoint,shuffled,Int64,10000,2,2,1327600,14,2
+disjoint,shuffled,Int64,10000,8,0,1482900,56,8
+disjoint,shuffled,Int64,10000,8,1,1358900,56,8
+disjoint,shuffled,Int64,10000,8,2,1215500,56,8
+disjoint,shuffled,Int64,10000,32,0,2196100,224,32
+disjoint,shuffled,Int64,10000,32,1,2327300,224,32
+disjoint,shuffled,Int64,10000,32,2,2146100,224,32
+disjoint,shuffled,Int64,10000,64,0,3612700,448,64
+disjoint,shuffled,Int64,10000,64,1,3652200,448,64
+disjoint,shuffled,Int64,10000,64,2,3230200,448,64
+disjoint,shuffled,Date,10000,0,0,261100,0,0
+disjoint,shuffled,Date,10000,0,1,199500,0,0
+disjoint,shuffled,Date,10000,0,2,196300,0,0
+disjoint,shuffled,Date,10000,1,0,249900,7,1
+disjoint,shuffled,Date,10000,1,1,207100,7,1
+disjoint,shuffled,Date,10000,1,2,196600,7,1
+disjoint,shuffled,Date,10000,2,0,1093700,14,2
+disjoint,shuffled,Date,10000,2,1,1376100,14,2
+disjoint,shuffled,Date,10000,2,2,1160700,14,2
+disjoint,shuffled,Date,10000,8,0,950000,56,8
+disjoint,shuffled,Date,10000,8,1,1155700,56,8
+disjoint,shuffled,Date,10000,8,2,1144600,56,8
+disjoint,shuffled,Date,10000,32,0,2278400,224,32
+disjoint,shuffled,Date,10000,32,1,2196200,224,32
+disjoint,shuffled,Date,10000,32,2,2074200,224,32
+disjoint,shuffled,Date,10000,64,0,3302800,448,64
+disjoint,shuffled,Date,10000,64,1,3428600,448,64
+disjoint,shuffled,Date,10000,64,2,3304900,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,0,213100,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,1,201500,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,2,311200,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,0,304600,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,1,273100,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,2,220500,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,0,1112000,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,1,1111200,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,2,1245600,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,0,1247500,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,1,1241500,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,2,1187100,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,0,2462100,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,1,2349600,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,2,2761000,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,0,3559200,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,1,3534900,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,2,3431400,448,64
+staircase,sorted,Int64,10000,0,0,148400,0,0
+staircase,sorted,Int64,10000,0,1,175500,0,0
+staircase,sorted,Int64,10000,0,2,142900,0,0
+staircase,sorted,Int64,10000,1,0,159400,17,1
+staircase,sorted,Int64,10000,1,1,134800,17,1
+staircase,sorted,Int64,10000,1,2,130700,17,1
+staircase,sorted,Int64,10000,2,0,775100,34,2
+staircase,sorted,Int64,10000,2,1,916100,34,2
+staircase,sorted,Int64,10000,2,2,797600,34,2
+staircase,sorted,Int64,10000,8,0,1080000,136,8
+staircase,sorted,Int64,10000,8,1,1001000,136,8
+staircase,sorted,Int64,10000,8,2,1075300,136,8
+staircase,sorted,Int64,10000,32,0,2546500,544,32
+staircase,sorted,Int64,10000,32,1,2539900,544,32
+staircase,sorted,Int64,10000,32,2,2686000,544,32
+staircase,sorted,Int64,10000,64,0,3985600,1088,64
+staircase,sorted,Int64,10000,64,1,4042900,1088,64
+staircase,sorted,Int64,10000,64,2,3971100,1088,64
+staircase,sorted,Date,10000,0,0,156800,0,0
+staircase,sorted,Date,10000,0,1,141700,0,0
+staircase,sorted,Date,10000,0,2,149600,0,0
+staircase,sorted,Date,10000,1,0,156100,17,1
+staircase,sorted,Date,10000,1,1,137700,17,1
+staircase,sorted,Date,10000,1,2,127900,17,1
+staircase,sorted,Date,10000,2,0,638200,34,2
+staircase,sorted,Date,10000,2,1,813800,34,2
+staircase,sorted,Date,10000,2,2,637500,34,2
+staircase,sorted,Date,10000,8,0,942200,136,8
+staircase,sorted,Date,10000,8,1,1106100,136,8
+staircase,sorted,Date,10000,8,2,1013500,136,8
+staircase,sorted,Date,10000,32,0,2346900,544,32
+staircase,sorted,Date,10000,32,1,2451200,544,32
+staircase,sorted,Date,10000,32,2,2268000,544,32
+staircase,sorted,Date,10000,64,0,4000200,1088,64
+staircase,sorted,Date,10000,64,1,3981300,1088,64
+staircase,sorted,Date,10000,64,2,3873000,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,0,172300,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,1,131100,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,2,127400,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,0,151000,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,1,142900,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,2,128100,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,0,864300,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,1,759700,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,2,940300,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,0,1110400,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,1,1122000,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,2,1123000,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,0,2446900,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,1,2391200,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,2,2442700,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,0,4004400,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,1,3964600,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,2,3871200,1088,64
+staircase,shuffled,Int64,10000,0,0,302300,0,0
+staircase,shuffled,Int64,10000,0,1,205300,0,0
+staircase,shuffled,Int64,10000,0,2,273700,0,0
+staircase,shuffled,Int64,10000,1,0,253200,17,1
+staircase,shuffled,Int64,10000,1,1,191800,17,1
+staircase,shuffled,Int64,10000,1,2,198100,17,1
+staircase,shuffled,Int64,10000,2,0,1096900,34,2
+staircase,shuffled,Int64,10000,2,1,1046800,34,2
+staircase,shuffled,Int64,10000,2,2,1248600,34,2
+staircase,shuffled,Int64,10000,8,0,1627700,136,8
+staircase,shuffled,Int64,10000,8,1,1460400,136,8
+staircase,shuffled,Int64,10000,8,2,1435400,136,8
+staircase,shuffled,Int64,10000,32,0,2784100,544,32
+staircase,shuffled,Int64,10000,32,1,2794600,544,32
+staircase,shuffled,Int64,10000,32,2,2580700,544,32
+staircase,shuffled,Int64,10000,64,0,4415700,1088,64
+staircase,shuffled,Int64,10000,64,1,4401700,1088,64
+staircase,shuffled,Int64,10000,64,2,4185300,1088,64
+staircase,shuffled,Date,10000,0,0,275000,0,0
+staircase,shuffled,Date,10000,0,1,209400,0,0
+staircase,shuffled,Date,10000,0,2,263000,0,0
+staircase,shuffled,Date,10000,1,0,273700,17,1
+staircase,shuffled,Date,10000,1,1,233200,17,1
+staircase,shuffled,Date,10000,1,2,208100,17,1
+staircase,shuffled,Date,10000,2,0,1010300,34,2
+staircase,shuffled,Date,10000,2,1,1185300,34,2
+staircase,shuffled,Date,10000,2,2,1165300,34,2
+staircase,shuffled,Date,10000,8,0,1130900,136,8
+staircase,shuffled,Date,10000,8,1,1298400,136,8
+staircase,shuffled,Date,10000,8,2,1058500,136,8
+staircase,shuffled,Date,10000,32,0,2577900,544,32
+staircase,shuffled,Date,10000,32,1,2583200,544,32
+staircase,shuffled,Date,10000,32,2,2495900,544,32
+staircase,shuffled,Date,10000,64,0,4099000,1088,64
+staircase,shuffled,Date,10000,64,1,4101800,1088,64
+staircase,shuffled,Date,10000,64,2,4077400,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,0,206600,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,1,201000,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,2,200800,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,0,270000,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,1,254200,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,2,224800,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,0,1075400,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,1,1167900,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,2,1198400,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,0,1285600,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,1,1445500,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,2,1353300,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,0,2747400,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,1,2821300,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,2,2855300,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,0,4320100,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,1,4495900,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,2,4511300,1088,64
+identical,sorted,Int64,10000,0,0,166900,0,0
+identical,sorted,Int64,10000,0,1,138800,0,0
+identical,sorted,Int64,10000,0,2,170500,0,0
+identical,sorted,Int64,10000,1,0,177500,7,1
+identical,sorted,Int64,10000,1,1,184000,7,1
+identical,sorted,Int64,10000,1,2,187800,7,1
+identical,sorted,Int64,10000,2,0,349200,7,1
+identical,sorted,Int64,10000,2,1,339100,7,1
+identical,sorted,Int64,10000,2,2,207200,7,1
+identical,sorted,Int64,10000,8,0,224500,7,1
+identical,sorted,Int64,10000,8,1,189000,7,1
+identical,sorted,Int64,10000,8,2,237800,7,1
+identical,sorted,Int64,10000,32,0,310600,7,1
+identical,sorted,Int64,10000,32,1,242200,7,1
+identical,sorted,Int64,10000,32,2,258100,7,1
+identical,sorted,Int64,10000,64,0,199500,7,1
+identical,sorted,Int64,10000,64,1,181700,7,1
+identical,sorted,Int64,10000,64,2,178500,7,1
+identical,sorted,Date,10000,0,0,239300,0,0
+identical,sorted,Date,10000,0,1,217900,0,0
+identical,sorted,Date,10000,0,2,168500,0,0
+identical,sorted,Date,10000,1,0,154500,7,1
+identical,sorted,Date,10000,1,1,140000,7,1
+identical,sorted,Date,10000,1,2,134100,7,1
+identical,sorted,Date,10000,2,0,214700,7,1
+identical,sorted,Date,10000,2,1,191000,7,1
+identical,sorted,Date,10000,2,2,169000,7,1
+identical,sorted,Date,10000,8,0,200400,7,1
+identical,sorted,Date,10000,8,1,226300,7,1
+identical,sorted,Date,10000,8,2,180300,7,1
+identical,sorted,Date,10000,32,0,176800,7,1
+identical,sorted,Date,10000,32,1,180000,7,1
+identical,sorted,Date,10000,32,2,180300,7,1
+identical,sorted,Date,10000,64,0,217900,7,1
+identical,sorted,Date,10000,64,1,304700,7,1
+identical,sorted,Date,10000,64,2,306900,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,0,155800,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,1,162300,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,0,2,153800,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,0,164800,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,1,141600,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,1,2,213100,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,0,280900,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,1,279800,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,2,2,207000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,0,215100,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,1,203800,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,8,2,187500,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,0,242500,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,1,283800,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,32,2,263300,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,0,262200,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,1,271200,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",10000,64,2,205300,7,1
+identical,shuffled,Int64,10000,0,0,307500,0,0
+identical,shuffled,Int64,10000,0,1,274800,0,0
+identical,shuffled,Int64,10000,0,2,286700,0,0
+identical,shuffled,Int64,10000,1,0,232300,7,1
+identical,shuffled,Int64,10000,1,1,204100,7,1
+identical,shuffled,Int64,10000,1,2,196500,7,1
+identical,shuffled,Int64,10000,2,0,237500,7,1
+identical,shuffled,Int64,10000,2,1,230000,7,1
+identical,shuffled,Int64,10000,2,2,369500,7,1
+identical,shuffled,Int64,10000,8,0,373100,7,1
+identical,shuffled,Int64,10000,8,1,389300,7,1
+identical,shuffled,Int64,10000,8,2,355200,7,1
+identical,shuffled,Int64,10000,32,0,426500,7,1
+identical,shuffled,Int64,10000,32,1,360300,7,1
+identical,shuffled,Int64,10000,32,2,441100,7,1
+identical,shuffled,Int64,10000,64,0,275300,7,1
+identical,shuffled,Int64,10000,64,1,376700,7,1
+identical,shuffled,Int64,10000,64,2,261900,7,1
+identical,shuffled,Date,10000,0,0,330300,0,0
+identical,shuffled,Date,10000,0,1,319200,0,0
+identical,shuffled,Date,10000,0,2,258500,0,0
+identical,shuffled,Date,10000,1,0,242000,7,1
+identical,shuffled,Date,10000,1,1,231000,7,1
+identical,shuffled,Date,10000,1,2,268100,7,1
+identical,shuffled,Date,10000,2,0,307000,7,1
+identical,shuffled,Date,10000,2,1,254300,7,1
+identical,shuffled,Date,10000,2,2,234200,7,1
+identical,shuffled,Date,10000,8,0,522400,7,1
+identical,shuffled,Date,10000,8,1,367800,7,1
+identical,shuffled,Date,10000,8,2,258200,7,1
+identical,shuffled,Date,10000,32,0,237700,7,1
+identical,shuffled,Date,10000,32,1,331800,7,1
+identical,shuffled,Date,10000,32,2,348500,7,1
+identical,shuffled,Date,10000,64,0,242600,7,1
+identical,shuffled,Date,10000,64,1,246000,7,1
+identical,shuffled,Date,10000,64,2,248600,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,0,208600,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,1,197000,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,0,2,189200,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,0,306700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,1,349200,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,1,2,276500,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,0,305400,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,1,284200,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,2,2,258400,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,0,439800,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,1,401900,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,8,2,478700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,0,442200,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,1,376300,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,32,2,434000,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,0,307700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,1,285600,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",10000,64,2,258500,7,1
+disjoint,sorted,Int64,100000,0,0,331700,0,0
+disjoint,sorted,Int64,100000,0,1,237600,0,0
+disjoint,sorted,Int64,100000,0,2,248900,0,0
+disjoint,sorted,Int64,100000,1,0,378200,7,1
+disjoint,sorted,Int64,100000,1,1,421700,7,1
+disjoint,sorted,Int64,100000,1,2,375000,7,1
+disjoint,sorted,Int64,100000,2,0,7949800,14,2
+disjoint,sorted,Int64,100000,2,1,7131300,14,2
+disjoint,sorted,Int64,100000,2,2,6372000,14,2
+disjoint,sorted,Int64,100000,8,0,8572400,56,8
+disjoint,sorted,Int64,100000,8,1,8912700,56,8
+disjoint,sorted,Int64,100000,8,2,8417700,56,8
+disjoint,sorted,Int64,100000,32,0,17803800,224,32
+disjoint,sorted,Int64,100000,32,1,17989200,224,32
+disjoint,sorted,Int64,100000,32,2,19747800,224,32
+disjoint,sorted,Int64,100000,64,0,37989800,448,64
+disjoint,sorted,Int64,100000,64,1,37134200,448,64
+disjoint,sorted,Int64,100000,64,2,38025800,448,64
+disjoint,sorted,Date,100000,0,0,458000,0,0
+disjoint,sorted,Date,100000,0,1,369900,0,0
+disjoint,sorted,Date,100000,0,2,358500,0,0
+disjoint,sorted,Date,100000,1,0,413800,7,1
+disjoint,sorted,Date,100000,1,1,534300,7,1
+disjoint,sorted,Date,100000,1,2,439800,7,1
+disjoint,sorted,Date,100000,2,0,5779000,14,2
+disjoint,sorted,Date,100000,2,1,6186000,14,2
+disjoint,sorted,Date,100000,2,2,6037700,14,2
+disjoint,sorted,Date,100000,8,0,8446600,56,8
+disjoint,sorted,Date,100000,8,1,10237400,56,8
+disjoint,sorted,Date,100000,8,2,8741200,56,8
+disjoint,sorted,Date,100000,32,0,18268800,224,32
+disjoint,sorted,Date,100000,32,1,18772200,224,32
+disjoint,sorted,Date,100000,32,2,20660700,224,32
+disjoint,sorted,Date,100000,64,0,37489900,448,64
+disjoint,sorted,Date,100000,64,1,34403400,448,64
+disjoint,sorted,Date,100000,64,2,29735500,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,0,394600,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,1,291500,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,2,251000,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,0,372000,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,1,347600,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,2,331800,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,0,6039300,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,1,5993700,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,2,7448200,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,0,8534300,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,1,8046600,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,2,9492700,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,0,17377000,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,1,17231300,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,2,17481100,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,0,29860800,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,1,28853300,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,2,29435400,448,64
+disjoint,shuffled,Int64,100000,0,0,1005000,0,0
+disjoint,shuffled,Int64,100000,0,1,817900,0,0
+disjoint,shuffled,Int64,100000,0,2,818200,0,0
+disjoint,shuffled,Int64,100000,1,0,1075800,7,1
+disjoint,shuffled,Int64,100000,1,1,882500,7,1
+disjoint,shuffled,Int64,100000,1,2,1007000,7,1
+disjoint,shuffled,Int64,100000,2,0,9094600,14,2
+disjoint,shuffled,Int64,100000,2,1,9644300,14,2
+disjoint,shuffled,Int64,100000,2,2,9367100,14,2
+disjoint,shuffled,Int64,100000,8,0,12089900,56,8
+disjoint,shuffled,Int64,100000,8,1,11332600,56,8
+disjoint,shuffled,Int64,100000,8,2,12093000,56,8
+disjoint,shuffled,Int64,100000,32,0,21389900,224,32
+disjoint,shuffled,Int64,100000,32,1,21051100,224,32
+disjoint,shuffled,Int64,100000,32,2,21630000,224,32
+disjoint,shuffled,Int64,100000,64,0,37594200,448,64
+disjoint,shuffled,Int64,100000,64,1,35308600,448,64
+disjoint,shuffled,Int64,100000,64,2,37899600,448,64
+disjoint,shuffled,Date,100000,0,0,895000,0,0
+disjoint,shuffled,Date,100000,0,1,729000,0,0
+disjoint,shuffled,Date,100000,0,2,705300,0,0
+disjoint,shuffled,Date,100000,1,0,881700,7,1
+disjoint,shuffled,Date,100000,1,1,830200,7,1
+disjoint,shuffled,Date,100000,1,2,743600,7,1
+disjoint,shuffled,Date,100000,2,0,7897700,14,2
+disjoint,shuffled,Date,100000,2,1,8065700,14,2
+disjoint,shuffled,Date,100000,2,2,8323800,14,2
+disjoint,shuffled,Date,100000,8,0,10072500,56,8
+disjoint,shuffled,Date,100000,8,1,9980300,56,8
+disjoint,shuffled,Date,100000,8,2,10066300,56,8
+disjoint,shuffled,Date,100000,32,0,21144700,224,32
+disjoint,shuffled,Date,100000,32,1,21022600,224,32
+disjoint,shuffled,Date,100000,32,2,23265900,224,32
+disjoint,shuffled,Date,100000,64,0,35474100,448,64
+disjoint,shuffled,Date,100000,64,1,35177700,448,64
+disjoint,shuffled,Date,100000,64,2,36213700,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,0,976700,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,1,1073500,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,2,1011600,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,0,990500,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,1,1155400,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,2,1257600,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,0,10067600,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,1,9834600,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,2,10169000,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,0,13483500,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,1,12734900,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,2,12858300,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,0,28764900,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,1,24934300,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,2,22350600,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,0,36200900,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,1,35138200,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,2,32833900,448,64
+staircase,sorted,Int64,100000,0,0,272000,0,0
+staircase,sorted,Int64,100000,0,1,236000,0,0
+staircase,sorted,Int64,100000,0,2,210400,0,0
+staircase,sorted,Int64,100000,1,0,522200,17,1
+staircase,sorted,Int64,100000,1,1,347100,17,1
+staircase,sorted,Int64,100000,1,2,339200,17,1
+staircase,sorted,Int64,100000,2,0,5438200,34,2
+staircase,sorted,Int64,100000,2,1,5865900,34,2
+staircase,sorted,Int64,100000,2,2,5970400,34,2
+staircase,sorted,Int64,100000,8,0,9516300,136,8
+staircase,sorted,Int64,100000,8,1,8546400,136,8
+staircase,sorted,Int64,100000,8,2,9947100,136,8
+staircase,sorted,Int64,100000,32,0,21693000,544,32
+staircase,sorted,Int64,100000,32,1,21643800,544,32
+staircase,sorted,Int64,100000,32,2,21719700,544,32
+staircase,sorted,Int64,100000,64,0,38780700,1088,64
+staircase,sorted,Int64,100000,64,1,37504800,1088,64
+staircase,sorted,Int64,100000,64,2,37846200,1088,64
+staircase,sorted,Date,100000,0,0,333700,0,0
+staircase,sorted,Date,100000,0,1,358300,0,0
+staircase,sorted,Date,100000,0,2,299500,0,0
+staircase,sorted,Date,100000,1,0,423600,17,1
+staircase,sorted,Date,100000,1,1,376800,17,1
+staircase,sorted,Date,100000,1,2,378300,17,1
+staircase,sorted,Date,100000,2,0,5167300,34,2
+staircase,sorted,Date,100000,2,1,5899400,34,2
+staircase,sorted,Date,100000,2,2,5641000,34,2
+staircase,sorted,Date,100000,8,0,8438100,136,8
+staircase,sorted,Date,100000,8,1,8755300,136,8
+staircase,sorted,Date,100000,8,2,8788700,136,8
+staircase,sorted,Date,100000,32,0,20698100,544,32
+staircase,sorted,Date,100000,32,1,20925000,544,32
+staircase,sorted,Date,100000,32,2,20912300,544,32
+staircase,sorted,Date,100000,64,0,37751900,1088,64
+staircase,sorted,Date,100000,64,1,36522000,1088,64
+staircase,sorted,Date,100000,64,2,37100000,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,0,313000,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,1,364400,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,2,247500,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,0,375500,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,1,379000,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,2,362000,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,0,5960000,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,1,5632200,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,2,6353600,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,0,9181000,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,1,8714900,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,2,8901300,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,0,21358200,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,1,22495300,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,2,22364400,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,0,37989700,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,1,38623600,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,2,38115100,1088,64
+staircase,shuffled,Int64,100000,0,0,571400,0,0
+staircase,shuffled,Int64,100000,0,1,444900,0,0
+staircase,shuffled,Int64,100000,0,2,1160100,0,0
+staircase,shuffled,Int64,100000,1,0,827700,17,1
+staircase,shuffled,Int64,100000,1,1,546700,17,1
+staircase,shuffled,Int64,100000,1,2,1402300,17,1
+staircase,shuffled,Int64,100000,2,0,8868000,34,2
+staircase,shuffled,Int64,100000,2,1,9287600,34,2
+staircase,shuffled,Int64,100000,2,2,8936300,34,2
+staircase,shuffled,Int64,100000,8,0,12110900,136,8
+staircase,shuffled,Int64,100000,8,1,12593600,136,8
+staircase,shuffled,Int64,100000,8,2,11498700,136,8
+staircase,shuffled,Int64,100000,32,0,24570900,544,32
+staircase,shuffled,Int64,100000,32,1,25407200,544,32
+staircase,shuffled,Int64,100000,32,2,24986400,544,32
+staircase,shuffled,Int64,100000,64,0,42901900,1088,64
+staircase,shuffled,Int64,100000,64,1,40486100,1088,64
+staircase,shuffled,Int64,100000,64,2,40560100,1088,64
+staircase,shuffled,Date,100000,0,0,1133500,0,0
+staircase,shuffled,Date,100000,0,1,655000,0,0
+staircase,shuffled,Date,100000,0,2,1154600,0,0
+staircase,shuffled,Date,100000,1,0,1125300,17,1
+staircase,shuffled,Date,100000,1,1,633500,17,1
+staircase,shuffled,Date,100000,1,2,655100,17,1
+staircase,shuffled,Date,100000,2,0,7702100,34,2
+staircase,shuffled,Date,100000,2,1,8240900,34,2
+staircase,shuffled,Date,100000,2,2,7922800,34,2
+staircase,shuffled,Date,100000,8,0,10620800,136,8
+staircase,shuffled,Date,100000,8,1,10562400,136,8
+staircase,shuffled,Date,100000,8,2,11414600,136,8
+staircase,shuffled,Date,100000,32,0,22896800,544,32
+staircase,shuffled,Date,100000,32,1,23079700,544,32
+staircase,shuffled,Date,100000,32,2,23238600,544,32
+staircase,shuffled,Date,100000,64,0,39143600,1088,64
+staircase,shuffled,Date,100000,64,1,40106000,1088,64
+staircase,shuffled,Date,100000,64,2,39660900,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,0,1218700,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,1,589700,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,2,658900,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,0,551100,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,1,526100,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,2,756900,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,0,9170500,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,1,9041100,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,2,9282100,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,0,12245400,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,1,12333600,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,2,11840600,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,0,24364200,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,1,24452400,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,2,24028900,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,0,39839200,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,1,41120800,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,2,41652500,1088,64
+identical,sorted,Int64,100000,0,0,376600,0,0
+identical,sorted,Int64,100000,0,1,403100,0,0
+identical,sorted,Int64,100000,0,2,240400,0,0
+identical,sorted,Int64,100000,1,0,498300,7,1
+identical,sorted,Int64,100000,1,1,442700,7,1
+identical,sorted,Int64,100000,1,2,385900,7,1
+identical,sorted,Int64,100000,2,0,1795800,7,1
+identical,sorted,Int64,100000,2,1,1906200,7,1
+identical,sorted,Int64,100000,2,2,1525300,7,1
+identical,sorted,Int64,100000,8,0,1584700,7,1
+identical,sorted,Int64,100000,8,1,1710000,7,1
+identical,sorted,Int64,100000,8,2,1582700,7,1
+identical,sorted,Int64,100000,32,0,1568200,7,1
+identical,sorted,Int64,100000,32,1,1569700,7,1
+identical,sorted,Int64,100000,32,2,1584900,7,1
+identical,sorted,Int64,100000,64,0,1553800,7,1
+identical,sorted,Int64,100000,64,1,1554100,7,1
+identical,sorted,Int64,100000,64,2,1492300,7,1
+identical,sorted,Date,100000,0,0,280200,0,0
+identical,sorted,Date,100000,0,1,272500,0,0
+identical,sorted,Date,100000,0,2,238200,0,0
+identical,sorted,Date,100000,1,0,394800,7,1
+identical,sorted,Date,100000,1,1,547300,7,1
+identical,sorted,Date,100000,1,2,563200,7,1
+identical,sorted,Date,100000,2,0,1256600,7,1
+identical,sorted,Date,100000,2,1,1343900,7,1
+identical,sorted,Date,100000,2,2,1225000,7,1
+identical,sorted,Date,100000,8,0,1292500,7,1
+identical,sorted,Date,100000,8,1,1317700,7,1
+identical,sorted,Date,100000,8,2,1277200,7,1
+identical,sorted,Date,100000,32,0,1233600,7,1
+identical,sorted,Date,100000,32,1,1185600,7,1
+identical,sorted,Date,100000,32,2,1486100,7,1
+identical,sorted,Date,100000,64,0,1286100,7,1
+identical,sorted,Date,100000,64,1,1347700,7,1
+identical,sorted,Date,100000,64,2,1468500,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,0,377300,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,1,249000,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,0,2,311900,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,0,377000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,1,353100,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,1,2,334800,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,0,1720000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,1,1548000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,2,2,1774100,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,0,1824000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,1,1512600,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,8,2,1559200,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,0,1582200,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,1,1572800,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,32,2,1725400,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,0,1737700,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,1,1821300,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",100000,64,2,1699400,7,1
+identical,shuffled,Int64,100000,0,0,460500,0,0
+identical,shuffled,Int64,100000,0,1,435200,0,0
+identical,shuffled,Int64,100000,0,2,405400,0,0
+identical,shuffled,Int64,100000,1,0,541400,7,1
+identical,shuffled,Int64,100000,1,1,1288100,7,1
+identical,shuffled,Int64,100000,1,2,1469200,7,1
+identical,shuffled,Int64,100000,2,0,2524400,7,1
+identical,shuffled,Int64,100000,2,1,2475700,7,1
+identical,shuffled,Int64,100000,2,2,2301100,7,1
+identical,shuffled,Int64,100000,8,0,3062300,7,1
+identical,shuffled,Int64,100000,8,1,3144700,7,1
+identical,shuffled,Int64,100000,8,2,3141900,7,1
+identical,shuffled,Int64,100000,32,0,2381700,7,1
+identical,shuffled,Int64,100000,32,1,2425500,7,1
+identical,shuffled,Int64,100000,32,2,3023900,7,1
+identical,shuffled,Int64,100000,64,0,2235000,7,1
+identical,shuffled,Int64,100000,64,1,2269100,7,1
+identical,shuffled,Int64,100000,64,2,2222800,7,1
+identical,shuffled,Date,100000,0,0,1100700,0,0
+identical,shuffled,Date,100000,0,1,467000,0,0
+identical,shuffled,Date,100000,0,2,617700,0,0
+identical,shuffled,Date,100000,1,0,1350900,7,1
+identical,shuffled,Date,100000,1,1,909100,7,1
+identical,shuffled,Date,100000,1,2,788300,7,1
+identical,shuffled,Date,100000,2,0,1597000,7,1
+identical,shuffled,Date,100000,2,1,1385400,7,1
+identical,shuffled,Date,100000,2,2,1584600,7,1
+identical,shuffled,Date,100000,8,0,1761300,7,1
+identical,shuffled,Date,100000,8,1,1828700,7,1
+identical,shuffled,Date,100000,8,2,2163800,7,1
+identical,shuffled,Date,100000,32,0,1404400,7,1
+identical,shuffled,Date,100000,32,1,1613300,7,1
+identical,shuffled,Date,100000,32,2,1700400,7,1
+identical,shuffled,Date,100000,64,0,1653600,7,1
+identical,shuffled,Date,100000,64,1,1439200,7,1
+identical,shuffled,Date,100000,64,2,1456800,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,0,1943000,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,1,1073600,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,0,2,1351300,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,0,884600,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,1,588700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,1,2,701000,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,0,2349600,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,1,3040000,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,2,2,3838100,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,0,3000200,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,1,2684600,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,8,2,2204900,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,0,2852500,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,1,2986900,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,32,2,3590400,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,0,3161100,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,1,2698100,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",100000,64,2,3076400,7,1
+disjoint,sorted,Int64,1000000,0,0,2150000,0,0
+disjoint,sorted,Int64,1000000,0,1,2105500,0,0
+disjoint,sorted,Int64,1000000,0,2,1940000,0,0
+disjoint,sorted,Int64,1000000,1,0,2725300,7,1
+disjoint,sorted,Int64,1000000,1,1,2514300,7,1
+disjoint,sorted,Int64,1000000,1,2,2574900,7,1
+disjoint,sorted,Int64,1000000,2,0,70392400,14,2
+disjoint,sorted,Int64,1000000,2,1,69007400,14,2
+disjoint,sorted,Int64,1000000,2,2,68280800,14,2
+disjoint,sorted,Int64,1000000,8,0,114487900,56,8
+disjoint,sorted,Int64,1000000,8,1,113847700,56,8
+disjoint,sorted,Int64,1000000,8,2,115650300,56,8
+disjoint,sorted,Int64,1000000,32,0,303296000,224,32
+disjoint,sorted,Int64,1000000,32,1,303492300,224,32
+disjoint,sorted,Int64,1000000,32,2,306101600,224,32
+disjoint,sorted,Int64,1000000,64,0,559153500,448,64
+disjoint,sorted,Int64,1000000,64,1,566179400,448,64
+disjoint,sorted,Int64,1000000,64,2,572677600,448,64
+disjoint,sorted,Date,1000000,0,0,1369300,0,0
+disjoint,sorted,Date,1000000,0,1,1358400,0,0
+disjoint,sorted,Date,1000000,0,2,1171200,0,0
+disjoint,sorted,Date,1000000,1,0,3017500,7,1
+disjoint,sorted,Date,1000000,1,1,2735700,7,1
+disjoint,sorted,Date,1000000,1,2,2543500,7,1
+disjoint,sorted,Date,1000000,2,0,64492300,14,2
+disjoint,sorted,Date,1000000,2,1,66699100,14,2
+disjoint,sorted,Date,1000000,2,2,61776000,14,2
+disjoint,sorted,Date,1000000,8,0,104717200,56,8
+disjoint,sorted,Date,1000000,8,1,110973400,56,8
+disjoint,sorted,Date,1000000,8,2,107127100,56,8
+disjoint,sorted,Date,1000000,32,0,285686500,224,32
+disjoint,sorted,Date,1000000,32,1,284841900,224,32
+disjoint,sorted,Date,1000000,32,2,288474500,224,32
+disjoint,sorted,Date,1000000,64,0,544645100,448,64
+disjoint,sorted,Date,1000000,64,1,528427800,448,64
+disjoint,sorted,Date,1000000,64,2,541568300,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,0,1824800,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,1,1907800,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,2,1700600,0,0
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,0,2769700,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,1,2615400,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,2,2548100,7,1
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,0,68050100,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,1,66998200,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,2,67843300,14,2
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,0,114954000,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,1,116760500,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,2,118361400,56,8
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,0,304581600,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,1,307597200,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,2,306079200,224,32
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,0,590071600,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,1,608090500,448,64
+disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,2,614690800,448,64
+disjoint,shuffled,Int64,1000000,0,0,7805800,0,0
+disjoint,shuffled,Int64,1000000,0,1,7340800,0,0
+disjoint,shuffled,Int64,1000000,0,2,7704500,0,0
+disjoint,shuffled,Int64,1000000,1,0,7794800,7,1
+disjoint,shuffled,Int64,1000000,1,1,7773000,7,1
+disjoint,shuffled,Int64,1000000,1,2,7875600,7,1
+disjoint,shuffled,Int64,1000000,2,0,113929200,14,2
+disjoint,shuffled,Int64,1000000,2,1,112031200,14,2
+disjoint,shuffled,Int64,1000000,2,2,111191400,14,2
+disjoint,shuffled,Int64,1000000,8,0,150622000,56,8
+disjoint,shuffled,Int64,1000000,8,1,152509900,56,8
+disjoint,shuffled,Int64,1000000,8,2,159549600,56,8
+disjoint,shuffled,Int64,1000000,32,0,342220400,224,32
+disjoint,shuffled,Int64,1000000,32,1,342402300,224,32
+disjoint,shuffled,Int64,1000000,32,2,343066700,224,32
+disjoint,shuffled,Int64,1000000,64,0,629448600,448,64
+disjoint,shuffled,Int64,1000000,64,1,598119500,448,64
+disjoint,shuffled,Int64,1000000,64,2,591001100,448,64
+disjoint,shuffled,Date,1000000,0,0,4693200,0,0
+disjoint,shuffled,Date,1000000,0,1,4340000,0,0
+disjoint,shuffled,Date,1000000,0,2,4233500,0,0
+disjoint,shuffled,Date,1000000,1,0,5530700,7,1
+disjoint,shuffled,Date,1000000,1,1,5527600,7,1
+disjoint,shuffled,Date,1000000,1,2,5846500,7,1
+disjoint,shuffled,Date,1000000,2,0,85494200,14,2
+disjoint,shuffled,Date,1000000,2,1,85727100,14,2
+disjoint,shuffled,Date,1000000,2,2,87457600,14,2
+disjoint,shuffled,Date,1000000,8,0,132906400,56,8
+disjoint,shuffled,Date,1000000,8,1,139005400,56,8
+disjoint,shuffled,Date,1000000,8,2,135290600,56,8
+disjoint,shuffled,Date,1000000,32,0,312925000,224,32
+disjoint,shuffled,Date,1000000,32,1,314850500,224,32
+disjoint,shuffled,Date,1000000,32,2,313888600,224,32
+disjoint,shuffled,Date,1000000,64,0,573025100,448,64
+disjoint,shuffled,Date,1000000,64,1,556677300,448,64
+disjoint,shuffled,Date,1000000,64,2,556653800,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,0,6419100,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,1,6583100,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,2,6359600,0,0
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,0,6843400,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,1,7196400,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,2,7060700,7,1
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,0,103216900,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,1,104459300,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,2,104925500,14,2
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,0,150173500,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,1,156498000,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,2,161952800,56,8
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,0,355184800,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,1,366720400,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,2,373102000,224,32
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,0,615324800,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,1,595051700,448,64
+disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,2,596607100,448,64
+staircase,sorted,Int64,1000000,0,0,1704000,0,0
+staircase,sorted,Int64,1000000,0,1,2030900,0,0
+staircase,sorted,Int64,1000000,0,2,2031100,0,0
+staircase,sorted,Int64,1000000,1,0,2534300,17,1
+staircase,sorted,Int64,1000000,1,1,2511200,17,1
+staircase,sorted,Int64,1000000,1,2,2457300,17,1
+staircase,sorted,Int64,1000000,2,0,66295800,34,2
+staircase,sorted,Int64,1000000,2,1,66040400,34,2
+staircase,sorted,Int64,1000000,2,2,65876300,34,2
+staircase,sorted,Int64,1000000,8,0,122130300,136,8
+staircase,sorted,Int64,1000000,8,1,125258600,136,8
+staircase,sorted,Int64,1000000,8,2,126683400,136,8
+staircase,sorted,Int64,1000000,32,0,340760700,544,32
+staircase,sorted,Int64,1000000,32,1,343640400,544,32
+staircase,sorted,Int64,1000000,32,2,338881100,544,32
+staircase,sorted,Int64,1000000,64,0,647323800,1088,64
+staircase,sorted,Int64,1000000,64,1,633276900,1088,64
+staircase,sorted,Int64,1000000,64,2,638936300,1088,64
+staircase,sorted,Date,1000000,0,0,1409500,0,0
+staircase,sorted,Date,1000000,0,1,1595600,0,0
+staircase,sorted,Date,1000000,0,2,1456400,0,0
+staircase,sorted,Date,1000000,1,0,2713800,17,1
+staircase,sorted,Date,1000000,1,1,2677300,17,1
+staircase,sorted,Date,1000000,1,2,2605200,17,1
+staircase,sorted,Date,1000000,2,0,58727800,34,2
+staircase,sorted,Date,1000000,2,1,59513100,34,2
+staircase,sorted,Date,1000000,2,2,59121200,34,2
+staircase,sorted,Date,1000000,8,0,117394900,136,8
+staircase,sorted,Date,1000000,8,1,118677700,136,8
+staircase,sorted,Date,1000000,8,2,115000700,136,8
+staircase,sorted,Date,1000000,32,0,323622300,544,32
+staircase,sorted,Date,1000000,32,1,319661700,544,32
+staircase,sorted,Date,1000000,32,2,327939700,544,32
+staircase,sorted,Date,1000000,64,0,635688600,1088,64
+staircase,sorted,Date,1000000,64,1,613001400,1088,64
+staircase,sorted,Date,1000000,64,2,618049100,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,0,2435300,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,1,2001400,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,2,1763800,0,0
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,0,2857000,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,1,2617500,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,2,2654100,17,1
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,0,66981200,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,1,65835300,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,2,65434600,34,2
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,0,119727900,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,1,125697800,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,2,127576100,136,8
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,0,334575900,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,1,342461600,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,2,339239600,544,32
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,0,642025100,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,1,652082000,1088,64
+staircase,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,2,631243100,1088,64
+staircase,shuffled,Int64,1000000,0,0,6134900,0,0
+staircase,shuffled,Int64,1000000,0,1,6822900,0,0
+staircase,shuffled,Int64,1000000,0,2,6404300,0,0
+staircase,shuffled,Int64,1000000,1,0,7269400,17,1
+staircase,shuffled,Int64,1000000,1,1,7377800,17,1
+staircase,shuffled,Int64,1000000,1,2,7603900,17,1
+staircase,shuffled,Int64,1000000,2,0,103262300,34,2
+staircase,shuffled,Int64,1000000,2,1,101609700,34,2
+staircase,shuffled,Int64,1000000,2,2,102222400,34,2
+staircase,shuffled,Int64,1000000,8,0,163483000,136,8
+staircase,shuffled,Int64,1000000,8,1,160872400,136,8
+staircase,shuffled,Int64,1000000,8,2,157684100,136,8
+staircase,shuffled,Int64,1000000,32,0,385444900,544,32
+staircase,shuffled,Int64,1000000,32,1,379576500,544,32
+staircase,shuffled,Int64,1000000,32,2,375012700,544,32
+staircase,shuffled,Int64,1000000,64,0,683068800,1088,64
+staircase,shuffled,Int64,1000000,64,1,680925900,1088,64
+staircase,shuffled,Int64,1000000,64,2,678935600,1088,64
+staircase,shuffled,Date,1000000,0,0,5350100,0,0
+staircase,shuffled,Date,1000000,0,1,4607500,0,0
+staircase,shuffled,Date,1000000,0,2,4557900,0,0
+staircase,shuffled,Date,1000000,1,0,5550900,17,1
+staircase,shuffled,Date,1000000,1,1,5674800,17,1
+staircase,shuffled,Date,1000000,1,2,5909200,17,1
+staircase,shuffled,Date,1000000,2,0,83818500,34,2
+staircase,shuffled,Date,1000000,2,1,83869200,34,2
+staircase,shuffled,Date,1000000,2,2,83053100,34,2
+staircase,shuffled,Date,1000000,8,0,140080700,136,8
+staircase,shuffled,Date,1000000,8,1,137569400,136,8
+staircase,shuffled,Date,1000000,8,2,139254500,136,8
+staircase,shuffled,Date,1000000,32,0,346839300,544,32
+staircase,shuffled,Date,1000000,32,1,364516700,544,32
+staircase,shuffled,Date,1000000,32,2,357639000,544,32
+staircase,shuffled,Date,1000000,64,0,627023100,1088,64
+staircase,shuffled,Date,1000000,64,1,630053400,1088,64
+staircase,shuffled,Date,1000000,64,2,648856200,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,0,6243800,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,1,6542800,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,2,6472900,0,0
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,0,7013000,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,1,7480800,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,2,7209000,17,1
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,0,102523400,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,1,104030100,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,2,104068800,34,2
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,0,165647700,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,1,164325600,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,2,160433100,136,8
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,0,381935400,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,1,390031500,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,2,378760100,544,32
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,0,680896500,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,1,688736800,1088,64
+staircase,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,2,689054600,1088,64
+identical,sorted,Int64,1000000,0,0,2242600,0,0
+identical,sorted,Int64,1000000,0,1,1951000,0,0
+identical,sorted,Int64,1000000,0,2,1578600,0,0
+identical,sorted,Int64,1000000,1,0,2829300,7,1
+identical,sorted,Int64,1000000,1,1,2551300,7,1
+identical,sorted,Int64,1000000,1,2,2525500,7,1
+identical,sorted,Int64,1000000,2,0,18990000,7,1
+identical,sorted,Int64,1000000,2,1,18782800,7,1
+identical,sorted,Int64,1000000,2,2,18404300,7,1
+identical,sorted,Int64,1000000,8,0,18402700,7,1
+identical,sorted,Int64,1000000,8,1,18405400,7,1
+identical,sorted,Int64,1000000,8,2,18560400,7,1
+identical,sorted,Int64,1000000,32,0,19270100,7,1
+identical,sorted,Int64,1000000,32,1,19693500,7,1
+identical,sorted,Int64,1000000,32,2,18968800,7,1
+identical,sorted,Int64,1000000,64,0,19616600,7,1
+identical,sorted,Int64,1000000,64,1,19760200,7,1
+identical,sorted,Int64,1000000,64,2,19465100,7,1
+identical,sorted,Date,1000000,0,0,1372100,0,0
+identical,sorted,Date,1000000,0,1,1562000,0,0
+identical,sorted,Date,1000000,0,2,1397500,0,0
+identical,sorted,Date,1000000,1,0,2789100,7,1
+identical,sorted,Date,1000000,1,1,2629300,7,1
+identical,sorted,Date,1000000,1,2,2813000,7,1
+identical,sorted,Date,1000000,2,0,12233500,7,1
+identical,sorted,Date,1000000,2,1,12572400,7,1
+identical,sorted,Date,1000000,2,2,12321000,7,1
+identical,sorted,Date,1000000,8,0,12200000,7,1
+identical,sorted,Date,1000000,8,1,12640300,7,1
+identical,sorted,Date,1000000,8,2,12179400,7,1
+identical,sorted,Date,1000000,32,0,12785200,7,1
+identical,sorted,Date,1000000,32,1,14105500,7,1
+identical,sorted,Date,1000000,32,2,13961400,7,1
+identical,sorted,Date,1000000,64,0,13486600,7,1
+identical,sorted,Date,1000000,64,1,13305400,7,1
+identical,sorted,Date,1000000,64,2,14560400,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,0,2236800,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,1,1762300,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,0,2,2279700,0,0
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,0,2985300,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,1,2752700,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,1,2,2719000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,0,20396600,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,1,20489000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,2,2,19989600,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,0,20887500,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,1,19866600,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,8,2,20300100,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,0,19745900,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,1,19843200,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,32,2,18892200,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,0,20779000,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,1,18574500,7,1
+identical,sorted,"Datetime(time_unit='us', time_zone=None)",1000000,64,2,19552300,7,1
+identical,shuffled,Int64,1000000,0,0,6803600,0,0
+identical,shuffled,Int64,1000000,0,1,6864700,0,0
+identical,shuffled,Int64,1000000,0,2,8480100,0,0
+identical,shuffled,Int64,1000000,1,0,7429800,7,1
+identical,shuffled,Int64,1000000,1,1,7367300,7,1
+identical,shuffled,Int64,1000000,1,2,7559400,7,1
+identical,shuffled,Int64,1000000,2,0,24000200,7,1
+identical,shuffled,Int64,1000000,2,1,24030600,7,1
+identical,shuffled,Int64,1000000,2,2,24741500,7,1
+identical,shuffled,Int64,1000000,8,0,24283500,7,1
+identical,shuffled,Int64,1000000,8,1,23519100,7,1
+identical,shuffled,Int64,1000000,8,2,24792800,7,1
+identical,shuffled,Int64,1000000,32,0,26870600,7,1
+identical,shuffled,Int64,1000000,32,1,26340900,7,1
+identical,shuffled,Int64,1000000,32,2,24780600,7,1
+identical,shuffled,Int64,1000000,64,0,24855200,7,1
+identical,shuffled,Int64,1000000,64,1,24467100,7,1
+identical,shuffled,Int64,1000000,64,2,23669900,7,1
+identical,shuffled,Date,1000000,0,0,4410500,0,0
+identical,shuffled,Date,1000000,0,1,5055400,0,0
+identical,shuffled,Date,1000000,0,2,4592600,0,0
+identical,shuffled,Date,1000000,1,0,5862800,7,1
+identical,shuffled,Date,1000000,1,1,5615000,7,1
+identical,shuffled,Date,1000000,1,2,5750700,7,1
+identical,shuffled,Date,1000000,2,0,14634700,7,1
+identical,shuffled,Date,1000000,2,1,14891500,7,1
+identical,shuffled,Date,1000000,2,2,15942100,7,1
+identical,shuffled,Date,1000000,8,0,15934100,7,1
+identical,shuffled,Date,1000000,8,1,14672500,7,1
+identical,shuffled,Date,1000000,8,2,14835300,7,1
+identical,shuffled,Date,1000000,32,0,14860900,7,1
+identical,shuffled,Date,1000000,32,1,15609000,7,1
+identical,shuffled,Date,1000000,32,2,15825500,7,1
+identical,shuffled,Date,1000000,64,0,15620200,7,1
+identical,shuffled,Date,1000000,64,1,14903800,7,1
+identical,shuffled,Date,1000000,64,2,14854100,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,0,6396900,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,1,6842000,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,0,2,6586200,0,0
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,0,7173000,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,1,7337700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,1,2,7350100,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,0,23504500,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,1,22563900,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,2,2,22867200,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,0,23195700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,1,23705200,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,8,2,22746500,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,0,23577700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,1,22736400,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,32,2,23494400,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,0,24047700,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,1,22713800,7,1
+identical,shuffled,"Datetime(time_unit='us', time_zone=None)",1000000,64,2,22998600,7,1

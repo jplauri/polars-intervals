@@ -1,5 +1,7 @@
 # API reference
 
+::: polars_intervals.max_k_coverage
+
 ::: polars_intervals.minimum_stabbing_points
 
 ::: polars_intervals.containment_count

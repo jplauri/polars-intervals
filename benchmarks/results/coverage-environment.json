@@ -1,0 +1,118 @@
+{
+  "recorded_utc": "2026-09-27T06:28:42.681175+00:00",
+  "base_commit": "19e9e2147422902064fb08e7881c89be01c7f947",
+  "working_tree": "Uncommitted feature; exact measured source hashes below.",
+  "cpu": {
+    "Name": "AMD Ryzen 9 3900X 12-Core Processor            ",
+    "NumberOfCores": 12,
+    "NumberOfLogicalProcessors": 24
+  },
+  "os": {
+    "Caption": "Microsoft Windows 11 Home",
+    "Version": "10.0.26200",
+    "TotalVisibleMemorySize": 33475628
+  },
+  "rust": [
+    "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "binary: rustc",
+    "commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985",
+    "commit-date: 2026-09-01",
+    "host: x86_64-pc-windows-msvc",
+    "release: 1.98.1",
+    "LLVM version: 22.1.8"
+  ],
+  "cargo": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "uv": "uv 0.11.3 (45da18ac3 2026-04-01 x86_64-pc-windows-msvc)",
+  "python": "3.14.0",
+  "polars": "1.44.2",
+  "polars_threads": 24,
+  "seed": 20260927,
+  "repeats": 3,
+  "core": {
+    "samples": 33246,
+    "workloads": 1506,
+    "candidate_workloads": 11082
+  },
+  "native": {
+    "samples": 1296,
+    "workloads": 432
+  },
+  "profile": "Release (Cargo bench and maturin --release); final core and native timing runs sequential, with no concurrent compilation/tests.",
+  "core_command": "cargo bench -p intervals-core --bench max_k_coverage --locked",
+  "native_command": "external-wheel-env/python -I D:/polars-intervals/benchmarks/coverage_temporal.py (outside checkout)",
+  "memory_metric": "Separate untimed counting-allocator invocation: peak live requested heap bytes and allocation/reallocation count, excluding inputs, verification, stack, allocator overhead and RSS.",
+  "phase_metric": "Sort includes record construction/dominance; preprocess is helpers; DP and reconstruction separated. Production phases are zero (uninstrumented). Total includes temporary destruction but excludes returned-result destruction.",
+  "limits": {
+    "full_and_unpruned_nk": 4000000,
+    "recompute_nk_squared": 30000000,
+    "components_n": 10000,
+    "components_k": 64,
+    "million_row_budgets": [
+      0,
+      1,
+      8,
+      64
+    ]
+  },
+  "validation": {
+    "rust_tests_and_doctests": 214,
+    "python_tests_and_doctests": 1560,
+    "external_wheel_tests_and_doctests": 1560,
+    "release_and_ci_helper_tests": 49,
+    "plotting_tests": 3,
+    "plotting_subtests": 8,
+    "new_core_integration_tests": 30,
+    "new_core_proptest_functions": 9,
+    "core_proptest_cases_per_function": 384,
+    "additional_production_unit_tests": 3,
+    "new_rust_polars_tests": 2,
+    "new_python_tests": 143,
+    "checks": [
+      "cargo fmt --check",
+      "cargo test --workspace --locked",
+      "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "cargo doc --workspace --no-deps --locked with RUSTDOCFLAGS=-D warnings",
+      "uv lock --check",
+      "uv run --locked ruff check .",
+      "uv run --locked ruff format --check .",
+      "uv run --locked pytest --doctest-modules python/polars_intervals tests",
+      "uv run --locked --isolated --only-group docs mkdocs build --strict",
+      "local wheel/sdist metadata and sdist source inclusion",
+      "twine check --strict"
+    ],
+    "windows_setup": "CARGO_BUILD_JOBS=2, PYO3_PYTHON points to project Python 3.14, Python base directory on PATH for Rust test DLL loading. UV_NO_BUILD_ISOLATION=true with maturin 1.15.0 preinstalled to reuse the same interpreter; UV_LINK_MODE=copy. Initial parallel builds exceeded Windows commit memory; final checks passed with these settings."
+  },
+  "source_sha256": {
+    "Cargo.lock": "1bc5b0379d7c77b43a9352e85798d262e4d1a23f1ab86258044ce177994cc14a",
+    "uv.lock": "2778b1d794c9b2311dc036d72b7f4f8cf740ef0b95d5db02235baadd1e0685a0",
+    "rust-toolchain.toml": "86810d0ace88a635a96ed7a8d7d432afa6950c0c0b99f78f6e905ed9616a9882",
+    "crates/intervals-core/src/coverage.rs": "83498cc9ebcf22f7cd080bb2f37c5a114f5fa0df955e973bb095d1fc400b14f9",
+    "crates/intervals-core/src/lib.rs": "f12dd8d6745062f9d4e326ef15190e1d127306f28fa86d93ed8cd1bb2c2b6780",
+    "crates/intervals-core/benches/max_k_coverage.rs": "ec99ed8754e04c6c15d99b7b283a6c9fc1e82f7a9ea3064ba1ef5dbe6f7fe42b",
+    "crates/intervals-core/benches/support/coverage.rs": "f9b8bd549248a3d2c0833baffa0fd292f9a2b5dc4c780cd9a973c78849e04465",
+    "crates/intervals-core/benches/support/allocations.rs": "aea607cd699727719afebe5b813ea8d65284db86f1fb4afa4cc7c95a4b299fb8",
+    "crates/intervals-core/tests/max_k_coverage.rs": "8537621735cf83cf29412bd32d2e54a5e81ef8a6e53f3c4143a4862565521702",
+    "crates/intervals-core/tests/support/coverage.rs": "36ffab04ba2106e9490c950bea33410ae7072aaece89887de12a157169fed6d4",
+    "crates/polars-intervals/src/lib.rs": "055ed74c31d404be59a064f21705600b78453a4667a6f1103096e6986f7531ba",
+    "crates/polars-intervals/tests/max_k_coverage.rs": "586d02e2eb651c2545b428ef903da907e6a41e48eea3dd0f30df52cfc3202b5b",
+    "python/polars_intervals/__init__.py": "c8f35b18a620dfcdc46f061ac8df789225198efecbc9d0a8999c28ac0116d01e",
+    "tests/test_max_k_coverage.py": "10c365ba838b8b152e2c3cbb455af1a387d8993afeaf81ba3176215e22da7564",
+    "benchmarks/coverage_temporal.py": "e0d0b69febfa3b35addc0bc0bc169162b93a15d16f42e6176831251f9ec77111",
+    "benchmarks/coverage_summary.py": "8002e05c025e4af2cdee2574f7c2d6efd52d53049e473aa519b62b5f3738983e"
+  },
+  "result_sha256": {
+    "coverage-core.csv": "6102bc3f77ec6872f442a53b0b49152e47e9e92feebdc6812beaf53bd6fc5493",
+    "coverage-summary.csv": "3aacaf1fe877597b3911fafff5a486f5eb645ee13e20b1781da4a2f513558b29",
+    "coverage-temporal.csv": "9049b8e2a834efec54a182af76643d049e1b5960069323b3d805be8194ebcd56"
+  },
+  "artifact_sha256": {
+    "polars_intervals-0.1.0-cp314-cp314-win_amd64.whl": "0c5db5a8029ef89c22f148c5b549fb74a1ae49a9c4b6977d8a6f1a93f16df29a",
+    "polars_intervals-0.1.0.tar.gz": "1e5714ed757fd52f39b0121a857ea02d5c568984a3b80df4b8421c0626e1daa0"
+  },
+  "limitations": [
+    "One Windows x86-64 host, synthetic data, three repeats.",
+    "Heap-request accounting is not OS peak RSS.",
+    "Local wheel checks cover CPython 3.14 Windows; the full 15-wheel platform matrix and source installation remain CI checks.",
+    "No equivalent native-Polars exact baseline found."
+  ]
+}

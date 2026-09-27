@@ -30,3 +30,7 @@ harness = false
 [[bench]]
 name = "minimum_stabbing_points"
 harness = false
+
+[[bench]]
+name = "max_k_coverage"
+harness = false
