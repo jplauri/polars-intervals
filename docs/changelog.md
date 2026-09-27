@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 0.2.0 — September 27, 2026
+
+Expand the native interval APIs with containment, nesting, scheduling, covering,
+and coverage operations, plus Date and Datetime endpoint support.
+
+```sh
+pip install polars-intervals==0.2.0
+```
+
+Requires Python 3.12+ and Polars `>=1.44.1,<1.45`.
+Endpoint dtypes must match exactly and endpoints must be non-null. Empty
+interval semantics depend on the operation; see [Usage](usage.md).
+The API remains early-stage and may change.
+
 - Add [`nesting_depth`](usage.md#nesting-depth): exact, row-aligned longest strict
   containment chain depth, with outermost depth zero and duplicate geometries
   sharing the same level. Supports grouped integer, Date and Datetime endpoints.
