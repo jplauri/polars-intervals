@@ -410,6 +410,14 @@ typing marker, source inclusion, lockfile/toolchain preservation and strict
 Twine checks passed. The full 15-wheel cross-platform release matrix remains a
 CI responsibility; it was not run on this Windows host.
 
+After integration with current master, the expanded workspace passed 166 Rust
+tests and 12 Rust doctests, Clippy/rustdoc with warnings denied, the 49 CI/release
+helper tests, three plotting tests, figure regeneration, and strict MkDocs.
+A fresh release wheel passed all 1,416 Python tests/doctests outside the checkout
+on both Polars 1.44.1 and 1.44.2. Native oracle checks, grouped/temporal cases,
+join safety limits, and all three release kernels at 1K/10K were rechecked.
+Wheel/sdist metadata, source inclusion and strict Twine validation also passed.
+
 The plugin uses the repository's fallible output-field registration and shared
 logical endpoint validation. Int128 remains unsupported. Existing temporal
 support for the other operations is preserved; containment adds no endpoint
