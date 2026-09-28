@@ -82,12 +82,11 @@ measured production and candidate implementations remained unchanged.
 ```sh
 cargo bench -p intervals-core --bench minimum_stabbing_points --locked > benchmarks/results/stabbing-local.csv
 python -I /path/to/checkout/benchmarks/stabbing_temporal.py > stabbing-temporal-local.csv
-uv run --no-sync python benchmarks/stabbing_summary.py
 ```
 
 `STABBING_BENCH_MAX` and `STABBING_BENCH_SAMPLES` restrict the core run.
 Run the temporal command with the installed release wheel's Python from outside
-the checkout; the summary command reads the published files.
+the checkout.
 
 </details>
 

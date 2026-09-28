@@ -81,7 +81,6 @@ shown here; their derivations, checks and contradictory results remain in the
 
 ```sh
 cargo bench -p intervals-core --bench max_weight_with_capacity_profile --locked > benchmarks/results/capacity-profile-local.csv
-uv run --no-sync python benchmarks/capacity_profile_summary.py benchmarks/results/capacity-profile-local.csv
 python -I /path/to/checkout/benchmarks/capacity_profile_temporal.py > capacity-profile-temporal-local.csv
 ```
 

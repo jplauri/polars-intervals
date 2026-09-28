@@ -74,7 +74,6 @@ from the separate allocation call, repeated on timing rows; zero means unavailab
 
 ```sh
 cargo bench -p intervals-core --bench max_weight_with_capacity --locked > benchmarks/results/capacity-local.csv
-uv run --no-sync python benchmarks/capacity_summary.py benchmarks/results/capacity-local.csv
 python -I /path/to/checkout/benchmarks/capacity_temporal.py > capacity-temporal-local.csv
 ```
 
