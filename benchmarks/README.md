@@ -33,12 +33,13 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`plot.py`](plot.py) | Shared report generator | [`plots.toml`](plots.toml) and saved CSV/JSON → compact Markdown tables, exact summary CSV, optional SVG | [Reporting workflow](../docs/benchmarking.md#generate-plots) |
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Plot workflow](../docs/benchmarking.md#generate-plots) |
 
-Rust candidate runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
+Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
+They time production only; candidate comparisons in saved runs are reproducible
+from the revision recorded in each run's metadata.
 
 The maximum-weight clique runner is `cargo bench -p intervals-core --bench
-max_weight_clique --locked`. It compares the actual production functions with
-private event, separate-stream, heap and small quadratic candidates, including
-unit-weight paths and separate allocator measurements. See the
+max_weight_clique --locked`. It times the production functions, including
+unit-weight paths, with separate allocator measurements. See the
 [clique report](../docs/clique-benchmarks.md) and [correctness notes](clique-notes.md).
 [`max_weight_clique.py`](max_weight_clique.py) times complete Polars collections
 with numeric/temporal, grouped and multichunk fixtures. After the documented
@@ -58,12 +59,10 @@ balance_lanes --locked`. Set `BALANCE_CSV` and `BALANCE_QUALITY_CSV` to new
 absolute output paths (Cargo runs inside the crate directory);
 `BALANCE_SIZES`, `BALANCE_BUDGETS`, and `BALANCE_FAMILIES` accept
 comma-separated lists, and `BALANCE_SAMPLES` selects repeated timing samples.
-It compares the existing baseline, forward/backward/best seeds, baseline repair,
-the public balanced constructor, and a benchmark-only shared-budget multiseed
-experiment. The public constructor and repair now share `assign_balanced_lanes`:
-omit `initial_lanes` to construct, or supply it to repair. Saved measurements
-predate that interface consolidation and preserve their original metadata.
-Quality and untimed requested-heap measurements are separate from
+It times the existing baseline, repair of that baseline, and the public balanced
+constructor: `assign_balanced_lanes` constructs without `initial_lanes` and
+repairs with it. Saved measurements also include seed and multiseed ablations
+that are no longer run. Quality and untimed requested-heap measurements are separate from
 raw timings. See [the balancing notes](balance-lanes-notes.md) for scopes and
 the [report](../docs/balance-lanes-benchmarks.md) for measured settings.
 They do not require Python or the Polars plugin. Each report names its Cargo

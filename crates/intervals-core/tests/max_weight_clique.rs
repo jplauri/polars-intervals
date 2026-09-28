@@ -1,10 +1,6 @@
 use intervals_core::{IntervalError, assign_lanes, max_clique, max_weight_clique};
 use proptest::prelude::*;
 
-#[path = "../benches/support/clique.rs"]
-#[allow(dead_code)] // Benchmark fixtures and instrumentation are used by the bench target.
-mod candidates;
-
 // Independent graph oracle: enumerate every subset, including the empty set,
 // and inspect EVERY selected pair. Empty singletons pass; an empty vertex in
 // any pair fails. This deliberately does not call sweep/reconstruction helpers.
@@ -41,7 +37,7 @@ fn brute_force(s: &[i64], e: &[i64], w: &[i64]) -> (i128, usize) {
 
 // A separately structured O(n²) oracle scores input start coordinates directly,
 // without sorting or maintaining active state. It also implements the tie rule
-// independently of production so candidate agreement alone cannot hide a bug.
+// independently of production.
 fn coordinate_reference(s: &[i64], e: &[i64], w: &[i64]) -> (Vec<bool>, i128) {
     let mut coordinate = None;
     let mut best = 0i128;
@@ -98,12 +94,6 @@ fn check(s: &[i64], e: &[i64], w: &[i64]) -> (Vec<bool>, i128) {
     assert_eq!(verify(s, e, w, &actual), optimum);
     assert_eq!(actual, expected);
     assert_eq!(actual, max_weight_clique(s, e, w).unwrap());
-    for &method in candidates::METHODS {
-        let mask = candidates::run(s, e, Some(w), method).unwrap();
-        assert_eq!(verify(s, e, w, &mask), optimum, "{method}");
-        assert_eq!(mask, expected, "{method} tie rule");
-        assert_eq!(mask, candidates::run(s, e, Some(w), method).unwrap());
-    }
     (actual, optimum)
 }
 
@@ -111,11 +101,6 @@ fn check_units(s: &[i64], e: &[i64]) -> Vec<bool> {
     let units = vec![1; s.len()];
     let (expected, optimum) = check(s, e, &units);
     assert_eq!(max_clique(s, e).unwrap(), expected);
-    for &method in candidates::METHODS {
-        let mask = candidates::run::<_, i64>(s, e, None, method).unwrap();
-        assert_eq!(verify(s, e, &units, &mask), optimum, "{method}");
-        assert_eq!(mask, expected, "{method} implicit/explicit units");
-    }
     let mut lanes = assign_lanes(s, e).unwrap();
     lanes.sort_unstable();
     lanes.dedup();
@@ -507,9 +492,6 @@ proptest! {
         let mask = max_weight_clique(&s, &e, &w).unwrap();
         prop_assert_eq!(verify(&s, &e, &w, &mask), optimum);
         prop_assert_eq!(&mask, &expected);
-        for &method in candidates::METHODS {
-            prop_assert_eq!(candidates::run(&s, &e, Some(&w), method).unwrap(), expected.clone());
-        }
     }
 
     #[test]

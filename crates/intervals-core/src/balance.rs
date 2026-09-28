@@ -39,15 +39,6 @@ pub struct BalanceResult {
     pub diagnostics: BalanceDiagnostics,
 }
 
-/// Construction-only benchmark scope; `Best` includes the old baseline.
-#[doc(hidden)]
-#[derive(Clone, Copy, Debug)]
-pub enum BalanceSeed {
-    Forward,
-    Backward,
-    Best,
-}
-
 /// Construct or improve a proper minimum-lane coloring, balancing row counts.
 ///
 /// Minimizes `(max(counts)-min(counts), sum(counts²))` lexicographically among
@@ -132,22 +123,6 @@ pub fn assign_balanced_lanes_with_diagnostics<T: Ord + Copy>(
     let order = sorted_nonempty(starts, ends);
     let lanes = best_seed(starts, ends, &order, baseline);
     Ok(refine(starts, ends, &order, lanes, max_work))
-}
-
-#[doc(hidden)]
-pub fn balanced_lane_seed<T: Ord + Copy>(
-    starts: &[T],
-    ends: &[T],
-    seed: BalanceSeed,
-) -> Result<Vec<u32>, IntervalError> {
-    let baseline = assign_lanes(starts, ends)?;
-    let order = sorted_nonempty(starts, ends);
-    let k = lane_count(&baseline);
-    Ok(match seed {
-        BalanceSeed::Forward => sweep(starts, ends, &order, k),
-        BalanceSeed::Backward => backward_seed(starts, ends, k),
-        BalanceSeed::Best => best_seed(starts, ends, &order, baseline),
-    })
 }
 
 fn sorted_nonempty<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Vec<usize> {
@@ -656,6 +631,16 @@ mod tests {
         ] {
             check_subset(&weights);
         }
+    }
+
+    #[test]
+    fn global_palette_available_before_late_clique() {
+        let s = [0, 1, 2, 3, 4, 10, 10, 10];
+        let e = [1, 2, 3, 4, 5, 11, 11, 11];
+        let baseline = assign_lanes(&s, &e).unwrap();
+        let forward = sweep(&s, &e, &sorted_nonempty(&s, &e), lane_count(&baseline));
+        assert_eq!(score(&counts(&forward)).0, 1);
+        assert!(score(&counts(&baseline)).0 > 1);
     }
 
     #[test]

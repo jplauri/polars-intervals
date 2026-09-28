@@ -170,15 +170,15 @@ fn solve_components<T: Ord + Copy + Sync>(
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct Segment<T> {
-    pub start: T,
-    pub end: T,
-    pub capacity: usize,
+struct Segment<T> {
+    start: T,
+    end: T,
+    capacity: usize,
 }
 
 /// Sort packed rows, reject ambiguous overlaps, insert zero gaps, and coalesce.
 /// Row IDs remain attached until overlap validation to report original indices.
-pub(crate) fn normalize<T: Ord + Copy, C: Copy>(
+fn normalize<T: Ord + Copy, C: Copy>(
     starts: &[T],
     ends: &[T],
     capacities: &[C],
@@ -263,14 +263,14 @@ fn constant_capacity<T: Ord + Copy>(profile: &[Segment<T>], start: T, end: T) ->
     }
 }
 
-pub(crate) struct Timeline<T> {
-    pub endpoints: Vec<T>,
-    pub capacities: Vec<usize>,
-    pub jobs: Vec<(usize, usize)>,
+struct Timeline<T> {
+    endpoints: Vec<T>,
+    capacities: Vec<usize>,
+    jobs: Vec<(usize, usize)>,
 }
 
 impl<T: Ord + Copy> Timeline<T> {
-    pub(crate) fn new(rows: &[Row<T>], profile: &[Segment<T>]) -> Self {
+    fn new(rows: &[Row<T>], profile: &[Segment<T>]) -> Self {
         if rows.is_empty() {
             return Self {
                 endpoints: Vec::new(),
@@ -321,7 +321,7 @@ impl<T: Ord + Copy> Timeline<T> {
     }
 }
 
-pub(crate) fn filter_impossible<T>(rows: &mut Vec<Row<T>>, timeline: &mut Timeline<T>) {
+fn filter_impossible<T>(rows: &mut Vec<Row<T>>, timeline: &mut Timeline<T>) {
     let mut zeros = Vec::with_capacity(timeline.capacities.len() + 1);
     zeros.push(0usize);
     for &capacity in &timeline.capacities {
@@ -338,7 +338,7 @@ pub(crate) fn filter_impossible<T>(rows: &mut Vec<Row<T>>, timeline: &mut Timeli
         .retain(|&(start, end)| zeros[start] == zeros[end]);
 }
 
-pub(crate) fn all_feasible<T>(timeline: &Timeline<T>) -> bool {
+fn all_feasible<T>(timeline: &Timeline<T>) -> bool {
     let mut changes = vec![0i128; timeline.endpoints.len()];
     for &(start, end) in &timeline.jobs {
         changes[start] += 1;
@@ -385,7 +385,7 @@ struct Edge {
 /// Rejecting all jobs proves feasibility. SSP minimizes rejection weight, hence
 /// maximizes retained weight; the omitted initial saturated cost is constant.
 /// This avoids negative-cycle cancellation and shares the same exact SSP.
-pub(crate) struct Network {
+struct Network {
     edges: Vec<Edge>,
     offsets: Vec<usize>,
     adjacent: Vec<usize>,
@@ -396,7 +396,7 @@ pub(crate) struct Network {
 }
 
 impl Network {
-    pub(crate) fn new<T>(timeline: &Timeline<T>, rows: &[Row<T>]) -> Self {
+    fn new<T>(timeline: &Timeline<T>, rows: &[Row<T>]) -> Self {
         let mut counts = vec![(0usize, 0usize); timeline.endpoints.len()];
         for &(start, end) in &timeline.jobs {
             counts[start].0 += 1;
@@ -432,30 +432,20 @@ impl Network {
         }
     }
 
-    // Forced model construction is kept for reproducible release benchmarks.
-    #[allow(dead_code)]
-    pub(crate) fn new_transshipment<T>(timeline: &Timeline<T>, rows: &[Row<T>]) -> Self {
+    // Forced model construction lets tests exercise both formulations.
+    #[cfg(test)]
+    fn new_transshipment<T>(timeline: &Timeline<T>, rows: &[Row<T>]) -> Self {
         Self::build(timeline, rows, &timeline.capacities, None)
     }
 
-    // Forced model construction is kept for reproducible release benchmarks.
-    #[allow(dead_code)]
-    pub(crate) fn new_circulation<T>(timeline: &Timeline<T>, rows: &[Row<T>]) -> Self {
-        Self::build(
-            timeline,
-            rows,
-            &timeline.capacities,
-            Some(Self::job_balances(timeline)),
-        )
-    }
-
-    fn job_balances<T>(timeline: &Timeline<T>) -> Vec<i128> {
+    #[cfg(test)]
+    fn new_circulation<T>(timeline: &Timeline<T>, rows: &[Row<T>]) -> Self {
         let mut balances = vec![0; timeline.endpoints.len()];
         for &(start, end) in &timeline.jobs {
             balances[start] -= 1;
             balances[end] += 1;
         }
-        balances
+        Self::build(timeline, rows, &timeline.capacities, Some(balances))
     }
 
     fn build<T>(
@@ -535,19 +525,19 @@ impl Network {
         self.offsets[to + 1] += 1;
     }
 
-    pub(crate) fn vertices(&self) -> usize {
+    fn vertices(&self) -> usize {
         self.offsets.len() - 1
     }
 
-    pub(crate) fn edge_count(&self) -> usize {
+    fn edge_count(&self) -> usize {
         self.edges.len() / 2
     }
 
-    pub(crate) fn is_circulation(&self) -> bool {
+    fn is_circulation(&self) -> bool {
         self.circulation
     }
 
-    pub(crate) fn solve(&mut self) -> Result<usize, IntervalError> {
+    fn solve(&mut self) -> Result<usize, IntervalError> {
         let n = self.vertices();
         let sink = n - 1;
         let mut potential = vec![0i128; n];
@@ -626,7 +616,7 @@ impl Network {
         Ok(augmentations)
     }
 
-    pub(crate) fn reconstruct<T>(&self, rows: &[Row<T>], mask: &mut [bool]) {
+    fn reconstruct<T>(&self, rows: &[Row<T>], mask: &mut [bool]) {
         debug_assert_eq!(rows.len(), self.job_count);
         for (i, row) in rows.iter().enumerate() {
             mask[row.index] = self.selected(i);

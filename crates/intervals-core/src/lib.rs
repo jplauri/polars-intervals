@@ -23,8 +23,8 @@ mod lanes;
 pub use lanes::assign_lanes;
 mod balance;
 pub use balance::{
-    BalanceDiagnostics, BalanceResult, BalanceSeed, BalanceStopReason, DEFAULT_BALANCE_WORK,
-    assign_balanced_lanes, assign_balanced_lanes_with_diagnostics, balanced_lane_seed,
+    BalanceDiagnostics, BalanceResult, BalanceStopReason, DEFAULT_BALANCE_WORK,
+    assign_balanced_lanes, assign_balanced_lanes_with_diagnostics,
 };
 mod weighted;
 pub use weighted::max_weight_non_overlapping;

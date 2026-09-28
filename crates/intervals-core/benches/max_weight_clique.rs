@@ -2,8 +2,9 @@
 //! CLIQUE_CSV must name a new file, including when rerunning the default target.
 #[path = "support/allocations.rs"]
 mod allocations;
-#[path = "support/clique.rs"]
-mod candidates;
+#[path = "support/random.rs"]
+mod random;
+use random::{random, shuffle};
 
 use std::{collections::BTreeMap, hint::black_box, io::Write, time::Instant};
 
@@ -189,13 +190,6 @@ const CASES: &[Case] = &[
     },
 ];
 
-fn random(state: &mut u64) -> u64 {
-    *state ^= *state << 13;
-    *state ^= *state >> 7;
-    *state ^= *state << 17;
-    *state
-}
-
 fn dataset(case: Case, n: usize, seed: u64) -> (Vec<i64>, Vec<i64>, Vec<i64>) {
     let mut rng = seed;
     let mut rows: Vec<_> = (0..n)
@@ -250,11 +244,7 @@ fn dataset(case: Case, n: usize, seed: u64) -> (Vec<i64>, Vec<i64>, Vec<i64>) {
         "start" => rows.sort_unstable_by_key(|r| r.0),
         "end" => rows.sort_unstable_by_key(|r| r.1),
         "reverse" => rows.sort_unstable_by_key(|r| std::cmp::Reverse(r.0)),
-        "shuffled" => {
-            for i in (1..n).rev() {
-                rows.swap(i, (random(&mut rng) as usize) % (i + 1));
-            }
-        }
+        "shuffled" => shuffle(&mut rows, &mut rng),
         "partial" => {
             rows.sort_unstable_by_key(|r| r.0);
             for chunk in rows.chunks_mut(32) {
@@ -274,19 +264,15 @@ fn dataset(case: Case, n: usize, seed: u64) -> (Vec<i64>, Vec<i64>, Vec<i64>) {
     (starts, ends, weights)
 }
 
-fn run<T: Ord + Copy, W: Copy>(s: &[T], e: &[T], w: Option<&[W]>, method: &str) -> Vec<bool>
+fn run<T: Ord + Copy, W: Copy>(s: &[T], e: &[T], w: Option<&[W]>) -> Vec<bool>
 where
     i128: From<W>,
 {
-    if method == "production" {
-        w.map_or_else(
-            || intervals_core::max_clique(s, e),
-            |w| intervals_core::max_weight_clique(s, e, w),
-        )
-        .unwrap()
-    } else {
-        candidates::run(s, e, w, method).unwrap()
-    }
+    w.map_or_else(
+        || intervals_core::max_clique(s, e),
+        |w| intervals_core::max_weight_clique(s, e, w),
+    )
+    .unwrap()
 }
 
 // Independent full-size optimum cross-check: aggregate sparse coordinate deltas
@@ -345,40 +331,27 @@ where
     }
 }
 
-struct Settings<'a> {
+struct Settings {
     samples: usize,
     warmups: usize,
-    methods: &'a [&'a str],
 }
 
 fn measure<T: Ord + Copy, W: Copy>(
     file: &mut impl Write,
     data: (&[T], &[T], Option<&[W]>),
     label: &str,
-    settings: &Settings<'_>,
+    settings: &Settings,
 ) where
     i128: From<W>,
 {
     let (s, e, w) = data;
     let optimum = oracle(s, e, w);
-    let expected = run(s, e, w, "production");
+    let (expected, peak, count) = allocations::measure(|| run(s, e, w));
     verify(s, e, w, &expected, optimum);
-    let methods: Vec<_> = settings
-        .methods
-        .iter()
-        .copied()
-        .filter(|&method| method != "quadratic" || s.len() <= 64)
-        .map(|method| {
-            let (mask, peak, count) = allocations::measure(|| run(s, e, w, method));
-            verify(s, e, w, &mask, optimum);
-            assert_eq!(mask, expected, "{label}/{method}");
-            for _ in 0..settings.warmups {
-                black_box(run(s, e, w, method));
-            }
-            (method, peak, count)
-        })
-        .collect();
-    // Batch tiny calls; output destruction is included for every candidate.
+    for _ in 0..settings.warmups {
+        black_box(run(s, e, w));
+    }
+    // Batch tiny calls; output destruction is included in every timing.
     let iterations = if s.len() <= 64 {
         256
     } else if s.len() <= 1000 {
@@ -387,26 +360,18 @@ fn measure<T: Ord + Copy, W: Copy>(
         1
     };
     for sample in 0..settings.samples {
-        for offset in 0..methods.len() {
-            let (method, peak, count) = methods[(sample + offset) % methods.len()];
-            let tick = Instant::now();
-            for _ in 0..iterations {
-                drop(black_box(run(
-                    black_box(s),
-                    black_box(e),
-                    black_box(w),
-                    method,
-                )));
-            }
-            let elapsed = tick.elapsed().as_nanos();
-            writeln!(
-                file,
-                "{label},{},{method},{sample},{iterations},{elapsed},{},{peak},{count},{optimum}",
-                s.len(),
-                elapsed / iterations
-            )
-            .unwrap();
+        let tick = Instant::now();
+        for _ in 0..iterations {
+            drop(black_box(run(black_box(s), black_box(e), black_box(w))));
         }
+        let elapsed = tick.elapsed().as_nanos();
+        writeln!(
+            file,
+            "{label},{},production,{sample},{iterations},{elapsed},{},{peak},{count},{optimum}",
+            s.len(),
+            elapsed / iterations
+        )
+        .unwrap();
     }
     file.flush().unwrap();
 }
@@ -415,7 +380,7 @@ fn measure_weights<T: Ord + Copy>(
     file: &mut impl Write,
     data: (&[T], &[T], Option<&[i64]>),
     label: &str,
-    settings: &Settings<'_>,
+    settings: &Settings,
     weight_dtypes: &str,
 ) {
     let (s, e, w) = data;
@@ -448,21 +413,11 @@ fn main() {
         .split(',')
         .map(|x| x.parse().unwrap())
         .collect();
-    let methods = value(
-        "CLIQUE_METHODS",
-        &format!("production,{}", candidates::METHODS.join(",")),
-    );
-    let methods: Vec<_> = methods.split(',').collect();
     let samples = value("CLIQUE_SAMPLES", "5").parse().unwrap();
     let warmups = value("CLIQUE_WARMUPS", "2").parse().unwrap();
     assert!(
         samples > 0 && warmups > 0,
         "samples and warmups must be positive"
-    );
-    assert!(
-        methods
-            .iter()
-            .all(|method| *method == "production" || candidates::METHODS.contains(method))
     );
     let filter = value("CLIQUE_CASES", "");
     let path = value(
@@ -482,16 +437,7 @@ fn main() {
     let mut file = std::io::BufWriter::new(output);
     writeln!(file, "dtype,family,order,weights,seed,weight_dtype,n,method,sample,iterations,batch_ns,total_ns,peak_bytes,allocations,optimum").unwrap();
     eprintln!(
-        "layouts bytes: endpoint i64={}, index={}, event unit={}, event weighted={}, stream weighted={}, heap entry={}",
-        size_of::<i64>(),
-        size_of::<usize>(),
-        size_of::<(i64, bool)>(),
-        size_of::<(i64, i128)>(),
-        size_of::<(i64, i64)>(),
-        size_of::<(i64, usize)>()
-    );
-    eprintln!(
-        "scope: validation, preparation, optimization, mask and destruction; warmups={warmups}; samples={samples}; quadratic omitted above n=64; million cases focused"
+        "scope: validation, preparation, optimization, mask and destruction; warmups={warmups}; samples={samples}; million cases focused"
     );
     for &case in CASES {
         let case_name = format!("{}-{}-{}", case.family, case.order, case.weights);
@@ -505,11 +451,7 @@ fn main() {
             for &seed in &seeds {
                 let (s, e, weights) = dataset(case, n, seed);
                 let w = (case.weights != "units").then_some(weights.as_slice());
-                let settings = Settings {
-                    samples,
-                    warmups,
-                    methods: &methods,
-                };
+                let settings = Settings { samples, warmups };
                 if dtypes.split(',').any(|dtype| dtype == "i64") {
                     measure_weights(
                         &mut file,

@@ -68,8 +68,8 @@ uv run --no-sync python benchmarks/nesting_depth.py --output target/nesting-pola
 ```
 
 The recorded collection run used an externally installed release wheel.
-`NESTING_SIZES`, `NESTING_SCENARIOS` and `NESTING_METHODS` select core cases;
-the current default includes the uninstrumented production entry point.
+`NESTING_SIZES` and `NESTING_SCENARIOS` select core cases; the core runner now
+times only the uninstrumented production entry point.
 The original eight-candidate matrix and the repeat use different selections,
 recorded in their metadata.
 

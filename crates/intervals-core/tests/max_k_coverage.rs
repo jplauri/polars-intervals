@@ -1,8 +1,6 @@
 use intervals_core::{IntervalError, max_k_coverage, minimum_cover};
 use proptest::prelude::*;
 
-#[path = "../benches/support/coverage.rs"]
-mod candidates;
 #[path = "support/coverage.rs"]
 mod oracle;
 use oracle::{brute, objective};
@@ -10,22 +8,13 @@ use oracle::{brute, objective};
 fn check(starts: &[i64], ends: &[i64], k: usize) -> (i128, usize) {
     let expected = brute(starts, ends, k);
     assert_eq!(oracle::quadratic(starts, ends, k), expected);
-    for method in candidates::METHODS {
-        let result = candidates::run(starts, ends, k, method);
-        assert_eq!(
-            objective(starts, ends, &result.mask),
-            expected,
-            "method={method}, starts={starts:?}, ends={ends:?}, k={k}"
-        );
-        assert!(result.mask.iter().filter(|&&b| b).count() <= k);
-        if *method != "production" {
-            assert_eq!(
-                (result.score.0, result.score.1.0),
-                expected,
-                "stored value {method}"
-            );
-        }
-    }
+    let mask = max_k_coverage(starts, ends, k).unwrap();
+    assert_eq!(
+        objective(starts, ends, &mask),
+        expected,
+        "starts={starts:?}, ends={ends:?}, k={k}"
+    );
+    assert!(mask.iter().filter(|&&b| b).count() <= k);
     expected
 }
 
@@ -136,7 +125,7 @@ proptest! {
     #![proptest_config(ProptestConfig::with_cases(384))]
 
     #[test]
-    fn exhaustive_objective_all_candidates((s,e) in intervals(), k in 0usize..=12) {
+    fn exhaustive_objective((s,e) in intervals(), k in 0usize..=12) {
         check(&s,&e,k);
         let mask = max_k_coverage(&s,&e,k).unwrap();
         prop_assert_eq!(mask.len(),s.len());
@@ -217,27 +206,6 @@ proptest! {
             if v.0 > best.0 || (v.0 == best.0 && v.1 < best.1) {best=v;}
         }
         prop_assert_eq!(solve(&s,&e,k),best);
-        let merged = candidates::run(&s,&e,k,"components");
-        prop_assert_eq!(objective(&s,&e,&merged.mask),best);
-    }
-
-    #[test]
-    fn helper_definitions_against_quadratic_oracle((s,e) in intervals()) {
-        for prune in [false,true] {
-            let rows = candidates::packed(&s,&e,prune);
-            for sweep in [false,true] {
-                if sweep && !prune {continue;}
-                let (phi,psi) = candidates::helpers(&rows,sweep,prune);
-                for i in 0..rows.len() {
-                    let r = rows[i];
-                    let disjoint = (0..i).rfind(|&j|rows[j].end <= r.start).map_or(0,|j|j+1);
-                    prop_assert_eq!(phi[i],disjoint);
-                    let overlap = (0..i).filter(|&j| rows[j].start < r.start && r.start < rows[j].end)
-                        .min_by_key(|&j| (rows[j].start, Reverse(rows[j].end), Reverse(j)));
-                    prop_assert_eq!(psi[i],overlap.map_or(0,|j|j+1));
-                }
-            }
-        }
     }
 
     #[test]
@@ -246,12 +214,6 @@ proptest! {
         k in 0usize..=20,
     ) {
         let (s,e): (Vec<_>,Vec<_>) = rows.into_iter().map(|(a,b)|(a.min(b),a.max(b))).unzip();
-        let expected = oracle::quadratic(&s,&e,k);
-        for method in candidates::METHODS {
-            let result=candidates::run(&s,&e,k,method);
-            prop_assert_eq!(objective(&s,&e,&result.mask),expected,"method={}",method);
-        }
+        prop_assert_eq!(solve(&s,&e,k),oracle::quadratic(&s,&e,k));
     }
 }
-
-use std::cmp::Reverse;

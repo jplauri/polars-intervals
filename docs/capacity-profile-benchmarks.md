@@ -86,8 +86,7 @@ python -I /path/to/checkout/benchmarks/capacity_profile_temporal.py > capacity-p
 ```
 
 `PROFILE_BENCH_MAX_N`, `PROFILE_BENCH_MIN_N`, `PROFILE_BENCH_MIN_M`,
-`PROFILE_BENCH_SAMPLES`, `PROFILE_BENCH_FAMILY` and `PROFILE_BENCH_METHODS`
-restrict the core run. Run the temporal command with the installed release
+`PROFILE_BENCH_SAMPLES` and `PROFILE_BENCH_FAMILY` restrict the core run. Run the temporal command with the installed release
 wheel's Python from outside the checkout, following the shared setup.
 
 </details>

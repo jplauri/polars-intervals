@@ -2,8 +2,12 @@ use intervals_core::{IntervalError, minimum_cost_cover, minimum_cover};
 use proptest::prelude::*;
 
 #[path = "../benches/support/covering.rs"]
-mod candidates;
-use candidates::{brute_force, covers, objective};
+mod oracle;
+use oracle::{brute_force, covers, objective};
+// White-box checks of the private frontier DP and its Fenwick tree.
+#[allow(dead_code)]
+#[path = "../src/cover.rs"]
+mod production;
 
 fn check(s: &[i32], e: &[i32], w: &[i128], l: i32, r: i32) -> Option<(i128, usize)> {
     let expected = brute_force(s, e, w, l, r);
@@ -19,16 +23,6 @@ fn check(s: &[i32], e: &[i32], w: &[i128], l: i32, r: i32) -> Option<(i128, usiz
         }
         None => assert_eq!(actual, Err(IntervalError::InfeasibleCover)),
     }
-    for method in ["MCC-A", "MCC-B", "MCC-C"] {
-        let actual = candidates::weighted(s, e, w, l, r, method).result;
-        assert_eq!(
-            actual.as_ref().ok().map(|mask| objective(w, mask)),
-            expected
-        );
-        if let Ok(mask) = actual {
-            assert!(covers(s, e, &mask, l, r));
-        }
-    }
     let unit = vec![1; s.len()];
     let cardinality = brute_force(s, e, &unit, l, r);
     let greedy = minimum_cover(s, e, l, r);
@@ -42,16 +36,6 @@ fn check(s: &[i32], e: &[i32], w: &[i128], l: i32, r: i32) -> Option<(i128, usiz
         assert!(covers(s, e, mask, l, r));
         let weighted = minimum_cost_cover(s, e, &unit, l, r).unwrap();
         assert_eq!(objective(&unit, mask), objective(&unit, &weighted));
-    }
-    for method in ["MC-A", "MC-B", "MC-C", "MC-A-detect"] {
-        let actual = candidates::cardinality(s, e, l, r, method).result;
-        assert_eq!(
-            actual.as_ref().ok().map(|mask| objective(&unit, mask)),
-            cardinality
-        );
-        if let Ok(mask) = actual {
-            assert!(covers(s, e, &mask, l, r));
-        }
     }
     expected
 }
@@ -101,13 +85,13 @@ proptest! {
             prop_assert_eq!(count, Some(1));
         }
         // Every published state/backpointer is itself an exact continuous prefix cover.
-        let mut prepared = candidates::production::prepare(&s, &e, l, r).unwrap();
+        let mut prepared = production::prepare(&s, &e, l, r).unwrap();
         prepared.sort_unstable_by_key(|c| (c.end, c.row));
-        let coordinates = candidates::production::coordinates(&prepared, l);
-        let solution = candidates::production::dynamic_program(&prepared, &coordinates, &w);
+        let coordinates = production::coordinates(&prepared, l);
+        let solution = production::dynamic_program(&prepared, &coordinates, &w);
         for (i, &end) in coordinates.iter().enumerate().skip(1) {
             let mut mask = vec![false; s.len()];
-            let reachable = candidates::production::reconstruct(&solution.back[..=i], &mut mask);
+            let reachable = production::reconstruct(&solution.back[..=i], &mut mask);
             let oracle = brute_force(&s, &e, &w, l, end);
             // Prefix covers may use intervals ending later; the DP at i only uses ends <= i.
             let allowed_s: Vec<_> = prepared.iter().filter(|c| c.end <= end).map(|c| c.start).collect();
@@ -125,20 +109,14 @@ proptest! {
     }
 
     #[test]
-    fn trees_match_naive_ranges(values in prop::collection::vec(prop::option::of((0i128..100, 0usize..10)), 1..40)) {
-        let mut fenwick = candidates::production::Fenwick::new(values.len());
-        let mut segment = candidates::SegmentTree::new(values.len());
+    fn fenwick_matches_naive_suffixes(values in prop::collection::vec(prop::option::of((0i128..100, 0usize..10)), 1..40)) {
+        let mut fenwick = production::Fenwick::new(values.len());
         let mut naive = vec![None; values.len()];
         for (i, value) in values.iter().enumerate() {
             naive[i] = value.map(|(cost, count)| (cost, count, i));
-            fenwick.update(i, naive[i]); segment.update(i, naive[i]);
+            fenwick.update(i, naive[i]);
             for l in 0..values.len() {
-                let expected = naive[l..].iter().flatten().copied().min();
-                prop_assert_eq!(fenwick.suffix(l), expected);
-                prop_assert_eq!(segment.query(l, values.len()), expected);
-                for r in l..=values.len() {
-                    prop_assert_eq!(segment.query(l, r), naive[l..r].iter().flatten().copied().min());
-                }
+                prop_assert_eq!(fenwick.suffix(l), naive[l..].iter().flatten().copied().min());
             }
         }
     }

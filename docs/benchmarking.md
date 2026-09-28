@@ -9,7 +9,7 @@ distinguishes benchmark runners from report generators.
 ## Setup
 
 Follow the [source build prerequisites](contributing.md#build-from-source).
-Rust candidate benchmarks use `cargo bench` without Python or the plugin.
+Rust core benchmarks use `cargo bench` without Python or the plugin.
 Python end-to-end benchmarks need a release build:
 
 ```sh
@@ -54,6 +54,8 @@ the fastest baseline independently per case.
 workloads, not every application or platform. Keep losses, skips, bounded
 baselines, and missing types visible. Preserve raw samples, environment, settings,
 revisions/source hashes, and historical evidence in `benchmarks/results/`.
+Core runners time production only; candidates that lost a saved comparison
+were removed and remain available at the revision recorded in its metadata.
 Discuss repeat runs separately, including meaningful variation or contradictions.
 
 ### Memory metrics

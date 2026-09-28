@@ -99,7 +99,7 @@ fn solve_component<T: Ord + Copy>(
     Ok(())
 }
 
-pub(crate) fn solve_parallel<T: Ord + Copy + Sync>(
+fn solve_parallel<T: Ord + Copy + Sync>(
     rows: &[Row<T>],
     ranges: &[std::ops::Range<usize>],
     capacity: usize,
@@ -144,8 +144,6 @@ pub(crate) fn solve_parallel<T: Ord + Copy + Sync>(
     })
 }
 
-// These internals are also compiled directly into the private benchmark target.
-// They are not exported by the library.
 #[derive(Clone, Copy)]
 pub(crate) struct Row<T> {
     pub start: T,
@@ -232,7 +230,7 @@ pub(crate) fn components<T: Ord + Copy>(rows: &[Row<T>]) -> Vec<std::ops::Range<
     result
 }
 
-pub(crate) fn concurrency<T: Ord + Copy>(rows: &[Row<T>]) -> usize {
+fn concurrency<T: Ord + Copy>(rows: &[Row<T>]) -> usize {
     let mut ends: Vec<_> = rows.iter().map(|r| r.end).collect();
     ends.sort_unstable();
     let (mut ended, mut peak) = (0, 0);
@@ -255,7 +253,7 @@ struct Edge {
     cost: i128,
 }
 
-pub(crate) struct Network {
+struct Network {
     // Paired residual edges: the reverse of edge e is e ^ 1. CSR adjacency
     // stores edge indices, keeping both edge and adjacency buffers contiguous.
     edges: Vec<Edge>,
@@ -266,7 +264,7 @@ pub(crate) struct Network {
 }
 
 impl Network {
-    pub(crate) fn new<T: Ord + Copy>(rows: &[Row<T>], capacity: usize) -> Self {
+    fn new<T: Ord + Copy>(rows: &[Row<T>], capacity: usize) -> Self {
         let mut endpoints = Vec::with_capacity(2 * rows.len());
         for row in rows {
             endpoints.extend([row.start, row.end]);
@@ -313,7 +311,7 @@ impl Network {
         self.offsets[to + 1] += 1;
     }
 
-    pub(crate) fn solve(&mut self, capacity: usize) -> Result<(), IntervalError> {
+    fn solve(&mut self, capacity: usize) -> Result<(), IntervalError> {
         let n = self.offsets.len() - 1;
         let mut potential = vec![0i128; n];
         let mut previous = vec![usize::MAX; n];
@@ -395,7 +393,7 @@ impl Network {
         Ok(())
     }
 
-    pub(crate) fn reconstruct<T>(&self, rows: &[Row<T>], mask: &mut [bool]) {
+    fn reconstruct<T>(&self, rows: &[Row<T>], mask: &mut [bool]) {
         for (row, edge) in rows
             .iter()
             .zip(self.edges[self.interval_start..].iter().step_by(2))

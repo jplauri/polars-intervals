@@ -1,15 +1,9 @@
 #[path = "../benches/support/mod.rs"]
 mod support;
 
-use intervals_core::IntervalError;
+use intervals_core::{IntervalError, assign_lanes};
 use proptest::prelude::*;
-use support::{CANDIDATES, Candidate, optimum, shuffle, verify};
-
-fn algorithms() -> impl Iterator<Item = (&'static str, Candidate)> {
-    let production: Candidate =
-        |starts, ends| intervals_core::assign_lanes(starts, ends).map(|v| (v, 0));
-    CANDIDATES.into_iter().chain([("production", production)])
-}
+use support::{optimum, shuffle, verify};
 
 fn valid_intervals() -> impl Strategy<Value = (Vec<i64>, Vec<i64>)> {
     prop::collection::vec((-8i64..=8, 0i64..=8), 0..=30).prop_map(|intervals| {
@@ -22,23 +16,21 @@ fn valid_intervals() -> impl Strategy<Value = (Vec<i64>, Vec<i64>)> {
 
 fn check(starts: &[i64], ends: &[i64]) -> usize {
     let expected = optimum(starts, ends);
-    for (_, run) in algorithms() {
-        let (lanes, _) = run(starts, ends).unwrap();
-        verify(starts, ends, &lanes, expected);
-        // Independent O(n²) conflict check, in original row order.
-        for i in 0..starts.len() {
-            for j in 0..i {
-                if starts[i] < ends[i]
-                    && starts[j] < ends[j]
-                    && starts[i] < ends[j]
-                    && starts[j] < ends[i]
-                {
-                    assert_ne!(lanes[i], lanes[j], "rows {i} and {j} overlap");
-                }
+    let lanes = assign_lanes(starts, ends).unwrap();
+    verify(starts, ends, &lanes, expected);
+    // Independent O(n²) conflict check, in original row order.
+    for i in 0..starts.len() {
+        for j in 0..i {
+            if starts[i] < ends[i]
+                && starts[j] < ends[j]
+                && starts[i] < ends[j]
+                && starts[j] < ends[i]
+            {
+                assert_ne!(lanes[i], lanes[j], "rows {i} and {j} overlap");
             }
         }
-        assert_eq!(lanes, run(starts, ends).unwrap().0);
     }
+    assert_eq!(lanes, assign_lanes(starts, ends).unwrap());
     expected
 }
 
@@ -73,31 +65,28 @@ fn equal_endpoints_and_shuffled_rows() {
 
 #[test]
 fn generic_endpoints_need_only_order_and_copy() {
-    let lanes = intervals_core::assign_lanes(&['a', 'c', 'd'], &['d', 'f', 'd']).unwrap();
+    let lanes = assign_lanes(&['a', 'c', 'd'], &['d', 'f', 'd']).unwrap();
     assert_eq!(lanes.len(), 3);
     assert_ne!(lanes[0], lanes[1]);
     assert_eq!(lanes[2], 0);
-    let lanes =
-        intervals_core::assign_lanes(&[u64::MAX - 2, u64::MAX - 1], &[u64::MAX; 2]).unwrap();
+    let lanes = assign_lanes(&[u64::MAX - 2, u64::MAX - 1], &[u64::MAX; 2]).unwrap();
     assert_ne!(lanes[0], lanes[1]);
 }
 
 #[test]
 fn validation_uses_original_indices() {
-    for (_, run) in algorithms() {
+    assert_eq!(
+        assign_lanes(&[9, 0, 5, 3], &[10, 0, 4, 2]),
+        Err(IntervalError::InvalidInterval { index: 2 })
+    );
+    for (starts, ends) in [(&[1][..], &[][..]), (&[][..], &[1][..])] {
         assert_eq!(
-            run(&[9, 0, 5, 3], &[10, 0, 4, 2]),
-            Err(IntervalError::InvalidInterval { index: 2 })
+            assign_lanes(starts, ends),
+            Err(IntervalError::LengthMismatch {
+                starts_len: starts.len(),
+                ends_len: ends.len(),
+            })
         );
-        for (starts, ends) in [(&[1][..], &[][..]), (&[][..], &[1][..])] {
-            assert_eq!(
-                run(starts, ends),
-                Err(IntervalError::LengthMismatch {
-                    starts_len: starts.len(),
-                    ends_len: ends.len(),
-                })
-            );
-        }
     }
 }
 
@@ -111,9 +100,7 @@ proptest! {
     fn translation_preserves_exact_assignment((starts, ends) in valid_intervals(), offset in -100i64..=100) {
         let shifted_starts: Vec<_> = starts.iter().map(|x| x + offset).collect();
         let shifted_ends: Vec<_> = ends.iter().map(|x| x + offset).collect();
-        for (_, run) in algorithms() {
-            prop_assert_eq!(run(&starts, &ends).unwrap().0, run(&shifted_starts, &shifted_ends).unwrap().0);
-        }
+        prop_assert_eq!(assign_lanes(&starts, &ends).unwrap(), assign_lanes(&shifted_starts, &shifted_ends).unwrap());
     }
 
     #[test]
