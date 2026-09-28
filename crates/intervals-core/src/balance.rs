@@ -3,9 +3,6 @@ use crate::{IntervalError, assign_lanes};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
-/// Default deterministic refinement budget used by the expression API.
-pub const DEFAULT_BALANCE_WORK: u64 = 100_000;
-
 /// Why bounded balancing stopped. Only `PairwiseFixedPoint` certifies a complete
 /// no-improvement pass; it does not certify a globally optimal coloring.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
