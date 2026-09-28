@@ -1,5 +1,6 @@
 """Rust-backed interval expressions and optimization functions for Polars."""
 
+import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
 
@@ -21,6 +22,28 @@ __all__ = [
     "nesting_depth",
     "overlap_count",
 ]
+
+_INTEGERS = (pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64)
+_USIZE_MAX = 2 * sys.maxsize + 1
+
+
+def _plugin(function_name: str, args: list, **options) -> pl.Expr:
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name=function_name,
+        args=args,
+        is_elementwise=False,
+        **options,
+    )
+
+
+def _nonnegative(value: int, name: str, limit: int, range_name: str) -> str:
+    """Validate an integer option, returning decimal text for the plugin kwargs."""
+    if not isinstance(value, int) or isinstance(value, bool):
+        raise TypeError(f"{name} must be a nonnegative integer")
+    if not 0 <= value <= limit:
+        raise ValueError(f"{name} must be nonnegative and fit in {range_name}")
+    return str(value)
 
 
 def max_weight_with_capacity_profile(
@@ -126,16 +149,15 @@ def max_weight_with_capacity_profile(
     # Reject unsupported Arrow types before PySeries imports them: optional
     # Polars features (e.g. categorical/object) may panic at the FFI boundary.
     # Rust independently validates supported Series and performs all optimization.
-    integers = (pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64)
     for column, role in ((columns[2], "weight"), (columns[5], "capacity")):
-        if column.dtype not in integers:
+        if column.dtype not in _INTEGERS:
             raise pl.exceptions.InvalidOperationError(
                 "max_weight_with_capacity_profile requires an 8-, 16-, 32-, or 64-bit "
                 f"integer {role} dtype, got {column.dtype}"
             )
     for column in (columns[0], columns[1], columns[3], columns[4]):
         if (
-            column.dtype not in integers
+            column.dtype not in _INTEGERS
             and column.dtype != pl.Date
             and not isinstance(column.dtype, pl.Datetime)
         ):
@@ -193,19 +215,8 @@ def max_k_coverage(start: str | pl.Expr, end: str | pl.Expr, *, k: int) -> pl.Ex
         >>> df.filter(max_k_coverage("start", "end", k=2))["start"].to_list()
         [-5, 6]
     """
-    import sys
-
-    if not isinstance(k, int) or isinstance(k, bool):
-        raise TypeError("k must be a nonnegative integer")
-    if not 0 <= k <= 2 * sys.maxsize + 1:
-        raise ValueError("k must be nonnegative and fit in the platform usize range")
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="max_k_coverage_plugin",
-        args=[start, end],
-        kwargs={"k": str(k)},
-        is_elementwise=False,
-    )
+    k = _nonnegative(k, "k", _USIZE_MAX, "the platform usize range")
+    return _plugin("max_k_coverage_plugin", [start, end], kwargs={"k": k})
 
 
 def minimum_stabbing_points(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
@@ -250,13 +261,7 @@ def minimum_stabbing_points(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr
         ... ).to_dict(as_series=False)
         {'group': ['a', 'b'], 'points': [[3], [8]]}
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="minimum_stabbing_points_plugin",
-        args=[start, end],
-        is_elementwise=False,
-        returns_scalar=True,
-    )
+    return _plugin("minimum_stabbing_points_plugin", [start, end], returns_scalar=True)
 
 
 def _target(value: int | date | datetime | pl.Series) -> dict:
@@ -280,7 +285,7 @@ def _target(value: int | date | datetime | pl.Series) -> dict:
     if len(value) != 1 or value.null_count():
         raise ValueError("target Series must contain exactly one non-null value")
     dtype = value.dtype
-    if dtype in (pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64):
+    if dtype in _INTEGERS:
         return {"kind": "integer", "value": str(value.item()), "dtype": str(dtype)}
     if dtype == pl.Date:
         return {"kind": "date", "value": str(value.to_physical().item())}
@@ -358,12 +363,10 @@ def minimum_cover(
         Reaching 6 first permits a two-interval cover; choosing [0,4) first can
         require three intervals.
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="minimum_cover_plugin",
-        args=[start, end],
+    return _plugin(
+        "minimum_cover_plugin",
+        [start, end],
         kwargs={"target_start": _target(target_start), "target_end": _target(target_end)},
-        is_elementwise=False,
     )
 
 
@@ -426,12 +429,10 @@ def minimum_cost_cover(
         The minimum-cardinality answer uses one interval costing 100. The
         minimum-cost answer uses two intervals costing 20 in total.
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="minimum_cost_cover_plugin",
-        args=[start, end, cost],
+    return _plugin(
+        "minimum_cost_cover_plugin",
+        [start, end, cost],
         kwargs={"target_start": _target(target_start), "target_end": _target(target_end)},
-        is_elementwise=False,
     )
 
 
@@ -507,18 +508,9 @@ def max_weight_with_capacity(
         Capacity one chooses the three shorter intervals. Capacity two allows
         the long interval to coexist with that schedule.
     """
-    import sys
-
-    if not isinstance(capacity, int) or isinstance(capacity, bool):
-        raise TypeError("capacity must be a nonnegative integer")
-    if not 0 <= capacity <= 2 * sys.maxsize + 1:
-        raise ValueError("capacity must be nonnegative and fit in the platform usize range")
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="max_weight_with_capacity_plugin",
-        args=[start, end, weight],
-        kwargs={"capacity": str(capacity)},
-        is_elementwise=False,
+    capacity = _nonnegative(capacity, "capacity", _USIZE_MAX, "the platform usize range")
+    return _plugin(
+        "max_weight_with_capacity_plugin", [start, end, weight], kwargs={"capacity": capacity}
     )
 
 
@@ -607,11 +599,9 @@ def max_weight_clique(
         ... ).collect()["selected"].to_list()
         [True, True, True, False]
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="max_weight_clique_plugin",
-        args=[start, end] if weight is None else [start, end, weight],
-        is_elementwise=False,
+    return _plugin(
+        "max_weight_clique_plugin",
+        [start, end] if weight is None else [start, end, weight],
     )
 
 
@@ -681,20 +671,7 @@ def max_weight_non_overlapping(
 
         The three shorter intervals beat the single largest-weight interval (15).
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="max_weight_non_overlapping_plugin",
-        args=[start, end, weight],
-        is_elementwise=False,
-    )
-
-
-def _balance_work(max_work: int) -> str:
-    if not isinstance(max_work, int) or isinstance(max_work, bool):
-        raise TypeError("max_work must be a nonnegative integer")
-    if not 0 <= max_work <= 2**64 - 1:
-        raise ValueError("max_work must be nonnegative and fit in UInt64")
-    return str(max_work)
+    return _plugin("max_weight_non_overlapping_plugin", [start, end, weight])
 
 
 def assign_balanced_lanes(
@@ -808,12 +785,11 @@ def assign_balanced_lanes(
         ... ).to_series().to_list()
         [0, 1, 0, 0]
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="assign_balanced_lanes_plugin",
-        args=[start, end] if initial_lanes is None else [start, end, initial_lanes],
-        kwargs={"max_work": _balance_work(max_work)},
-        is_elementwise=False,
+    max_work = _nonnegative(max_work, "max_work", 2**64 - 1, "UInt64")
+    return _plugin(
+        "assign_balanced_lanes_plugin",
+        [start, end] if initial_lanes is None else [start, end, initial_lanes],
+        kwargs={"max_work": max_work},
     )
 
 
@@ -881,12 +857,7 @@ def assign_lanes(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
 
         The first and last intervals touch, so two lanes suffice for all three.
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="assign_lanes_plugin",
-        args=[start, end],
-        is_elementwise=False,
-    )
+    return _plugin("assign_lanes_plugin", [start, end])
 
 
 def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
@@ -985,12 +956,7 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
 
         Python `date` values similarly produce supported `pl.Date` columns.
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="overlap_count_plugin",
-        args=[start, end],
-        is_elementwise=False,
-    )
+    return _plugin("overlap_count_plugin", [start, end])
 
 
 def nesting_depth(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
@@ -1055,12 +1021,7 @@ def nesting_depth(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
         >>> empties.select(nesting_depth("start", "end")).to_series().to_list()
         [0, 1, 1]
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="nesting_depth_plugin",
-        args=[start, end],
-        is_elementwise=False,
-    )
+    return _plugin("nesting_depth_plugin", [start, end])
 
 
 def containment_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
@@ -1132,9 +1093,4 @@ def containment_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
         ... ).to_series().to_list()
         [1, 0, 0, 0]
     """
-    return register_plugin_function(
-        plugin_path=Path(__file__).parent,
-        function_name="containment_count_plugin",
-        args=[start, end],
-        is_elementwise=False,
-    )
+    return _plugin("containment_count_plugin", [start, end])
