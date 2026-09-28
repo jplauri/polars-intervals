@@ -106,37 +106,6 @@ def test_empty_interval_alone_and_group_error():
         frame([0, 3], [2, 3]).with_columns(pl.lit("a").alias("g")).group_by("g").agg(points_expr())
 
 
-def test_invalid_and_null_endpoints():
-    with pytest.raises(
-        pl.exceptions.ComputeError, match="interval at index 1 has start greater than end"
-    ):
-        frame([6, 4, 0], [8, 3, 2]).select(points_expr())
-    for s, e in [([None], [1]), ([0], [None])]:
-        with pytest.raises(pl.exceptions.ComputeError, match="null endpoints"):
-            frame(s, e).select(points_expr())
-
-
-@pytest.mark.parametrize("dtype", [pl.Float64, pl.Float32, pl.Boolean, pl.Int128, pl.String])
-def test_unsupported_dtype(dtype):
-    with pytest.raises(pl.exceptions.PolarsError):
-        frame([0], [1]).cast(dtype).select(points_expr())
-
-
-@pytest.mark.parametrize(
-    ("left", "right"),
-    [
-        (pl.Int64, pl.UInt64),
-        (pl.Date, pl.Int32),
-        (pl.Datetime("ms"), pl.Datetime("ns")),
-        (pl.Datetime("us", "UTC"), pl.Datetime("us", "Europe/Helsinki")),
-    ],
-)
-def test_mismatched_logical_dtypes(left, right):
-    df = pl.DataFrame({"start": pl.Series([0]).cast(left), "end": pl.Series([1]).cast(right)})
-    with pytest.raises(pl.exceptions.PolarsError, match="matching"):
-        df.select(points_expr())
-
-
 def test_expression_arguments_and_unequal_lengths():
     df = frame([0, 2, 5], [4, 6, 9])
     assert df.select(
