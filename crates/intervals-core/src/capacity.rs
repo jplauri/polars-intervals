@@ -1,4 +1,4 @@
-use crate::{IntervalError, max_weight_non_overlapping};
+use crate::{IntervalError, max_weight_non_overlapping, validate_lengths};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
@@ -166,12 +166,7 @@ pub(crate) fn prepare<T: Ord + Copy, W: Copy>(
 where
     i128: From<W>,
 {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
     if starts.len() != weights.len() {
         return Err(IntervalError::WeightLengthMismatch {
             intervals_len: starts.len(),

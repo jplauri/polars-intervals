@@ -193,6 +193,16 @@ impl fmt::Display for IntervalError {
 
 impl std::error::Error for IntervalError {}
 
+fn validate_lengths<T>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
+    if starts.len() != ends.len() {
+        return Err(IntervalError::LengthMismatch {
+            starts_len: starts.len(),
+            ends_len: ends.len(),
+        });
+    }
+    Ok(())
+}
+
 /// Counts the other intervals overlapping each interval, in input order.
 ///
 /// Intervals are half-open: `[start, end)`. Two non-empty intervals `a` and `b`
@@ -223,12 +233,7 @@ pub fn overlap_counts<T>(starts: &[T], ends: &[T]) -> Result<Vec<usize>, Interva
 where
     T: Ord + Copy,
 {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
 
     let mut sorted_starts = Vec::with_capacity(starts.len());
     let mut sorted_ends = Vec::with_capacity(ends.len());

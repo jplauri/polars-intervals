@@ -1,4 +1,4 @@
-use crate::IntervalError;
+use crate::{IntervalError, validate_lengths};
 
 mod sealed {
     pub trait Sealed {}
@@ -91,12 +91,7 @@ pub fn max_k_coverage<T: CoverageEndpoint>(
     ends: &[T],
     k: usize,
 ) -> Result<Vec<bool>, IntervalError> {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
     let mut longest = None;
     let mut length = 0;
     for (row, (&start, &end)) in starts.iter().zip(ends).enumerate() {

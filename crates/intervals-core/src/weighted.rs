@@ -1,4 +1,4 @@
-use crate::IntervalError;
+use crate::{IntervalError, validate_lengths};
 
 /// Select a globally maximum-weight subset of mutually non-overlapping intervals.
 ///
@@ -44,12 +44,7 @@ where
     W: Copy,
     i128: From<W>,
 {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
     if starts.len() != weights.len() {
         return Err(IntervalError::WeightLengthMismatch {
             intervals_len: starts.len(),

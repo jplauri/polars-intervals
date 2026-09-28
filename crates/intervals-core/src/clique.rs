@@ -1,4 +1,4 @@
-use crate::IntervalError;
+use crate::{IntervalError, validate_lengths};
 
 /// Select one maximum-cardinality clique of half-open intervals.
 ///
@@ -245,16 +245,6 @@ where
             }
         })
         .collect())
-}
-
-fn validate_lengths<T>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
-    Ok(())
 }
 
 fn update_intersection<T: Ord + Copy>(intersection: &mut Option<(T, T)>, start: T, end: T) {
