@@ -116,6 +116,7 @@ print(selected.rows())  # [(0, 6), (6, 10)]
 | [`containment_count`](https://jplauri.github.io/polars-intervals/usage/#count-containment) | Count the other intervals contained by each interval. |
 | [`nesting_depth`](https://jplauri.github.io/polars-intervals/usage/#nesting-depth) | Length of the longest strict containment chain above each interval. |
 | [`assign_lanes`](https://jplauri.github.io/polars-intervals/usage/#assign-the-minimum-number-of-lanes) | Assign the fewest lanes with no overlaps within a lane. |
+| [`assign_balanced_lanes`](https://jplauri.github.io/polars-intervals/usage/#balance-lane-row-counts) | Assign the fewest lanes and heuristically balance row counts, optionally improving supplied `initial_lanes`. |
 | [`max_weight_non_overlapping`](https://jplauri.github.io/polars-intervals/usage/#select-a-globally-maximum-weight-schedule) | Select a non-overlapping subset with maximum total weight. |
 | [`max_weight_with_capacity`](https://jplauri.github.io/polars-intervals/usage/#select-with-a-simultaneous-capacity) | Maximize total weight under a simultaneous overlap limit. |
 | [`max_weight_with_capacity_profile`](https://jplauri.github.io/polars-intervals/usage/#select-with-a-capacity-profile) | Maximize total weight under a piecewise-constant capacity profile. |

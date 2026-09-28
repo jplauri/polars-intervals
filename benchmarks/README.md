@@ -15,6 +15,8 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated, sharded interval instances | [Interval-graph corpora](#interval-graph-corpora) |
 | [`test_generate_interval_graphs.py`](test_generate_interval_graphs.py) | Corpus checks | Tiny deterministic instances and local fixtures → structural and reproducibility checks | [Interval-graph corpora](#interval-graph-corpora) |
 | [`nesting_depth.py`](nesting_depth.py) | End-to-end benchmark | Exact analytic families, integer/temporal and grouped inputs → verified collection samples and environment metadata | [Nesting depth](../docs/nesting-depth-benchmarks.md) |
+| [`balance_lanes.py`](balance_lanes.py) | End-to-end benchmark | Existing interval corpora → independently checked row-count quality, collection samples and provenance | [Lane balancing](../docs/balance-lanes-benchmarks.md) |
+| [`test_balance_lanes.py`](test_balance_lanes.py) | Runner checks | Tiny offline records → oracle, scoring, baseline alignment and aggregation checks | [Lane balancing notes](balance-lanes-notes.md) |
 | [`coverage_summary.py`](coverage_summary.py) | Report generator | Core candidate CSV → median runtime and allocation CSV | [Maximum k-coverage](../docs/coverage-benchmarks.md) |
 | [`coverage_temporal.py`](coverage_temporal.py) | End-to-end benchmark | Integer/temporal fixtures → raw timing CSV | [Maximum k-coverage](../docs/coverage-benchmarks.md) |
 | [`overlap_count.py`](overlap_count.py) | End-to-end benchmark | Generated workloads → timing samples, RSS and environment in JSON | [Overlap counting](../docs/overlap-count-benchmarks.md) |
@@ -32,6 +34,20 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Plot workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust candidate runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
+
+The lane-balancing core runner uses `cargo bench -p intervals-core --bench
+balance_lanes --locked`. Set `BALANCE_CSV` and `BALANCE_QUALITY_CSV` to new
+absolute output paths (Cargo runs inside the crate directory);
+`BALANCE_SIZES`, `BALANCE_BUDGETS`, and `BALANCE_FAMILIES` accept
+comma-separated lists, and `BALANCE_SAMPLES` selects repeated timing samples.
+It compares the existing baseline, forward/backward/best seeds, baseline repair,
+the public balanced constructor, and a benchmark-only shared-budget multiseed
+experiment. The public constructor and repair now share `assign_balanced_lanes`:
+omit `initial_lanes` to construct, or supply it to repair. Saved measurements
+predate that interface consolidation and preserve their original metadata.
+Quality and untimed requested-heap measurements are separate from
+raw timings. See [the balancing notes](balance-lanes-notes.md) for scopes and
+the [report](../docs/balance-lanes-benchmarks.md) for measured settings.
 They do not require Python or the Polars plugin. Each report names its Cargo
 target. Covering and cost covering share the `covering` target.
 

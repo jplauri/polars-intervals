@@ -7,6 +7,7 @@ import polars as pl
 from polars.plugins import register_plugin_function
 
 __all__ = [
+    "assign_balanced_lanes",
     "assign_lanes",
     "containment_count",
     "max_k_coverage",
@@ -590,6 +591,134 @@ def max_weight_non_overlapping(
         plugin_path=Path(__file__).parent,
         function_name="max_weight_non_overlapping_plugin",
         args=[start, end, weight],
+        is_elementwise=False,
+    )
+
+
+def _balance_work(max_work: int) -> str:
+    if not isinstance(max_work, int) or isinstance(max_work, bool):
+        raise TypeError("max_work must be a nonnegative integer")
+    if not 0 <= max_work <= 2**64 - 1:
+        raise ValueError("max_work must be nonnegative and fit in UInt64")
+    return str(max_work)
+
+
+def assign_balanced_lanes(
+    start: str | pl.Expr,
+    end: str | pl.Expr,
+    *,
+    initial_lanes: str | pl.Expr | None = None,
+    max_work: int = 100_000,
+) -> pl.Expr:
+    """Assign a minimum number of lanes and heuristically balance their row counts.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+        initial_lanes: Optional column name or expression containing a proper,
+            contiguous minimum-lane assignment to improve. None constructs a new
+            assignment. Supplied labels are validated; individual rows may move.
+        max_work: Nonnegative integer up to 2**64 - 1. Defaults to 100,000
+            deterministic search-work units, not milliseconds. Zero returns the
+            supplied initial_lanes unchanged, or the existing ``assign_lanes``
+            result when initial_lanes is None, after validating all inputs.
+
+    Returns:
+        pl.Expr: Non-null UInt32 lane IDs in original row order, with the minimum
+            palette ``0..k-1``. Empty input returns no rows and uses zero lanes.
+
+    Raises:
+        TypeError: If max_work is not an integer, or is Boolean.
+        ValueError: If max_work is negative or exceeds the UInt64 range.
+        polars.exceptions.PolarsError: For unequal lengths, null endpoints,
+            unsupported or mismatched logical dtypes, or reversed intervals
+            (reporting the first original row index). Also rejects invalid initial
+            lanes: unequal lengths, nulls, unsupported integer dtypes, negative or
+            out-of-UInt32 values, sparse IDs, conflicts, or a nonminimum palette.
+            Validation runs at zero budget and on empty or balanced collections.
+
+    Notes:
+        For lane cardinalities s, minimize ``(D, Q)`` lexicographically, where
+        ``D = max(s) - min(s)`` and ``Q = sum(size * size for size in s)``.
+        Exact integer comparisons count ROWS, including empty intervals, never
+        occupied duration. A smaller D wins even with larger Q. The result is
+        never worse than initial_lanes when supplied, otherwise never worse than
+        ``assign_lanes`` on the same input under this score.
+        Properness and the minimum lane count are guaranteed. Balance is a
+        heuristic, without a global optimality or approximation-ratio guarantee.
+
+        Half-open intervals [start, end) can touch in one lane. An empty [x, x)
+        conflicts with nothing, even inside a nonempty interval. Unlike
+        ``assign_lanes``, which always places empties in lane 0, this expression
+        counts every empty row and may put it in ANY existing lane. It never
+        adds lanes to spread empties. Nonempty input uses
+        ``k = max(1, maximum_nonempty_concurrency)``; empty-only input uses one.
+
+        Endpoints must have exactly matching Int8/16/32/64, UInt8/16/32/64,
+        Date, or Datetime dtypes, including time unit and timezone metadata.
+        Physical integer values retain precision. There is no coercion, scalar
+        broadcasting, null filling, or Python row loop.
+
+        Initial lane columns accept Int8/16/32/64 and UInt8/16/32/64, checked
+        losslessly. IDs must be contiguous ``0..k-1`` and k must be minimum.
+        Boolean, floats, temporal IDs and wider integers are unsupported. An
+        invalid starting assignment is rejected, never silently replaced.
+
+        All chunks form one collection. ``.over("group")`` solves each whole
+        group and preserves row order; grouped aggregation returns lists of
+        UInt32 IDs. The full collection is required even with streaming.
+        Identical input and options give identical labels across chunking,
+        eager/lazy execution, and equivalent order-preserving endpoint types.
+        Row permutations need not preserve labels or heuristic quality.
+
+        Without initial_lanes, the Rust core compares the existing baseline with
+        forward and backward least-loaded-free-lane seeds, then repairs the best
+        seed. With initial_lanes, it repairs the supplied assignment. Both paths
+        use exact two-lane component subset sums. Repair is bounded by max_work,
+        including pair enumeration, row scans, and bitset-word processing;
+        an operation that cannot fit leaves the incumbent intact. Fixed
+        validation and O(n log n) preparation are outside the work budget.
+        Total time includes that preparation PLUS bounded search; scratch space
+        is linear in the input, with checked allocation limits. Exhausting the
+        budget does not establish pairwise local optimality. For two lanes,
+        a completed exact pair operation gives globally optimal balance.
+        A budget-limited result need not be idempotent: passing it as initial_lanes
+        to another call can improve it further. Each whole group shares one budget.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({"start": [0, 0, 1, 1], "end": [3, 3, 1, 1]})
+        >>> labels = df.select(pi.assign_balanced_lanes("start", "end")).to_series()
+        >>> sorted(labels.value_counts()["count"].to_list())
+        [2, 2]
+        >>> labels.dtype
+        UInt32
+        >>> df.lazy().select(
+        ...     pi.assign_balanced_lanes(pl.col("start"), "end", max_work=0)
+        ... ).collect().to_series().to_list() == df.select(
+        ...     pi.assign_lanes("start", "end")
+        ... ).to_series().to_list()
+        True
+
+        >>> df = pl.DataFrame({
+        ...     "start": [0, 0, 1, 1], "end": [3, 3, 1, 1], "lane": [0, 1, 0, 0],
+        ... })
+        >>> result = df.lazy().with_columns(
+        ...     pi.assign_balanced_lanes("start", "end", initial_lanes="lane").alias("balanced")
+        ... ).collect()
+        >>> sorted(result["balanced"].value_counts()["count"].to_list())
+        [2, 2]
+        >>> df.select(
+        ...     pi.assign_balanced_lanes("start", "end", initial_lanes="lane", max_work=0)
+        ... ).to_series().to_list()
+        [0, 1, 0, 0]
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="assign_balanced_lanes_plugin",
+        args=[start, end] if initial_lanes is None else [start, end, initial_lanes],
+        kwargs={"max_work": _balance_work(max_work)},
         is_elementwise=False,
     )
 

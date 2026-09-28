@@ -1,0 +1,857 @@
+{
+  "quality": [
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "random_endpoints",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "baseline": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 6.25,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "random_endpoints",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 8,
+      "unchanged": 4,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "not_exposed": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 5.5,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "random_endpoints",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 12,
+      "unchanged": 0,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "not_exposed": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 3.0833333333333335,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "start_duration",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "baseline": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1504.6666666666667,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "start_duration",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 8,
+      "unchanged": 4,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 4,
+        "not_exposed": 8
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1363.75,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "start_duration",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 12,
+      "unchanged": 0,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 0.6666666666666666,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "fixed_duration",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "baseline": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1259.5,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "fixed_duration",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 8,
+      "unchanged": 4,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 4,
+        "not_exposed": 8
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1195.8333333333333,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "fixed_duration",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 12,
+      "unchanged": 0,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 0.6666666666666666,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "heavy_tailed",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "baseline": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 2388.1666666666665,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "heavy_tailed",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 8,
+      "unchanged": 4,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 4,
+        "not_exposed": 8
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 2162.5,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "heavy_tailed",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 12,
+      "unchanged": 0,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 0.6666666666666666,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "bursty",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "baseline": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 10.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "bursty",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 8,
+      "unchanged": 4,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "not_exposed": 11,
+        "equity": 1
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 7.75,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "bursty",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 12,
+      "unchanged": 0,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 0.8333333333333334,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "quantized",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "baseline": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 583.6666666666666,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "quantized",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 8,
+      "unchanged": 4,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 4,
+        "not_exposed": 8
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 441.9166666666667,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "quantized",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 12,
+      "unchanged": 0,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "nested",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "nested",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "nested",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "staircase",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 0.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "staircase",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 0.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "staircase",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 0.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "multi_component",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 12,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "baseline": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 12.666666666666666,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "multi_component",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 8,
+      "unchanged": 4,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 4,
+        "not_exposed": 8
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 12.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "multi_component",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 12,
+      "known_optima": 0,
+      "optimum_hits": 0,
+      "improved": 12,
+      "unchanged": 0,
+      "additive_gap_distribution": {},
+      "stop_reasons": {
+        "equity": 12
+      },
+      "unknown_optimum_reasons": {
+        "unknown_size_limit": 12
+      },
+      "worst": [],
+      "mean_D": 1.0,
+      "optimum_hit_rate": null,
+      "mean_additive_gap": null
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "planted_balanced",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "baseline",
+      "max_work": "0",
+      "instances": 24,
+      "known_optima": 24,
+      "optimum_hits": 0,
+      "improved": 0,
+      "unchanged": 24,
+      "additive_gap_distribution": {
+        "11": 1,
+        "15": 1,
+        "12": 1,
+        "4": 3,
+        "2": 1,
+        "3": 1,
+        "63": 1,
+        "60": 1,
+        "77": 1,
+        "53": 1,
+        "13": 1,
+        "20": 2,
+        "18": 1,
+        "675": 1,
+        "545": 1,
+        "711": 1,
+        "598": 1,
+        "136": 1,
+        "129": 1,
+        "147": 1,
+        "109": 1
+      },
+      "stop_reasons": {
+        "baseline": 24
+      },
+      "unknown_optimum_reasons": {},
+      "worst": [
+        {
+          "id": "353fc1f57b0d43aa4e98675d8573f5c6f4072d4e7c01fe9cbe9f37cbc85b7563",
+          "family": "planted_balanced",
+          "gap": 711,
+          "D": 711
+        },
+        {
+          "id": "c3547bae2d0656f0e9c380d16a1388a3c5c69b95c23db52cf69a33b949cc1b99",
+          "family": "planted_balanced",
+          "gap": 675,
+          "D": 675
+        },
+        {
+          "id": "68bb9a9129f3a67840dc43cac6e860e2088c9fc450af208c2b98e24494babecf",
+          "family": "planted_balanced",
+          "gap": 598,
+          "D": 598
+        },
+        {
+          "id": "57256338c0188919517eb6870c5566594ee2c059cb4c6448fe361fcbe2bbbb67",
+          "family": "planted_balanced",
+          "gap": 545,
+          "D": 545
+        },
+        {
+          "id": "ed7970fedb3a98a4630ef6c8fbabe0b0a30221a45668e25450a1e81299281246",
+          "family": "planted_balanced",
+          "gap": 147,
+          "D": 148
+        }
+      ],
+      "mean_D": 143.375,
+      "optimum_hit_rate": 0.0,
+      "mean_additive_gap": 142.875
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "planted_balanced",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "repair",
+      "max_work": "100000",
+      "instances": 24,
+      "known_optima": 24,
+      "optimum_hits": 12,
+      "improved": 20,
+      "unchanged": 4,
+      "additive_gap_distribution": {
+        "0": 12,
+        "9": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "675": 1,
+        "545": 1,
+        "711": 1,
+        "598": 1,
+        "107": 1,
+        "110": 1,
+        "103": 1,
+        "97": 1
+      },
+      "stop_reasons": {
+        "equity": 12,
+        "not_exposed": 12
+      },
+      "unknown_optimum_reasons": {},
+      "worst": [
+        {
+          "id": "353fc1f57b0d43aa4e98675d8573f5c6f4072d4e7c01fe9cbe9f37cbc85b7563",
+          "family": "planted_balanced",
+          "gap": 711,
+          "D": 711
+        },
+        {
+          "id": "c3547bae2d0656f0e9c380d16a1388a3c5c69b95c23db52cf69a33b949cc1b99",
+          "family": "planted_balanced",
+          "gap": 675,
+          "D": 675
+        },
+        {
+          "id": "68bb9a9129f3a67840dc43cac6e860e2088c9fc450af208c2b98e24494babecf",
+          "family": "planted_balanced",
+          "gap": 598,
+          "D": 598
+        },
+        {
+          "id": "57256338c0188919517eb6870c5566594ee2c059cb4c6448fe361fcbe2bbbb67",
+          "family": "planted_balanced",
+          "gap": 545,
+          "D": 545
+        },
+        {
+          "id": "f0307c955f2d6f7ea3c64544c802cd6a618614ce3c15ecc28d383186465a63e5",
+          "family": "planted_balanced",
+          "gap": 110,
+          "D": 111
+        }
+      ],
+      "mean_D": 124.25,
+      "optimum_hit_rate": 0.5,
+      "mean_additive_gap": 123.75
+    },
+    {
+      "corpus": "target/balance-work/scaling",
+      "population": "planted_balanced",
+      "workload": "integer",
+      "engine": "auto",
+      "method": "balanced",
+      "max_work": "100000",
+      "instances": 24,
+      "known_optima": 24,
+      "optimum_hits": 24,
+      "improved": 24,
+      "unchanged": 0,
+      "additive_gap_distribution": {
+        "0": 24
+      },
+      "stop_reasons": {
+        "equity": 24
+      },
+      "unknown_optimum_reasons": {},
+      "worst": [
+        {
+          "id": "14f82272d520f0fff0f7e5d55de072c208dae40303bc25c1bbc3e52460996dc3",
+          "family": "planted_balanced",
+          "gap": 0,
+          "D": 0
+        },
+        {
+          "id": "201601c65d471024a641966b9905221c9b401451b6e29063010b24272960dd53",
+          "family": "planted_balanced",
+          "gap": 0,
+          "D": 0
+        },
+        {
+          "id": "2324a8617dfff076207dfd504470b11afdde1c080dfa944a9c58ab684d26b45b",
+          "family": "planted_balanced",
+          "gap": 0,
+          "D": 0
+        },
+        {
+          "id": "353fc1f57b0d43aa4e98675d8573f5c6f4072d4e7c01fe9cbe9f37cbc85b7563",
+          "family": "planted_balanced",
+          "gap": 0,
+          "D": 0
+        },
+        {
+          "id": "39bb9147af72c95d8cdc1c41ff912a9af79977bdd2598204df0893ae3dc913a5",
+          "family": "planted_balanced",
+          "gap": 0,
+          "D": 1
+        }
+      ],
+      "mean_D": 0.5,
+      "optimum_hit_rate": 1.0,
+      "mean_additive_gap": 0.0
+    }
+  ],
+  "timing_summary": "benchmarks\\results\\balance-polars-scaling-windows-20260928.timing-summary.csv"
+}

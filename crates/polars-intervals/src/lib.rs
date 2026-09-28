@@ -1,6 +1,7 @@
 //! Interval algorithms for Rust Polars, backed by `intervals-core`.
 //!
 //! [`overlap_count`], [`containment_count`], [`nesting_depth`], [`assign_lanes`],
+//! [`assign_balanced_lanes`],
 //! [`max_weight_non_overlapping`] and
 //! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
 //! to the core and Python expressions.
@@ -354,6 +355,110 @@ pub fn assign_lanes(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     evaluate(starts, ends, Algorithm::AssignLanes)
 }
 
+fn balanced_lanes_inputs<T>(inputs: &[T]) -> PolarsResult<(&T, &T, Option<&T>)> {
+    match inputs {
+        [starts, ends] => Ok((starts, ends, None)),
+        [starts, ends, lanes] => Ok((starts, ends, Some(lanes))),
+        _ => polars_bail!(InvalidOperation:
+            "assign_balanced_lanes requires two or three inputs, got {}", inputs.len()),
+    }
+}
+
+fn balanced_lanes_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let (start, _, initial_lanes) = balanced_lanes_inputs(inputs)?;
+    if let Some(lanes) = initial_lanes {
+        validate_integer_dtype(lanes.dtype(), "assign_balanced_lanes", "lane")?;
+    }
+    Ok(Field::new(start.name().clone(), DataType::UInt32))
+}
+
+#[derive(serde::Deserialize)]
+struct BalanceOptions {
+    // Decimal text transports the entire u64 range through serde-pickle.
+    max_work: String,
+}
+
+impl BalanceOptions {
+    fn max_work(&self) -> PolarsResult<u64> {
+        self.max_work.parse().map_err(
+            |_| polars_err!(InvalidOperation: "max_work must be nonnegative and fit in UInt64"),
+        )
+    }
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = balanced_lanes_output)]
+fn assign_balanced_lanes_plugin(inputs: &[Series], kwargs: BalanceOptions) -> PolarsResult<Series> {
+    let (starts, ends, initial_lanes) = balanced_lanes_inputs(inputs)?;
+    assign_balanced_lanes(starts, ends, initial_lanes, kwargs.max_work()?)
+}
+
+/// Assign the minimum number of lanes while heuristically balancing row counts.
+///
+/// Returns non-null contiguous `UInt32` labels in original row order. Minimize
+/// `(max(size) - min(size), sum(size * size))` lexicographically using exact
+/// integers, never occupied duration. Without `initial_lanes`, starts from
+/// [`assign_lanes`]; otherwise starts from the supplied proper minimum-lane
+/// assignment. The result preserves the palette and never worsens its starting
+/// score, but individual rows may change lanes. A minimum lane count and proper
+/// coloring are guaranteed; globally optimal balance or an approximation ratio
+/// is not. Every empty row counts and
+/// may use any existing lane, unlike [`assign_lanes`], which uses lane zero.
+/// Nonempty empty-only input uses one lane; empty input uses zero lanes.
+///
+/// `max_work` bounds deterministic refinement work, not elapsed time; zero
+/// returns the validated starting assignment unchanged. Validation and fixed
+/// `O(n log n)` preparation are outside that budget; bounded refinement adds
+/// work beyond construction. See [`intervals_core::assign_balanced_lanes`] for
+/// work units and the algorithm. All chunks form one collection, including in
+/// streaming queries; Python window/group expressions solve each group whole.
+///
+/// # Errors
+///
+/// Endpoint validation matches [`assign_lanes`]: matching integer, Date, or
+/// Datetime dtypes including units/timezones, no nulls or broadcasting, and
+/// original row indices for reversed intervals. Identical inputs/options are
+/// deterministic; labels and heuristic quality need not survive row permutation.
+///
+/// In addition to endpoint errors, rejects unequal lane lengths, null lane IDs,
+/// sparse/noncontiguous labels, conflicts, or a nonminimum palette. Lane columns
+/// must be 8/16/32/64-bit signed/unsigned integers, with every value nonnegative
+/// and in the UInt32 range; no lossy cast is performed. Boolean, floating-point,
+/// temporal, and wider integer lane dtypes are unsupported, even on empty input.
+/// All validation precedes zero-budget or balance early returns.
+pub fn assign_balanced_lanes(
+    starts: &Series,
+    ends: &Series,
+    initial_lanes: Option<&Series>,
+    max_work: u64,
+) -> PolarsResult<Series> {
+    let lanes = initial_lanes
+        .map(|lanes| {
+            validate_integer_dtype(lanes.dtype(), "assign_balanced_lanes", "lane")?;
+            polars_ensure!(starts.len() == lanes.len(), ShapeMismatch:
+                "assign_balanced_lanes requires equal lengths, got {} intervals and {} lanes",
+                starts.len(), lanes.len());
+            polars_ensure!(lanes.null_count() == 0, ComputeError:
+                "assign_balanced_lanes does not support null lane IDs");
+            integer_values(lanes)?
+                .into_iter()
+                .enumerate()
+                .map(|(index, value)| {
+                    u32::try_from(value).map_err(|_| {
+                        polars_err!(InvalidOperation:
+                            "assign_balanced_lanes requires nonnegative UInt32-range lane IDs; invalid value at index {}",
+                            index)
+                    })
+                })
+                .collect::<PolarsResult<Vec<_>>>()
+            })
+        .transpose()?;
+    evaluate(
+        starts,
+        ends,
+        Algorithm::AssignBalancedLanes(lanes.as_deref(), max_work),
+    )
+}
+
 /// Select a globally maximum-weight subset of mutually non-overlapping intervals.
 ///
 /// Returns a non-null Boolean Series named `max_weight_non_overlapping` in
@@ -480,6 +585,7 @@ enum Algorithm<'a> {
     ContainmentCount,
     NestingDepth,
     AssignLanes,
+    AssignBalancedLanes(Option<&'a [u32]>, u64),
     MaxWeight(&'a [i128]),
     Capacity(&'a [i128], usize),
     Cover(i128, i128),
@@ -495,6 +601,7 @@ impl Algorithm<'_> {
             Self::ContainmentCount => "containment_count",
             Self::NestingDepth => "nesting_depth",
             Self::AssignLanes => "assign_lanes",
+            Self::AssignBalancedLanes(_, _) => "assign_balanced_lanes",
             Self::MaxWeight(_) => "max_weight_non_overlapping",
             Self::Capacity(_, _) => "max_weight_with_capacity",
             Self::Cover(_, _) => "minimum_cover",
@@ -585,6 +692,12 @@ where
         Algorithm::AssignLanes => {
             let lanes = intervals_core::assign_lanes(&starts, &ends)
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(Series::from_vec(algorithm.name().into(), lanes))
+        }
+        Algorithm::AssignBalancedLanes(initial_lanes, max_work) => {
+            let lanes =
+                intervals_core::assign_balanced_lanes(&starts, &ends, initial_lanes, max_work)
+                    .map_err(|error| polars_err!(ComputeError: "{error}"))?;
             Ok(Series::from_vec(algorithm.name().into(), lanes))
         }
         Algorithm::MaxWeight(weights) => {

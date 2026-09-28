@@ -376,3 +376,46 @@ cases = [
   {label = "Components, sorted, k=64", sizes = [10000], filters = {family = "components", order = "sorted", k = 64}},
   {label = "Saturation, shuffled, k=64", sizes = [100000], methods = {production = "Production", rolling = "Rolling rows reference"}, filters = {family = "saturation", order = "shuffled", k = 64}},
 ]
+
+# Same raw timing samples, filtered to each production method's default options.
+# The full three-budget matrix remains in balance-core-*.timings.csv.
+[sources.balance_core]
+path = "benchmarks/results/balance-core-windows-20260928.default-timings.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order"]
+
+[sources.balance_polars]
+path = "benchmarks/results/balance-polars-quality-windows-20260928.timings.csv"
+x = "n"
+method = "method"
+# max_work is fixed by method: baseline=0, production balancing=100000.
+dimensions = ["corpus", "id", "family", "population", "seed", "order", "workload", "engine", "groups"]
+
+[[tables]]
+id = "balance-polars-table"
+source = "balance_polars"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Polars collection time (ms)"
+methods = { baseline = "Existing assignment", repair = "Repair baseline", balanced = "Balanced constructor" }
+cases = [
+  { label = "Interior empties", sizes = [11], filters = { corpus = "handcrafted", id = "8f532cfb8eea51ee3ab762f0b5f4030eb642874c67585a8721cb97e6a1042e85", family = "handcrafted", population = "handcrafted", seed = 0, order = "fixture", workload = "integer", engine = "auto", groups = 1 } },
+  { label = "Late clique, k=8", sizes = [100000], filters = { corpus = "handcrafted", id = "64ea4da24da1f13fbb2c45cd8fc428700d2ceb9eeabbd935d2226a80ada42b40", family = "handcrafted", population = "handcrafted", seed = 0, order = "fixture", workload = "integer", engine = "auto", groups = 1 } },
+  { label = "Forced star, k=2", sizes = [100000], filters = { corpus = "handcrafted", id = "4f2c81e93bef3f123fd64f5813677c287061935e13724607764f4f5f01714779", family = "handcrafted", population = "handcrafted", seed = 0, order = "fixture", workload = "integer", engine = "auto", groups = 1 } },
+  { label = "Nearly clique, k=50,001", sizes = [100000], filters = { corpus = "handcrafted", id = "16640e2e2bd56a2116badc8794ebc13f7c04eb84e3c96098134430b5c9a65f5b", family = "handcrafted", population = "handcrafted", seed = 0, order = "fixture", workload = "integer", engine = "auto", groups = 1 } },
+]
+
+[[tables]]
+id = "balance-core-table"
+source = "balance_core"
+value = "ns"
+divisor = 1000000
+ylabel = "Core call time (ms)"
+methods = { baseline = "Existing assignment", best_seed = "Best seed only", repair = "Repair baseline", balanced = "Balanced constructor" }
+cases = [
+  { label = "Long/short, sorted", sizes = [10000, 100000], filters = { family = "long_short", order = "sorted" } },
+  { label = "Mixed empties, shuffled", sizes = [100000], filters = { family = "mixed_empty", order = "shuffled" } },
+  { label = "Stars, sorted", sizes = [1000], filters = { family = "stars", order = "sorted" } },
+  { label = "Clique, shuffled", sizes = [100000], filters = { family = "clique", order = "shuffled" } },
+]
