@@ -34,10 +34,6 @@ jobs:
         run: uv run --locked --only-group dev ruff format --check .
       - name: Check benchmark reporting
         run: uv run --locked --only-group plots python -m unittest discover -s benchmarks -p test_plot.py
-      - name: Generate benchmark figures
-        run: uv run --locked --only-group plots python benchmarks/plot.py
-      - name: Build documentation
-        run: uv run --locked --only-group docs mkdocs build --strict
 
   tests:
     name: Python ${{ matrix.python-version }} tests
@@ -69,4 +65,4 @@ jobs:
         run: uv run --locked pytest --doctest-modules python/polars_intervals tests
       - name: Documentation-only change
         if: needs.quality.outputs.build_required == 'false'
-        run: echo "Native tests skipped; lint and documentation checks passed."
+        run: echo "Native tests skipped for a documentation-only change."

@@ -62,7 +62,18 @@ uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
 The site is written to `target/docs/`. Building it does not compile the Rust
-plugin. See [Running and publishing benchmarks](https://github.com/jplauri/polars-intervals/blob/master/docs/benchmarking.md)
+plugin. The **Documentation** workflow validates every pull request and push to
+`master`, and publishes successful `master` builds to
+[GitHub Pages](https://jplauri.github.io/polars-intervals/). Pull requests provide
+a downloadable `github-pages` artifact for previewing the site. A manual run
+on `master` can republish it; runs on other branches only validate and build.
+
+The site tracks `master` without versioned snapshots, so documentation fixes
+publish without a package release. GitHub Pages must use **GitHub Actions** as
+its source in **Settings > Pages**. The `github-pages` environment should allow
+deployments only from the `master` branch. No generated HTML is committed.
+
+See [Running and publishing benchmarks](https://jplauri.github.io/polars-intervals/benchmarking/)
 for report templates, plotting commands, and reporting checks.
 
 Check API examples against the installed plugin with:

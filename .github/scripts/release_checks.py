@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 REPOSITORY = "jplauri/polars-intervals"
 REQUIRED_JOBS = {
+    ".github/workflows/docs.yml": {"Build documentation"},
     ".github/workflows/rust.yml": {"checks"},
     ".github/workflows/python.yml": {
         "quality",

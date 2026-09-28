@@ -1,6 +1,8 @@
-# Getting started
+# polars-intervals
 
-Interval algorithms for Polars, with support for eager and lazy queries.
+Interval algorithms for Polars, implemented in Rust with support for eager and
+lazy queries. Count overlaps and containment, measure nesting, assign lanes,
+and select intervals for scheduling, covering, and coverage problems.
 
 ## Install
 

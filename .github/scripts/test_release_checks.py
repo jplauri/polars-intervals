@@ -49,7 +49,7 @@ def ci():
             "status": "completed",
             "conclusion": "success",
         }
-        for number, workflow in enumerate(("rust", "python"), 1)
+        for number, workflow in enumerate(("rust", "python", "docs"), 1)
     ]
     jobs = {
         number: [{"name": name, "status": "completed", "conclusion": "success"} for name in names]
@@ -57,6 +57,7 @@ def ci():
             (
                 ("checks",),
                 ("quality", "Python 3.12 tests", "Python 3.13 tests", "Python 3.14 tests"),
+                ("Build documentation",),
             ),
             1,
         )
@@ -70,9 +71,10 @@ def test_ci_passes(ci):
 
 
 @pytest.mark.parametrize("conclusion", ["failure", None])
-def test_ci_latest_run_supersedes_older_success(ci, conclusion):
+@pytest.mark.parametrize("workflow_index", [0, 2])
+def test_ci_latest_run_supersedes_older_success(ci, conclusion, workflow_index):
     runs, jobs = ci
-    runs.append({**runs[0], "id": 3, "conclusion": conclusion})
+    runs.append({**runs[workflow_index], "id": 4, "conclusion": conclusion})
     with pytest.raises(SystemExit, match="Latest .* successfully"):
         checks.check_ci(SHA, runs, jobs.__getitem__)
 
@@ -81,20 +83,22 @@ def test_ci_latest_run_supersedes_older_success(ci, conclusion):
     ("field", "value"),
     [("head_sha", "b" * 40), ("event", "pull_request"), ("head_branch", "feature")],
 )
-def test_ci_requires_master_push_provenance(ci, field, value):
+@pytest.mark.parametrize("workflow_index", [0, 2])
+def test_ci_requires_master_push_provenance(ci, field, value, workflow_index):
     runs, jobs = ci
-    runs[0][field] = value
+    runs[workflow_index][field] = value
     with pytest.raises(SystemExit, match="No master push CI run"):
         checks.check_ci(SHA, runs, jobs.__getitem__)
 
 
 @pytest.mark.parametrize("conclusion", ["missing", "skipped", "failure", None])
-def test_ci_requires_every_successful_job(ci, conclusion):
+@pytest.mark.parametrize("run_id", [2, 3])
+def test_ci_requires_every_successful_job(ci, conclusion, run_id):
     runs, jobs = ci
     if conclusion == "missing":
-        jobs[2].pop()
+        jobs[run_id].pop()
     else:
-        jobs[2][-1]["conclusion"] = conclusion
+        jobs[run_id][-1]["conclusion"] = conclusion
     with pytest.raises(SystemExit, match="Missing successful jobs"):
         checks.check_ci(SHA, runs, jobs.__getitem__)
 
