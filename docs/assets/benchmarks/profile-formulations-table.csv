@@ -1,0 +1,7 @@
+case,workload_family,workload_pattern,workload_order,workload_m,workload_k,method,x,median,min,max,samples
+"Moderate overlap, 1K profile segments",moderate,small_changes,sorted,1000,4,csr,10000,385.942,379.72049999999996,389.44809999999995,3
+"Moderate overlap, 1K profile segments",moderate,small_changes,sorted,1000,4,csr_C,10000,39.5331,39.159,39.660599999999995,3
+"Moderate overlap, 1K profile segments",moderate,small_changes,sorted,1000,4,production,10000,37.8959,37.07,37.922,3
+"Moderate overlap, 10K profile segments",moderate,small_changes,sorted,10000,4,csr,10000,3820.3023,3812.0217,3883.6742,3
+"Moderate overlap, 10K profile segments",moderate,small_changes,sorted,10000,4,csr_C,10000,40.2943,39.9026,46.1463,3
+"Moderate overlap, 10K profile segments",moderate,small_changes,sorted,10000,4,production,10000,37.2925,36.986599999999996,37.6241,3

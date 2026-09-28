@@ -1,0 +1,10 @@
+case,workload_scenario,method,x,median,min,max,samples
+Duplicates,duplicates,indirect_fenwick,3000000,38.6005,37.533,39.5091,5
+Duplicates,duplicates,packed_fenwick,3000000,53.1797,52.873,58.1842,5
+Duplicates,duplicates,packed_segment,3000000,53.804,53.1169,63.7734,5
+Sparse,sparse,indirect_fenwick,3000000,1343.97,1337.5319,1375.2843,5
+Sparse,sparse,packed_fenwick,3000000,1006.3137,971.2165,1189.4476,5
+Sparse,sparse,packed_segment,3000000,1117.0755,1102.1254,1174.3755,5
+Dense,dense,indirect_fenwick,3000000,779.1895,757.0816,880.4346,5
+Dense,dense,packed_fenwick,3000000,418.3973,408.841,435.6692,5
+Dense,dense,packed_segment,3000000,487.6999,481.4329,562.6475,5

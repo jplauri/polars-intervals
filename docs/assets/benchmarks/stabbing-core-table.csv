@@ -1,0 +1,16 @@
+case,workload_dtype,workload_family,workload_order,method,x,median,min,max,samples
+"Disjoint, sorted",i64,disjoint,sorted,A,3000000,31.3801,31.3387,31.4328,3
+"Disjoint, sorted",i64,disjoint,sorted,B,3000000,24.5937,24.3497,25.1691,3
+"Disjoint, sorted",i64,disjoint,sorted,production,3000000,17.7665,17.6065,24.0034,3
+"Disjoint, shuffled",i64,disjoint,shuffled,A,3000000,108.8449,105.835,109.99409999999999,3
+"Disjoint, shuffled",i64,disjoint,shuffled,B,3000000,283.3318,273.6468,292.2747,3
+"Disjoint, shuffled",i64,disjoint,shuffled,production,3000000,112.71889999999999,110.0869,115.5251,3
+"Disjoint, reverse",i64,disjoint,reverse,A,3000000,35.4309,34.2436,36.1856,3
+"Disjoint, reverse",i64,disjoint,reverse,B,3000000,26.7607,26.387999999999998,27.6523,3
+"Disjoint, reverse",i64,disjoint,reverse,production,3000000,35.1962,34.2644,36.1723,3
+"Common intersection, reverse",i64,common,reverse,A,3000000,23.6542,23.4596,23.7796,3
+"Common intersection, reverse",i64,common,reverse,B,3000000,14.3608,14.3407,14.7792,3
+"Common intersection, reverse",i64,common,reverse,production,3000000,23.7042,23.447499999999998,24.237,3
+"Dense random, shuffled",i64,dense,shuffled,A,3000000,99.3053,95.8706,103.0831,3
+"Dense random, shuffled",i64,dense,shuffled,B,3000000,230.3671,229.80499999999998,252.13649999999998,3
+"Dense random, shuffled",i64,dense,shuffled,production,3000000,98.2734,97.6347,106.892,3

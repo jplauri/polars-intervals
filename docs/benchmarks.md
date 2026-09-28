@@ -1,29 +1,46 @@
 # Benchmarks
 
-Explore benchmarks for each available operation below.
+Saved measurements compare the production implementation with native Polars
+expressions or Rust candidates. Start with an operation's results table; each
+report identifies its timing scope, workload, tradeoffs, and missing coverage.
 
-| Operation | Problem |
+| Operation | What was measured |
 | --- | --- |
-| [Overlap counting](overlap-count-benchmarks.md) | Count the other intervals overlapping each interval. |
-| [Containment counting](containment-benchmarks.md) | Count the other intervals contained by each row. |
-| [Nesting depth](nesting-depth-benchmarks.md) | Longest strict containment chain above each row. |
-| [Lane assignment](assign-lanes-benchmarks.md) | Assign the fewest lanes without overlaps within a lane. |
-| [Weighted scheduling](weighted-scheduling-benchmarks.md) | Select a non-overlapping subset with maximum total weight. |
-| [Capacity scheduling](capacity-scheduling-benchmarks.md) | Maximize total weight under an overlap limit. |
-| [Capacity profiles](capacity-profile-benchmarks.md) | Exact selection under capacity that changes over time. |
-| [Minimum covering](covering-benchmarks.md) | Cover a target with the fewest intervals. |
-| [Minimum-cost covering](cost-covering-benchmarks.md) | Cover a target at minimum total cost. |
-| [Minimum stabbing points](stabbing-benchmarks.md) | Find the fewest points that hit every interval. |
+| [Overlap counting](overlap-count-benchmarks.md) | Complete Polars collections against native counting expressions |
+| [Containment counting](containment-benchmarks.md) | Polars collections and separate Rust candidate comparisons |
+| [Nesting depth](nesting-depth-benchmarks.md) | Polars collections and separate Rust candidate comparisons |
+| [Lane assignment](assign-lanes-benchmarks.md) | Rust candidates for assigning the fewest nonoverlapping lanes |
+| [Weighted scheduling](weighted-scheduling-benchmarks.md) | Rust candidates for maximum-weight nonoverlapping selection |
+| [Capacity scheduling](capacity-scheduling-benchmarks.md) | Polars collections and Rust selection under an overlap limit |
+| [Capacity profiles](capacity-profile-benchmarks.md) | Polars collections and Rust selection under changing capacity |
+| [Minimum covering](covering-benchmarks.md) | Polars collections and Rust candidates for fewest-interval covering |
+| [Minimum-cost covering](cost-covering-benchmarks.md) | Polars collections and Rust candidates for minimum-cost covering |
+| [Minimum stabbing points](stabbing-benchmarks.md) | Polars collections and Rust candidates for interval hitting sets |
+| [Maximum k-coverage](coverage-benchmarks.md) | Polars collections and Rust candidates for maximum covered measure |
 
-## Reading the plots
+## Hardware
 
-Lines show medians and shaded bands show the sample range. Runtime axes are logarithmic.
+Published runs use the maintainer's fixed home machine: **AMD Ryzen 9 3900X,
+12 physical cores / 24 logical processors, 32 GiB RAM** (about 31.9 GiB usable),
+running Windows 11 x86-64. The original hardware records remain in each run's
+metadata for provenance.
 
-## Run, regenerate, or extend
+Thread counts, sample counts, software versions, builds, and instrumentation vary
+between runs. Read the scope line beside each result set and follow its metadata
+link for the exact settings; Rust core timings and complete Polars collections
+are separate measurements.
 
-- [Running and publishing benchmarks](benchmarking.md): setup, measurement rules,
-  chart configuration, and the checklist for a new operation.
+## Reading and reproducing results
+
+Tables show selected median runtimes with explicit units, including important
+production losses. Their downloadable data retain exact medians, sample ranges,
+and counts. Detailed candidates and historical runs remain linked from each
+report. See the [shared methodology](benchmarking.md#measurement-rules) for timing,
+validation, memory definitions, and interpretation limits.
+
+- [Running and publishing benchmarks](benchmarking.md): setup, regeneration, and
+  a short checklist for adding an operation.
 - [Script inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md):
-  what each Python script runs or summarizes.
+  runners and report generators.
 - [Report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md):
-  a starting point for documenting a new operation.
+  the four-section structure used by every operation.

@@ -1,0 +1,10 @@
+case,workload_family,workload_pattern,workload_order,workload_m,workload_k,method,x,median,min,max,samples
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,csr_components,1000,0.6476999999999999,0.6157,0.6513,3
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,csr_components,10000,6.0158,5.9917,6.0184,3
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,csr_components,1000000,671.1118,664.2914,673.7606999999999,3
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,csr_parallel,1000,0.7138,0.6255999999999999,0.8388,3
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,csr_parallel,10000,2.2464,2.1263,2.4571,3
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,csr_parallel,1000000,216.676,215.7544,218.7928,3
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,production,1000,0.6196999999999999,0.6119,0.6345,3
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,production,10000,5.738099999999999,5.6617999999999995,5.8546,3
+"32-job components, 16 profile segments",components,small_changes,sorted,16,4,production,1000000,226.2582,224.72879999999998,230.986,3

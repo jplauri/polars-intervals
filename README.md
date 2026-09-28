@@ -80,7 +80,7 @@ selected = df.filter(pi.max_k_coverage("start", "end", k=2))
 Select at most `k` intervals whose union has maximum total measure. Among
 maximum-coverage solutions, use the fewest intervals. The result is an exact,
 deterministic Boolean mask in original row order; empty intervals are never
-selected. See the [design and benchmarks](https://jplauri.github.io/polars-intervals/coverage-benchmarks/).
+selected. See the [benchmarks and linked design notes](https://jplauri.github.io/polars-intervals/coverage-benchmarks/).
 
 ### Cover a target
 

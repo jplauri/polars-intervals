@@ -1,0 +1,16 @@
+case,workload_family,workload_order,workload_costs,method,x,median,min,max,samples
+Int64 touching chain,chain,shuffled,random,MC-A,1000000,50.070899999999995,49.9379,50.5259,3
+Int64 touching chain,chain,shuffled,random,MC-B,1000000,84.1771,82.06519999999999,91.1458,3
+Int64 touching chain,chain,shuffled,random,MC-C,1000000,54.841899999999995,54.5226,58.407799999999995,3
+Int64 dense overlap,dense,shuffled,random,MC-A,1000000,47.4835,47.0483,47.8153,3
+Int64 dense overlap,dense,shuffled,random,MC-B,1000000,65.37259999999999,65.27159999999999,65.6759,3
+Int64 dense overlap,dense,shuffled,random,MC-C,1000000,64.2391,63.6162,67.3962,3
+Int64 equal starts,equal_starts,shuffled,random,MC-A,1000000,13.852599999999999,13.7242,16.217399999999998,3
+Int64 equal starts,equal_starts,shuffled,random,MC-B,1000000,8.9865,7.8049,9.61,3
+Int64 equal starts,equal_starts,shuffled,random,MC-C,1000000,30.0525,29.053099999999997,31.228499999999997,3
+Int64 mostly irrelevant,irrelevant,shuffled,random,MC-A,1000000,0.9097999999999999,0.8663,0.9792,3
+Int64 mostly irrelevant,irrelevant,shuffled,random,MC-B,1000000,0.9339,0.8642,1.1271,3
+Int64 mostly irrelevant,irrelevant,shuffled,random,MC-C,1000000,0.8835,0.8782,0.8887999999999999,3
+"Date physical width, chain",date32_chain,shuffled,random,MC-A,1000000,38.7846,38.6988,51.699099999999994,3
+"Date physical width, chain",date32_chain,shuffled,random,MC-B,1000000,72.23049999999999,71.6302,98.7924,3
+"Date physical width, chain",date32_chain,shuffled,random,MC-C,1000000,51.5015,43.4326,60.0637,3

@@ -1,0 +1,19 @@
+case,workload_family,workload_order,method,x,median,min,max,samples
+"Disjoint, shuffled",disjoint,shuffled,events,1000,0.0617,0.058199999999999995,0.0653,9
+"Disjoint, shuffled",disjoint,shuffled,events,1000000,101.4015,99.3436,102.0808,9
+"Disjoint, shuffled",disjoint,shuffled,heap,1000,0.021599999999999998,0.019799999999999998,0.0294,9
+"Disjoint, shuffled",disjoint,shuffled,heap,1000000,79.7289,78.3329,84.3017,9
+"Disjoint, shuffled",disjoint,shuffled,two_sorts,1000,0.0445,0.043199999999999995,0.0487,9
+"Disjoint, shuffled",disjoint,shuffled,two_sorts,1000000,137.0702,136.52859999999998,147.337,9
+"Concurrency 128, sorted",moderate128,sorted,events,1000000,87.93469999999999,87.5679,92.6664,9
+"Concurrency 128, sorted",moderate128,sorted,heap,1000000,23.5181,23.3903,24.0127,9
+"Concurrency 128, sorted",moderate128,sorted,two_sorts,1000000,10.2006,10.0306,10.6767,9
+"Concurrency 128, shuffled",moderate128,shuffled,events,1000000,100.10929999999999,98.7276,101.5432,9
+"Concurrency 128, shuffled",moderate128,shuffled,heap,1000000,153.1129,148.7727,162.0601,9
+"Concurrency 128, shuffled",moderate128,shuffled,two_sorts,1000000,140.0814,139.5134,143.3397,9
+"Nested, sorted",nested,sorted,events,1000000,85.5954,83.9705,87.0963,9
+"Nested, sorted",nested,sorted,heap,1000000,29.9334,29.3962,31.3451,9
+"Nested, sorted",nested,sorted,two_sorts,1000000,9.083,8.6641,9.505799999999999,9
+"Nested, shuffled",nested,shuffled,events,1000000,95.98039999999999,94.8078,98.7247,9
+"Nested, shuffled",nested,shuffled,heap,1000000,171.9333,167.2123,186.2535,9
+"Nested, shuffled",nested,shuffled,two_sorts,1000000,121.3848,120.74579999999999,125.02149999999999,9

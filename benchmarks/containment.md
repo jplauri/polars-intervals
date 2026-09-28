@@ -1,9 +1,6 @@
-# Containment counting: design and measurements
+# Containment counting design notes
 
-`containment_count` counts other rows satisfying `start_j >= start_i` and
-`end_j <= end_i`. It is offline two-dimensional dominance counting. Empty
-intervals participate in exactly the same endpoint predicate; duplicates count
-one another, and each row excludes itself once.
+For headline results, scope and limitations, see the [benchmark report](https://jplauri.github.io/polars-intervals/containment-benchmarks/). These notes retain the native formulations, counting invariant and historical validation.
 
 ## Candidates and correctness invariant
 
@@ -37,41 +34,6 @@ comparisons and copies, preserving signed/unsigned extremes without subtraction
 or negation. Counts use `usize` in core, bounded by the collection size, and
 become non-null `UInt64` at the Polars boundary. Core has zero production
 dependencies, including no Polars, Arrow, Python, chrono or PyO3 dependency.
-
-## Datasets and timing protocol
-
-The Rust harness covers all 14 structures at 1K, 10K, 100K, 1M and 3M rows:
-disjoint, strict nesting, complete duplicates, equal starts, equal ends, random
-sparse, random dense, broad outers around short intervals, crossing antichains,
-many empties, mixed empty/non-empty, descending-start sorted, reverse-sorted and
-shuffled nesting. Randomness has fixed seeds. Rust uses a portable xorshift;
-Python uses `random.Random`, so their random datasets are reproducible but not
-identical. The last three Rust cases isolate input-order effects on the same
-nesting family.
-
-Before timing, the harness checks all candidates against an independent nested
-loop oracle on small data and against production on every full-sized case.
-Five raw samples per candidate alternate execution order, after full-output
-verification/warmup. Each result is also checked outside its timed region.
-Total kernel time includes validation, allocation, compression, sorting and
-sweep; phase columns separately time compression (including rank lookup), record
-sorting, and tree allocation/updates/queries. Input generation and destruction
-of the returned output are excluded. Phase clock overhead is included in totals.
-
-Polars timings include expression execution, extraction, kernel and result
-construction, and any native preprocessing/restoration of row order. Queries
-are built outside timing, collected on the in-memory engine, warmed once and
-measured five times with alternating execution order. Every timed output must
-match. Small structural and seeded random cases also check every native
-formulation directly against an independent Python oracle.
-The native queries assume valid, matching endpoints; the plugin's timed work
-also includes its public input validation.
-
-Grouped cases use 10K/100K total rows, 1/10/100/1000 interleaved groups and sparse,
-dense and mixed structures. Even the one-group window case explicitly uses
-`.over("group")`. Date and UTC Datetime(us) are sampled at 10K/100K, globally
-and with 100 groups; Date uses i32, Datetime uses the same i64 kernel as Int64.
-The Python suite tests all three Datetime units and timezone metadata separately.
 
 ## Native Polars comparisons
 
@@ -136,52 +98,9 @@ also remeasures the plugin, so their within-run comparison has the same conditio
 
 See also the [native join API](https://docs.pola.rs/api/python/stable/reference/lazyframe/api/polars.LazyFrame.join_where.html).
 
-## Measured results
+## Candidate selection and phases
 
-Recorded September 26, 2026 on Windows 11, AMD Ryzen 9 3900X (12 cores /
-24 logical CPUs), rustc 1.98.1, Python 3.14.0, Polars 1.44.2
-with 24 Polars threads. Kernels are single-threaded; Polars may parallelize
-sorting and groups. These are five-sample medians on one machine, not universal
-speed guarantees. Both benchmark suites ran sequentially after builds/checks.
-
-Source hashes describe the code at measurement time. Subsequent cleanup
-simplified dtype dispatch and removed duplicate untimed benchmark checks;
-the measured kernels and native query definitions are unchanged.
-Integration with the current shared Polars adapter subsequently replaced
-unconditional endpoint copies with borrowing contiguous columns. The archived
-Polars timings describe the original copying adapter, not a remeasurement of
-that integration. Reference candidates moved from `benches/support/mod.rs` to
-`benches/support/containment.rs` without algorithm changes.
-
-Raw data and provenance:
-
-- [Kernel CSV](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-kernels-windows.csv)
-- [Kernel environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-kernels-windows.json)
-- [Polars samples, plans, skips and environment](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-polars-windows.json)
-- [Follow-up run-rank samples and environment](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-polars-rank-runs-windows.json)
-
-### Kernel medians at 3M rows (ms)
-
-| Structure | A: packed Fenwick | B: indirect Fenwick | C: segment tree |
-| --- | ---: | ---: | ---: |
-| disjoint | 274.7 | 255.4 | 371.6 |
-| nested | 274.7 | 262.0 | 358.5 |
-| duplicates | 53.2 | 38.6 | 53.8 |
-| equal_starts | 193.8 | 186.2 | 358.6 |
-| equal_ends | 53.0 | 38.1 | 54.2 |
-| sparse | 1006.3 | 1344.0 | 1117.1 |
-| dense | 418.4 | 779.2 | 487.7 |
-| broad | 447.5 | 457.5 | 533.5 |
-| crossing | 272.9 | 255.5 | 362.7 |
-| empty | 295.1 | 753.3 | 302.7 |
-| mixed | 362.9 | 862.9 | 365.9 |
-| sorted | 272.1 | 260.4 | 356.7 |
-| reverse | 278.1 | 260.9 | 357.2 |
-| shuffled | 1049.4 | 1385.8 | 1248.1 |
-
-### Production choice
-
-**A, packed records plus Fenwick, is the production implementation.** Its
+**Packed records plus Fenwick (A) is the production implementation.** Its
 contiguous endpoint comparisons substantially reduce sorting cost on random
 and tie-heavy inputs. B saves record-copying and memory and wins several
 already ordered / low-cardinality cases. We accept that tradeoff for the
@@ -213,60 +132,9 @@ it explains the throughput choice without erasing B's wins on smaller inputs.
 Phase medians need not sum to the total; validation/record construction and
 other allocations are included only in total time.
 
-### Native Polars: global Int64, 1M rows (ms)
+## Additional historical native comparisons
 
-| Structure | Plugin | Native rank | Native rank_by | IEJoin |
-| --- | ---: | ---: | ---: | ---: |
-| disjoint | 73.33 | 882.01 | 915.18 | 259.37 |
-| nested | 77.25 | 1049.46 | 1106.05 | skip |
-| duplicates | 22.24 | 61.70 | 79.39 | skip |
-| equal_starts | 65.42 | 1019.29 | 1072.84 | skip |
-| equal_ends | 22.10 | 88.26 | 96.75 | skip |
-| sparse | 218.66 | 654.90 | 660.79 | 357.03 |
-| dense | 114.50 | 325.62 | 349.82 | skip |
-| broad | 123.98 | 878.61 | 916.01 | skip |
-| crossing | 75.82 | 876.79 | 919.76 | 247.67 |
-| empty | 85.03 | 179.48 | 205.74 | skip |
-| mixed | 97.51 | 169.35 | 184.08 | skip |
-| sorted | 76.64 | 1034.94 | 1081.08 | skip |
-| reverse | 74.92 | 1013.09 | 1060.68 | skip |
-| shuffled | 187.18 | 1054.38 | 1092.60 | skip |
-
-All missing join times are safety skips. At 3M rows even disjoint data
-exceeds the 2M cap once self-matches are included; the native rank methods
-remain in the comparison at that size.
-
-### Leaner native run-rank: global Int64, 3M rows (ms)
-
-This follow-up includes fresh plugin measurements alongside `rank_runs`.
-Compare within each row; the earlier prefix-rank tables come from a separate run.
-
-| Structure | Plugin | Native rank_runs |
-| --- | ---: | ---: |
-| disjoint | 274.17 | 2792.37 |
-| nested | 282.04 | 3332.80 |
-| duplicates | 65.34 | 146.47 |
-| equal_starts | 202.13 | 2756.34 |
-| equal_ends | 66.52 | 187.65 |
-| sparse | 1089.34 | 2012.46 |
-| dense | 410.76 | 1338.39 |
-| broad | 450.99 | 2778.05 |
-| crossing | 275.11 | 2733.39 |
-| empty | 307.15 | 544.18 |
-| mixed | 362.61 | 458.66 |
-| sorted | 278.45 | 3251.54 |
-| reverse | 291.59 | 3297.83 |
-| shuffled | 1101.40 | 3304.81 |
-
-### Pair-materializing joins at 1K rows (ms)
-
-| Structure | Rows materialized (including self) | Plugin | IEJoin |
-| --- | ---: | ---: | ---: |
-| nested | 500,500 | 0.23 | 5.42 |
-| duplicates | 1,000,000 | 0.30 | 9.03 |
-| sparse | 1,467 | 0.29 | 1.83 |
-| dense | 128,045 | 0.37 | 2.71 |
-| mixed | 21,547 | 0.24 | 1.74 |
+The original native comparison and run-rank follow-up are separate five-sample runs. Each table compares methods measured together; do not compare columns across runs. These measurements use the historical copying adapter.
 
 ### Group windows: 100K Int64 rows (ms)
 
@@ -352,31 +220,7 @@ parallelism. We do not report native RSS or claim a measured allocation count
 for Polars itself; join match counts explicitly show the pair-materialization
 cost that the core and native rank formulations avoid.
 
-## Reproduce
-
-```sh
-cargo bench -p intervals-core --bench containment --locked
-uv sync --locked --reinstall-package polars-intervals --config-setting "build-args=--profile release"
-uv run --locked --no-sync python benchmarks/containment_count.py
-```
-
-To reproduce the two recorded native runs separately, pass
-`--methods plugin rank rank_by join bands equality` for the original run, then
-`--methods plugin rank_runs` with a different `--output` for the follow-up.
-
-Run benchmarks sequentially on an otherwise idle machine. `CONTAINMENT_SIZES`
-accepts comma-separated kernel sizes and `CONTAINMENT_CSV` overrides its output
-path. Python accepts `--sizes`, `--repeats`, `--methods` and `--output`. Defaults produce
-`target/containment-kernels.csv` and `target/containment-polars.json`.
-The latter includes environment metadata, all samples, join skips and query
-plans. Windows Rust tests need the selected Python interpreter in `PYO3_PYTHON`
-and its base directory on PATH so the Python DLL can be loaded.
-On the recorded Windows host, Rust tests/Clippy/rustdoc used
-`CARGO_PROFILE_DEV_DEBUG=0` and `CARGO_PROFILE_TEST_DEBUG=0` to avoid oversized
-debug-symbol artifacts. Kernel and wheel measurements use the ordinary optimized
-release profile, without either setting affecting their optimization level.
-
-## Validation
+## Validation at the recorded revisions
 
 Named tests lock down nesting, disjoint/crossing/touching intervals, same-start
 and same-end families, duplicates, boundary empties, empty outers, row order,
@@ -422,3 +266,11 @@ The plugin uses the repository's fallible output-field registration and shared
 logical endpoint validation. Int128 remains unsupported. Existing temporal
 support for the other operations is preserved; containment adds no endpoint
 dependencies or separate extraction path.
+
+## Data and provenance
+
+- [Kernel samples](results/containment-kernels-windows.csv) and [metadata](results/containment-kernels-windows.json).
+- [Original native samples, query plans, safety skips and metadata](results/containment-polars-windows.json).
+- [Run-rank follow-up samples and metadata](results/containment-polars-rank-runs-windows.json).
+
+The archived Polars timings precede the shared adapter's change from unconditional endpoint copies to borrowing contiguous columns. Candidate references subsequently moved from `benches/support/mod.rs` to `benches/support/containment.rs` without algorithm changes.

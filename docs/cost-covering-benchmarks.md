@@ -1,200 +1,95 @@
 # Minimum-cost covering benchmarks
 
-[All benchmarks](benchmarks.md) · [Running and publishing](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
 
 ## Summary
 
-`minimum_cost_cover` selects a continuous cover with minimum total cost, breaking cost
-ties by the fewest intervals. Production uses a reversed Fenwick suffix-minimum dynamic
-program: `O(n log n)` time and `O(n)` additional space. It uses less storage than the
-segment-tree reference and wins many workloads with many reachable frontiers, with some
-measured exceptions.
-
-The unweighted operation has its own [minimum-covering report](covering-benchmarks.md).
-
-## Compared implementations
-
-| Candidate | Implementation | Role |
-| --- | --- | --- |
-| MCC-A | Reversed Fenwick suffix-min frontier DP | Production and instrumented benchmark |
-| MCC-B | Iterative segment-tree range-min frontier DP | Tests/benchmarks |
-| MCC-C | Direct scan of prior reachable frontier states | Tests/benchmarks, at most 1K rows |
-
-Both trees stop ancestor updates when the stored minimum does not improve. The
-segment-tree reference retains no redundant second DP array. Production has no method
-switch or graph/solver dependency.
-
-### Semantics and exactness
-
-All intervals and the single target are half-open. Touching intervals chain. Empty
-targets return all false after validation. Empty intervals never help. Outside rows are
-discarded after validation, and useful rows are clipped to the target. Reversed
-targets/intervals and null endpoints are errors. A non-empty target without a continuous
-cover raises `target interval cannot be covered by the supplied intervals`.
-
-Sort candidates by effective right end, compress right ends plus target start, and
-maintain the best `(cost, count, frontier_index)` at reachable frontiers. A reversed
-Fenwick tree queries the minimum over reachable frontiers `x >= l`. Only frontiers
-strictly below `r` have been published when processing `[l,r)`. Add the interval's cost
-and one selected interval. Publish the best state only after all candidates ending at
-`r` have been queried. Backpointers reconstruct the original row mask.
-
-This recurrence is exact: any advancing interval extends a reachable continuous prefix,
-and any nonredundant cover can be ordered by its advancing right endpoints. Nonnegative
-costs and the secondary count objective ensure that a nonadvancing interval is never
-necessary. The cheapest local interval is not a valid greedy rule: `[0,4):1`, `[0,6):5`,
-`[4,10):100`, `[6,10):5` has optimum 10, although starting with the cheapest interval
-can cost 101.
-
-Weighted comparisons first minimize cost, then count. Remaining ties use row index and
-predecessor coordinate. Deterministic masks are guaranteed for identical input, but a
-particular tied mask is not a stable public contract. Costs must be nonnegative
-integers. Python/Polars accepts the eight integer dtypes through 64 bits, without nulls
-or casts. The core accepts integer types convertible to `i128`. Addition is checked.
-Overflowing paths cannot return to a representable cost because costs are nonnegative.
-Such paths are discarded. If the final state is absent after an overflow, an unweighted
-feasibility check distinguishes infeasible coverage from an optimum exceeding
-`i128::MAX`.
-
-The production algorithm takes **O(n log n) time and O(n) additional space**, including
-output. Reconstruction is linear after sorting and dynamic programming. For `m` useful
-rows and `q <= m+1` distinct frontier coordinates, weighted storage is `O(m+q+n)`:
-candidates, coordinates, one Fenwick tree, backpointers and the output mask. The tree is
-released before allocating the output mask. The Polars adapter borrows contiguous
-physical endpoint slices. Multiple chunks require copying. Costs are widened once to
-`i128`.
+[`minimum_cost_cover`](api.md#polars_intervals.minimum_cost_cover) selects a
+continuous cover minimizing cost, then interval count. Production's Fenwick
+dynamic program uses less memory than the segment-tree reference and is faster
+on many measured workloads with many reachable frontiers. The Date-width chain
+is a meaningful exception; neither tree wins every case.
 
 ## Results
 
-- **CPU:** AMD Ryzen 9 3900X (12 cores, 24 logical processors).
-- **OS:** Windows 11 Home, build 10.0.26200, x86-64.
-- **Rust:** 1.98.1, LLVM 22.1.8, target `x86_64-pc-windows-msvc`.
-- **Python / Polars:** 3.14.0 / 1.44.2 for the plugin timings.
-- **Build:** optimized Cargo `bench` profile for the core, release wheel for the plugin.
-- **Threads:** one for the core algorithms.
-- **Samples:** one warmup and three timed samples per case.
+**Polars collection · single-threaded solver, Polars pool size unrecorded · median
+of 3 samples · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
 
-The shared covering run has 7,425 timed samples across 396 workloads and 2,475
-candidate/workload combinations. These counts cover both covering operations.
+--8<-- "docs/assets/benchmarks/cost-cover-polars-table.md"
 
---8<-- "docs/assets/benchmarks/cost-cover-runtime.md"
+Installed release-wheel measurements include eager selection, Series retrieval,
+plugin validation, physical adaptation and output construction. Fixture creation,
+expression construction and casts are outside timing. The native fixtures and
+costs differ from the Rust harness: these totals cannot be subtracted from core
+times to estimate adapter overhead.
 
-### Wider workload comparison
+**Rust core · single-threaded · median of 3 samples · internal phase clocks included
+· [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
 
-Median per-workload runtime ratios (candidate / Fenwick baseline). Values below one favor the candidate.
-Each geometry/order/cost/size combination has equal weight:
+Shuffled inputs with random nonnegative costs:
 
-| Candidate | Sorted | Nearly sorted | Shuffled |
-| --- | ---: | ---: | ---: |
-| MCC-B / MCC-A | 1.237 | 1.209 | 1.122 |
-| MCC-C / MCC-A, 1K only | 1.254 | 1.250 | 1.141 |
+--8<-- "docs/assets/benchmarks/cost-cover-core-table.md"
 
-Sorted/shuffled include physical-width runs. Nearly sorted does not. Small compressed
-state spaces hide the quadratic reference's poor scaling: at 1K rows its medians are
-1.51 ms on dense data and 2.25 ms on equal starts, versus 0.089 ms for Fenwick on the
-shuffled dense/random case.
+Fenwick uses suffix-minimum frontier queries; the segment tree supports general
+range minima. Both stop ancestor updates when a value does not improve. Their
+performance depends on the number and arrangement of useful frontier states:
+irrelevant-row workloads mostly pay validation and output costs. A direct scan
+of previous states is also recorded, but deliberately limited to 1K rows because
+its work can be quadratic.
 
-Selected 1M-row shuffled medians, milliseconds:
+The segment tree wins the Date-width chain. Its nearly equal irrelevant-row
+median does not establish a reliable advantage. The memory tradeoff favors
+Fenwick on the larger state spaces: peak **requested live heap** for the 1M
+Int64 chain is 105 MB versus 158 MB for the segment tree; dense overlap uses
+87.2 MB versus 152 MB. These decimal MB measurements include output and temporary
+buffers, not process RSS.
 
-| Workload | Fenwick | Segment tree |
-| --- | ---: | ---: |
-| Touching chain | 188.08 | 205.33 |
-| Dense overlaps | 226.50 | 389.63 |
-| Equal starts | 198.61 | 274.19 |
-| Mostly irrelevant | 2.05 | 2.04 |
-| Date-width chain | 210.87 | 195.95 |
-| Date-width dense | 275.19 | 448.58 |
+## Coverage and limitations
 
-The Date-width chain favors the segment tree. Fenwick is not a universal winner. For the
-1M-row i64 chain, Fenwick/segment-tree peak requested allocations are 105.17/157.83 MB.
-For dense input they are 87.17/151.83 MB. Irrelevant-row workloads need about 1 MB,
-mostly output. The maximum shared-run peak is 157.83 decimal MB, not RSS.
+The shared [covering harness](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/covering-methodology.md)
+spans 1K–1M rows, 17 geometry/difficulty families, three orders and selected cost
+distributions. It includes zero costs, skew, ties, duplicate costs, expensive
+long intervals, gaps and infeasible targets. Date and Datetime physical-width
+slices cover chains, dense overlaps and duplicates. The separate plugin suite
+covers eight integer/temporal dtypes on four families, with sorted and shuffled
+rows. Nearly sorted physical-width cases and a native Polars optimization
+baseline are absent.
 
-For the shuffled chain, Fenwick preprocessing/DP/reconstruction medians are
-50.26/131.92/3.60 ms, with 23 allocation/reallocation events. Dense phases are
-50.28/172.78/0.063 ms. Raw samples retain phase and memory data, including failures.
+Core correctness checks combine independent coverage verification with objective
+agreement across implementations. Exhaustive subset optimality checks apply to
+small test cases; the quadratic reference stops at 1K benchmark rows. Release-wheel
+checks verify coverage and deterministic masks, not independent full-size
+optimality. The shared notes retain the exact oracle and property-test coverage.
 
-### End-to-end temporal measurements
+Core totals include preprocessing, dynamic programming, reconstruction,
+temporary-buffer destruction and phase-clock overhead; phase sums need not equal
+the total. Allocation measurements use a separate untimed invocation. Early
+failures can skip later phases. The recorded wheel predates adapter cleanup;
+original and cleanup hashes are retained separately, and the measured solver and
+candidate algorithms are unchanged.
 
-The release wheel installed outside the checkout produced 1,536 samples across 512
-dtype/workload combinations for both covering operations. These selected 1M-row
-shuffled-chain medians include plugin, validation, adapter and output overhead. The
-native fixtures and costs differ from the core harness. Subtracting their times does not
-estimate adapter overhead.
+<span id="historical-validation"></span>
 
-| Endpoint dtype | minimum_cost_cover (ms) |
-| --- | ---: |
-| Int32 | 196.09 |
-| Int64 | 210.80 |
-| UInt64 | 208.29 |
-| Date | 196.34 |
-| Datetime(ms) | 213.34 |
-| Datetime(us) | 206.46 |
-| Datetime(ns, UTC) | 221.16 |
-| Datetime(ns, Europe/Helsinki) | 205.19 |
+## Reproduce and data
 
-## Workloads and correctness
-
---8<-- "benchmarks/covering-methodology.md"
-
-## Reproduce
-
-| File | Role |
-| --- | --- |
-| [`covering.rs`](https://github.com/jplauri/polars-intervals/blob/master/crates/intervals-core/benches/covering.rs) | Run both covering candidate suites |
-| [`covering_summary.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/covering_summary.py) | Summarize a supplied candidate CSV |
-| [`covering_temporal.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/covering_temporal.py) | Time both operations with integer/temporal release-plugin inputs |
-| [`plot.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/plot.py) | Generate separate figures for each operation |
-
-Build the release plugin using the shared setup guide before running the temporal suite.
-Save new runs separately from the published measurements:
+<details markdown="1">
+<summary>Operation-specific commands</summary>
 
 ```sh
 cargo bench -p intervals-core --bench covering --locked > benchmarks/results/covering-local.csv
 uv run --no-sync python benchmarks/covering_summary.py benchmarks/results/covering-local.csv
-uv run --no-sync python benchmarks/covering_temporal.py > benchmarks/results/covering-temporal-local.csv
+python -I /path/to/checkout/benchmarks/covering_temporal.py > covering-temporal-local.csv
 ```
 
-`COVER_BENCH_MAX` and `COVER_BENCH_SAMPLES` limit candidate size and repeats. Defaults
-are one million rows and three samples. The harness measures both operations. The chart
-configuration selects the relevant method IDs.
-
-## Limitations
-
-Raw CSV columns retain every sample's total, preprocessing (validation, clipping,
-sorting/compression), optimization, and mask reconstruction time. Total time also
-includes temporary-buffer destruction and phase-clock overhead, so it need not equal
-the sum of phase times. Early failures skip later phases.
-
-Peak live requested allocation bytes and allocation/reallocation event counts are
-measured in a **separate untimed invocation** using the system allocator. These include
-algorithm buffers and output, but exclude caller-owned inputs, oracle work, allocator
-metadata, stacks and process RSS. Measurements are serial.
-
-These synthetic workloads were measured on one Windows x86-64 machine. Short timings
-are sensitive to scheduler and clock noise. Candidate comparisons cover Rust
-implementations, with separate end-to-end plugin timings and no native Polars baseline.
-
-## Raw data
-
-- [Shared candidate samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-windows.csv)
-- [Completion log](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-windows.log)
-- [Environment and hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)
-- [Installed release-wheel samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-temporal-windows.csv)
-
-The original source hashes remain attached to the measurements. Cleanup verification
-records the consolidated harness/adapter sources separately. The measured solver and
-candidate implementations were unchanged.
-
-<details markdown="1" id="historical-validation">
-<summary>Validation at the recorded revision</summary>
-
-The completed local validation includes 99 Rust tests/doctests, 1,229 Python
-tests/doctests (also all passing against the installed external release wheel), and 49
-CI/release helper tests. Formatting, Clippy across all targets with denied warnings,
-Rustdoc with denied warnings, the uv lock check, Ruff lint/format and strict MkDocs
-builds pass. A release wheel and source archive were built and audited for metadata,
-license, type marker, native extension and new source files. The full 15-wheel
-cross-platform CI matrix is not a local test and was not run.
+The target measures both covering operations. `COVER_BENCH_MAX` and
+`COVER_BENCH_SAMPLES` restrict it. Run the final command with the installed release
+wheel's Python from outside the checkout, following the shared setup guide.
 
 </details>
+
+[Setup, metrics and publishing](benchmarking.md) ·
+[Core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-windows.csv) ·
+[Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-temporal-windows.csv) ·
+[Completion log](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-windows.log) ·
+[Design notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#covering) ·
+[Validation and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)

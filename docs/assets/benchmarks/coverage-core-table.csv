@@ -1,0 +1,12 @@
+case,workload_family,workload_order,workload_k,method,x,median,min,max,samples
+"Staircase, shuffled, k=32",staircase,shuffled,32,components,10000,4.664499999999999,4.6587,4.761699999999999,3
+"Staircase, shuffled, k=32",staircase,shuffled,32,production,10000,1.7068999999999999,1.696,1.7218,3
+"Staircase, shuffled, k=32",staircase,shuffled,32,rolling,10000,2.4545999999999997,2.4528,2.4771,3
+"Components, sorted, k=8",components,sorted,8,components,10000,1.1122999999999998,1.045,1.1564999999999999,3
+"Components, sorted, k=8",components,sorted,8,production,10000,0.47519999999999996,0.46859999999999996,0.4769,3
+"Components, sorted, k=8",components,sorted,8,rolling,10000,0.6706,0.6463,0.6918,3
+"Components, sorted, k=64",components,sorted,64,components,10000,2.6473,2.6277,2.7167,3
+"Components, sorted, k=64",components,sorted,64,production,10000,3.1039999999999996,3.0498,3.1157,3
+"Components, sorted, k=64",components,sorted,64,rolling,10000,4.7065,4.7029,4.7153,3
+"Saturation, shuffled, k=64",saturation,shuffled,64,production,100000,4.2875,4.2583,4.3186,3
+"Saturation, shuffled, k=64",saturation,shuffled,64,rolling,100000,57.4441,56.2234,58.672799999999995,3

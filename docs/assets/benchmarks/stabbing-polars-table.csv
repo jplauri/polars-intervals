@@ -1,0 +1,13 @@
+case,workload_family,workload_order,method,x,median,min,max,samples
+"Disjoint, sorted",disjoint,sorted,Date,3000000,15.009799999999998,14.7248,17.830099999999998,3
+"Disjoint, sorted",disjoint,sorted,"Datetime(time_unit='us', time_zone=None)",3000000,27.6436,27.3798,29.2704,3
+"Disjoint, sorted",disjoint,sorted,Int64,3000000,26.473599999999998,24.5705,27.9346,3
+"Disjoint, shuffled",disjoint,shuffled,Date,3000000,96.6378,90.7195,124.06479999999999,3
+"Disjoint, shuffled",disjoint,shuffled,"Datetime(time_unit='us', time_zone=None)",3000000,129.2437,126.9182,144.5395,3
+"Disjoint, shuffled",disjoint,shuffled,Int64,3000000,139.07989999999998,135.2773,150.6179,3
+"Dense regular, sorted",dense,sorted,Date,3000000,4.4051,3.9720999999999997,4.4555,3
+"Dense regular, sorted",dense,sorted,"Datetime(time_unit='us', time_zone=None)",3000000,6.445799999999999,6.3031,6.566599999999999,3
+"Dense regular, sorted",dense,sorted,Int64,3000000,7.757499999999999,7.611199999999999,9.0255,3
+"Dense regular, shuffled",dense,shuffled,Date,3000000,78.6994,77.969,90.9627,3
+"Dense regular, shuffled",dense,shuffled,"Datetime(time_unit='us', time_zone=None)",3000000,113.7868,110.24969999999999,115.04079999999999,3
+"Dense regular, shuffled",dense,shuffled,Int64,3000000,114.72999999999999,109.5955,116.3805,3

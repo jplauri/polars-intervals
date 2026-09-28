@@ -1,0 +1,7 @@
+case,workload_family,workload_order,workload_method,method,x,median,min,max,samples
+"Touching chain, shuffled",chain,shuffled,minimum_cost_cover,Date,1000000,196.3407,194.29389999999998,196.9748,3
+"Touching chain, shuffled",chain,shuffled,minimum_cost_cover,"Datetime(time_unit='us', time_zone=None)",1000000,206.4555,206.3005,208.21089999999998,3
+"Touching chain, shuffled",chain,shuffled,minimum_cost_cover,Int64,1000000,210.802,207.56289999999998,212.56029999999998,3
+"Dense overlap, shuffled",dense,shuffled,minimum_cost_cover,Date,1000000,237.8198,237.6324,242.08409999999998,3
+"Dense overlap, shuffled",dense,shuffled,minimum_cost_cover,"Datetime(time_unit='us', time_zone=None)",1000000,263.5616,254.63219999999998,270.59479999999996,3
+"Dense overlap, shuffled",dense,shuffled,minimum_cost_cover,Int64,1000000,263.1597,261.85429999999997,270.0458,3

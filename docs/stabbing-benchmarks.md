@@ -1,253 +1,98 @@
 # Minimum stabbing points benchmarks
 
-[All benchmarks](benchmarks.md) · [Running and publishing](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
 
 ## Summary
 
-`minimum_stabbing_points` finds the fewest points that hit every interval.
-Production sorts packed endpoints and scans them, with a direct scan for input
-already sorted by end.
-
-## Compared implementations
-
-All candidates use the same exact greedy rule: process increasing ends and choose
-`predecessor(end)` when the last point does not hit the current interval. Validation
-rejects empty/reversed intervals in original order before any sorting.
-
-| Candidate | Representation and preprocessing |
-| --- | --- |
-| A | Copy packed `(start,end)` pairs, unstable comparison sort by end, linear scan |
-| B | Keep endpoint arrays, unstable-sort `usize` indices by end, indirect scan |
-| C | Scan borrowed arrays when ends are nondecreasing, otherwise use A |
-| production | The public core function, timed without phase instrumentation |
-
-Production retains **packed comparison sorting with the sorted-input fast path**.
-Directly scanning sorted endpoints avoids allocating records. Indirect sorting saves
-record storage but has less predictable memory access on shuffled inputs. The adapter
-preserves the physical endpoint width when allocating records.
-
-Sorting takes `O(n log n)` and the greedy scan `O(n)`. Additional space is `O(n + k)`
-including `k` points. End-sorted inputs take `O(n)` time and `O(k)` output space.
-Unsorted packed storage is `2 * n * sizeof(endpoint)` bytes, plus the growing output
-vector. Sorting is in place. The Polars adapter borrows contiguous physical columns.
-Multiple chunks require contiguous input copies.
-
-### Why the greedy algorithm is exact
-
-Sort by increasing end and consider the earliest-ending uncovered interval.
-Every feasible solution must put a point `q` in that interval. Move it rightward
-to `predecessor(end)`. Any later-ending interval that contained `q` still contains
-the moved point: its start is at most `q`, and its end is at least this earliest
-end. An optimal solution therefore exists containing the greedy point. Remove
-the intervals it hits and repeat the argument on those remaining.
-
-The triggering intervals are pairwise disjoint, and any stabbing set needs at
-least one point for each of them. This also proves the interval identity:
-
-```text
-minimum stabbing number = maximum number of pairwise disjoint intervals
-```
+[`minimum_stabbing_points`](api.md#polars_intervals.minimum_stabbing_points)
+finds the fewest points hitting every interval. Production's direct scan of
+end-sorted inputs saves both sorting time and record storage; packed sorting is
+its fallback for other input. Indirect sorting is slower on the largest shuffled
+cases but wins some reverse-order workloads and uses fewer temporary bytes for
+Int64 endpoints.
 
 ## Results
 
-- **CPU:** AMD Ryzen 9 3900X (12 cores, 24 logical processors).
-- **OS:** Windows 11 Home, build 10.0.26200, x86-64.
-- **Rust:** 1.98.1, LLVM 22.1.8, target `x86_64-pc-windows-msvc`.
-- **Python / Polars:** 3.14.0 / 1.44.2 for the plugin timings.
-- **Build:** optimized Cargo `bench` profile for the core, release wheel for the plugin.
-- **Threads:** one for the core algorithms, 24 Polars threads for the plugin runs.
-- **Samples:** one warmup and three timed samples per case.
+**Polars collection · 24 Polars threads, single-threaded solver · median of 3
+samples · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json)**
 
-Runs were sequential, without concurrent compilation or tests. The recorded results
-contain **2,700 core samples** over 225 workloads and **270 release-wheel samples** over
-90 workloads.
+--8<-- "docs/assets/benchmarks/stabbing-polars-table.md"
 
---8<-- "docs/assets/benchmarks/stabbing-runtime.md"
+Collection includes plugin dispatch, validation, physical adaptation and logical
+list construction. Fixture construction, casts and checks are outside timing.
+Date uses narrower physical records than Int64 and microsecond Datetime. These
+regular dense fixtures differ from the random dense core cases below; subtracting
+their times would not isolate adapter overhead.
 
-### Full matrix and temporal measurements
+**Rust core · single-threaded · median of 3 samples · production has no phase
+clocks; candidate totals include them · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json)**
 
-Selected 3M-row Int64 core medians, milliseconds:
+Int64 endpoints; production detects end-sorted input before its packed fallback.
+The references always sort packed records or original-row indices.
 
-| Family / order | A packed | B indirect | C detect + packed | Production |
-| --- | ---: | ---: | ---: | ---: |
-| Disjoint / sorted | 31.38 | 24.59 | 17.84 | 17.77 |
-| Disjoint / shuffled | 108.84 | 283.33 | 106.79 | 112.72 |
-| Disjoint / reverse | 35.43 | **26.76** | 36.58 | 35.20 |
-| Dense random / sorted | 22.58 | 15.34 | 7.67 | 7.44 |
-| Dense random / shuffled | 99.31 | 230.37 | 98.53 | 98.27 |
-| Dense random / reverse | 98.21 | 111.15 | 100.54 | 103.89 |
-| Common intersection / reverse | 23.65 | **14.36** | 23.89 | 23.70 |
-| Equal ends / shuffled | 23.93 | 17.15 | 9.59 | 9.22 |
+--8<-- "docs/assets/benchmarks/stabbing-core-table.md"
 
-C/A's geometric mean runtime ratio across all sorted sizes, families and physical widths
-is **0.403** (about 2.48x faster). Excluding identical/equal-end families, which remain
-sorted under permutation, the unsorted ratios are **0.988 shuffled** and **1.009
-reverse**. The detection overhead is small beside the sorted-input benefit. At 3M
-shuffled rows, packed records also clearly outperform indirect sorting. B wins some
-reverse/monotone workloads and uses fewer temporary bytes for i64. Production keeps
-C's sorted-input check and packed fallback for their performance across the full matrix.
+Input order changes the result more than small differences between production
+and the packed reference. Indirect sorting's reverse-order wins remain relevant;
+the packed fallback was selected for its broader shuffled-input performance.
+The instrumented sortedness-detection candidate is preserved in the samples,
+without adding another almost identical production series to the main table.
+Phase-clock overhead matters most at the smallest sizes.
 
-For 3M disjoint Int64 intervals, measured production peak requested heap is **33,554,432
-bytes (32 MiB)** when sorted versus **81,554,432 bytes (77.78 MiB)** when shuffled. The
-difference is the 48,000,000-byte record buffer. For the common intersection, sorted
-input allocates only **32 bytes**, versus 48,000,032 bytes when shuffled. Both include
-output vector capacity. The sorted path therefore retains its memory benefit even where
-standard-library sorting is already linear.
+For 3M disjoint Int64 rows, production peak **requested live heap** is 32.0 MiB
+when sorted and 77.8 MiB when shuffled. The extra storage is the packed record
+buffer. Output size matters too: a sorted common-intersection case allocates only
+32 bytes, since it emits one point. These core allocations include output-vector
+capacity and are not plugin process RSS.
 
-Installed release-wheel medians for 3M rows, milliseconds:
+## Coverage and limitations
 
-| Family / order | Int64 | Date | Datetime(us) |
-| --- | ---: | ---: | ---: |
-| Disjoint / sorted | 26.47 | 15.01 | 27.64 |
-| Disjoint / shuffled | 139.08 | 96.64 | 129.24 |
-| Dense regular / sorted | 7.76 | 4.41 | 6.45 |
-| Dense regular / shuffled | 114.73 | 78.70 | 113.79 |
-| Identical / sorted | 6.44 | 4.33 | 7.78 |
-| Identical / shuffled | 20.75 | 13.44 | 20.36 |
+The core covers 1K, 10K, 100K, 1M and 3M rows, twelve geometry families, and
+end-sorted, reverse and shuffled orders. Int64 spans the full matrix; Date's
+physical-width supplement covers disjoint, dense and identical families.
+Equal-end and identical families remain end-sorted even when shuffled or reversed,
+so their order labels still exercise the fast path. Tied ends also affect sorting
+behavior in random reversed fixtures.
 
-Core timings isolate the algorithm. These totals additionally include Polars and list
-construction. Native data construction/shuffling and correctness checks are excluded.
-Physical Date records are narrower than Int64/Datetime records.
+The installed release-wheel suite measures Int64, Date and microsecond Datetime
+on disjoint, dense and identical inputs, sorted and shuffled. Other Datetime
+units, timezone metadata, chunk adaptation and grouping have correctness tests
+but no matching performance matrix here. No native Polars expression baseline
+is supplied.
 
-## Workloads and correctness
+Core outputs are checked for coverage, sorted uniqueness and optimum cardinality
+against an independent right-to-left maximum-packing oracle. Small coordinate-
+and interval-subset oracles cross-check it before timing. Temporal checks use
+coverage joins and explicit disjoint-packing certificates, rather than replaying
+the production greedy rule. [Design and validation details](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#minimum-stabbing-points)
+retain the proof and oracle boundaries.
 
-Core controls `STABBING_BENCH_MAX` and `STABBING_BENCH_SAMPLES` default to 3M and three
-samples. The seed is 20260926. Each workload has a verified, untimed allocation/warmup
-pass, then three timing samples in shuffled method order. Inputs, independent oracles,
-and result checks are outside the timed region. Core totals include validation,
-record/index materialization, sorting, scanning and temporary-buffer destruction. Output
-destruction is excluded. Candidate phase clocks distinguish validation, preprocessing
-(including sortedness detection), sort, and scan. Production has no phase clocks. Its
-phase CSV fields are intentionally empty. Clock overhead matters most at 1K.
+Core totals include validation, materialization, sorting, scanning and temporary
+buffer destruction; output destruction is excluded. Blank production phase
+fields mean unavailable. Cleanup changed the driver and tests, while the
+measured production and candidate implementations remained unchanged.
 
-The core matrix uses 1K, 10K, 100K, 1M and 3M intervals. All twelve families run with
-end-sorted, reverse and shuffled orders: disjoint, common intersection, sparse random
-overlap, dense random overlap, nested, touching, staircase/path overlap, identical,
-equal ends, equal starts, random unit length, and very wide. Equal-end and identical
-families remain end-sorted after reversal/shuffling. They exercise the fast path in all
-orders. Random reversed data may have tied ends, which also affects standard-library
-sort behavior.
+<span id="historical-validation"></span>
 
-Int64 covers the full matrix. Date's i32 physical kernel additionally covers
-disjoint/dense/identical families in all sizes/orders. Datetime has the same i64 kernel
-as Int64, so its huge core matrix is not repeated. The actual installed release wheel
-measures Int64, Date and default microsecond Datetime on all five sizes,
-disjoint/dense/identical families and sorted/shuffled orders. Native totals include lazy
-collection, plugin dispatch, validation, physical adaptation and logical list
-construction. These temporal workloads are regular interval families with explicit
-packing certificates. The core random dense family differs.
+## Reproduce and data
 
-### Independent correctness checks
-
-Before recording times, each exact candidate is checked for coverage, strictly
-increasing output and optimum cardinality. Large workloads use an independent
-right-to-left maximum packing oracle: sort starts descending and accept an interval only
-when its end does not cross the last accepted start. This oracle never computes stabbing
-points. Each temporal benchmark checks every interval against its first candidate point
-using an as-of join, and compares cardinality to a disjoint-packing certificate for that
-family.
-
-Small-instance tests enumerate subsets of **all integer coordinates** between the
-minimum start and maximum end, not just predecessors of ends. A second oracle enumerates
-subsets of intervals and checks every pair for disjointness. The benchmark cross-checks
-both oracles on 256 small cases before running any timing.
-
-The core has named regression tests for empty/single inputs, excluded touching
-boundaries and chains, common intersections, duplicates, nesting and separated
-components, disjoint intervals, the broad-first greedy counterexample, equal ends,
-signed/unsigned limits and original-index errors. Seven proptest tests run 512 cases
-each. The main generator directly produces 0–8 non-empty intervals in [-5,7]. Separate
-generators inject empties, common points and disjointness. They cover all fourteen
-requested properties: coverage, brute-force optimum, packing duality, sorted uniqueness,
-determinism, permutation, translation, duplicates, added constraints, separated union,
-common-point/disjoint cases, empty infeasibility, and predecessor-of-an-end as an
-additional invariant.
-
-Python tests exercise the installed native plugin, eager/lazy select, groups, window
-list broadcasting, chunks, expressions, empty collections, all supported integer widths,
-extreme values, Date, all three Datetime units and UTC/Helsinki metadata. Nanosecond
-correctness is checked using physical values, avoiding Python datetime's microsecond
-precision. Rust Polars tests also verify the list dtype and chunk adaptation. The
-production Python wrapper contains no solver.
-
-## Reproduce
-
-| File | Role |
-| --- | --- |
-| [`minimum_stabbing_points.rs`](https://github.com/jplauri/polars-intervals/blob/master/crates/intervals-core/benches/minimum_stabbing_points.rs) | Run Rust candidate comparisons |
-| [`stabbing_summary.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/stabbing_summary.py) | Summarize the recorded core and temporal CSVs |
-| [`stabbing_temporal.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/stabbing_temporal.py) | Time installed release-wheel integer and temporal queries |
-| [`plot.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/plot.py) | Generate figures and tables from saved samples |
-
-Run optimized builds only, with no concurrent compilation or other benchmark:
+<details markdown="1">
+<summary>Operation-specific commands</summary>
 
 ```sh
 cargo bench -p intervals-core --bench minimum_stabbing_points --locked > benchmarks/results/stabbing-local.csv
-uv build --wheel --sdist --out-dir target/stabbing-dist --config-setting build-args=--locked
-```
-
-Install the wheel and Polars in an isolated environment outside the checkout, then run
-its Python with `-I` and an external working directory:
-
-```sh
 python -I /path/to/checkout/benchmarks/stabbing_temporal.py > stabbing-temporal-local.csv
-```
-
-Keep the new temporal CSV under a separate local filename in `benchmarks/results/`. The
-summary script reads the published filenames. Use the shared chart configuration to
-select a separately named local run.
-
-To summarize the existing published runs:
-
-```sh
 uv run --no-sync python benchmarks/stabbing_summary.py
 ```
 
-## Limitations
-
-Peak memory means live requested heap bytes and allocation/reallocation counts in a
-separate invocation, excluding caller inputs, verification, stack, allocator metadata
-and OS RSS. These are core measurements, not process-wide plugin memory.
-
-Candidate comparisons cover Rust implementations. The release-wheel timings measure
-the plugin without a native Polars baseline.
-
-These are synthetic results from one Windows host. Three samples do not establish
-significance for small percentage differences. Candidate phase clocks add overhead that
-the production call does not have.
-
-## Raw data
-
-Raw samples and environment details are in [core
-CSV](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-windows.csv),
-[release-wheel
-CSV](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-temporal-windows.csv),
-and [environment
-metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json).
-The summary script calculates medians directly from these files.
-
-<details markdown="1" id="historical-validation">
-<summary>Validation at the recorded revision</summary>
-
-- `cargo fmt --check`, `cargo test --workspace --locked` (125 tests/doctests),
-  `cargo clippy --workspace --all-targets --locked -- -D warnings` and strict
-  `cargo doc --workspace --no-deps --locked`: passed.
-- `uv lock --check`, `uv run --locked ruff check .` and
-  `uv run --locked ruff format --check .`: passed.
-- `uv run --locked pytest --doctest-modules python/polars_intervals tests`:
-  1,295 passed. The same 1,295 passed against the release wheel from an external
-  environment and working directory with Python `-I`.
-- All 49 CI/release helper tests and
-  `uv run --locked --isolated --only-group docs mkdocs build --strict`: passed.
-- Local wheel/sdist metadata, license, typing marker, native library, Rust source,
-  lockfile and pinned toolchain audits, and Twine strict checks: passed.
-
-Local Rust tests needed the project Python interpreter in `PYO3_PYTHON` and its base
-installation on `PATH` so Windows could locate the Python DLL. This is a
-test-environment setup requirement, not a package dependency change.
-
-These synthetic results describe one Windows x86-64 host, not a cross-platform speed
-guarantee. Only the local CPython 3.14 Windows wheel is exercised here. The complete
-15-wheel release matrix remains a CI check.
+`STABBING_BENCH_MAX` and `STABBING_BENCH_SAMPLES` restrict the core run.
+Run the temporal command with the installed release wheel's Python from outside
+the checkout; the summary command reads the published files.
 
 </details>
+
+[Setup, metrics and publishing](benchmarking.md) ·
+[Core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-windows.csv) ·
+[Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-temporal-windows.csv) ·
+[Metadata and historical validation](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json) ·
+[Design notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#minimum-stabbing-points)

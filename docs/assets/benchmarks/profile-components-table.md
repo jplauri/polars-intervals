@@ -1,0 +1,9 @@
+**Rust runtime (ms) · medians**
+
+| Workload | Input rows | Production | Forced serial components | Forced eight workers |
+| --- | ---: | ---: | ---: | ---: |
+| 32-job components, 16 profile segments | 1,000 | 0.62 | 0.648 | 0.714 |
+| 32-job components, 16 profile segments | 10,000 | 5.74 | 6.02 | 2.25 |
+| 32-job components, 16 profile segments | 1,000,000 | 226 | 671 | 217 |
+
+[Exact values, sample ranges and counts](assets/benchmarks/profile-components-table.csv) · [Source samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-core.csv).
