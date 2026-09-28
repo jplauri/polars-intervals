@@ -9,23 +9,17 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
 import json
-import os
-import platform
 import random
-import subprocess
-import sys
 from collections import defaultdict
-from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter_ns
 
 import polars as pl
 import polars_intervals as pi
 from polars_intervals import _internal
+from provenance import ROOT, environment, sha256
 
-ROOT = Path(__file__).resolve().parents[1]
 # Focused workload matrix, not a Cartesian product. Group IDs are interleaved.
 CASES = [
     ("low8", "sorted", "i64", 1, 1, "auto"),
@@ -40,15 +34,6 @@ CASES = [
     ("low8", "shuffled", "i64", 32, 7, "auto"),
     ("repeated", "shuffled", "date", 32, 1, "streaming"),
 ]
-
-
-def digest(path):
-    with Path(path).open("rb") as source:
-        return hashlib.file_digest(source, "sha256").hexdigest()
-
-
-def command(*args):
-    return subprocess.check_output(args, cwd=ROOT, text=True).strip()
 
 
 def fixture(n, case, seed):
@@ -161,7 +146,7 @@ def main():
         for name in ("polars_intervals.dll", "libpolars_intervals.so", "libpolars_intervals.dylib")
     ]
     release = args.release_library or next((p for p in libraries if p.exists()), None)
-    if release is None or digest(native) != digest(release):
+    if release is None or sha256(native) != sha256(release):
         parser.error("Installed plugin does not match Cargo release library; rebuild release first")
     native_inputs = [ROOT / name for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml")]
     for crate in (ROOT / "crates").iterdir():
@@ -177,28 +162,15 @@ def main():
         parser.error("Need nonnegative sizes and positive sample/warmup counts")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     metadata = {
-        "timestamp_utc": datetime.now(UTC).isoformat(),
-        "command": sys.argv,
-        "platform": platform.platform(),
-        "cpu": platform.processor(),
-        "logical_cpus": os.cpu_count(),
-        "python": sys.version,
-        "polars": pl.__version__,
-        "rustc": command("rustc", "-Vv"),
-        "revision": command("git", "rev-parse", "HEAD"),
-        "thread_settings": {
-            key: os.getenv(key)
-            for key in ("POLARS_MAX_THREADS", "RAYON_NUM_THREADS", "CARGO_BUILD_JOBS")
-        },
-        "polars_thread_pool": pl.thread_pool_size(),
-        "native_sha256": digest(native),
+        **environment(),
+        "native_sha256": sha256(native),
         "release_library": str(release),
-        "release_sha256": digest(release),
+        "release_sha256": sha256(release),
         "native_input_sha256": {
-            str(path.relative_to(ROOT)): digest(path) for path in sorted(native_inputs)
+            str(path.relative_to(ROOT)): sha256(path) for path in sorted(native_inputs)
         },
         "source_sha256": {
-            str(p.relative_to(ROOT)): digest(p)
+            str(p.relative_to(ROOT)): sha256(p)
             for p in [
                 ROOT / "benchmarks/max_weight_clique.py",
                 ROOT / "crates/intervals-core/src/clique.rs",
@@ -283,7 +255,7 @@ def main():
                             )
                             count += 1
                     output.flush()
-    metadata.update(status="completed", timing_samples=count, timing_sha256=digest(timing_path))
+    metadata.update(status="completed", timing_samples=count, timing_sha256=sha256(timing_path))
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(f"Saved {count} samples to {timing_path}")
 

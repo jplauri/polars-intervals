@@ -1,13 +1,8 @@
 """Containment integration and native Polars baselines; see containment.md."""
 
 import argparse
-import hashlib
 import json
-import os
-import platform
 import random
-import subprocess
-from datetime import UTC, datetime
 from pathlib import Path
 from statistics import median
 from time import perf_counter_ns
@@ -15,6 +10,7 @@ from time import perf_counter_ns
 import polars as pl
 import polars_intervals as pi
 from polars.testing import assert_frame_equal
+from provenance import environment, sha256
 
 SCENARIOS = [
     "disjoint",
@@ -293,18 +289,7 @@ def main():
     check_baselines()
     report = {
         "environment": {
-            "timestamp_utc": datetime.now(UTC).isoformat(),
-            "platform": platform.platform(),
-            "python": platform.python_version(),
-            "polars": pl.__version__,
-            "logical_cpus": os.cpu_count(),
-            "processor": platform.processor(),
-            "polars_threads": pl.thread_pool_size(),
-            "rustc": subprocess.check_output(["rustc", "-Vv"], text=True),
-            "git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
-            "git_dirty": bool(
-                subprocess.check_output(["git", "status", "--porcelain"], text=True).strip()
-            ),
+            **environment(),
             "engine": "in-memory",
             "kernel_profile": "release",
             "plugin_path": pi.__file__,
@@ -313,7 +298,7 @@ def main():
             "methods": args.methods,
             "seed": 42,
             "source_sha256": {
-                str(path): hashlib.sha256(path.read_bytes()).hexdigest()
+                str(path): sha256(path)
                 for path in [
                     Path(__file__),
                     Path("crates/intervals-core/src/containment.rs"),
