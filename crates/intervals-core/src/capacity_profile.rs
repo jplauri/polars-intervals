@@ -188,16 +188,16 @@ where
     i128: From<C>,
 {
     if starts.len() != ends.len() {
-        return Err(IntervalError::ProfileLengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("profile starts", starts.len()),
+            ("profile ends", ends.len()),
+        ]));
     }
     if starts.len() != capacities.len() {
-        return Err(IntervalError::CapacityLengthMismatch {
-            segments_len: starts.len(),
-            capacities_len: capacities.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("profile segments", starts.len()),
+            ("capacities", capacities.len()),
+        ]));
     }
     let mut packed = Vec::with_capacity(starts.len());
     for (index, ((&start, &end), &capacity)) in starts.iter().zip(ends).zip(capacities).enumerate()

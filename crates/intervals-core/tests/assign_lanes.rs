@@ -82,10 +82,10 @@ fn validation_uses_original_indices() {
     for (starts, ends) in [(&[1][..], &[][..]), (&[][..], &[1][..])] {
         assert_eq!(
             assign_lanes(starts, ends),
-            Err(IntervalError::LengthMismatch {
-                starts_len: starts.len(),
-                ends_len: ends.len(),
-            })
+            Err(IntervalError::LengthMismatch([
+                ("starts", starts.len()),
+                ("ends", ends.len())
+            ]))
         );
     }
 }

@@ -140,18 +140,15 @@ fn integer_boundaries_and_generic_endpoints() {
 fn validation_and_error_messages() {
     assert_eq!(
         solve(&[1], &[], &[0]),
-        Err(IntervalError::LengthMismatch {
-            starts_len: 1,
-            ends_len: 0
-        })
+        Err(IntervalError::LengthMismatch([("starts", 1), ("ends", 0)]))
     );
     for w in [vec![], vec![1, 2]] {
         assert_eq!(
             solve(&[1], &[2], &w),
-            Err(IntervalError::WeightLengthMismatch {
-                intervals_len: 1,
-                weights_len: w.len(),
-            })
+            Err(IntervalError::LengthMismatch([
+                ("intervals", 1),
+                ("weights", w.len())
+            ]))
         );
     }
     assert_eq!(
@@ -160,12 +157,9 @@ fn validation_and_error_messages() {
     );
     assert!(IntervalError::WeightOverflow.to_string().contains("i128"));
     assert!(
-        IntervalError::WeightLengthMismatch {
-            intervals_len: 1,
-            weights_len: 2
-        }
-        .to_string()
-        .contains("1 intervals, 2 weights")
+        IntervalError::LengthMismatch([("intervals", 1), ("weights", 2)])
+            .to_string()
+            .contains("1 intervals, 2 weights")
     );
 }
 

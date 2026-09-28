@@ -112,10 +112,10 @@ fn invalid_interval_and_lengths() {
     for (s, e) in [(vec![1], vec![]), (vec![], vec![1])] {
         assert_eq!(
             minimum_stabbing_points(&s, &e),
-            Err(IntervalError::LengthMismatch {
-                starts_len: s.len(),
-                ends_len: e.len()
-            })
+            Err(IntervalError::LengthMismatch([
+                ("starts", s.len()),
+                ("ends", e.len())
+            ]))
         );
     }
 }

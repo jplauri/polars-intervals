@@ -195,7 +195,7 @@ fn validates_before_all_early_returns() {
     for budget in [0, 1, 100_000] {
         assert!(matches!(
             assign_balanced_lanes(&[1], &[], None, budget),
-            Err(IntervalError::LengthMismatch { .. })
+            Err(IntervalError::LengthMismatch(_))
         ));
         assert_eq!(
             assign_balanced_lanes(&[9, 0, 5, 3], &[10, 0, 4, 2], None, budget),
@@ -203,7 +203,7 @@ fn validates_before_all_early_returns() {
         );
         assert!(matches!(
             assign_balanced_lanes::<i32>(&[], &[], Some(&[0]), budget),
-            Err(IntervalError::LaneLengthMismatch { .. })
+            Err(IntervalError::LengthMismatch([_, ("lanes", _)]))
         ));
         assert!(matches!(
             assign_balanced_lanes(&[0], &[0], Some(&[u32::MAX]), budget),

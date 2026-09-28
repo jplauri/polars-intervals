@@ -370,20 +370,17 @@ fn validates_all_rows_before_fast_paths_and_optimization() {
         Err(IntervalError::InvalidInterval { index: 2 })
     );
     for (s, e) in [(&[1][..], &[][..]), (&[][..], &[1][..])] {
-        let error = IntervalError::LengthMismatch {
-            starts_len: s.len(),
-            ends_len: e.len(),
-        };
+        let error = IntervalError::LengthMismatch([("starts", s.len()), ("ends", e.len())]);
         assert_eq!(max_weight_clique(s, e, &[1]), Err(error));
         assert_eq!(max_clique(s, e), Err(error));
     }
     for w in [vec![], vec![1, 2]] {
         assert_eq!(
             max_weight_clique(&[0], &[1], &w),
-            Err(IntervalError::WeightLengthMismatch {
-                intervals_len: 1,
-                weights_len: w.len()
-            })
+            Err(IntervalError::LengthMismatch([
+                ("intervals", 1),
+                ("weights", w.len())
+            ]))
         );
     }
     assert!(
@@ -393,12 +390,9 @@ fn validates_all_rows_before_fast_paths_and_optimization() {
     );
     assert!(IntervalError::WeightOverflow.to_string().contains("i128"));
     assert!(
-        IntervalError::WeightLengthMismatch {
-            intervals_len: 1,
-            weights_len: 2
-        }
-        .to_string()
-        .contains("1 intervals, 2 weights")
+        IntervalError::LengthMismatch([("intervals", 1), ("weights", 2)])
+            .to_string()
+            .contains("1 intervals, 2 weights")
     );
 }
 

@@ -160,10 +160,10 @@ fn validate_coloring<T: Ord + Copy>(
     minimum: usize,
 ) -> Result<(), IntervalError> {
     if starts.len() != lanes.len() {
-        return Err(IntervalError::LaneLengthMismatch {
-            intervals_len: starts.len(),
-            lanes_len: lanes.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("intervals", starts.len()),
+            ("lanes", lanes.len()),
+        ]));
     }
     // Check before any maximum-label-indexed allocation: scratch is at most n.
     for (index, &lane) in lanes.iter().enumerate() {

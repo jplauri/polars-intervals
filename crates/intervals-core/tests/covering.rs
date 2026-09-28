@@ -196,10 +196,7 @@ fn validation_and_overflow() {
     );
     assert_eq!(
         minimum_cover(&[1], &[], 0, 1),
-        Err(IntervalError::LengthMismatch {
-            starts_len: 1,
-            ends_len: 0
-        })
+        Err(IntervalError::LengthMismatch([("starts", 1), ("ends", 0)]))
     );
     assert_eq!(
         minimum_cover(&[0], &[1], 2, 1),
@@ -215,10 +212,10 @@ fn validation_and_overflow() {
     );
     assert_eq!(
         minimum_cost_cover(&[0], &[1], &[] as &[i32], 0, 1),
-        Err(IntervalError::CostLengthMismatch {
-            intervals_len: 1,
-            costs_len: 0
-        })
+        Err(IntervalError::LengthMismatch([
+            ("intervals", 1),
+            ("costs", 0)
+        ]))
     );
     assert_eq!(
         minimum_cost_cover(&[0, 1], &[1, 2], &[i128::MAX, 1], 0, 2),

@@ -128,10 +128,10 @@ fn length_mismatch_precedes_interval_validation() {
     ] {
         assert_eq!(
             containment_counts(s, e),
-            Err(IntervalError::LengthMismatch {
-                starts_len: s.len(),
-                ends_len: e.len()
-            })
+            Err(IntervalError::LengthMismatch([
+                ("starts", s.len()),
+                ("ends", e.len())
+            ]))
         );
     }
 }

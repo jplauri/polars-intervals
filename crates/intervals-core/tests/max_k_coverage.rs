@@ -103,10 +103,7 @@ fn unsigned_extremes_and_validation() {
         );
         assert_eq!(
             max_k_coverage(&[0], &[], k),
-            Err(IntervalError::LengthMismatch {
-                starts_len: 1,
-                ends_len: 0
-            })
+            Err(IntervalError::LengthMismatch([("starts", 1), ("ends", 0)]))
         );
     }
 }

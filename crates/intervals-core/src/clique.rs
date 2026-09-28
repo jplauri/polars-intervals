@@ -119,8 +119,7 @@ where
 ///
 /// # Errors
 ///
-/// Returns [`IntervalError::LengthMismatch`] or
-/// [`IntervalError::WeightLengthMismatch`] for unequal lengths,
+/// Returns [`IntervalError::LengthMismatch`] for unequal lengths,
 /// [`IntervalError::InvalidInterval`] for the first reversed original row
 /// (even if its weight is nonpositive), or [`IntervalError::WeightOverflow`]
 /// if a clique objective cannot be represented in `i128`. All rows are
@@ -148,10 +147,10 @@ where
 {
     validate_lengths(starts, ends)?;
     if starts.len() != weights.len() {
-        return Err(IntervalError::WeightLengthMismatch {
-            intervals_len: starts.len(),
-            weights_len: weights.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("intervals", starts.len()),
+            ("weights", weights.len()),
+        ]));
     }
     let (mut count, mut singleton) = (0, None);
     let mut singleton_weight = 0i128;

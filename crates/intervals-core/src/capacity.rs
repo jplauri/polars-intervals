@@ -168,10 +168,10 @@ where
 {
     validate_lengths(starts, ends)?;
     if starts.len() != weights.len() {
-        return Err(IntervalError::WeightLengthMismatch {
-            intervals_len: starts.len(),
-            weights_len: weights.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("intervals", starts.len()),
+            ("weights", weights.len()),
+        ]));
     }
     let mut mask = vec![false; starts.len()];
     let mut rows = Vec::new();

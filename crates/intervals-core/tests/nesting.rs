@@ -180,10 +180,10 @@ fn lengths_must_match_before_validating_intervals() {
     ] {
         assert_eq!(
             nesting_depths(starts, ends),
-            Err(IntervalError::LengthMismatch {
-                starts_len: starts.len(),
-                ends_len: ends.len(),
-            })
+            Err(IntervalError::LengthMismatch([
+                ("starts", starts.len()),
+                ("ends", ends.len())
+            ]))
         );
     }
 }
