@@ -54,6 +54,7 @@ nav:
       - Lane assignment: assign-lanes-benchmarks.md
       - Lane balancing: balance-lanes-benchmarks.md
       - Weighted scheduling: weighted-scheduling-benchmarks.md
+      - Maximum-weight clique: clique-benchmarks.md
       - Capacity scheduling: capacity-scheduling-benchmarks.md
       - Capacity profiles: capacity-profile-benchmarks.md
       - Minimum covering: covering-benchmarks.md

@@ -35,6 +35,24 @@ release plugin. Summary and plotting scripts only read saved results.
 
 Rust candidate runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
 
+The maximum-weight clique runner is `cargo bench -p intervals-core --bench
+max_weight_clique --locked`. It compares the actual production functions with
+private event, separate-stream, heap and small quadratic candidates, including
+unit-weight paths and separate allocator measurements. See the
+[clique report](../docs/clique-benchmarks.md) and [correctness notes](clique-notes.md).
+[`max_weight_clique.py`](max_weight_clique.py) times complete Polars collections
+with numeric/temporal, grouped and multichunk fixtures. After the documented
+release rebuild, run:
+
+```sh
+uv run --no-sync python benchmarks/max_weight_clique.py --output benchmarks/results/clique-polars-new
+```
+
+The runner checks that the installed native extension matches the local Cargo
+release library, records hashes and environment metadata, preserves existing
+results, and rotates unit/explicit-unit/positive/mixed-weight measurements.
+Use `--sizes`, `--seeds`, `--samples`, and `--warmups` for focused repeat runs.
+
 The lane-balancing core runner uses `cargo bench -p intervals-core --bench
 balance_lanes --locked`. Set `BALANCE_CSV` and `BALANCE_QUALITY_CSV` to new
 absolute output paths (Cargo runs inside the crate directory);

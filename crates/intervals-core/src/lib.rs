@@ -7,6 +7,7 @@
 //! [`assign_lanes`] assigns intervals to the minimum number of lanes.
 //! [`assign_balanced_lanes`] constructs or improves lane row-count balance.
 //! [`max_weight_non_overlapping`] selects an exact maximum-weight schedule.
+//! [`max_weight_clique`] and [`max_clique`] select one exact maximum clique.
 //! [`minimum_cover`] and [`minimum_cost_cover`] cover one continuous target exactly.
 //! [`minimum_stabbing_points`] hits every discrete interval with the fewest points.
 
@@ -27,6 +28,8 @@ pub use balance::{
 };
 mod weighted;
 pub use weighted::max_weight_non_overlapping;
+mod clique;
+pub use clique::{max_clique, max_weight_clique};
 mod capacity;
 pub use capacity::max_weight_with_capacity;
 mod capacity_profile;

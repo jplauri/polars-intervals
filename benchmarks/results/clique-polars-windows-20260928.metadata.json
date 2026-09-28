@@ -1,0 +1,166 @@
+{
+  "timestamp_utc": "2026-09-28T17:33:45.760371+00:00",
+  "command": [
+    "benchmarks/max_weight_clique.py",
+    "--output",
+    "benchmarks/results/clique-polars-windows-20260928"
+  ],
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+  "logical_cpus": 24,
+  "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+  "polars": "1.44.2",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+  "revision": "023174dfc50bef6993dd225f125064ba64fab07d",
+  "thread_settings": {
+    "POLARS_MAX_THREADS": "1",
+    "RAYON_NUM_THREADS": null,
+    "CARGO_BUILD_JOBS": "2"
+  },
+  "polars_thread_pool": 1,
+  "native_sha256": "9b65cabcf79cc4199c1d0792be889554e6792b5f13e752c164a9dce8e2189765",
+  "release_library": "D:\\polars-intervals\\target\\release\\polars_intervals.dll",
+  "release_sha256": "9b65cabcf79cc4199c1d0792be889554e6792b5f13e752c164a9dce8e2189765",
+  "native_input_sha256": {
+    "Cargo.lock": "a895f6e69f7a89c8a0743173dd0c073f3e4fc11a1522709f862a250b28ae6b2c",
+    "Cargo.toml": "f9aa1b57de86ef9b31d9c8a1f556f97880133264239deacad738bd10182964af",
+    "crates\\intervals-core\\Cargo.toml": "f97bf330e130ff4dafa1ebac514fc250208d9cb7626e38d3e79a74afa4ec4f0c",
+    "crates\\intervals-core\\src\\balance.rs": "d6d8336d9463d54c2287e0fd672c042eeda4db351f146e0d623e5cd084fcd323",
+    "crates\\intervals-core\\src\\capacity.rs": "ff68400bc227ed60e17abfdeb4047c3da4ea817dd628eb464b5b744e99cb2890",
+    "crates\\intervals-core\\src\\capacity_profile.rs": "a00504174a326c1f90326c2a6962b6de922009fd0814adefd4d14875fc38125d",
+    "crates\\intervals-core\\src\\clique.rs": "1382b4d89820700df37cf95cfc5d1d72909ebeec1c89bfd5deddb2ff27603c8a",
+    "crates\\intervals-core\\src\\containment.rs": "83104f9c157cdb45e084b1adbd1c83943f983ca0254ffdbf304a1d244e82bc13",
+    "crates\\intervals-core\\src\\cover.rs": "9128ac972f0b55d297c72ed262bd02e22f88038750d3b8bac33a99975f9051d9",
+    "crates\\intervals-core\\src\\coverage.rs": "3af72ad0d3b7b7cbbf54aa79db38a3533a35e989a8430b9f027d2f4e1f4ec07e",
+    "crates\\intervals-core\\src\\lanes.rs": "af289c1add48cfd6be7255bf7c7d23d58621c2dd9c939c0a59f822d03384b754",
+    "crates\\intervals-core\\src\\lib.rs": "8fe7e3c9cf90f670843b4a67bac506e029d8f300d74f7f61d5defacb6f1fb75d",
+    "crates\\intervals-core\\src\\nesting.rs": "d9f1767744e10301af4d7a69786bdbd55cd58ce8e2f0d59e96bf5e4be1a96f56",
+    "crates\\intervals-core\\src\\stabbing.rs": "6a4771542535cac24c7852171384257845cffad6e1771d860dc9cac7944a9d19",
+    "crates\\intervals-core\\src\\weighted.rs": "ab8e0d3a3b182054438eb0825665756b917b5afc5696990b2d151a33e2f010f5",
+    "crates\\polars-intervals\\Cargo.toml": "ccbb9cbc09ddc1309de685b9967f8e9f79018fd3aeb15a1dff5202e272ef9cf8",
+    "crates\\polars-intervals\\src\\cover.rs": "33212bca8b245864d65cfed6062c81e65df8676315b4b0aa8880db13799c5c1d",
+    "crates\\polars-intervals\\src\\lib.rs": "b8abfddae4a9990894564d912e4881e9cbb70150d88a61c3fe1c8ec47fe1f0eb",
+    "crates\\polars-intervals\\src\\profile.rs": "cc608db5987ff5368fadee5ec045efe8e4eaef742134dec8e6da4e2893819f9e",
+    "rust-toolchain.toml": "86810d0ace88a635a96ed7a8d7d432afa6950c0c0b99f78f6e905ed9616a9882"
+  },
+  "source_sha256": {
+    "benchmarks\\max_weight_clique.py": "c57bfae65da92e7e369559c030259e7964fada041be4ee382ca6e07697f9b382",
+    "crates\\intervals-core\\src\\clique.rs": "1382b4d89820700df37cf95cfc5d1d72909ebeec1c89bfd5deddb2ff27603c8a",
+    "crates\\polars-intervals\\src\\lib.rs": "b8abfddae4a9990894564d912e4881e9cbb70150d88a61c3fe1c8ec47fe1f0eb",
+    "python\\polars_intervals\\__init__.py": "267aeac599c1bd0345961c93f816ad80dfda128a972080da9d5ea5688af1efa6",
+    "Cargo.lock": "a895f6e69f7a89c8a0743173dd0c073f3e4fc11a1522709f862a250b28ae6b2c",
+    "uv.lock": "397fa2f0a8e4275ba5f1543441ad7ecb4e2b65a5c8beb598f7ec7249cbbe5002"
+  },
+  "sizes": [
+    0,
+    8,
+    64,
+    1000,
+    10000,
+    100000,
+    1000000
+  ],
+  "seeds": [
+    42,
+    137
+  ],
+  "samples": 5,
+  "warmups": 2,
+  "cases": [
+    [
+      "low8",
+      "sorted",
+      "i64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "low8",
+      "shuffled",
+      "i64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "disjoint",
+      "shuffled",
+      "u64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "nested",
+      "reverse",
+      "i64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "clique",
+      "shuffled",
+      "date",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "repeated",
+      "shuffled",
+      "datetime_us",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "low8",
+      "shuffled",
+      "datetime_ns_utc",
+      1,
+      7,
+      "streaming"
+    ],
+    [
+      "empty",
+      "sorted",
+      "i64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "mixed_empty",
+      "shuffled",
+      "i64",
+      1,
+      7,
+      "auto"
+    ],
+    [
+      "low8",
+      "shuffled",
+      "i64",
+      32,
+      7,
+      "auto"
+    ],
+    [
+      "repeated",
+      "shuffled",
+      "date",
+      32,
+      1,
+      "streaming"
+    ]
+  ],
+  "scope": "Prepared lazy query collect: optimization, plugin validation/extraction, algorithm, Boolean output. Fixture and expression construction, output checks and destruction excluded.",
+  "verification": "Independent Python exact event objective per group, positive-only mask, length/dtype/null checks and linear common-intersection feasibility; repeated masks checked outside timing.",
+  "memory": "Not measured in Python; Rust runner separately measures requested live heap.",
+  "chunks": "Requested split target, not actual chunk count. Per-column steps are max(1, n // target + column_index), yielding different boundaries/counts; zero-row inputs remain empty.",
+  "status": "completed",
+  "timing_samples": 3080,
+  "timing_sha256": "d85e9585ecf1f29e052f3eda1cc6dcef4ff73529f910873f6e8d830f1998c7c8"
+}
