@@ -1,9 +1,9 @@
 # Benchmarks
 
-See the [benchmark overview](../docs/benchmarks.md) for results and plots.
+See the [benchmark overview](../docs/benchmarks.md) for compact results tables.
 
 [Running and publishing benchmarks](../docs/benchmarking.md) covers setup,
-plot generation, and adding benchmarks.
+table/plot generation, and the four-section checklist for adding an operation.
 
 ## Python scripts
 
@@ -28,7 +28,7 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`covering_temporal.py`](covering_temporal.py) | End-to-end benchmark | Integer/temporal covering fixtures → raw timing CSV on stdout | [Covering](../docs/covering-benchmarks.md), [cost covering](../docs/cost-covering-benchmarks.md) |
 | [`stabbing_summary.py`](stabbing_summary.py) | Report generator | Recorded core and optional temporal CSVs in `results/` → median/ratio tables on stdout | [Stabbing points](../docs/stabbing-benchmarks.md) |
 | [`stabbing_temporal.py`](stabbing_temporal.py) | End-to-end benchmark | Integer/temporal fixtures → raw timing CSV on stdout | [Stabbing points](../docs/stabbing-benchmarks.md) |
-| [`plot.py`](plot.py) | Shared figure generator | [`plots.toml`](plots.toml) and saved CSV/JSON → SVG, plotted CSV and Markdown tables | [Plot workflow](../docs/benchmarking.md#generate-plots) |
+| [`plot.py`](plot.py) | Shared report generator | [`plots.toml`](plots.toml) and saved CSV/JSON → compact Markdown tables, exact summary CSV, optional SVG | [Reporting workflow](../docs/benchmarking.md#generate-plots) |
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Plot workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust candidate runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
@@ -157,7 +157,7 @@ uv run --locked --only-group dev ruff format --check benchmarks
 uv run --locked --only-group dev python -m unittest discover -s benchmarks -p "test_generate_interval_graphs.py"
 ```
 
-## Regenerate all figures
+## Regenerate tables and optional plots
 
 ```sh
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
@@ -166,4 +166,10 @@ uv run --locked --isolated --only-group docs mkdocs build --strict
 
 This reads saved measurements. It does not run benchmarks or compile Rust.
 Commit regenerated files in `docs/assets/benchmarks/` with the source/configuration
-change. The documentation CI build regenerates the figures before building the site.
+change. The documentation CI build regenerates the assets before building the site.
+
+Start a report from [report-template.md](report-template.md): Summary, Results,
+Coverage and limitations, Reproduce and data. Register a small representative
+table in [plots.toml](plots.toml), including important losses; a plot is optional.
+See the [adding an operation checklist](../docs/benchmarking.md#adding-an-operation)
+for scope lines, shared methodology, supporting notes, and navigation.

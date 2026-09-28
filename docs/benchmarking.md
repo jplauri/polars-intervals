@@ -1,52 +1,76 @@
 # Running and publishing benchmarks
 
-The [overview](benchmarks.md) links to one report per operation. Use those reports
-for workload-specific commands and the [script inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md)
-to distinguish benchmark runners from report generators.
+The [overview](benchmarks.md) links to results for every operation and describes
+the shared [hardware](benchmarks.md#hardware). Operation reports give commands,
+timing exceptions, and links to run-specific metadata. The
+[script inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md)
+distinguishes benchmark runners from report generators.
 
 ## Setup
 
 Follow the [source build prerequisites](contributing.md#build-from-source).
-Rust candidate benchmarks run with `cargo bench` and need neither Python nor
-the Polars plugin. Python end-to-end benchmarks need a release build:
+Rust candidate benchmarks use `cargo bench` without Python or the plugin.
+Python end-to-end benchmarks need a release build:
 
 ```sh
 uv sync --locked --reinstall-package polars-intervals --config-setting "build-args=--profile release"
 ```
 
-Then use `uv run --no-sync python ...` to preserve that build. Rebuild after
-changing Rust code or dependencies. For an external wheel measurement, install
-the release wheel into a separate environment and run its Python outside the
-checkout. Individual reports describe the recorded setup.
-
-Run benchmarks sequentially on an idle machine. Set `POLARS_MAX_THREADS` before
-starting Python to control parallelism, and restore it afterwards. Save new runs
-under new filenames rather than overwriting published measurements.
+Use `uv run --no-sync python ...` to preserve that build; rebuild after code or
+dependency changes. To measure an external wheel, install it in a separate
+environment and run its Python outside the checkout. Run benchmarks sequentially
+on an idle machine. Set `POLARS_MAX_THREADS` before starting Python, restoring it
+afterwards. Save new runs under new filenames.
 
 ## Measurement rules
 
-- **Correctness:** validate results outside timing against an independent oracle
-  or documented scalable cross-check. Check feasibility, dtype, and output order
-  where applicable. Tied optimal selections need not have identical masks.
-- **Timing:** report what the timed region includes. Core calls and complete
-  Polars collections are separate measurements. Exclude workload construction,
-  compilation, and correctness checks. Warm up, vary candidate order, and retain
-  every accepted sample. Summarize repeats within each workload before comparing
-  workloads. Do not pool different sizes, distributions, or machines.
-- **Memory:** name the metric and exclusions. Live buffer capacity, instrumented
-  requested heap bytes, and process RSS are distinct. Keep instrumented allocation
-  calls outside runtime measurement. An RSS high-water-mark increase is not an
-  exact allocation count.
-- **Evidence:** save raw samples, configuration, source revision/hashes, build
-  settings, environment, and explicit omissions in `benchmarks/results/`.
-  Repeat measurements before drawing conclusions. Preserve losing cases and
-  describe uncertainty from small sample counts or one-machine measurements.
+**Timing and warmup.** Rust core calls and complete Polars collections measure
+different scopes and must stay separate. Report whether validation, preprocessing,
+planning, output materialization, and destruction are timed. Workload construction,
+compilation, and correctness checks belong outside timing. Warm up before samples
+and vary candidate order where the harness supports it. Warmup/sample counts,
+thread settings, software versions, phase clocks, and allocator instrumentation
+differ between saved runs; the report's scope line and metadata describe what
+actually happened. These guidelines do not retroactively change historical runs.
 
-Existing reports document their historical measurement details, including
-exceptions such as candidate phase-clock overhead. These rules do not change
-what the saved runs measured.
+**Correctness.** Validate outside timing against an independent oracle or a
+documented cross-check. State which was used: agreement with another candidate,
+a deterministic-mask check, and an independent optimum oracle are different
+evidence. Check feasibility, dtype, and row order where applicable. Tied optimal
+selections need not have identical masks. Detailed test inventories belong in
+supporting notes or metadata.
+
+**Runtime summaries.** Use medians within one run, workload, size, method, and
+timing scope. Keep exact samples and min/max ranges accessible. Headline values
+use about three significant figures. Ranges describe observed samples; overlap
+is not a significance test, and a small median difference does not establish a
+reliable winner. Do not pool separate runs or unrelated workloads. If reporting
+relative runtime, define it as **candidate median / production median**:
+production is 1.0× and values above 1.0× mean slower. This ratio of medians is
+not a distribution of paired measurements. Identify the method whenever selecting
+the fastest baseline independently per case.
+
+**Limits and provenance.** Synthetic fixtures on one machine characterize those
+workloads, not every application or platform. Keep losses, skips, bounded
+baselines, and missing types visible. Preserve raw samples, environment, settings,
+revisions/source hashes, and historical evidence in `benchmarks/results/`.
+Discuss repeat runs separately, including meaningful variation or contradictions.
+
+### Memory metrics
+
+| Metric | What it means |
+| --- | --- |
+| Buffer capacity | Capacity of live algorithm buffers, often including output; excludes caller inputs, allocator bookkeeping, and RSS. Capacity accounting may exclude transient reallocations. |
+| Requested live heap | Peak bytes requested from an instrumented allocator during a separate untimed call. Includes the objects named by the harness, excluding allocator overhead, stack, and RSS. |
+| Process RSS | Resident memory for the whole process, including inputs and runtime. A query's high-water-mark increase is not an exact allocation count. Cold memory runs can differ from warmed timing runs. |
+
+Name the applicable metric and exclusions beside results. Allocation counts,
+buffer capacity, requested heap, and RSS cannot be substituted for one another.
 
 ## Generate plots
+
+The same command generates compact tables and optional plots from saved data;
+it never runs benchmark suites or builds Rust.
 
 ```sh
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
@@ -54,39 +78,25 @@ uv run --locked --isolated --only-group plots python -m unittest discover -s ben
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
-The `plots` dependency group contains only the tools needed to process and plot
-data. It does not build the plugin. The shared generator uses Polars to aggregate
-samples and Matplotlib to render static SVGs. The documentation CI runs its checks
-and regenerates figures before building the site. Checked-in figures also make
-ordinary local documentation builds possible without plotting dependencies.
-
-For each chart, `docs/assets/benchmarks/` contains:
-
-| File | Purpose |
-| --- | --- |
-| `<id>.svg` | Figure with title, workload, axes, method labels, medians and sample ranges |
-| `<id>.csv` | Exact plotted values: method, x, median, min, max and sample count |
-| `<id>.md` | Figure, caption, source/download links and an expandable table from the same values |
-
-Report pages include the generated Markdown with the same snippet syntax used
-elsewhere in the documentation. For example:
+The existing generator uses Polars aggregation and Matplotlib for optional SVGs.
+Documentation CI regenerates assets before its strict build. Commit generated
+`docs/assets/benchmarks/<id>.md` and `<id>.csv`; include `<id>.svg` only for a
+configured chart. Markdown snippets are excluded as standalone site pages:
 
 ```text
-;--8<-- "docs/assets/benchmarks/lanes-runtime.md"
+;--8<-- "docs/assets/benchmarks/overlap-headline.md"
 ```
 
-The Markdown fragments are excluded as standalone site pages. Commit all three
-generated files together. Use `--output PATH` to preview generated assets in a
-different directory, or `--config PATH` to use another chart configuration.
+CSV downloads retain exact medians, min/max, sample counts, and table workload
+dimensions. Missing measurements stay missing. Use `--output PATH` for a preview
+or `--config PATH` for another configuration.
 
-### Configure a chart
+### Configure a table or chart
 
 [`benchmarks/plots.toml`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/plots.toml)
-holds source column mappings and chart choices. Paths are relative to the
-repository root. New CSV sources need one row per recorded sample, a `sample`
-index, a size column, a method column, and numeric measurement columns. Existing
-column names can be mapped directly. The original overlap-count JSON has a small
-reader that flattens its `samples_ms`. It does not trust precomputed medians.
+holds source mappings and display choices. Each source is **one run**. CSV files
+need a sample index, size, method, and numeric measurement columns. The JSON
+reader flattens saved `samples_ms`, rather than trusting stored medians.
 
 ```toml
 [sources.example]
@@ -95,50 +105,54 @@ x = "n"
 method = "algorithm"
 dimensions = ["family", "order", "dtype"]
 
-[[charts]]
+[[tables]]
 id = "example-runtime"
 source = "example"
-title = "Example operation"
-scope = "Rust core"
 value = "ns"
 divisor = 1000000
 ylabel = "Runtime (ms)"
-filters = { family = "disjoint", order = "shuffled", dtype = "i64" }
-methods = { production = "Production", reference = "Reference" }
-caption = "Describe this workload, the recorded environment, and any omissions."
+methods = { production = "Heap (production)", reference = "Endpoint sweep" }
+cases = [
+  { label = "Shuffled disjoint Int64", sizes = [1000, 100000], filters = { family = "disjoint", order = "shuffled", dtype = "i64" } },
+]
 ```
 
-List every independent workload dimension in the source: geometry, order, dtype,
-weights, capacity, groups, seed, or any other factor that varies in that file.
-Exclude derived output statistics such as optimum objective and concurrency
-determined by the fixture. Every chart must fix all dimensions other than its
-x coordinate and method. Use a single source file per run. Add a separate chart
-for a repeat or another machine.
+List every independent workload dimension: geometry, order, dtype, weights,
+capacity, groups, seed, and any other varying input. Exclude derived output
+statistics. Each case fixes all dimensions other than size and method; use labels
+that make those choices understandable. Optional case `methods` selects a subset
+of the table's methods when a baseline is unavailable for that whole case.
+Unmeasured cells show a dash, never zero. Use separate tables for separate runs.
 
-The generator rejects missing filters, empty selections, duplicate sample keys,
-missing methods, negative measurements, warmup rows, and non-finite values.
-Omitted method/size combinations remain gaps rather than zeroes or interpolated
-measurements. It cannot discover dimensions omitted from the source declaration,
-so review that list when adding a source. The x coordinate must be a positive
-integer. Runtime charts also need positive values for their logarithmic y axis.
+The generator rejects unfixed dimensions, empty selections, duplicate sample
+keys, absent requested methods, negative or non-finite measurements, and warmup
+rows. It cannot discover a dimension omitted from the source declaration, so
+review that list. A requested size with no samples is an error; missing individual
+method/size combinations remain missing.
 
-For a memory chart, change `value`, `divisor`, `ylabel`, and set
-`yscale = "linear"`. For example, `buffer_bytes / 1048576` is MiB of live buffer
-capacity. Describe the measurement scope in the caption. A new temporal CSV can
-use `dtype` as its method/series column to compare dtypes within one workload.
+Plots are optional. Keep at most one per report, only when it clarifies scaling,
+a crossover, a substantial workload difference, or a runtime/memory tradeoff.
+A `[[charts]]` entry uses the same source/value/divisor/ylabel/methods, one
+`filters` mapping, plus `id`, `title`, `scope`, and `caption`. Runtime plots
+default to a logarithmic y axis and require positive values; memory plots use
+`yscale = "linear"`. Lines show medians and bands show sample ranges. Close
+comparisons usually belong in a table.
 
 ### Adding an operation
 
-1. Add the appropriate benchmark runner and correctness checks. Reuse an existing
-   harness when operations share fixtures. A new Python runner is not mandatory.
-2. Record samples and environment metadata, including cases skipped or not yet
-   measured. Keep raw reports in `benchmarks/results/`.
-3. Copy the [report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md)
-   into `docs/`. Keep its seven section headings and label missing coverage.
-4. Register the source and charts in `benchmarks/plots.toml`, generate the figures,
-   and include them under the report's Results section. Inspect the figures and
-   check their tables against the source samples.
-5. Add the operation to the overview table and the Benchmarks navigation in
-   `mkdocs.yml`. Add any new scripts to `benchmarks/README.md`.
-6. Run the reporting checks and strict documentation build above. Commit the
-   report, source data, chart configuration, and generated assets together.
+1. Reuse an appropriate runner and correctness checks; record samples, omissions,
+   and run metadata without overwriting historical evidence.
+2. Copy the [report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md)
+   into `docs/`. Keep **Summary → Results → Coverage and limitations → Reproduce
+   and data**, aiming for roughly 400–600 visible words without padding.
+3. Add source mappings and a small representative table to `plots.toml`, including
+   important production losses. Put end-to-end Polars results before separately
+   labelled Rust comparisons. Give each set a scope line and metadata link.
+4. Link shared methodology and hardware instead of repeating them. Put derivations
+   and experiment history in existing supporting notes where possible. Include
+   the operation command in a collapsed reproduction block.
+5. Add the page to both the overview and `mkdocs.yml`; update the script inventory
+   if needed. Preserve existing page URLs and repair affected links/anchors.
+6. Run generation, reporting tests, and the strict build above. Check source
+   agreement, generated assets, and representative wide/narrow rendered pages.
+   Commit the report, configuration, and generated assets together.

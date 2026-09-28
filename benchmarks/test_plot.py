@@ -4,9 +4,10 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import polars as pl
-from plot import load_samples, render, summarize
+from plot import load_samples, main, render, render_table, summarize, summarize_table
 
 
 class PlotTests(unittest.TestCase):
@@ -95,6 +96,128 @@ class PlotTests(unittest.TestCase):
                 load_samples(source, root), source, {**chart, "value": "ms", "divisor": 1}
             )
             self.assertEqual(csv_points.to_dicts(), json_points.to_dicts())
+
+            # JSON reports can name the size and method columns differently.
+            report = json.loads((root / "run.json").read_text(encoding="utf-8"))
+            report["results"][0]["n"] = report["results"][0].pop("rows")
+            (root / "run.json").write_text(json.dumps(report), encoding="utf-8")
+            source = {**source, "x": "n", "method": "algorithm"}
+            self.assertEqual(
+                summarize(
+                    load_samples(source, root), source, {**chart, "value": "ms", "divisor": 1}
+                ).to_dicts(),
+                csv_points.to_dicts(),
+            )
+
+    def test_table_preserves_workloads_and_missing_combinations(self):
+        table = {
+            **self.chart,
+            "methods": {"A": "Production", "B": "Baseline"},
+            "cases": [
+                {"label": "Dense", "filters": {"family": "dense"}, "sizes": [1000, 10000]},
+                {
+                    "label": "Sparse",
+                    "filters": {"family": "sparse"},
+                    "sizes": [1000],
+                    "methods": {"A": "Production"},
+                },
+            ],
+        }
+        points = summarize_table(self.samples, self.source, table)
+        markdown = render_table(points, self.source, table)
+        self.assertIn("| Workload | Input rows | Production | Baseline |", markdown)
+        self.assertIn("| Dense | 1,000 | 2 | 4 |", markdown)
+        self.assertIn("| Dense | 10,000 | 10 | — |", markdown)
+        self.assertIn("| Sparse | 1,000 | 999 | — |", markdown)
+        self.assertIn("Runtime (ms)", markdown)
+        self.assertNotIn(".svg", markdown)
+        self.assertEqual(points.height, 4)
+        self.assertEqual(
+            points.columns,
+            ["case", "workload_family", "method", "x", "median", "min", "max", "samples"],
+        )
+        self.assertEqual(points.row(0, named=True)["min"], 1.0)
+        self.assertEqual(points.row(0, named=True)["max"], 3.0)
+        self.assertEqual(points.row(0, named=True)["samples"], 2)
+        # Empty-input measurements outside the selected sizes are not table samples.
+        with_empty_input = pl.concat(
+            [
+                self.samples,
+                pl.LazyFrame(
+                    {"family": ["dense"], "n": [0], "method": ["A"], "ns": [0], "sample": [0]}
+                ),
+            ]
+        )
+        self.assertEqual(
+            summarize_table(with_empty_input, self.source, table).to_dicts(), points.to_dicts()
+        )
+        for case in (
+            {**table["cases"][0], "filters": {}},
+            {**table["cases"][0], "sizes": [123]},
+            {**table["cases"][0], "sizes": [1000, 123]},
+            {**table["cases"][0], "sizes": [1000, 1000]},
+            {**table["cases"][0], "methods": {"unknown": "Unknown"}},
+        ):
+            with self.subTest(case=case), self.assertRaises(ValueError):
+                summarize_table(self.samples, self.source, {**table, "cases": [case]})
+        with self.assertRaisesRegex(ValueError, "Duplicate samples"):
+            summarize_table(pl.concat([self.samples, self.samples]), self.source, table)
+        complete = {**table, "cases": [{**table["cases"][0], "sizes": [1000]}]}
+        self.assertNotIn("—", render_table(points, self.source, complete))
+
+    def test_table_preserves_method_as_workload_dimension(self):
+        samples = self.samples.with_columns(
+            pl.col("method").alias("dtype"), pl.lit("minimum_cover").alias("method")
+        )
+        source = {**self.source, "method": "dtype", "dimensions": ["family", "method"]}
+        table = {
+            **self.chart,
+            "cases": [
+                {
+                    "label": "Dense",
+                    "filters": {"family": "dense", "method": "minimum_cover"},
+                    "sizes": [1000, 10000],
+                }
+            ],
+        }
+        points = summarize_table(samples, source, table)
+        self.assertEqual(points["method"].to_list(), ["A", "A", "B"])
+        self.assertEqual(points["workload_method"].to_list(), ["minimum_cover"] * 3)
+        self.assertEqual(points["workload_family"].to_list(), ["dense"] * 3)
+        self.assertIn("| Dense | 1,000 | 2 | 4 |", render_table(points, source, table))
+
+    def test_table_only_config_writes_no_plot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            samples_path = root / "run.csv"
+            self.samples.collect().write_csv(samples_path)
+            config = root / "tables.toml"
+            config.write_text(
+                f'''[sources.example]
+path = "{samples_path.as_posix()}"
+dimensions = ["family"]
+x = "n"
+method = "method"
+[[tables]]
+id = "headline"
+source = "example"
+value = "ns"
+divisor = 1000000
+ylabel = "Runtime (ms)"
+methods = {{ A = "Production", B = "Baseline" }}
+cases = [{{ label = "Dense", sizes = [1000, 10000], filters = {{ family = "dense" }} }}]
+''',
+                encoding="utf-8",
+            )
+            output = root / "output"
+            with patch("sys.argv", ["plot.py", "--config", str(config), "--output", str(output)]):
+                main()
+            self.assertEqual(
+                {path.name for path in output.iterdir()}, {"headline.md", "headline.csv"}
+            )
+            saved = pl.read_csv(output / "headline.csv")
+            self.assertEqual(saved.height, 3)
+            self.assertEqual(saved.row(0, named=True)["median"], 2.0)
 
 
 if __name__ == "__main__":

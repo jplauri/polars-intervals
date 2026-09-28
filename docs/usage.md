@@ -42,8 +42,8 @@ The implementation uses the exact Li et al. offline dynamic program, not a
 greedy approximation. Worst-case time is `O(n log n + min(k,n)n)` and space
 is `O(n + min(k,n)n)`, with rolling objective rows and compact decisions.
 Validated zero/one budgets take `O(n)`; a sufficient budget uses a minimum
-full-union cover after sorting. See the [design and benchmarks](coverage-benchmarks.md)
-for proofs, literature citations, measured variants and memory scaling.
+full-union cover after sorting. See the [benchmarks and linked design notes](coverage-benchmarks.md)
+for measured variants, memory scaling, proofs, and literature citations.
 
 ## Count containment
 
@@ -189,7 +189,7 @@ share one query and update. Total time is `O(n log n)` and additional space is
 coordinate compression are needed. The production code uses the standard sort
 without an additional sorted-input scan.
 See the
-[algorithm design and measured candidate comparison](nesting-depth-benchmarks.md)
+[benchmarks and linked design notes](nesting-depth-benchmarks.md)
 for memory tradeoffs and the sorted-input investigation.
 
 ## Count overlaps
@@ -471,8 +471,8 @@ as `max_weight_with_capacity(..., capacity=k)` and dispatches to that existing
 kernel. Capacity one consequently reaches `max_weight_non_overlapping`.
 Empty/zero profiles and instances where all positive jobs fit avoid flow.
 The compact timeline contains endpoints, never every elapsed Date/Datetime tick.
-See the [design, proofs, complexity, and measurements](capacity-profile-benchmarks.md)
-for the production solver and component fast paths.
+See the [benchmarks and linked design notes](capacity-profile-benchmarks.md)
+for measurements, proofs, and the production solver's component fast paths.
 
 The Rust Polars API takes six `&Series` arguments in job start/end/weight,
 profile start/end/capacity order. The Polars-independent core API takes six

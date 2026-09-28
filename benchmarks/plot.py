@@ -18,7 +18,7 @@ REPOSITORY = "https://github.com/jplauri/polars-intervals/blob/master/"
 
 
 def load_samples(source, root=ROOT):
-    """Read CSV samples, or flatten the original overlap-count JSON report."""
+    """Read CSV samples, or flatten legacy JSON timing reports."""
     path = root / source["path"]
     if path.suffix == ".csv":
         # Objectives can exceed Int64. Only cast the columns used by a chart.
@@ -27,8 +27,8 @@ def load_samples(source, root=ROOT):
     rows = [
         {
             **{key: case[key] for key in source["dimensions"]},
-            "rows": case["rows"],
-            "method": method,
+            source["x"]: case[source["x"]],
+            source["method"]: method,
             "sample": sample,
             "ms": value,
         }
@@ -170,6 +170,91 @@ def render(points, source, chart):
     return svg.getvalue(), "\n".join(lines)
 
 
+def summarize_table(samples, source, table):
+    """Select representative sizes without combining distinct workloads."""
+    labels = [case["label"] for case in table["cases"]]
+    if len(labels) != len(set(labels)):
+        raise ValueError("Table case labels must be unique")
+    dimensions = [key for key in source["dimensions"] if key not in {source["x"], source["method"]}]
+    points = []
+    for case in table["cases"]:
+        methods = case.get("methods", table["methods"])
+        if not set(methods).issubset(table["methods"]):
+            raise ValueError("Case methods must be included in table methods")
+        sizes = case["sizes"]
+        if not sizes or len(sizes) != len(set(sizes)) or any(size <= 0 for size in sizes):
+            raise ValueError("Table sizes must be distinct positive values")
+        selected_samples = samples.filter(pl.col(source["x"]).cast(pl.Int64).is_in(sizes))
+        selected = (
+            summarize(selected_samples, source, {**table, **case, "methods": methods})
+            .lazy()
+            .with_columns(
+                pl.lit(case["label"]).alias("case"),
+                *(
+                    pl.lit(str(value)).alias(f"workload_{key}")
+                    for key, value in case["filters"].items()
+                ),
+            )
+            .select(
+                "case",
+                *(f"workload_{key}" for key in dimensions),
+                "method",
+                "x",
+                "median",
+                "min",
+                "max",
+                "samples",
+            )
+            .collect()
+        )
+        if set(sizes) != set(selected["x"]):
+            raise ValueError("No samples match one or more selected table sizes")
+        points.append(selected)
+    return pl.concat(points)
+
+
+def render_table(points, source, table):
+    """Render a compact comparison; missing combinations remain empty measurements."""
+    values = {
+        (row["case"], row["x"], row["method"]): row["median"]
+        for row in points.iter_rows(named=True)
+    }
+    lines = [
+        f"**{table['ylabel']} · medians**",
+        "",
+        f"| Workload | {table.get('xlabel', 'Input rows')} | "
+        + " | ".join(table["methods"].values())
+        + " |",
+        "| --- | ---: | " + " | ".join("---:" for _ in table["methods"]) + " |",
+    ]
+    has_missing = False
+    for case in table["cases"]:
+        for size in case["sizes"]:
+            cells = []
+            for method in table["methods"]:
+                value = values.get((case["label"], size, method))
+                has_missing |= value is None
+                if value is None:
+                    cells.append("—")
+                else:
+                    rounded = float(f"{value:.3g}")
+                    cells.append(f"{rounded:,g}")
+            lines.append(f"| {case['label']} | {size:,} | " + " | ".join(cells) + " |")
+    if has_missing:
+        lines.extend(["", "— means no recorded measurement for that combination."])
+    lines.extend(
+        [
+            "",
+            (
+                f"[Exact values, sample ranges and counts](assets/benchmarks/{table['id']}.csv) · "
+                f"[Source samples]({REPOSITORY}{source['path']})."
+            ),
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=ROOT / "benchmarks/plots.toml")
@@ -179,10 +264,12 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     sources = config["sources"]
     samples = {name: load_samples(source) for name, source in sources.items()}
-    ids = [chart["id"] for chart in config["charts"]]
+    charts = config.get("charts", [])
+    tables = config.get("tables", [])
+    ids = [entry["id"] for entry in charts + tables]
     if len(ids) != len(set(ids)):
-        raise ValueError("Chart IDs must be unique")
-    for chart in config["charts"]:
+        raise ValueError("Chart and table IDs must be unique")
+    for chart in charts:
         source = sources[chart["source"]]
         points = summarize(samples[chart["source"]], source, chart)
         svg, markdown = render(points, source, chart)
@@ -191,6 +278,15 @@ def main():
                 content, encoding="utf-8", newline="\n"
             )
         print(f"{chart['id']}: {points.height} plotted points")
+    for table in tables:
+        source = sources[table["source"]]
+        points = summarize_table(samples[table["source"]], source, table)
+        markdown = render_table(points, source, table)
+        for suffix, content in (("md", markdown), ("csv", points.write_csv())):
+            (args.output / f"{table['id']}.{suffix}").write_text(
+                content, encoding="utf-8", newline="\n"
+            )
+        print(f"{table['id']}: {points.height} table values")
 
 
 if __name__ == "__main__":
