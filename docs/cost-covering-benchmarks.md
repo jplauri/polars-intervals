@@ -4,69 +4,72 @@
 
 ## Summary
 
-[`minimum_cost_cover`](api.md#polars_intervals.minimum_cost_cover) selects a
-continuous cover minimizing cost, then interval count. Production's Fenwick
-dynamic program uses less memory than the segment-tree reference and is faster
-on many measured workloads with many reachable frontiers. The Date-width chain
-is a meaningful exception; neither tree wins every case.
+[`minimum_cost_cover`](api.md#polars_intervals.minimum_cost_cover) covers a target
+range without gaps while minimizing the total cost of selected intervals.
+If costs tie, it selects fewer intervals. Complete Polars queries took
+**211–263 ms for one million shuffled integer intervals** in the two displayed
+examples. The result is exact. The number and arrangement of useful intervals
+affect both runtime and working memory.
 
 ## Results
 
-**Polars collection · single-threaded solver, Polars pool size unrecorded · median
-of 3 samples · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
+**Complete Polars queries · one solver thread · median of 3 samples ·
+Polars thread count unrecorded · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
+
+The first input forms a continuous chain of intervals whose endpoints touch.
+The second has many overlapping alternatives for covering the target. Both are
+shuffled. Columns compare integer, Date and microsecond Datetime endpoints.
 
 --8<-- "docs/assets/benchmarks/cost-cover-polars-table.md"
 
-Installed release-wheel measurements include eager selection, Series retrieval,
-plugin validation, physical adaptation and output construction. Fixture creation,
-expression construction and casts are outside timing. The native fixtures and
-costs differ from the Rust harness: these totals cannot be subtracted from core
-times to estimate adapter overhead.
+These million-row examples take roughly a quarter of a second. The overlapping
+case takes longer than the chain for each endpoint type. Date values are
+somewhat faster in this run, but the measurements do not separate type-handling
+costs from the rest of the computation.
 
-**Rust core · single-threaded · median of 3 samples · internal phase clocks included
-· [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
+<details markdown="1">
+<summary>Underlying algorithm and memory comparisons</summary>
 
-Shuffled inputs with random nonnegative costs:
+**Rust algorithm only · one thread · median of 3 samples ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
+
+The package and its alternative use different tree structures to track the
+cheapest way to reach each part of the target. Their technical names are Fenwick
+tree and segment tree. These examples use shuffled input and random nonnegative
+costs. Timings include internal measurement overhead. “32-bit endpoints” uses
+the storage width of Date values without calling Polars.
 
 --8<-- "docs/assets/benchmarks/cost-cover-core-table.md"
 
-Fenwick uses suffix-minimum frontier queries; the segment tree supports general
-range minima. Both stop ancestor updates when a value does not improve. Their
-performance depends on the number and arrangement of useful frontier states:
-irrelevant-row workloads mostly pay validation and output costs. A direct scan
-of previous states is also recorded, but deliberately limited to 1K rows because
-its work can be quadratic.
+The package's tree is faster on most of these examples, but the alternative
+wins on the chain with 32-bit endpoints. It also uses more memory: on the
+million-row integer chain, peak requested heap storage is 158 MB compared with
+105 MB for the package. These figures include output and working buffers,
+not total process memory.
 
-The segment tree wins the Date-width chain. Its nearly equal irrelevant-row
-median does not establish a reliable advantage. The memory tradeoff favors
-Fenwick on the larger state spaces: peak **requested live heap** for the 1M
-Int64 chain is 105 MB versus 158 MB for the segment tree; dense overlap uses
-87.2 MB versus 152 MB. These decimal MB measurements include output and temporary
-buffers, not process RSS.
+</details>
 
 ## Coverage and limitations
 
-The shared [covering harness](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/covering-methodology.md)
-spans 1K–1M rows, 17 geometry/difficulty families, three orders and selected cost
-distributions. It includes zero costs, skew, ties, duplicate costs, expensive
-long intervals, gaps and infeasible targets. Date and Datetime physical-width
-slices cover chains, dense overlaps and duplicates. The separate plugin suite
-covers eight integer/temporal dtypes on four families, with sorted and shuffled
-rows. Nearly sorted physical-width cases and a native Polars optimization
-baseline are absent.
+The shared covering tests span 1,000 to one million rows and seventeen input
+patterns. They include different input orders, duplicate intervals, gaps,
+impossible covers, zero costs, tied costs and expensive intervals competing with
+cheaper ones. The separate Polars tests cover eight integer and temporal
+endpoint types on four patterns. No Polars-only optimizer was benchmarked.
 
-Core correctness checks combine independent coverage verification with objective
-agreement across implementations. Exhaustive subset optimality checks apply to
-small test cases; the quadratic reference stops at 1K benchmark rows. Release-wheel
-checks verify coverage and deterministic masks, not independent full-size
-optimality. The shared notes retain the exact oracle and property-test coverage.
+Results are checked for complete target coverage and agreement on optimal cost
+across implementations. Small tests try every possible subset. A simpler
+reference algorithm is limited to 1,000 benchmark rows. Polars tests check
+coverage and repeatable selections, without independently proving optimality
+for every large input.
 
-Core totals include preprocessing, dynamic programming, reconstruction,
-temporary-buffer destruction and phase-clock overhead; phase sums need not equal
-the total. Allocation measurements use a separate untimed invocation. Early
-failures can skip later phases. The recorded wheel predates adapter cleanup;
-original and cleanup hashes are retained separately, and the measured solver and
-candidate algorithms are unchanged.
+Query times include validation, optimization and output construction. Input
+generation, query construction and type conversion are excluded. The measured
+package predates an input-handling cleanup, with the optimizer unchanged.
+Algorithm-only inputs and costs differ from the Polars examples, so their
+timings cannot isolate Polars overhead. See the
+[shared validation notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/covering-methodology.md)
+for the full checks and timing scope.
 
 <span id="historical-validation"></span>
 

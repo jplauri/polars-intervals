@@ -1,29 +1,29 @@
 case,workload_family,workload_order,workload_weights,workload_k,method,x,median,min,max,samples
-"Disjoint, k=2",disjoint,shuffled,positive,2,components,1000000,86.3667,84.0142,96.73559999999999,3
-"Disjoint, k=2",disjoint,shuffled,positive,2,generic,1000000,2447.2194,2442.6494,2467.2164,3
-"Disjoint, k=2",disjoint,shuffled,positive,2,production,1000000,85.6451,84.9241,87.9729,3
-"Disjoint, k=2",disjoint,shuffled,positive,2,whole,1000000,443.359,439.9706,446.3221,3
-"Dense, k=2",dense,shuffled,positive,2,components,1000000,1115.5427,1068.539,1165.1443,3
-"Dense, k=2",dense,shuffled,positive,2,generic,1000000,3224.7951,3193.2468999999996,3228.9359999999997,3
-"Dense, k=2",dense,shuffled,positive,2,production,1000000,1086.6223,1081.7081,1142.5052,3
-"Dense, k=2",dense,shuffled,positive,2,whole,1000000,1059.8187,1059.1398,1063.0330999999999,3
-"Identical intervals, k=2",identical,shuffled,positive,2,components,1000000,105.54889999999999,105.0916,105.7483,3
-"Identical intervals, k=2",identical,shuffled,positive,2,generic,1000000,90.321,90.31729999999999,90.5446,3
-"Identical intervals, k=2",identical,shuffled,positive,2,production,1000000,137.7113,110.743,148.8567,3
-"Identical intervals, k=2",identical,shuffled,positive,2,whole,1000000,93.1246,87.5765,119.5529,3
-"Components, k=2",components,shuffled,positive,2,components,10000,2.2681,2.2241,2.2706999999999997,3
-"Components, k=2",components,shuffled,positive,2,components,1000000,267.7676,267.704,267.7874,3
-"Components, k=2",components,shuffled,positive,2,generic,10000,7.2336,6.5337,7.4566,3
-"Components, k=2",components,shuffled,positive,2,generic,1000000,1968.7217999999998,1954.0701,2023.4334999999999,3
-"Components, k=2",components,shuffled,positive,2,production,10000,2.214,2.2102,2.2847999999999997,3
-"Components, k=2",components,shuffled,positive,2,production,1000000,128.4448,121.8159,142.30759999999998,3
-"Components, k=2",components,shuffled,positive,2,whole,10000,3.2407999999999997,3.2104,3.5785,3
-"Components, k=2",components,shuffled,positive,2,whole,1000000,501.52329999999995,496.87149999999997,504.87609999999995,3
-"Components, k=8",components,shuffled,positive,8,components,100000,76.82379999999999,74.4309,77.83659999999999,3
-"Components, k=8",components,shuffled,positive,8,generic,100000,294.9875,292.1441,296.20369999999997,3
-"Components, k=8",components,shuffled,positive,8,production,100000,17.7688,16.3643,18.545099999999998,3
-"Components, k=8",components,shuffled,positive,8,whole,100000,152.19129999999998,149.2634,157.0179,3
-"Components, k=16 (sufficient)",components,shuffled,positive,16,components,100000,6.2886999999999995,6.217,6.4361,3
-"Components, k=16 (sufficient)",components,shuffled,positive,16,generic,100000,455.567,445.6959,465.8529,3
-"Components, k=16 (sufficient)",components,shuffled,positive,16,production,100000,6.439,6.290299999999999,7.4079,3
-"Components, k=16 (sufficient)",components,shuffled,positive,16,whole,100000,262.34639999999996,248.63119999999998,276.5155,3
+"Non-overlapping, capacity 2",disjoint,shuffled,positive,2,components,1000000,86.3667,84.0142,96.73559999999999,3
+"Non-overlapping, capacity 2",disjoint,shuffled,positive,2,generic,1000000,2447.2194,2442.6494,2467.2164,3
+"Non-overlapping, capacity 2",disjoint,shuffled,positive,2,production,1000000,85.6451,84.9241,87.9729,3
+"Non-overlapping, capacity 2",disjoint,shuffled,positive,2,whole,1000000,443.359,439.9706,446.3221,3
+"Many overlaps, capacity 2",dense,shuffled,positive,2,components,1000000,1115.5427,1068.539,1165.1443,3
+"Many overlaps, capacity 2",dense,shuffled,positive,2,generic,1000000,3224.7951,3193.2468999999996,3228.9359999999997,3
+"Many overlaps, capacity 2",dense,shuffled,positive,2,production,1000000,1086.6223,1081.7081,1142.5052,3
+"Many overlaps, capacity 2",dense,shuffled,positive,2,whole,1000000,1059.8187,1059.1398,1063.0330999999999,3
+"Identical intervals, capacity 2",identical,shuffled,positive,2,components,1000000,105.54889999999999,105.0916,105.7483,3
+"Identical intervals, capacity 2",identical,shuffled,positive,2,generic,1000000,90.321,90.31729999999999,90.5446,3
+"Identical intervals, capacity 2",identical,shuffled,positive,2,production,1000000,137.7113,110.743,148.8567,3
+"Identical intervals, capacity 2",identical,shuffled,positive,2,whole,1000000,93.1246,87.5765,119.5529,3
+"Independent overlap sets, capacity 2",components,shuffled,positive,2,components,10000,2.2681,2.2241,2.2706999999999997,3
+"Independent overlap sets, capacity 2",components,shuffled,positive,2,components,1000000,267.7676,267.704,267.7874,3
+"Independent overlap sets, capacity 2",components,shuffled,positive,2,generic,10000,7.2336,6.5337,7.4566,3
+"Independent overlap sets, capacity 2",components,shuffled,positive,2,generic,1000000,1968.7217999999998,1954.0701,2023.4334999999999,3
+"Independent overlap sets, capacity 2",components,shuffled,positive,2,production,10000,2.214,2.2102,2.2847999999999997,3
+"Independent overlap sets, capacity 2",components,shuffled,positive,2,production,1000000,128.4448,121.8159,142.30759999999998,3
+"Independent overlap sets, capacity 2",components,shuffled,positive,2,whole,10000,3.2407999999999997,3.2104,3.5785,3
+"Independent overlap sets, capacity 2",components,shuffled,positive,2,whole,1000000,501.52329999999995,496.87149999999997,504.87609999999995,3
+"Independent overlap sets, capacity 8",components,shuffled,positive,8,components,100000,76.82379999999999,74.4309,77.83659999999999,3
+"Independent overlap sets, capacity 8",components,shuffled,positive,8,generic,100000,294.9875,292.1441,296.20369999999997,3
+"Independent overlap sets, capacity 8",components,shuffled,positive,8,production,100000,17.7688,16.3643,18.545099999999998,3
+"Independent overlap sets, capacity 8",components,shuffled,positive,8,whole,100000,152.19129999999998,149.2634,157.0179,3
+"Independent overlap sets, capacity 16 (enough for all)",components,shuffled,positive,16,components,100000,6.2886999999999995,6.217,6.4361,3
+"Independent overlap sets, capacity 16 (enough for all)",components,shuffled,positive,16,generic,100000,455.567,445.6959,465.8529,3
+"Independent overlap sets, capacity 16 (enough for all)",components,shuffled,positive,16,production,100000,6.439,6.290299999999999,7.4079,3
+"Independent overlap sets, capacity 16 (enough for all)",components,shuffled,positive,16,whole,100000,262.34639999999996,248.63119999999998,276.5155,3

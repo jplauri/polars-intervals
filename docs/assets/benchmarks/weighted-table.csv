@@ -1,19 +1,19 @@
 case,workload_family,workload_order,workload_weights,method,x,median,min,max,samples
-"Disjoint, shuffled",disjoint,shuffled,positive,A_binary,1000,0.047799999999999995,0.043699999999999996,0.0562,5
-"Disjoint, shuffled",disjoint,shuffled,positive,A_binary,1000000,147.7807,146.8862,182.5675,5
-"Disjoint, shuffled",disjoint,shuffled,positive,B_two_orders,1000,0.0358,0.0355,0.0393,5
-"Disjoint, shuffled",disjoint,shuffled,positive,B_two_orders,1000000,81.9387,81.3785,120.06909999999999,5
-"Disjoint, shuffled",disjoint,shuffled,positive,C_events,1000,0.0681,0.06659999999999999,0.0696,5
-"Disjoint, shuffled",disjoint,shuffled,positive,C_events,1000000,204.0076,196.4572,243.66989999999998,5
-"Moderate overlap, finish-sorted",moderate128,finish_sorted,positive,A_binary,1000000,46.338899999999995,46.1215,47.2395,5
-"Moderate overlap, finish-sorted",moderate128,finish_sorted,positive,B_two_orders,1000000,20.8788,20.442,21.1546,5
-"Moderate overlap, finish-sorted",moderate128,finish_sorted,positive,C_events,1000000,109.0651,108.9887,112.0226,5
+"Non-overlapping, shuffled",disjoint,shuffled,positive,A_binary,1000,0.047799999999999995,0.043699999999999996,0.0562,5
+"Non-overlapping, shuffled",disjoint,shuffled,positive,A_binary,1000000,147.7807,146.8862,182.5675,5
+"Non-overlapping, shuffled",disjoint,shuffled,positive,B_two_orders,1000,0.0358,0.0355,0.0393,5
+"Non-overlapping, shuffled",disjoint,shuffled,positive,B_two_orders,1000000,81.9387,81.3785,120.06909999999999,5
+"Non-overlapping, shuffled",disjoint,shuffled,positive,C_events,1000,0.0681,0.06659999999999999,0.0696,5
+"Non-overlapping, shuffled",disjoint,shuffled,positive,C_events,1000000,204.0076,196.4572,243.66989999999998,5
+"Moderate overlap, sorted by end",moderate128,finish_sorted,positive,A_binary,1000000,46.338899999999995,46.1215,47.2395,5
+"Moderate overlap, sorted by end",moderate128,finish_sorted,positive,B_two_orders,1000000,20.8788,20.442,21.1546,5
+"Moderate overlap, sorted by end",moderate128,finish_sorted,positive,C_events,1000000,109.0651,108.9887,112.0226,5
 "Nested, shuffled",nested,shuffled,positive,A_binary,1000000,132.7697,132.5159,154.4191,5
 "Nested, shuffled",nested,shuffled,positive,B_two_orders,1000000,78.12519999999999,77.68549999999999,100.6152,5
 "Nested, shuffled",nested,shuffled,positive,C_events,1000000,138.4153,136.98739999999998,141.2045,5
-"Random lengths, finish-sorted",random_lengths,finish_sorted,positive,A_binary,1000000,82.8098,81.8445,93.35379999999999,5
-"Random lengths, finish-sorted",random_lengths,finish_sorted,positive,B_two_orders,1000000,120.2222,120.0723,123.961,5
-"Random lengths, finish-sorted",random_lengths,finish_sorted,positive,C_events,1000000,118.1278,117.1544,121.2665,5
+"Random lengths, sorted by end",random_lengths,finish_sorted,positive,A_binary,1000000,82.8098,81.8445,93.35379999999999,5
+"Random lengths, sorted by end",random_lengths,finish_sorted,positive,B_two_orders,1000000,120.2222,120.0723,123.961,5
+"Random lengths, sorted by end",random_lengths,finish_sorted,positive,C_events,1000000,118.1278,117.1544,121.2665,5
 "Random lengths, shuffled",random_lengths,shuffled,positive,A_binary,1000000,198.5769,196.7385,211.9821,5
 "Random lengths, shuffled",random_lengths,shuffled,positive,B_two_orders,1000000,240.0557,228.5882,251.2806,5
 "Random lengths, shuffled",random_lengths,shuffled,positive,C_events,1000000,153.0811,151.91049999999998,191.8876,5

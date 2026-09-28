@@ -1,7 +1,7 @@
 case,workload_dtype,workload_scenario,workload_groups,method,x,median,min,max,samples
-"Full chain, shuffled",i64,chain,1,A_packed_fenwick,3000000,1221.1453999999999,1210.0991,1267.3036,5
-"Full chain, shuffled",i64,chain,1,B_indirect_fenwick,3000000,1447.6491999999998,1410.3156999999999,1526.4345999999998,5
-"Full chain, shuffled",i64,chain,1,D_append_frontier,3000000,199.483,198.7393,220.8935,5
+"Fully nested, shuffled",i64,chain,1,A_packed_fenwick,3000000,1221.1453999999999,1210.0991,1267.3036,5
+"Fully nested, shuffled",i64,chain,1,B_indirect_fenwick,3000000,1447.6491999999998,1410.3156999999999,1526.4345999999998,5
+"Fully nested, shuffled",i64,chain,1,D_append_frontier,3000000,199.483,198.7393,220.8935,5
 Dense random,i64,dense,1,A_packed_fenwick,3000000,375.59799999999996,354.6393,443.30559999999997,5
 Dense random,i64,dense,1,B_indirect_fenwick,3000000,731.3004999999999,728.0446999999999,749.5322,5
 Dense random,i64,dense,1,D_append_frontier,3000000,249.92,248.68689999999998,272.0863,5

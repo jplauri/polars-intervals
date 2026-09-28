@@ -1,29 +1,29 @@
 case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_engine,workload_seed,workload_algorithm,method,x,median,min,max,samples
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,explicit_unit,1000,0.09849999999999999,0.09559999999999999,0.1081,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,explicit_unit,100000,7.3816999999999995,7.327299999999999,10.2211,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,explicit_unit,1000000,148.25369999999998,121.5067,181.0083,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,mixed,1000,0.0788,0.07769999999999999,0.0803,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,mixed,100000,3.2637,3.0278,3.5004999999999997,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,mixed,1000000,45.5173,45.2341,61.5195,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,positive,1000,0.0972,0.0931,0.1076,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,positive,100000,7.4512,7.2897,7.9033999999999995,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,positive,1000000,140.2896,120.5581,165.74779999999998,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,unit,1000,0.0803,0.0773,0.0865,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,unit,100000,3.8718,3.7266999999999997,4.0347,5
-"Concurrency 8, shuffled Int64",low8,shuffled,i64,1,1,auto,42,production,unit,1000000,43.0539,42.253099999999996,55.244,5
-"Full clique, shuffled Date",clique,shuffled,date,1,1,auto,42,production,explicit_unit,1000000,11.032499999999999,10.6173,12.0587,5
-"Full clique, shuffled Date",clique,shuffled,date,1,1,auto,42,production,mixed,1000000,12.6455,12.398299999999999,13.130099999999999,5
-"Full clique, shuffled Date",clique,shuffled,date,1,1,auto,42,production,positive,1000000,10.5792,10.0565,10.9688,5
-"Full clique, shuffled Date",clique,shuffled,date,1,1,auto,42,production,unit,1000000,2.058,2.0471999999999997,2.7784999999999997,5
-"Concurrency 8, shuffled UTC ns, multichunk streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,explicit_unit,1000000,129.0087,125.24929999999999,138.9118,5
-"Concurrency 8, shuffled UTC ns, multichunk streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,mixed,1000000,48.6046,47.1905,49.324,5
-"Concurrency 8, shuffled UTC ns, multichunk streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,positive,1000000,125.8214,125.1231,137.236,5
-"Concurrency 8, shuffled UTC ns, multichunk streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,unit,1000000,48.2332,47.4373,52.7245,5
-"32 interleaved groups, shuffled Int64, multichunk",low8,shuffled,i64,32,7,auto,42,production,explicit_unit,1000,0.40909999999999996,0.3715,0.6305,5
-"32 interleaved groups, shuffled Int64, multichunk",low8,shuffled,i64,32,7,auto,42,production,explicit_unit,1000000,82.88889999999999,81.4995,89.2051,5
-"32 interleaved groups, shuffled Int64, multichunk",low8,shuffled,i64,32,7,auto,42,production,mixed,1000,0.4332,0.381,0.5073,5
-"32 interleaved groups, shuffled Int64, multichunk",low8,shuffled,i64,32,7,auto,42,production,mixed,1000000,44.657199999999996,42.7312,49.995999999999995,5
-"32 interleaved groups, shuffled Int64, multichunk",low8,shuffled,i64,32,7,auto,42,production,positive,1000,0.4371,0.378,0.594,5
-"32 interleaved groups, shuffled Int64, multichunk",low8,shuffled,i64,32,7,auto,42,production,positive,1000000,83.0834,80.583,85.6952,5
-"32 interleaved groups, shuffled Int64, multichunk",low8,shuffled,i64,32,7,auto,42,production,unit,1000,0.41409999999999997,0.3072,0.43439999999999995,5
-"32 interleaved groups, shuffled Int64, multichunk",low8,shuffled,i64,32,7,auto,42,production,unit,1000000,49.616,47.9555,51.1115,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,explicit_unit,1000,0.09849999999999999,0.09559999999999999,0.1081,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,explicit_unit,100000,7.3816999999999995,7.327299999999999,10.2211,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,explicit_unit,1000000,148.25369999999998,121.5067,181.0083,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,mixed,1000,0.0788,0.07769999999999999,0.0803,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,mixed,100000,3.2637,3.0278,3.5004999999999997,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,mixed,1000000,45.5173,45.2341,61.5195,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,positive,1000,0.0972,0.0931,0.1076,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,positive,100000,7.4512,7.2897,7.9033999999999995,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,positive,1000000,140.2896,120.5581,165.74779999999998,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,unit,1000,0.0803,0.0773,0.0865,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,unit,100000,3.8718,3.7266999999999997,4.0347,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,unit,1000000,43.0539,42.253099999999996,55.244,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,42,production,explicit_unit,1000000,11.032499999999999,10.6173,12.0587,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,42,production,mixed,1000000,12.6455,12.398299999999999,13.130099999999999,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,42,production,positive,1000000,10.5792,10.0565,10.9688,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,42,production,unit,1000000,2.058,2.0471999999999997,2.7784999999999997,5
+"Up to 8 overlapping, shuffled UTC datetimes, streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,explicit_unit,1000000,129.0087,125.24929999999999,138.9118,5
+"Up to 8 overlapping, shuffled UTC datetimes, streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,mixed,1000000,48.6046,47.1905,49.324,5
+"Up to 8 overlapping, shuffled UTC datetimes, streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,positive,1000000,125.8214,125.1231,137.236,5
+"Up to 8 overlapping, shuffled UTC datetimes, streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,unit,1000000,48.2332,47.4373,52.7245,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,explicit_unit,1000,0.40909999999999996,0.3715,0.6305,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,explicit_unit,1000000,82.88889999999999,81.4995,89.2051,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,mixed,1000,0.4332,0.381,0.5073,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,mixed,1000000,44.657199999999996,42.7312,49.995999999999995,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,positive,1000,0.4371,0.378,0.594,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,positive,1000000,83.0834,80.583,85.6952,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,unit,1000,0.41409999999999997,0.3072,0.43439999999999995,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,unit,1000000,49.616,47.9555,51.1115,5
