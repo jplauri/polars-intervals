@@ -398,6 +398,79 @@ and heuristic quality because original row indices break ties.
 [API reference](api.md#polars_intervals.assign_balanced_lanes) ·
 [Measured quality and runtime](balance-lanes-benchmarks.md)
 
+## Select a maximum-weight clique
+
+`max_weight_clique` returns a non-null Boolean mask selecting **one globally
+maximum-weight clique**: every selected pair intersects. A maximum clique
+optimizes weight over all cliques; a merely maximal clique only cannot be
+extended. This operation does not select a nonoverlapping schedule, a connected
+component, or a maximum-coverage union.
+
+```python
+df = pl.DataFrame(
+    {
+        "start": [0, 1, 2, 10],
+        "end": [5, 4, 3, 11],
+        "value": [1, 1, 1, 9],
+        "group": ["a", "a", "a", "a"],
+    }
+)
+df.filter(pi.max_weight_clique("start", "end"))
+# First three rows: maximum cardinality 3.
+df.filter(pi.max_weight_clique("start", "end", weight="value"))
+# Last row: maximum weight 9.
+df.with_columns(
+    pi.max_weight_clique("start", "end", weight=pl.col("value")).over("group").alias("selected")
+)
+df.lazy().select(pi.max_weight_clique("start", "end").alias("selected")).collect()
+df.group_by("group").agg(pi.max_weight_clique("start", "end").alias("selected"))
+# One list of Boolean mask values per group.
+```
+
+Omitted `weight` and explicit `weight=None` assign one to **every row**, regardless
+of a column named `weight`. This path constructs no column or vector of ones.
+Explicit weights must be signed or unsigned 8/16/32/64-bit integer columns or
+column expressions of matching length; they are not cast, filled, or broadcast.
+Null-valued weight expressions are invalid. Nonpositive rows are omitted, and
+the empty clique with objective zero is allowed.
+
+Intervals are half-open `[start, end)`: touching endpoints are not adjacent.
+Duplicate nonempty rows are distinct, mutually adjacent vertices whose positive
+weights add. Each empty `[x, x)` row is an isolated vertex and can only be selected
+alone, even when other empty rows have the same coordinate. Thus default units
+select one row from a nonempty empty-only collection. Empty input returns an
+empty Boolean mask.
+
+Endpoints must have identical logical types: Int8/16/32/64, UInt8/16/32/64, Date,
+or Datetime, including matching unit and timezone metadata. Physical integers
+retain full precision. All rows are validated before optimization, including
+nonpositive rows. Reversed intervals report their zero-based position in the
+original collection or group. Objective arithmetic uses checked `i128`; unrelated
+disjoint or empty vertices are never summed together.
+
+Current internal ties select the earliest maximizing coordinate, prefer a
+nonempty clique over an equally weighted empty singleton, and choose the lowest
+original row index among equal empty singletons. Ties do not optimize a secondary
+cardinality objective. Identical logical inputs give the same mask across chunks,
+eager/lazy execution and unit/explicit-one weights. Particular tied masks are not
+a cross-release stability promise.
+
+Each whole collection or group is one optimization instance, across Arrow chunks
+and streaming execution. The expression has one output value per input row;
+`.over(...)` restores each group mask to its original rows. **Filtering before
+optimization changes the instance.** To filter a previously chosen clique, first
+materialize its mask with `with_columns`.
+
+The core uses interval common intersections directly, with `O(n log n)` time
+including sorting and `O(n)` extra space including output. It stores the best
+coordinate or singleton row and reconstructs the mask in one final linear pass.
+Validated empty-only, nonpositive, and common-intersection inputs take linear
+time. The common-intersection path needs only the output allocation.
+See the [candidate measurements](clique-benchmarks.md) and
+[correctness argument](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/clique-notes.md).
+Rust entry points are `intervals_core::max_clique(&starts, &ends)` for units and
+`intervals_core::max_weight_clique(&starts, &ends, &weights)` for explicit weights.
+
 ## Select a globally maximum-weight schedule
 
 `max_weight_non_overlapping` selects non-overlapping intervals with the largest

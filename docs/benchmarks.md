@@ -12,6 +12,7 @@ report identifies its timing scope, workload, tradeoffs, and missing coverage.
 | [Lane assignment](assign-lanes-benchmarks.md) | Rust candidates for assigning the fewest nonoverlapping lanes |
 | [Lane balancing](balance-lanes-benchmarks.md) | Row-count quality and runtime of construction and repair, in Polars and the Rust core |
 | [Weighted scheduling](weighted-scheduling-benchmarks.md) | Rust candidates for maximum-weight nonoverlapping selection |
+| [Maximum-weight clique](clique-benchmarks.md) | Exact maximum-weight intersection, unit defaults, Rust candidates and release Polars collections |
 | [Capacity scheduling](capacity-scheduling-benchmarks.md) | Polars collections and Rust selection under an overlap limit |
 | [Capacity profiles](capacity-profile-benchmarks.md) | Polars collections and Rust selection under changing capacity |
 | [Minimum covering](covering-benchmarks.md) | Polars collections and Rust candidates for fewest-interval covering |

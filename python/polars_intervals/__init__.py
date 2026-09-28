@@ -11,6 +11,7 @@ __all__ = [
     "assign_lanes",
     "containment_count",
     "max_k_coverage",
+    "max_weight_clique",
     "max_weight_non_overlapping",
     "max_weight_with_capacity",
     "max_weight_with_capacity_profile",
@@ -517,6 +518,99 @@ def max_weight_with_capacity(
         function_name="max_weight_with_capacity_plugin",
         args=[start, end, weight],
         kwargs={"capacity": str(capacity)},
+        is_elementwise=False,
+    )
+
+
+def max_weight_clique(
+    start: str | pl.Expr,
+    end: str | pl.Expr,
+    *,
+    weight: str | pl.Expr | None = None,
+) -> pl.Expr:
+    """Select one globally maximum-weight clique of overlapping intervals.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression with exactly the same logical dtype.
+        weight: Integer weight column/expression, or None for unit weight per row.
+            Omitting this argument always means units, even if a column named
+            ``weight`` exists. The unit path does not construct a column of ones.
+
+    Returns:
+        pl.Expr: Non-null Boolean mask, one value per original row, selecting
+            one maximum-weight clique. Empty input returns an empty mask.
+
+    Raises:
+        polars.exceptions.PolarsError: For unequal lengths, null endpoints or
+            weights, unsupported or mismatched dtypes, reversed intervals, or
+            checked i128 objective overflow. Reversed intervals report their
+            original zero-based index within the collection or group. All rows
+            are validated, including rows with nonpositive weights.
+
+    Notes:
+        A clique has every pair of distinct rows adjacent. Nonempty half-open
+        intervals ``[start, end)`` are adjacent exactly when they overlap;
+        touching intervals are not adjacent. An empty interval ``[x, x)`` is
+        isolated: it may be a singleton clique but cannot be combined with any
+        other row, including another empty at x. Duplicate nonempty rows are
+        distinct vertices and their positive weights accumulate.
+
+        This finds a *maximum* clique by total weight, not merely a *maximal*
+        clique that cannot be enlarged. It optimizes weight only; there is no
+        secondary cardinality objective. Zero and negative weights are omitted.
+        The empty clique is allowed with objective zero, so all-nonpositive
+        weights return all False. Unit weights select at least one row whenever
+        the input is nonempty, even if every interval is empty.
+
+        Ties use the earliest maximizing coordinate for nonempty cliques. A
+        nonempty clique wins a tie with an empty singleton; equal-weight empty
+        singletons choose the lowest original row index. Identical inputs give
+        identical masks across chunks and eager/lazy execution. Explicit ones
+        and omitted weights agree. Tied masks are not promised stable across
+        releases or row permutations.
+
+        Endpoints support matching Int8/16/32/64, UInt8/16/32/64, Date, or
+        Datetime, including exactly matching time unit and timezone metadata.
+        Physical integer days/timestamps preserve full precision. Explicit
+        weights support Int8/16/32/64 and UInt8/16/32/64 only. Float, Decimal,
+        Boolean, temporal, null-valued, and other weight dtypes are rejected.
+        There is no implicit casting, null filling, or scalar broadcasting.
+
+        Use ``df.filter(...)``, ``select``, or ``with_columns`` in eager or lazy
+        queries. ``.over("group")`` solves each whole group in original row
+        order; ``group_by(...).agg(...)`` returns lists of Boolean values. All
+        chunks form one instance, including with the streaming engine. Filtering
+        before optimization changes the instance being solved.
+
+        Positive nonempty intervals in a clique share a point. The Rust core
+        finds the greatest active weight at a start coordinate, compares it with
+        the best empty singleton, and reconstructs the mask in one final pass.
+        It uses O(n log n) time including sorting and O(n) additional space
+        including output, without constructing an adjacency graph.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({
+        ...     "start": [0, 1, 2, 10], "end": [5, 4, 3, 11],
+        ...     "value": [1, 1, 1, 9], "weight": [0, 0, 0, 100],
+        ... })
+        >>> df.filter(pi.max_weight_clique("start", "end"))["start"].to_list()
+        [0, 1, 2]
+        >>> df.filter(
+        ...     pi.max_weight_clique("start", "end", weight="value")
+        ... )["start"].to_list()
+        [10]
+        >>> df.lazy().with_columns(
+        ...     pi.max_weight_clique(pl.col("start"), "end", weight=None).alias("selected")
+        ... ).collect()["selected"].to_list()
+        [True, True, True, False]
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="max_weight_clique_plugin",
+        args=[start, end] if weight is None else [start, end, weight],
         is_elementwise=False,
     )
 

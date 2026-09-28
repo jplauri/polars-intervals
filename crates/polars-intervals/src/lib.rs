@@ -2,7 +2,7 @@
 //!
 //! [`overlap_count`], [`containment_count`], [`nesting_depth`], [`assign_lanes`],
 //! [`assign_balanced_lanes`],
-//! [`max_weight_non_overlapping`] and
+//! [`max_weight_clique`], [`max_weight_non_overlapping`] and
 //! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
 //! to the core and Python expressions.
 //! [`minimum_cover`] and [`minimum_cost_cover`] select exact continuous target covers.
@@ -165,6 +165,38 @@ fn weighted_output(inputs: &[Field]) -> PolarsResult<Field> {
 
 fn capacity_output(inputs: &[Field]) -> PolarsResult<Field> {
     weighted_field(inputs, "max_weight_with_capacity")
+}
+
+fn clique_inputs<T>(inputs: &[T]) -> PolarsResult<(&T, &T, Option<&T>)> {
+    match inputs {
+        [starts, ends] => Ok((starts, ends, None)),
+        [starts, ends, weights] => Ok((starts, ends, Some(weights))),
+        _ => polars_bail!(InvalidOperation:
+            "max_weight_clique requires two or three inputs, got {}", inputs.len()),
+    }
+}
+
+fn clique_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let (start, end, weight) = clique_inputs(inputs)?;
+    polars_ensure!(start.dtype() == end.dtype(), InvalidOperation:
+        "max_weight_clique requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
+        start.dtype(), end.dtype());
+    polars_ensure!(matches!(start.dtype(),
+        DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
+        DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
+        DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
+        "max_weight_clique requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
+        start.dtype());
+    if let Some(weight) = weight {
+        validate_weight_dtype(weight.dtype(), "max_weight_clique")?;
+    }
+    Ok(Field::new(start.name().clone(), DataType::Boolean))
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = clique_output)]
+fn max_weight_clique_plugin(inputs: &[Series]) -> PolarsResult<Series> {
+    let (starts, ends, weights) = clique_inputs(inputs)?;
+    max_weight_clique(starts, ends, weights)
 }
 
 fn weighted_field(inputs: &[Field], name: &str) -> PolarsResult<Field> {
@@ -498,6 +530,46 @@ pub fn max_weight_non_overlapping(
     evaluate_weighted(starts, ends, weights, None)
 }
 
+/// Select one globally maximum-weight clique of the interval intersection graph.
+///
+/// Returns a non-null Boolean Series in original row order. `None` assigns every
+/// row unit weight without constructing a weight vector. Explicit weights must
+/// be signed/unsigned integers up to 64 bits; nonpositive rows are omitted.
+/// Half-open nonempty intervals are adjacent exactly when they overlap; touching
+/// intervals are not adjacent. Each empty interval is an isolated vertex, hence
+/// may only be selected alone. The empty clique has weight zero.
+///
+/// Matching integer, Date and Datetime endpoints follow [`overlap_count`]. All
+/// chunks form one instance. Ties choose the earliest maximizing coordinate,
+/// prefer a nonempty clique over an equal-weight empty singleton, then choose
+/// the lowest original row among tied empty singletons. Tied masks are not a
+/// stability promise across releases. See [`intervals_core::max_weight_clique`]
+/// for the exact algorithm and its `O(n log n)` time / `O(n)` space bounds.
+///
+/// # Errors
+///
+/// Rejects unequal lengths, nulls, unsupported or mismatched logical dtypes,
+/// reversed intervals (with original row index), and checked i128 objective
+/// overflow. Every row is validated, including those with nonpositive weights.
+/// No implicit casting, null filling, or scalar broadcasting occurs.
+pub fn max_weight_clique(
+    starts: &Series,
+    ends: &Series,
+    weights: Option<&Series>,
+) -> PolarsResult<Series> {
+    let Some(weights) = weights else {
+        return evaluate(starts, ends, Algorithm::Clique(None));
+    };
+    validate_weight_dtype(weights.dtype(), "max_weight_clique")?;
+    polars_ensure!(starts.len() == weights.len(), ShapeMismatch:
+        "max_weight_clique requires equal lengths, got {} intervals and {} weights",
+        starts.len(), weights.len());
+    polars_ensure!(weights.null_count() == 0, ComputeError:
+        "max_weight_clique does not support null weights");
+    let weights = integer_values(weights)?;
+    evaluate(starts, ends, Algorithm::Clique(Some(&weights)))
+}
+
 /// Select a globally maximum-weight subset subject to maximum simultaneous capacity.
 ///
 /// Returns a non-null Boolean Series named `max_weight_with_capacity` in original
@@ -587,6 +659,7 @@ enum Algorithm<'a> {
     AssignLanes,
     AssignBalancedLanes(Option<&'a [u32]>, u64),
     MaxWeight(&'a [i128]),
+    Clique(Option<&'a [i128]>),
     Capacity(&'a [i128], usize),
     Cover(i128, i128),
     CostCover(&'a [i128], i128, i128),
@@ -603,6 +676,7 @@ impl Algorithm<'_> {
             Self::AssignLanes => "assign_lanes",
             Self::AssignBalancedLanes(_, _) => "assign_balanced_lanes",
             Self::MaxWeight(_) => "max_weight_non_overlapping",
+            Self::Clique(_) => "max_weight_clique",
             Self::Capacity(_, _) => "max_weight_with_capacity",
             Self::Cover(_, _) => "minimum_cover",
             Self::CostCover(_, _, _) => "minimum_cost_cover",
@@ -703,6 +777,14 @@ where
         Algorithm::MaxWeight(weights) => {
             let mask = intervals_core::max_weight_non_overlapping(&starts, &ends, weights)
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(Series::new(algorithm.name().into(), mask))
+        }
+        Algorithm::Clique(weights) => {
+            let mask = match weights {
+                Some(weights) => intervals_core::max_weight_clique(&starts, &ends, weights),
+                None => intervals_core::max_clique(&starts, &ends),
+            }
+            .map_err(|error| polars_err!(ComputeError: "{error}"))?;
             Ok(Series::new(algorithm.name().into(), mask))
         }
         Algorithm::Capacity(weights, capacity) => {

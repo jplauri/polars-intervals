@@ -16,6 +16,8 @@
 
 ::: polars_intervals.max_weight_non_overlapping
 
+::: polars_intervals.max_weight_clique
+
 ::: polars_intervals.max_weight_with_capacity
 
 ::: polars_intervals.max_weight_with_capacity_profile

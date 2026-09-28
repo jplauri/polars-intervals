@@ -1,5 +1,46 @@
 # Paths are relative to the repository root. Each source is exactly one run.
 # List every independent workload dimension so every table case or chart must explicitly fix it.
+[sources.clique_core]
+path = "benchmarks/results/clique-core-windows-20260928.csv"
+x = "n"
+method = "method"
+dimensions = ["dtype", "family", "order", "weights", "seed", "weight_dtype"]
+
+[sources.clique_polars]
+path = "benchmarks/results/clique-polars-windows-20260928.timings.csv"
+x = "n"
+method = "weights"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "engine", "seed", "algorithm"]
+
+[[tables]]
+id = "clique-polars-table"
+source = "clique_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Polars collection time (ms)"
+methods = { unit = "Implicit units", explicit_unit = "Explicit ones", positive = "Positive weights", mixed = "Mixed signs" }
+cases = [
+  { label = "Concurrency 8, shuffled Int64", sizes = [1000, 100000, 1000000], filters = { family = "low8", order = "shuffled", dtype = "i64", groups = 1, chunks = 1, engine = "auto", seed = 42, algorithm = "production" } },
+  { label = "Full clique, shuffled Date", sizes = [1000000], filters = { family = "clique", order = "shuffled", dtype = "date", groups = 1, chunks = 1, engine = "auto", seed = 42, algorithm = "production" } },
+  { label = "Concurrency 8, shuffled UTC ns, multichunk streaming", sizes = [1000000], filters = { family = "low8", order = "shuffled", dtype = "datetime_ns_utc", groups = 1, chunks = 7, engine = "streaming", seed = 42, algorithm = "production" } },
+  { label = "32 interleaved groups, shuffled Int64, multichunk", sizes = [1000, 1000000], filters = { family = "low8", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, engine = "auto", seed = 42, algorithm = "production" } },
+]
+
+[[tables]]
+id = "clique-core-table"
+source = "clique_core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Complete core call time (ms)"
+methods = { production = "Production B + common", events_index = "A tagged events", streams = "B packed streams", heap = "C heap" }
+cases = [
+  { label = "Concurrency 64, shuffled, implicit units", sizes = [100000, 1000000], filters = { dtype = "i64", family = "moderate", order = "shuffled", weights = "units", seed = 7, weight_dtype = "unit" } },
+  { label = "Concurrency 2, shuffled, i128 weights", sizes = [100000, 1000000], filters = { dtype = "i64", family = "low2", order = "shuffled", weights = "positive", seed = 7, weight_dtype = "i128" } },
+  { label = "Repeated endpoints, shuffled, i128 weights", sizes = [1000000], filters = { dtype = "i64", family = "repeated", order = "shuffled", weights = "positive", seed = 7, weight_dtype = "i128" } },
+  { label = "Full clique, shuffled, i128 weights", sizes = [1000000], filters = { dtype = "i64", family = "full", order = "shuffled", weights = "positive", seed = 7, weight_dtype = "i128" } },
+  { label = "Disjoint, shuffled, native i64 weights", sizes = [100000], filters = { dtype = "i64", family = "disjoint", order = "shuffled", weights = "positive", seed = 7, weight_dtype = "i64" } },
+]
+
 [sources.overlap]
 path = "benchmarks/results/sweep-windows.json"
 x = "rows"

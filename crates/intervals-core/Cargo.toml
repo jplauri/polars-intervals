@@ -46,3 +46,7 @@ harness = false
 [[bench]]
 name = "nesting_depth"
 harness = false
+
+[[bench]]
+name = "max_weight_clique"
+harness = false
