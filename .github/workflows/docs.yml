@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: "3.12"
           enable-cache: false
-      - name: Generate benchmark figures
+      - name: Generate benchmark tables
         run: uv run --locked --isolated --only-group plots python benchmarks/plot.py
       # Static mkdocstrings extraction needs neither the package nor a Rust build.
       - name: Build with strict link and configuration validation

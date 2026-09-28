@@ -1,4 +1,4 @@
-"""Check that documentation charts preserve samples, units, and missing cases."""
+"""Check that documentation tables preserve samples, units, and missing cases."""
 
 import json
 import tempfile
@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import polars as pl
-from plot import load_samples, main, render, render_table, summarize, summarize_table
+from plot import load_samples, main, render_table, summarize, summarize_table
 
 
 class PlotTests(unittest.TestCase):
@@ -15,9 +15,6 @@ class PlotTests(unittest.TestCase):
         self.source = {"path": "run.csv", "dimensions": ["family"], "x": "n", "method": "method"}
         self.chart = {
             "id": "example",
-            "title": "Example",
-            "scope": "Rust core",
-            "caption": "One run.",
             "ylabel": "Runtime (ms)",
             "filters": {"family": "dense"},
             "methods": {"A": "A", "B": "B"},
@@ -44,11 +41,6 @@ class PlotTests(unittest.TestCase):
                 {"method": "B", "x": 1000, "median": 4.0, "min": 4.0, "max": 4.0, "samples": 1},
             ],
         )
-        svg, markdown = render(points, self.source, self.chart)
-        self.assertIn("<svg", svg)
-        self.assertIn("| 1,000 | A | 2 | 1 | 3 | 2 |", markdown)
-        self.assertNotIn("| 10,000 | B |", markdown)
-        self.assertEqual(svg, render(points, self.source, self.chart)[0])
 
     def test_rejects_ambiguous_and_invalid_data(self):
         for chart in (
@@ -130,7 +122,6 @@ class PlotTests(unittest.TestCase):
         self.assertIn("| Dense | 10,000 | 10 | — |", markdown)
         self.assertIn("| Sparse | 1,000 | 999 | — |", markdown)
         self.assertIn("Runtime (ms)", markdown)
-        self.assertNotIn(".svg", markdown)
         self.assertEqual(points.height, 4)
         self.assertEqual(
             points.columns,
@@ -186,7 +177,7 @@ class PlotTests(unittest.TestCase):
         self.assertEqual(points["workload_family"].to_list(), ["dense"] * 3)
         self.assertIn("| Dense | 1,000 | 2 | 4 |", render_table(points, source, table))
 
-    def test_table_only_config_writes_no_plot(self):
+    def test_config_writes_table_outputs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             samples_path = root / "run.csv"

@@ -1,3 +1,1 @@
 docs/assets/benchmarks/* linguist-generated=true
-# Keep Matplotlib's SVG output unchanged, including path whitespace.
-docs/assets/benchmarks/*.svg -whitespace

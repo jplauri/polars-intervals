@@ -14,8 +14,7 @@ production time with units, and descriptive baseline names. Mark production
 explicitly. Include a typical case, a meaningful alternative, and important
 losses. Explain any per-case baseline selection rule and name the selected method.
 
-Interpret the table briefly without reciting its numbers. Use at most one plot,
-only for a useful scaling difference, crossover, or runtime/memory tradeoff.
+Interpret the table briefly without reciting its numbers.
 Where measured, put Polars collections before a separately labelled Rust table;
 otherwise say that coverage is Rust-only. Give each set its own scope/metadata
 line. Keep material timing or instrumentation exceptions next to the table.

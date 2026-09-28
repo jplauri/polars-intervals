@@ -1,5 +1,5 @@
 # Paths are relative to the repository root. Each source is exactly one run.
-# List every independent workload dimension so every table case or chart must explicitly fix it.
+# List every independent workload dimension so every table case must explicitly fix it.
 [sources.clique_core]
 path = "benchmarks/results/clique-core-windows-20260928.csv"
 x = "n"

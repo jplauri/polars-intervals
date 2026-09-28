@@ -69,9 +69,9 @@ Discuss repeat runs separately, including meaningful variation or contradictions
 Name the applicable metric and exclusions beside results. Allocation counts,
 buffer capacity, requested heap, and RSS cannot be substituted for one another.
 
-## Generate plots
+## Generate tables { #generate-plots }
 
-The same command generates compact tables and optional plots from saved data;
+The same command generates compact tables from saved data;
 it never runs benchmark suites or builds Rust.
 
 ```sh
@@ -80,10 +80,9 @@ uv run --locked --isolated --only-group plots python -m unittest discover -s ben
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
-The existing generator uses Polars aggregation and Matplotlib for optional SVGs.
-Documentation CI regenerates assets before its strict build. Commit generated
-`docs/assets/benchmarks/<id>.md` and `<id>.csv`; include `<id>.svg` only for a
-configured chart. Markdown snippets are excluded as standalone site pages:
+The generator uses Polars aggregation only. Documentation CI regenerates assets
+before its strict build. Commit generated `docs/assets/benchmarks/<id>.md` and
+`<id>.csv`. Markdown snippets are excluded as standalone site pages:
 
 ```text
 ;--8<-- "docs/assets/benchmarks/overlap-headline.md"
@@ -93,7 +92,7 @@ CSV downloads retain exact medians, min/max, sample counts, and table workload
 dimensions. Missing measurements stay missing. Use `--output PATH` for a preview
 or `--config PATH` for another configuration.
 
-### Configure a table or chart
+### Configure a table
 
 [`benchmarks/plots.toml`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/plots.toml)
 holds source mappings and display choices. Each source is **one run**. CSV files
@@ -131,14 +130,6 @@ keys, absent requested methods, negative or non-finite measurements, and warmup
 rows. It cannot discover a dimension omitted from the source declaration, so
 review that list. A requested size with no samples is an error; missing individual
 method/size combinations remain missing.
-
-Plots are optional. Keep at most one per report, only when it clarifies scaling,
-a crossover, a substantial workload difference, or a runtime/memory tradeoff.
-A `[[charts]]` entry uses the same source/value/divisor/ylabel/methods, one
-`filters` mapping, plus `id`, `title`, `scope`, and `caption`. Runtime plots
-default to a logarithmic y axis and require positive values; memory plots use
-`yscale = "linear"`. Lines show medians and bands show sample ranges. Close
-comparisons usually belong in a table.
 
 ### Adding an operation
 

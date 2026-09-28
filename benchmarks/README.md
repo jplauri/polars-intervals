@@ -3,7 +3,7 @@
 See the [benchmark overview](../docs/benchmarks.md) for compact results tables.
 
 [Running and publishing benchmarks](../docs/benchmarking.md) covers setup,
-table/plot generation, and the four-section checklist for adding an operation.
+table generation, and the four-section checklist for adding an operation.
 
 ## Python scripts
 
@@ -24,8 +24,8 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`capacity_profile_temporal.py`](capacity_profile_temporal.py) | End-to-end benchmark | Integer/temporal profiles → verified release-native timing CSV | [Capacity profiles](../docs/capacity-profile-benchmarks.md) |
 | [`covering_temporal.py`](covering_temporal.py) | End-to-end benchmark | Integer/temporal covering fixtures → raw timing CSV on stdout | [Covering](../docs/covering-benchmarks.md), [cost covering](../docs/cost-covering-benchmarks.md) |
 | [`stabbing_temporal.py`](stabbing_temporal.py) | End-to-end benchmark | Integer/temporal fixtures → raw timing CSV on stdout | [Stabbing points](../docs/stabbing-benchmarks.md) |
-| [`plot.py`](plot.py) | Shared report generator | [`plots.toml`](plots.toml) and saved CSV/JSON → compact Markdown tables, exact summary CSV, optional SVG | [Reporting workflow](../docs/benchmarking.md#generate-plots) |
-| [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Plot workflow](../docs/benchmarking.md#generate-plots) |
+| [`plot.py`](plot.py) | Shared report generator | [`plots.toml`](plots.toml) and saved CSV/JSON → compact Markdown tables and exact summary CSV | [Reporting workflow](../docs/benchmarking.md#generate-plots) |
+| [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
 They time production only; candidate comparisons in saved runs are reproducible
@@ -184,7 +184,7 @@ uv run --locked --only-group dev ruff format --check benchmarks
 uv run --locked --only-group dev python -m unittest discover -s benchmarks -p "test_generate_interval_graphs.py"
 ```
 
-## Regenerate tables and optional plots
+## Regenerate tables
 
 ```sh
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
@@ -197,6 +197,6 @@ change. The documentation CI build regenerates the assets before building the si
 
 Start a report from [report-template.md](report-template.md): Summary, Results,
 Coverage and limitations, Reproduce and data. Register a small representative
-table in [plots.toml](plots.toml), including important losses; a plot is optional.
+table in [plots.toml](plots.toml), including important losses.
 See the [adding an operation checklist](../docs/benchmarking.md#adding-an-operation)
 for scope lines, shared methodology, supporting notes, and navigation.
