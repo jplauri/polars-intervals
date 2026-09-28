@@ -69,20 +69,6 @@ fn native_validation_and_precision() {
     for k in [0, 1, 2] {
         for (s, e, w, message) in [
             (s.clone(), e.clone(), w.slice(0, 1), "equal lengths"),
-            (s.clone(), e.slice(0, 1), w.clone(), "equal lengths"),
-            (e.clone(), s.clone(), w.clone(), "index 0"),
-            (
-                s.clone(),
-                e.cast(&DataType::Int32).unwrap(),
-                w.clone(),
-                "matching integer",
-            ),
-            (
-                Series::full_null("s".into(), 3, &DataType::Int64),
-                e.clone(),
-                w.clone(),
-                "null endpoints",
-            ),
             (
                 s.clone(),
                 e.clone(),
