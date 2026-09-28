@@ -10,6 +10,7 @@ report identifies its timing scope, workload, tradeoffs, and missing coverage.
 | [Containment counting](containment-benchmarks.md) | Polars collections and separate Rust candidate comparisons |
 | [Nesting depth](nesting-depth-benchmarks.md) | Polars collections and separate Rust candidate comparisons |
 | [Lane assignment](assign-lanes-benchmarks.md) | Rust candidates for assigning the fewest nonoverlapping lanes |
+| [Lane balancing](balance-lanes-benchmarks.md) | Row-count quality and runtime of construction and repair, in Polars and the Rust core |
 | [Weighted scheduling](weighted-scheduling-benchmarks.md) | Rust candidates for maximum-weight nonoverlapping selection |
 | [Capacity scheduling](capacity-scheduling-benchmarks.md) | Polars collections and Rust selection under an overlap limit |
 | [Capacity profiles](capacity-profile-benchmarks.md) | Polars collections and Rust selection under changing capacity |

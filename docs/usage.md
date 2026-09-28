@@ -326,6 +326,78 @@ assignments within groups.
 
 [API reference](api.md#polars_intervals.assign_lanes) · [Benchmarks](assign-lanes-benchmarks.md)
 
+## Balance lane row counts
+
+`assign_balanced_lanes` assigns the minimum number of nonoverlapping lanes and
+heuristically balances the **number of rows** in them. Its keyword-only
+`initial_lanes=None` default constructs an assignment; supply a lane column or
+expression to improve an existing proper minimum-lane assignment:
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 0, 1, 2, 3, 4], "end": [10, 10, 1, 2, 3, 4]})
+result = df.with_columns(pi.assign_balanced_lanes("start", "end").alias("lane"))
+# Two lanes, three rows each: the four empty rows can use either lane.
+
+original = df.with_columns(pi.assign_lanes("start", "end").alias("lane"))
+repaired = original.with_columns(
+    pi.assign_balanced_lanes("start", "end", initial_lanes="lane", max_work=100_000).alias("lane")
+)
+```
+
+For lane sizes `s`, the objective is lexicographic: first minimize
+`D = max(s) - min(s)`, then `Q = sum(size * size for size in s)`. Decisions use
+exact integers. A smaller spread wins even if its squared-size sum is larger.
+Occupied duration and endpoint span do not enter the objective. Properness and
+minimum lane count are guaranteed; globally optimal balance and approximation
+ratios are **not**. With `initial_lanes=None`, the result never worsens `(D, Q)`
+relative to `assign_lanes`. With supplied `initial_lanes`, it never worsens the
+supplied coloring's score and preserves that coloring's palette.
+
+**Empty-row difference:** `assign_lanes` always puts empty rows in lane zero.
+`assign_balanced_lanes` counts every row and may put empties in any existing lane,
+even when the empty point lies inside another interval. Empties conflict
+with nothing. Touching nonempty intervals do not overlap either. No extra lanes
+are introduced: empty input uses zero lanes; other inputs use
+`max(1, maximum_nonempty_concurrency)`, including one lane for an empty-only input.
+
+The balancing expression accepts column names or expressions and returns non-null
+`UInt32` IDs in original row order. Endpoints must have exactly matching Int8/16/32/64,
+UInt8/16/32/64, Date, or Datetime dtypes, including time unit and timezone.
+Nulls, unequal lengths and reversed intervals are errors; reversed intervals
+report the first original row index. There is no coercion or scalar broadcasting.
+Supplied lanes must be non-null 8/16/32/64-bit integers in `0..2**32-1`, with a
+contiguous palette `0..k-1`, no within-lane conflicts, and the true minimum `k`.
+Boolean, floating-point and temporal lane columns, sparse IDs and proper
+assignments with extra lanes are rejected. Invalid supplied assignments are
+never replaced with a coloring constructed from scratch.
+
+The finite default `max_work=100_000` bounds deterministic refinement work, not
+elapsed time. It accepts integers from zero through `2**64-1`, excluding Boolean.
+Validation and fixed `O(n log n)` preprocessing/construction are outside this
+budget. Refinement charges for candidate-pair scans, row visits, bitset words
+and reconstruction; it can stop before attempting a costly exact pair. Scratch
+space is linear in the pair size, preflighted against the remaining budget,
+and allocated with checked sizes. See the
+[algorithm and work-accounting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/balance-lanes-notes.md)
+for units, limits and complexity. At zero budget, `initial_lanes=None` returns the
+existing baseline; supplied `initial_lanes` returns those IDs unchanged, **after
+all validation**, including empty and already-balanced inputs. Another call with
+the result as `initial_lanes` can improve a budget-limited result further.
+
+Lazy and eager queries, slices and streaming collection have the same whole-input
+semantics across all chunks. Use `.over("group")` to solve each complete group
+independently with its own budget, or `group_by("group").agg(...)` for one lane
+list per group. Supplied lanes must be minimum and proper within each such group.
+Identical input/options give identical output, including equivalent chunk layouts
+and order-preserving endpoint representations. Row permutations can change labels
+and heuristic quality because original row indices break ties.
+
+[API reference](api.md#polars_intervals.assign_balanced_lanes) ·
+[Measured quality and runtime](balance-lanes-benchmarks.md)
+
 ## Select a globally maximum-weight schedule
 
 `max_weight_non_overlapping` selects non-overlapping intervals with the largest

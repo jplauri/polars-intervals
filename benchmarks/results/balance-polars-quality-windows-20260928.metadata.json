@@ -1,0 +1,234 @@
+{
+  "timestamp_utc": "2026-09-28T13:18:08.054344+00:00",
+  "arguments": {
+    "dataset": [
+      "target\\balance-work\\smoke",
+      "target\\balance-work\\smoke-43",
+      "target\\balance-work\\exact",
+      "target\\balance-work\\jaist-all",
+      "target\\balance-work\\jaist-connected"
+    ],
+    "output": "benchmarks\\results\\balance-polars-quality-windows-20260928",
+    "handcrafted": true,
+    "stress_sizes": [
+      1000,
+      10000,
+      100000
+    ],
+    "max_work": [
+      100000
+    ],
+    "workloads": [
+      "integer"
+    ],
+    "engines": [
+      "auto"
+    ],
+    "warmups": 1,
+    "repeats": 5,
+    "oracle_max_n": 10,
+    "oracle_max_nodes": 200000,
+    "max_instances": null
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+  "logical_cpus": 24,
+  "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "D:\\polars-intervals\\.venv\\Scripts\\python.exe",
+  "polars": "1.44.2",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+  "revision": "023174dfc50bef6993dd225f125064ba64fab07d",
+  "git_status": "M .github/workflows/python.yml\n M README.md\n M benchmarks/README.md\n M benchmarks/containment.md\n M benchmarks/plot.py\n M benchmarks/plots.toml\n M benchmarks/report-template.md\n M benchmarks/test_plot.py\n M crates/intervals-core/Cargo.toml\n M crates/intervals-core/src/lib.rs\n M crates/polars-intervals/src/lib.rs\n M docs/api.md\n D docs/assets/benchmarks/capacity-runtime.csv\n D docs/assets/benchmarks/capacity-runtime.md\n D docs/assets/benchmarks/capacity-runtime.svg\n D docs/assets/benchmarks/cost-cover-runtime.csv\n D docs/assets/benchmarks/cost-cover-runtime.md\n D docs/assets/benchmarks/cost-cover-runtime.svg\n D docs/assets/benchmarks/cover-runtime.csv\n D docs/assets/benchmarks/cover-runtime.md\n D docs/assets/benchmarks/cover-runtime.svg\n D docs/assets/benchmarks/lanes-memory.csv\n D docs/assets/benchmarks/lanes-memory.md\n D docs/assets/benchmarks/lanes-memory.svg\n D docs/assets/benchmarks/lanes-runtime.csv\n D docs/assets/benchmarks/lanes-runtime.md\n D docs/assets/benchmarks/lanes-runtime.svg\n D docs/assets/benchmarks/nesting-deep-runtime.csv\n D docs/assets/benchmarks/nesting-deep-runtime.md\n D docs/assets/benchmarks/nesting-deep-runtime.svg\n D docs/assets/benchmarks/nesting-memory.csv\n D docs/assets/benchmarks/nesting-memory.md\n D docs/assets/benchmarks/nesting-memory.svg\n D docs/assets/benchmarks/nesting-shallow-runtime.csv\n D docs/assets/benchmarks/nesting-shallow-runtime.md\n D docs/assets/benchmarks/nesting-shallow-runtime.svg\n D docs/assets/benchmarks/nesting-temporal.csv\n D docs/assets/benchmarks/nesting-temporal.md\n D docs/assets/benchmarks/nesting-temporal.svg\n D docs/assets/benchmarks/overlap-runtime.csv\n D docs/assets/benchmarks/overlap-runtime.md\n D docs/assets/benchmarks/overlap-runtime.svg\n D docs/assets/benchmarks/stabbing-runtime.csv\n D docs/assets/benchmarks/stabbing-runtime.md\n D docs/assets/benchmarks/stabbing-runtime.svg\n D docs/assets/benchmarks/weighted-runtime.csv\n D docs/assets/benchmarks/weighted-runtime.md\n D docs/assets/benchmarks/weighted-runtime.svg\n M docs/assign-lanes-benchmarks.md\n M docs/benchmarking.md\n M docs/benchmarks.md\n M docs/capacity-profile-benchmarks.md\n M docs/capacity-scheduling-benchmarks.md\n M docs/containment-benchmarks.md\n M docs/cost-covering-benchmarks.md\n M docs/coverage-benchmarks.md\n M docs/covering-benchmarks.md\n M docs/nesting-depth-benchmarks.md\n M docs/overlap-count-benchmarks.md\n M docs/stabbing-benchmarks.md\n M docs/usage.md\n M docs/weighted-scheduling-benchmarks.md\n M mkdocs.yml\n M python/polars_intervals/__init__.py\n?? benchmarks/algorithm-notes.md\n?? benchmarks/balance-lanes-notes.md\n?? benchmarks/balance_lanes.py\n?? benchmarks/balance_lanes_fixtures.py\n?? benchmarks/fixtures/jaist_interval_connected_tiny.txt\n?? benchmarks/results/balance-core-windows-20260928.metadata.json\n?? benchmarks/results/balance-core-windows-20260928.quality.csv\n?? benchmarks/results/balance-core-windows-20260928.timings.csv\n?? benchmarks/results/balance-verification-windows-20260928.md\n?? benchmarks/selection-notes.md\n?? benchmarks/test_balance_lanes.py\n?? crates/intervals-core/benches/balance_lanes.rs\n?? crates/intervals-core/src/balance.rs\n?? crates/intervals-core/tests/balance_lanes.rs\n?? crates/polars-intervals/tests/balance_lanes.rs\n?? docs/assets/benchmarks/capacity-core-table.csv\n?? docs/assets/benchmarks/capacity-core-table.md\n?? docs/assets/benchmarks/capacity-polars-table.csv\n?? docs/assets/benchmarks/capacity-polars-table.md\n?? docs/assets/benchmarks/containment-core-table.csv\n?? docs/assets/benchmarks/containment-core-table.md\n?? docs/assets/benchmarks/containment-polars-table.csv\n?? docs/assets/benchmarks/containment-polars-table.md\n?? docs/assets/benchmarks/cost-cover-core-table.csv\n?? docs/assets/benchmarks/cost-cover-core-table.md\n?? docs/assets/benchmarks/cost-cover-polars-table.csv\n?? docs/assets/benchmarks/cost-cover-polars-table.md\n?? docs/assets/benchmarks/cover-core-table.csv\n?? docs/assets/benchmarks/cover-core-table.md\n?? docs/assets/benchmarks/cover-polars-table.csv\n?? docs/assets/benchmarks/cover-polars-table.md\n?? docs/assets/benchmarks/coverage-collection-table.csv\n?? docs/assets/benchmarks/coverage-collection-table.md\n?? docs/assets/benchmarks/coverage-core-table.csv\n?? docs/assets/benchmarks/coverage-core-table.md\n?? docs/assets/benchmarks/lanes-table.csv\n?? docs/assets/benchmarks/lanes-table.md\n?? docs/assets/benchmarks/nesting-collection-table.csv\n?? docs/assets/benchmarks/nesting-collection-table.md\n?? docs/assets/benchmarks/nesting-core-table.csv\n?? docs/assets/benchmarks/nesting-core-table.md\n?? docs/assets/benchmarks/overlap-headline.csv\n?? docs/assets/benchmarks/overlap-headline.md\n?? docs/assets/benchmarks/profile-components-table.csv\n?? docs/assets/benchmarks/profile-components-table.md\n?? docs/assets/benchmarks/profile-formulations-table.csv\n?? docs/assets/benchmarks/profile-formulations-table.md\n?? docs/assets/benchmarks/profile-polars-table.csv\n?? docs/assets/benchmarks/profile-polars-table.md\n?? docs/assets/benchmarks/stabbing-core-table.csv\n?? docs/assets/benchmarks/stabbing-core-table.md\n?? docs/assets/benchmarks/stabbing-polars-table.csv\n?? docs/assets/benchmarks/stabbing-polars-table.md\n?? docs/assets/benchmarks/weighted-table.csv\n?? docs/assets/benchmarks/weighted-table.md\n?? docs/balance-lanes-benchmarks.md\n?? tests/test_balance_lanes.py",
+  "build_profile": "release (operator-declared)",
+  "plugin": "D:\\polars-intervals\\python\\polars_intervals\\__init__.py",
+  "native_sha256": {
+    "_internal.cp314-win_amd64.pyd": "3a3a42779eebc224b5c352b919d6b8b85367913d0723b17e94bb1d2a3eab332d"
+  },
+  "source_sha256": {
+    "benchmarks\\balance_lanes.py": "9b00709df753ba3dabfdf8d74c9f9a25bf7682b93032d944ef6af3b3f2a309a0",
+    "benchmarks\\balance_lanes_fixtures.py": "93a43f797fd4f2adaf71dad0081582a986011c76c071f022419c9c2e36aca19e",
+    "python\\polars_intervals\\__init__.py": "3db0c1e20bcca9417d691d962d4b0882e5f8f18238da49f46ee4410c92b24a3e",
+    "crates\\polars-intervals\\src\\cover.rs": "33212bca8b245864d65cfed6062c81e65df8676315b4b0aa8880db13799c5c1d",
+    "crates\\polars-intervals\\src\\lib.rs": "dffc8c3461d071af694073cce9df976fb3a753bf2989d95251c426d686f3c6bf",
+    "crates\\polars-intervals\\src\\profile.rs": "cc608db5987ff5368fadee5ec045efe8e4eaef742134dec8e6da4e2893819f9e",
+    "crates\\polars-intervals\\tests\\assign_lanes.rs": "b1bfd8efe35071773ff546d1ffd2d871d5998531e5b1c2e3d2b4b75049332166",
+    "crates\\polars-intervals\\tests\\balance_lanes.rs": "c3246610ec79f1d3fd0055ca6c7074e0d81093ab013d6c492ff475347b29a163",
+    "crates\\polars-intervals\\tests\\containment_count.rs": "aed4234fa389749af18e4e1b8046d0ceb8b8b5d9ec0e7d61a8544a412b9ceb0d",
+    "crates\\polars-intervals\\tests\\covering.rs": "3ae20eeb6d8d3accb3a1ac72905d70f72759b0eee921aa91a832808eeb4ea99d",
+    "crates\\polars-intervals\\tests\\max_k_coverage.rs": "21c2717e95b75c5de937353a23daf62c7c9c9ec84f9d67a37c4981107b3ecb65",
+    "crates\\polars-intervals\\tests\\max_weight_non_overlapping.rs": "0f5a88e03a4928c8858e33f697ed527e962e9ab3e73a977237820f5efaca538f",
+    "crates\\polars-intervals\\tests\\max_weight_with_capacity.rs": "735caba520bae0336f5d3622dcaf6e21ab800b327ea675e8deb1a8c47064b211",
+    "crates\\polars-intervals\\tests\\max_weight_with_capacity_profile.rs": "8382d05e3496b0eafbcc6f1f4ddd200ca9f26200837e332708fdc2e1c6066b09",
+    "crates\\polars-intervals\\tests\\minimum_stabbing_points.rs": "40cfa0848ae956131cdce7f4452a724cd139f7df0c1d0f05621d26fb441a63dd",
+    "crates\\polars-intervals\\tests\\nesting_depth.rs": "fc1d26d52d064f0f1593613d9eb0624e562fa2d3a2290c44d597bf86106ec25c",
+    "crates\\polars-intervals\\tests\\overlap_count.rs": "a8089ad056256d5ff803e6bc5b0cd12ae92cf29211edb36f06d21176eb141031",
+    "crates\\polars-intervals\\tests\\support\\mod.rs": "519b50a1795739ca95a359567dc52e93089680dd4c5139a8e0aa63dd769c4615",
+    "crates\\intervals-core\\benches\\assign_lanes.rs": "3a15abbaea7955a820ee0e646766e59d397ce4858903ccf14743f09d930f4ffe",
+    "crates\\intervals-core\\benches\\balance_lanes.rs": "d34eb435a18ab0ecb2d6224c4c8b708bca280c6971f7eff7ab23b69cfbe24d71",
+    "crates\\intervals-core\\benches\\containment.rs": "949a269b7a07874c66ed323fca830d116c822b6420520071ef438ae88deebee1",
+    "crates\\intervals-core\\benches\\covering.rs": "568e95aca4c2cc6acd4d326da71052ab4a61d2ce1f138e7b0cd23c3a8ca15401",
+    "crates\\intervals-core\\benches\\max_k_coverage.rs": "7ca6b0cc561bece05e6bc68c6e2fc63a2d5ce9b694c7d32f068fb87c28af0a94",
+    "crates\\intervals-core\\benches\\max_weight_non_overlapping.rs": "773e618aa7f0a94091e8ee0bbe1fb4ea95cce0914c9620a8c81568a63db89fd6",
+    "crates\\intervals-core\\benches\\max_weight_with_capacity.rs": "162db0bfc92f2b801e092502205c4d0e84d68ce0228349a6b9c86b6656b3202c",
+    "crates\\intervals-core\\benches\\max_weight_with_capacity_profile.rs": "2d541d0cd6a348ad5ecead87cdd75a2cd6f5d16db9b3925bdbabb841b9e38ea9",
+    "crates\\intervals-core\\benches\\minimum_stabbing_points.rs": "b45b48e80838874abed077f60b2728e8a3d1bd6ad4afc0147178241248c351a3",
+    "crates\\intervals-core\\benches\\nesting_depth.rs": "0e57aaf651b88643415fc104ae9eb0afaff4f82fb2d18e71432af360ded4cc7f",
+    "crates\\intervals-core\\src\\balance.rs": "a365bd6b8e65dbe8b34ea52e0a5c9fe6a6592623a6e2d5a9519234cc0cdf033e",
+    "crates\\intervals-core\\src\\capacity.rs": "ff68400bc227ed60e17abfdeb4047c3da4ea817dd628eb464b5b744e99cb2890",
+    "crates\\intervals-core\\src\\capacity_profile.rs": "a00504174a326c1f90326c2a6962b6de922009fd0814adefd4d14875fc38125d",
+    "crates\\intervals-core\\src\\containment.rs": "83104f9c157cdb45e084b1adbd1c83943f983ca0254ffdbf304a1d244e82bc13",
+    "crates\\intervals-core\\src\\cover.rs": "9128ac972f0b55d297c72ed262bd02e22f88038750d3b8bac33a99975f9051d9",
+    "crates\\intervals-core\\src\\coverage.rs": "3af72ad0d3b7b7cbbf54aa79db38a3533a35e989a8430b9f027d2f4e1f4ec07e",
+    "crates\\intervals-core\\src\\lanes.rs": "af289c1add48cfd6be7255bf7c7d23d58621c2dd9c939c0a59f822d03384b754",
+    "crates\\intervals-core\\src\\lib.rs": "0580f0452ef3415413126b0ad23e0c8e97c9e16d0690b39550b6d70e4fe0320e",
+    "crates\\intervals-core\\src\\nesting.rs": "d9f1767744e10301af4d7a69786bdbd55cd58ce8e2f0d59e96bf5e4be1a96f56",
+    "crates\\intervals-core\\src\\stabbing.rs": "6a4771542535cac24c7852171384257845cffad6e1771d860dc9cac7944a9d19",
+    "crates\\intervals-core\\src\\weighted.rs": "ab8e0d3a3b182054438eb0825665756b917b5afc5696990b2d151a33e2f010f5",
+    "crates\\intervals-core\\tests\\allocation_accounting.rs": "c1afe96ff141906215855b93a367cff34b1d0f03770394410047d8b4b86642c0",
+    "crates\\intervals-core\\tests\\assign_lanes.rs": "0af42cff78793fa249ed5a6949a08fc5a4ce50a6ac485ecfb4b2e87ca6d13d07",
+    "crates\\intervals-core\\tests\\balance_lanes.rs": "3c16fda79704a2b2857234e059b7e335af18656bcfa67204027b962888cb0945",
+    "crates\\intervals-core\\tests\\capacity_profile_formulations.rs": "3b4620a5e56a2f504b542cfd3a4643e1cb5ddef0423c7eae0deb789c9c1c58a7",
+    "crates\\intervals-core\\tests\\containment.rs": "fdf94d7ece14a6398e6a807e752f7a572eb3fe8a6cfea40ccb94b328671706e1",
+    "crates\\intervals-core\\tests\\covering.rs": "7be004b3af3f08d8342a66a5b579eab7e400389c4b420d505da7de8c07efae45",
+    "crates\\intervals-core\\tests\\max_k_coverage.rs": "97027a577bbdc701f66094bac669a9e3f4526c95f93ceda30af0c3bcc7ea996f",
+    "crates\\intervals-core\\tests\\max_weight_non_overlapping.rs": "87b769f4a8edc1a76e1cf135e676f1c2c6a4378e28c6cfe9fec2f132cce15893",
+    "crates\\intervals-core\\tests\\max_weight_with_capacity.rs": "37cf4d3173b5722de374eea55f842b5f8bc4499894ebbd8e08ff42cb346d903a",
+    "crates\\intervals-core\\tests\\max_weight_with_capacity_profile.rs": "a30eec36c99ab923a2b1e55b3e79504195c83573c1f0400891c8038e8a77df8a",
+    "crates\\intervals-core\\tests\\minimum_stabbing_points.rs": "3bf4a21413e2909aa3104d8fd80c87a1bc678e1e59b3288e8148ef8d68082eea",
+    "crates\\intervals-core\\tests\\nesting.rs": "af2d56689d4edd614936958017d6b1486d918c8babaece9f7f4743c4711987f7",
+    "crates\\intervals-core\\tests\\nesting_candidates.rs": "523cddc449435b1c33db253823d00ea762e262ff25d6ed6877e719020265266a",
+    "crates\\intervals-core\\tests\\support\\coverage.rs": "ff5c8c1ad3df044db6d836ec952aeea443bf1879cd891453a5c06cb005226e9f",
+    "crates\\intervals-core\\tests\\support\\stabbing.rs": "b179fd86a4ded83334dfff632185eb720fdcc8bd951e3ee841f5ab29965fad53",
+    "crates\\intervals-core\\benches\\support\\allocations.rs": "a6adeab442ae00fce6e180ac65109e85805451d44580ef936c6e2c4f2db501b9",
+    "crates\\intervals-core\\benches\\support\\capacity_candidates.rs": "a4fb43742c5de9a7971a45cead3f37b54e25c226d70f12091615dc4032b1ba03",
+    "crates\\intervals-core\\benches\\support\\capacity_reference.rs": "6fa59d00a90146723581c02c5adce1c338dcde99740068e4f26dce08dbee8ced",
+    "crates\\intervals-core\\benches\\support\\containment.rs": "799c3d9a94e5adcba41a8b03c40ae3286bb0db01d2027892edde41ea053454b2",
+    "crates\\intervals-core\\benches\\support\\coverage.rs": "892561162ec343bfc02af8c369581e1f4decd6610fa8bb2e3f24e577ce74ecab",
+    "crates\\intervals-core\\benches\\support\\covering.rs": "d5ddd3d67bbfea90a3c237003de96b2466be9fda2b4a69e45e1a1d3535a0b453",
+    "crates\\intervals-core\\benches\\support\\mod.rs": "4117f9465b4eac8cfd47ccfbe4a27302f1f14b9c1bb963cf4bd940b32b805442",
+    "crates\\intervals-core\\benches\\support\\nesting_depth.rs": "d5467bf84636e85bae8023fb7b35eda91922b82d5e3e185af2b6393d2c2a9749",
+    "crates\\intervals-core\\benches\\support\\profile_candidates.rs": "0cc2e30e65c7d02a21be320baccc791d3989732b93404c43df0ecc526734b26b",
+    "crates\\intervals-core\\benches\\support\\random.rs": "af3c2c2dc63c8b5879d077a37844b9ab25457b6ec9bed9c382db77866bf6fc94",
+    "crates\\intervals-core\\benches\\support\\stabbing.rs": "8827eb9b4282d08cc78e8bd5eddfe7a8aca19e5b00ca5e09938847b6cbb73f8b",
+    "crates\\intervals-core\\benches\\support\\weighted.rs": "aa0c7c884a69d70b220fe555b6d5f9dd11b53a178c80e2019eeaf3948963b0f1"
+  },
+  "threads": 1,
+  "thread_environment": {
+    "POLARS_MAX_THREADS": "1",
+    "RAYON_NUM_THREADS": null,
+    "CARGO_BUILD_JOBS": null
+  },
+  "corpora": {
+    "target\\balance-work\\smoke": {
+      "manifest": {
+        "instance_count": 30,
+        "kind": "synthetic",
+        "schema_version": 1,
+        "seed": 42,
+        "shard_size": 50000,
+        "shards": [
+          {
+            "instance_count": 30,
+            "path": "shards/part-00000.jsonl.gz"
+          }
+        ],
+        "suite": "smoke"
+      },
+      "sha256": {
+        "dataset.json": "d061a7cedc62b1a7d04fcbd6782da87208f40edddf09cbfcc077513895f8a6b5",
+        "shards/part-00000.jsonl.gz": "3124bd4046651721543d9f159f35e4ec87a03c778ac1677ed4575989d4d2f197"
+      }
+    },
+    "target\\balance-work\\smoke-43": {
+      "manifest": {
+        "instance_count": 30,
+        "kind": "synthetic",
+        "schema_version": 1,
+        "seed": 43,
+        "shard_size": 50000,
+        "shards": [
+          {
+            "instance_count": 30,
+            "path": "shards/part-00000.jsonl.gz"
+          }
+        ],
+        "suite": "smoke"
+      },
+      "sha256": {
+        "dataset.json": "e754b84d4fa0d8572e6124598d60cd65452fe5447977bae378710adb55cad0e4",
+        "shards/part-00000.jsonl.gz": "6176953eb21844ff546975969feff1f13a5ed5191539bab3a08fe037bcfa46fc"
+      }
+    },
+    "target\\balance-work\\exact": {
+      "manifest": {
+        "instance_count": 450,
+        "kind": "synthetic",
+        "schema_version": 1,
+        "seed": 42,
+        "shard_size": 50000,
+        "shards": [
+          {
+            "instance_count": 450,
+            "path": "shards/part-00000.jsonl.gz"
+          }
+        ],
+        "suite": "exact"
+      },
+      "sha256": {
+        "dataset.json": "849d08c85badcfc5cc528ea2257ef35e8351c08f96db6469e54060c64821625f",
+        "shards/part-00000.jsonl.gz": "d5852af5776b2fb9c13864f2c8eab48edb44a0ab8f2bf274c4b860b7be0e1fd0"
+      }
+    },
+    "target\\balance-work\\jaist-all": {
+      "manifest": {
+        "instance_count": 7,
+        "kind": "jaist",
+        "schema_version": 1,
+        "seed": null,
+        "shard_size": 50000,
+        "shards": [
+          {
+            "instance_count": 7,
+            "path": "shards/part-00000.jsonl.gz"
+          }
+        ],
+        "suite": "all"
+      },
+      "sha256": {
+        "dataset.json": "f79d163c8379d494a8bc28fe5220a11ceebdaa4b8fb4de80c0f65df1b10d4aeb",
+        "shards/part-00000.jsonl.gz": "c9877568811305f98ec93f8b9994da8d33fcaabd9a8821c0278b399959d53dcd"
+      }
+    },
+    "target\\balance-work\\jaist-connected": {
+      "manifest": {
+        "instance_count": 4,
+        "kind": "jaist",
+        "schema_version": 1,
+        "seed": null,
+        "shard_size": 50000,
+        "shards": [
+          {
+            "instance_count": 4,
+            "path": "shards/part-00000.jsonl.gz"
+          }
+        ],
+        "suite": "connected"
+      },
+      "sha256": {
+        "dataset.json": "aaf651d63f8f5b831325e93f61c5000252ab4649b970191d0a3e61d79a3c0025",
+        "shards/part-00000.jsonl.gz": "ca9e70df4c03fb112f56ac215c4bf74d6393e5083c77175c6cc54bcb1d08c4d2"
+      }
+    }
+  },
+  "warmups": 1,
+  "samples": 5,
+  "timed_scope": "Lazy planning/optimization, full collect, plugin validation/preprocessing/refinement and lane Series retrieval. Baseline construction for repair, fixture casts/copies, expression construction, correctness, oracle and output destruction are excluded. Each repair reuses the same original baseline column.",
+  "quality_scope": "One logical graph per instance/method/options; grouped workload repeats it four times. No weighting by timing repeats.",
+  "diagnostics": "Public Polars Series API exposes no counters or local-optimality status. equity is independently proven from output; all other positive-budget stops are not_exposed. See separate core benchmark.",
+  "comparison_scope": "Public Polars baseline, repair of same baseline, balanced constructor; seed/stage ablations live in the separately timed core benchmark.",
+  "memory": "Not measured; neither buffer capacity nor requested live heap nor RSS is claimed.",
+  "runtime_ratio": "candidate median / same-instance baseline median; above 1 means slower",
+  "status": "completed",
+  "completed_instances": 541,
+  "completed_utc": "2026-09-28T13:18:40.955045+00:00"
+}

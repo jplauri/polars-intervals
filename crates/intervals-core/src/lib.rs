@@ -5,6 +5,7 @@
 //! [`containment_counts`] counts other intervals contained by each row.
 //! [`nesting_depths`] returns the longest strict containment chain above each row.
 //! [`assign_lanes`] assigns intervals to the minimum number of lanes.
+//! [`assign_balanced_lanes`] constructs or improves lane row-count balance.
 //! [`max_weight_non_overlapping`] selects an exact maximum-weight schedule.
 //! [`minimum_cover`] and [`minimum_cost_cover`] cover one continuous target exactly.
 //! [`minimum_stabbing_points`] hits every discrete interval with the fewest points.
@@ -19,6 +20,11 @@ mod nesting;
 pub use nesting::nesting_depths;
 mod lanes;
 pub use lanes::assign_lanes;
+mod balance;
+pub use balance::{
+    BalanceDiagnostics, BalanceResult, BalanceSeed, BalanceStopReason, DEFAULT_BALANCE_WORK,
+    assign_balanced_lanes, assign_balanced_lanes_with_diagnostics, balanced_lane_seed,
+};
 mod weighted;
 pub use weighted::max_weight_non_overlapping;
 mod capacity;
@@ -43,6 +49,17 @@ pub enum IntervalError {
     EmptyInterval { index: usize },
     /// More than `u32::MAX + 1` lanes are required.
     TooManyLanes,
+    /// The lane slice must contain one ID per interval.
+    LaneLengthMismatch {
+        intervals_len: usize,
+        lanes_len: usize,
+    },
+    /// Lane IDs must be contiguous from zero and smaller than the row count.
+    InvalidLaneId { index: usize, lane: u32 },
+    /// Two nonempty intervals in the same lane overlap.
+    LaneConflict { first: usize, second: usize },
+    /// A supplied coloring does not use the true minimum number of lanes.
+    NonMinimumLanes { actual: usize, minimum: usize },
     /// The weight slice does not contain one value per interval.
     WeightLengthMismatch {
         intervals_len: usize,
@@ -95,6 +112,25 @@ impl fmt::Display for IntervalError {
                 write!(f, "cannot stab empty interval at index {index}")
             }
             Self::TooManyLanes => write!(f, "lane IDs exceed the UInt32 range"),
+            Self::LaneLengthMismatch {
+                intervals_len,
+                lanes_len,
+            } => write!(
+                f,
+                "interval and lane lengths differ: {intervals_len} intervals, {lanes_len} lanes"
+            ),
+            Self::InvalidLaneId { index, lane } => write!(
+                f,
+                "invalid lane ID {lane} at index {index}: IDs must be contiguous from zero and smaller than the row count"
+            ),
+            Self::LaneConflict { first, second } => write!(
+                f,
+                "intervals at indices {first} and {second} overlap in the same lane"
+            ),
+            Self::NonMinimumLanes { actual, minimum } => write!(
+                f,
+                "supplied coloring uses {actual} lanes; the minimum is {minimum}"
+            ),
             Self::WeightLengthMismatch {
                 intervals_len,
                 weights_len,
