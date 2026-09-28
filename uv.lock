@@ -966,6 +966,7 @@ dev = [
 docs = [
     { name = "mkdocs-material" },
     { name = "mkdocstrings", extra = ["python"] },
+    { name = "ruff" },
 ]
 plots = [
     { name = "matplotlib" },
@@ -983,6 +984,7 @@ dev = [
 docs = [
     { name = "mkdocs-material", specifier = ">=9.7,<10" },
     { name = "mkdocstrings", extras = ["python"], specifier = ">=1,<2" },
+    { name = "ruff", specifier = "==0.16.8" },
 ]
 plots = [
     { name = "matplotlib", specifier = ">=3.10,<4" },

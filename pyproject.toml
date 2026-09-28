@@ -25,12 +25,17 @@ classifiers = [
 dynamic = ["version"]
 
 [project.urls]
+Documentation = "https://jplauri.github.io/polars-intervals/"
 Repository = "https://github.com/jplauri/polars-intervals"
 Issues = "https://github.com/jplauri/polars-intervals/issues"
 
 [dependency-groups]
 dev = ["pytest==9.1.1", "ruff==0.16.8"]
-docs = ["mkdocs-material>=9.7,<10", "mkdocstrings[python]>=1,<2"]
+docs = [
+    "mkdocs-material>=9.7,<10",
+    "mkdocstrings[python]>=1,<2",
+    "ruff==0.16.8", # Format API signatures, using the same formatter as development.
+]
 plots = ["matplotlib>=3.10,<4", "polars>=1.44.1,<1.45"]
 
 [tool.maturin]
