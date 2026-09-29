@@ -3,6 +3,7 @@
 import sys
 from datetime import UTC, date, datetime
 from pathlib import Path
+from typing import overload
 
 import polars as pl
 from polars.plugins import register_plugin_function
@@ -10,13 +11,16 @@ from polars.plugins import register_plugin_function
 __all__ = [
     "assign_balanced_lanes",
     "assign_lanes",
+    "cluster_intervals",
     "containment_count",
     "coverage_profile",
+    "interval_gaps",
     "max_k_coverage",
     "max_weight_clique",
     "max_weight_non_overlapping",
     "max_weight_with_capacity",
     "max_weight_with_capacity_profile",
+    "merge_intervals",
     "minimum_cost_cover",
     "minimum_cost_dominating_set",
     "minimum_cover",
@@ -46,6 +50,312 @@ def _nonnegative(value: int, name: str, limit: int, range_name: str) -> str:
     if not 0 <= value <= limit:
         raise ValueError(f"{name} must be nonnegative and fit in {range_name}")
     return str(value)
+
+
+def _frame_keys(by: str | list[str] | None, reserved: tuple[str, ...]) -> tuple[str, ...]:
+    if by is None:
+        by = []
+    elif isinstance(by, str):
+        by = [by]
+    elif not isinstance(by, list) or not all(isinstance(key, str) for key in by):
+        raise TypeError("by must be a column name or a list of column names")
+    if len(set(by)) != len(by):
+        raise ValueError("by must contain distinct group keys")
+    if any(key in reserved for key in by):
+        raise ValueError(f"group keys cannot use reserved output names {'/'.join(reserved)}")
+    # Freeze caller-owned arguments captured by deferred plans.
+    return tuple(by)
+
+
+def _frame_dtypes(endpoint_dtypes, key_dtypes, name: str) -> None:
+    # Guard optional Arrow types before importing Series at the FFI boundary.
+    for dtype in endpoint_dtypes:
+        if dtype not in _INTEGERS and dtype != pl.Date and not isinstance(dtype, pl.Datetime):
+            raise pl.exceptions.InvalidOperationError(
+                f"{name} requires an 8-, 16-, 32-, or 64-bit "
+                f"integer dtype, Date, or Datetime, got {dtype}"
+            )
+    for dtype in key_dtypes:
+        if dtype not in (*_INTEGERS, pl.String, pl.Boolean, pl.Date) and not isinstance(
+            dtype, pl.Datetime
+        ):
+            raise pl.exceptions.InvalidOperationError(
+                f"{name} requires String, Boolean, 8/16/32/64-bit integer, "
+                f"Date, or Datetime group keys, got {dtype}"
+            )
+    if endpoint_dtypes[0] != endpoint_dtypes[1]:
+        raise pl.exceptions.InvalidOperationError(
+            f"{name} requires matching integer, Date, or Datetime dtypes "
+            "(including Datetime time unit and timezone)"
+        )
+
+
+def _geometry_input(intervals, start, end, by, name):
+    if not isinstance(intervals, (pl.DataFrame, pl.LazyFrame)):
+        raise TypeError("intervals must be a Polars DataFrame or LazyFrame")
+    if not isinstance(start, str) or not isinstance(end, str):
+        raise TypeError("start and end column names must be strings")
+    by = _frame_keys(by, ("start", "end"))
+    required = list(dict.fromkeys([start, end, *by]))
+    # Names such as '*' and regex-looking names are literal column references.
+    intervals = intervals.select(pl.selectors.by_name(required))
+    schema = intervals.collect_schema()
+    _frame_dtypes((schema[start], schema[end]), [schema[key] for key in by], name)
+    output_schema = {**{key: schema[key] for key in by}, "start": schema[start], "end": schema[end]}
+    return intervals, by, output_schema
+
+
+def _blocking_frame(intervals, solve, schema):
+    if isinstance(intervals, pl.DataFrame):
+        return solve(intervals)
+    return intervals.map_batches(
+        solve,
+        schema=schema,
+        validate_output_schema=True,
+        predicate_pushdown=False,
+        projection_pushdown=False,
+        slice_pushdown=False,
+        streamable=False,
+    )
+
+
+def cluster_intervals(
+    start: str | pl.Expr,
+    end: str | pl.Expr,
+    *,
+    include_touching: bool = False,
+) -> pl.Expr:
+    """Label connected components of half-open intervals in original row order.
+
+    Args:
+        start: Start column name or expression.
+        end: End column name or expression with exactly the same endpoint dtype.
+        include_touching: Connect touching nonempty intervals as well as overlaps.
+            Must be a real Boolean. Strict overlap is the default.
+
+    Returns:
+        A non-null UInt32 expression with one ID per original row. IDs are
+        contiguous from zero, assigned in order of each component's first input
+        row. Use ``.alias(...)`` to name the result.
+
+    Raises:
+        TypeError: If include_touching is not Boolean.
+        polars.exceptions.PolarsError: For null, reversed, mismatched or unsupported
+            endpoints, unequal lengths or cluster IDs exceeding UInt32.
+
+    Notes:
+        Connectivity is transitive. Members need not all overlap each other.
+        Every empty interval is an isolated singleton, even in touching mode.
+        Duplicate nonempty intervals connect. Duplicate empty rows stay separate.
+        Input permutations can renumber IDs while preserving the partition.
+
+        Supports matching Int8/16/32/64, UInt8/16/32/64, Date and Datetime endpoints.
+        Datetime units and timezone metadata must match exactly. All input rows
+        are validated before sorting. Interval errors name original row indices
+        within the collection or group. No casting or broadcasting is performed.
+
+        Works in eager/lazy select, with_columns, windows and group aggregations.
+        Every chunk in a group forms one collection, including streaming queries.
+        The operation blocks on that collection. Time is O(n log n) and extra
+        space is O(n), including canonical ID restoration. A verified start-sorted
+        collection permits linear work. Downstream filters retain assigned IDs.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({"start": [4, 0, 2, 2], "end": [6, 2, 4, 2]})
+        >>> df.select(pi.cluster_intervals("start", "end")).to_series().to_list()
+        [0, 1, 2, 3]
+        >>> df.select(
+        ...     pi.cluster_intervals("start", "end", include_touching=True)
+        ... ).to_series().to_list()
+        [0, 0, 0, 1]
+    """
+    if not isinstance(include_touching, bool):
+        raise TypeError("include_touching must be a Boolean")
+    return _plugin(
+        "cluster_intervals_plugin", [start, end], kwargs={"include_touching": include_touching}
+    )
+
+
+@overload
+def merge_intervals(
+    intervals: pl.DataFrame,
+    *,
+    start: str = "start",
+    end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame: ...
+
+
+@overload
+def merge_intervals(
+    intervals: pl.LazyFrame,
+    *,
+    start: str = "start",
+    end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.LazyFrame: ...
+
+
+def merge_intervals(
+    intervals: pl.DataFrame | pl.LazyFrame,
+    *,
+    start: str = "start",
+    end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame | pl.LazyFrame:
+    """Return the canonical exact union of half-open intervals.
+
+    Args:
+        intervals: Polars DataFrame or LazyFrame. Returns the same frame kind.
+        start: Input start column name.
+        end: Input end column name with exactly matching logical dtype.
+        by: Group column or ordered list of distinct group columns. None and []
+            solve one ungrouped collection. Null group values compare equal.
+
+    Returns:
+        Columns ``[group keys..., start, end]``. Endpoint names are fixed even
+        with custom source names. Each group's nonempty ranges are start-sorted,
+        maximal and strictly separated. Overlapping and touching intervals always
+        coalesce. Empty rows contribute nothing. No input metadata is aggregated.
+
+    Raises:
+        TypeError: For invalid frame, column name or grouping argument types.
+        ValueError: For duplicate or reserved group names.
+        polars.exceptions.PolarsError: For missing columns, null endpoints,
+            reversed intervals, or unsupported/mismatched endpoint or key dtypes.
+
+    Notes:
+        Endpoints support matching Int8/16/32/64, UInt8/16/32/64, Date and Datetime.
+        Exact logical dtypes, units and timezone metadata survive empty results.
+        Keys support those types plus String and Boolean, including null values.
+        Keys cannot be named start/end. Groups appear in first-observed input
+        order before pruning. Groups with no union output contribute no rows.
+        Every original interval is validated, with original input row indices.
+
+        A LazyFrame remains deferred until collection. Schema resolution reads no
+        rows. The Rust adapter groups, sorts and builds output with the GIL
+        released. The lazy boundary materializes the whole input, including with
+        the streaming engine. Filters, projections and slices after the call
+        remain after the solve. Input operations before the call define its data.
+        An entirely optimizer-pruned node need not execute validation.
+        Time is O(n log n + z), space O(n + z), for z output ranges.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({"start": [0, 2, 6, 8], "end": [2, 4, 8, 8]})
+        >>> pi.merge_intervals(df).rows()
+        [(0, 4), (6, 8)]
+        >>> query = df.lazy().pipe(pi.merge_intervals)
+        >>> isinstance(query, pl.LazyFrame)
+        True
+        >>> query.filter(pl.col("start") > 0).collect().rows()
+        [(6, 8)]
+    """
+    from polars_intervals._internal import merge_intervals as solve
+
+    intervals, by, schema = _geometry_input(intervals, start, end, by, "merge_intervals")
+    return _blocking_frame(
+        intervals, lambda frame: solve(frame[start], frame[end], [frame[key] for key in by]), schema
+    )
+
+
+@overload
+def interval_gaps(
+    intervals: pl.DataFrame,
+    *,
+    domain_start: int | date | datetime | pl.Series,
+    domain_end: int | date | datetime | pl.Series,
+    start: str = "start",
+    end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame: ...
+
+
+@overload
+def interval_gaps(
+    intervals: pl.LazyFrame,
+    *,
+    domain_start: int | date | datetime | pl.Series,
+    domain_end: int | date | datetime | pl.Series,
+    start: str = "start",
+    end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.LazyFrame: ...
+
+
+def interval_gaps(
+    intervals: pl.DataFrame | pl.LazyFrame,
+    *,
+    domain_start: int | date | datetime | pl.Series,
+    domain_end: int | date | datetime | pl.Series,
+    start: str = "start",
+    end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame | pl.LazyFrame:
+    """Return maximal uncovered ranges within an explicit half-open domain.
+
+    Args:
+        intervals: Polars DataFrame or LazyFrame. Returns the same frame kind.
+        domain_start: Inclusive scalar bound, shared by every observed group.
+        domain_end: Exclusive scalar bound. Both bounds are required.
+        start: Input start column name.
+        end: Input end column name with exactly matching logical dtype.
+        by: Group column or ordered list of distinct group columns.
+
+    Returns:
+        Columns ``[group keys..., start, end]`` with the schema and order rules
+        of merge_intervals. Gaps are sorted, strictly separated, nonempty and
+        within the domain. Leading and trailing uncovered ranges are included.
+
+    Raises:
+        TypeError: For invalid frame/options or unsupported scalar types.
+        ValueError: For duplicate/reserved keys or non-singleton/null Series bounds.
+        polars.exceptions.PolarsError: For merge_intervals validation failures,
+            reversed bounds, out-of-range bounds or mismatched scalar metadata.
+
+    Notes:
+        Validate every original row before clipping, including rows entirely
+        outside the domain and calls with equal bounds. Empty intervals never
+        split gaps. A fully covered or empty domain returns zero rows. Ungrouped
+        empty/empty-only input returns the whole nonempty domain. Observed groups
+        with no clipped coverage also return the whole domain. Grouped empty
+        input has no observed keys and returns no rows. Absent groups require a
+        future domain-table API. No infinite outer gaps are inferred.
+
+        Python integers are range-checked against the endpoint dtype. Typed
+        singleton Series bounds must match endpoint logical metadata exactly.
+        Python date values match Date. Python datetime values have microsecond
+        resolution and must match Datetime unit/timezone metadata. Use typed
+        Series for millisecond/nanosecond bounds. Boolean bounds are rejected.
+
+        Uses merge_intervals' genuine lazy execution, optimizer safeguards,
+        grouping contract and whole-input materialization boundary. The same
+        blocking fallback is used under the streaming engine. All geometry uses
+        exact endpoint comparisons. Time is O(n log n + z), space O(n + z).
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({"start": [0, 2, 6, 8], "end": [2, 4, 8, 8]})
+        >>> pi.interval_gaps(df, domain_start=-1, domain_end=10).rows()
+        [(-1, 0), (4, 6), (8, 10)]
+        >>> df.clear().lazy().pipe(
+        ...     pi.interval_gaps, domain_start=0, domain_end=10,
+        ... ).collect().rows()
+        [(0, 10)]
+    """
+    from polars_intervals._internal import interval_gaps as solve
+
+    intervals, by, schema = _geometry_input(intervals, start, end, by, "interval_gaps")
+    domain = (_target(domain_start), _target(domain_end))
+    return _blocking_frame(
+        intervals,
+        lambda frame: solve(frame[start], frame[end], [frame[key] for key in by], domain),
+        schema,
+    )
 
 
 def coverage_profile(
@@ -171,18 +481,7 @@ def coverage_profile(
         raise TypeError("weight must be a column name or None")
     if not isinstance(include_zero, bool):
         raise TypeError("include_zero must be a Boolean")
-    if by is None:
-        by = []
-    elif isinstance(by, str):
-        by = [by]
-    elif not isinstance(by, list) or not all(isinstance(key, str) for key in by):
-        raise TypeError("by must be a column name or a list of column names")
-    if len(set(by)) != len(by):
-        raise ValueError("by must contain distinct group keys")
-    if any(key in {"start", "end", "load"} for key in by):
-        raise ValueError("group keys cannot use reserved output names start/end/load")
-    # Freeze caller-owned arguments before capturing them in a deferred plan.
-    by = tuple(by)
+    by = _frame_keys(by, ("start", "end", "load"))
     if (domain_start is None) != (domain_end is None):
         raise ValueError("domain_start and domain_end must both be supplied or both omitted")
     domain = None if domain_start is None else (_target(domain_start), _target(domain_end))
@@ -201,40 +500,21 @@ def coverage_profile(
         endpoint_dtypes = (starts.dtype, ends.dtype)
         weight_dtype = None if weights is None else weights.dtype
         key_dtypes = [key.dtype for key in keys]
-    # Guard optional Arrow types before PySeries imports them at the FFI boundary.
-    # Rust independently validates all supported columns and computes the profile.
-    for dtype in endpoint_dtypes:
-        if dtype not in _INTEGERS and dtype != pl.Date and not isinstance(dtype, pl.Datetime):
-            raise pl.exceptions.InvalidOperationError(
-                "coverage_profile requires an 8-, 16-, 32-, or 64-bit "
-                f"integer dtype, Date, or Datetime, got {dtype}"
-            )
+    _frame_dtypes(endpoint_dtypes, key_dtypes, "coverage_profile")
     if weight_dtype is not None and weight_dtype not in _INTEGERS:
         raise pl.exceptions.InvalidOperationError(
             "coverage_profile requires an 8-, 16-, 32-, or 64-bit "
             f"integer weight dtype, got {weight_dtype}"
         )
-    for dtype in key_dtypes:
-        if dtype not in (*_INTEGERS, pl.String, pl.Boolean, pl.Date) and not isinstance(
-            dtype, pl.Datetime
-        ):
-            raise pl.exceptions.InvalidOperationError(
-                "coverage_profile requires String, Boolean, 8/16/32/64-bit integer, "
-                f"Date, or Datetime group keys, got {dtype}"
-            )
     if isinstance(intervals, pl.LazyFrame):
-        if endpoint_dtypes[0] != endpoint_dtypes[1]:
-            raise pl.exceptions.InvalidOperationError(
-                "coverage_profile requires matching integer, Date, or Datetime dtypes "
-                "(including Datetime time unit and timezone)"
-            )
         output_schema = {
             **{key: schema[key] for key in by},
             "start": endpoint_dtypes[0],
             "end": endpoint_dtypes[1],
             "load": pl.Int128,
         }
-        return intervals.map_batches(
+        return _blocking_frame(
+            intervals,
             lambda frame: solve(
                 frame[start],
                 frame[end],
@@ -243,12 +523,7 @@ def coverage_profile(
                 domain,
                 include_zero,
             ),
-            schema=output_schema,
-            validate_output_schema=True,
-            predicate_pushdown=False,
-            projection_pushdown=False,
-            slice_pushdown=False,
-            streamable=False,
+            output_schema,
         )
     return solve(starts, ends, weights, keys, domain, include_zero)
 

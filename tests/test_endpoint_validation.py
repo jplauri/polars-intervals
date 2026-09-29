@@ -14,6 +14,8 @@ ALGORITHMS = {
     "containment_count": pi.containment_count,
     "nesting_depth": pi.nesting_depth,
     "assign_lanes": pi.assign_lanes,
+    "cluster_strict": pi.cluster_intervals,
+    "cluster_touching": lambda s, e: pi.cluster_intervals(s, e, include_touching=True),
     "balanced_construct": lambda s, e: pi.assign_balanced_lanes(s, e, max_work=0),
     "balanced_repair": lambda s, e: pi.assign_balanced_lanes(s, e, initial_lanes=ROWS),
     "max_k_coverage_k0": lambda s, e: pi.max_k_coverage(s, e, k=0),
@@ -25,12 +27,18 @@ ALGORITHMS = {
     "capacity_0": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=0),
     "capacity_2": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=2),
     "coverage_profile": pi.coverage_profile,
+    "merge_intervals": pi.merge_intervals,
+    "interval_gaps": pi.interval_gaps,
 }
 pytestmark = pytest.mark.parametrize("algorithm", ALGORITHMS.values(), ids=ALGORITHMS.keys())
 
 
 def evaluate(frame, algorithm, start="start", end="end"):
-    if algorithm is pi.coverage_profile:
+    if algorithm is pi.interval_gaps:
+        dtype = frame[start].dtype if isinstance(start, str) else pl.Int64
+        bound = pl.Series([0], dtype=dtype) if dtype in ENDPOINT_DTYPES else 0
+        return algorithm(frame, start=start, end=end, domain_start=bound, domain_end=bound)
+    if algorithm in (pi.coverage_profile, pi.merge_intervals):
         return algorithm(frame, start=start, end=end)
     return frame.select(algorithm(start, end))
 
@@ -97,7 +105,7 @@ def test_lengths_must_match_without_broadcasting(algorithm, argument, scalar):
     frame = pl.DataFrame({"start": [0, 1], "end": [3, 4]})
     args = {"start": pl.col("start"), "end": pl.col("end")}
     args[argument] = pl.lit(1, dtype=pl.Int64) if scalar else args[argument].head(1)
-    if algorithm is pi.coverage_profile:
+    if algorithm in (pi.coverage_profile, pi.merge_intervals, pi.interval_gaps):
         # DataFrames enforce column lengths; direct Series mismatch coverage is
         # in the Rust integration suite. Expressions are rejected explicitly.
         with pytest.raises(TypeError, match="strings"):

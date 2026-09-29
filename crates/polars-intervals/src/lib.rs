@@ -12,6 +12,37 @@
 use polars::prelude::*;
 use std::borrow::Cow;
 
+// Keep physical extraction and logical validation identical across row-aligned
+// expressions and frame adapters. The body is monomorphized for each endpoint.
+macro_rules! dispatch_endpoints {
+    ($starts:expr, $ends:expr, $name:expr, |$left:ident, $right:ident| $body:expr) => {{
+        let (starts, ends, name) = ($starts, $ends, $name);
+        validate_endpoint_pair(starts, ends, name)?;
+        macro_rules! call {
+            ($s:expr, $e:expr) => {{
+                let ($left, $right) = ($s, $e);
+                $body
+            }};
+        }
+        match starts.dtype() {
+            DataType::Int8 => call!(starts.i8()?, ends.i8()?),
+            DataType::Int16 => call!(starts.i16()?, ends.i16()?),
+            DataType::Int32 => call!(starts.i32()?, ends.i32()?),
+            DataType::Int64 => call!(starts.i64()?, ends.i64()?),
+            DataType::UInt8 => call!(starts.u8()?, ends.u8()?),
+            DataType::UInt16 => call!(starts.u16()?, ends.u16()?),
+            DataType::UInt32 => call!(starts.u32()?, ends.u32()?),
+            DataType::UInt64 => call!(starts.u64()?, ends.u64()?),
+            DataType::Date => call!(starts.date()?.physical(), ends.date()?.physical()),
+            DataType::Datetime(_, _) => {
+                call!(starts.datetime()?.physical(), ends.datetime()?.physical())
+            }
+            dtype => polars_bail!(InvalidOperation:
+                "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}", name, dtype),
+        }
+    }};
+}
+
 mod cover;
 pub use cover::{minimum_cost_cover, minimum_cover};
 mod domination;
@@ -20,11 +51,19 @@ mod profile;
 pub use profile::max_weight_with_capacity_profile;
 mod coverage_profile;
 pub use coverage_profile::coverage_profile;
+mod geometry;
+pub use geometry::{interval_gaps, merge_intervals};
 
 #[pyo3::pymodule]
 mod _internal {
     #[pymodule_export]
     use super::coverage_profile::coverage_profile_py;
+    #[pymodule_export]
+    use super::geometry::interval_gaps_py;
+    #[pymodule_export]
+    use super::geometry::merge_intervals_py;
+    #[pymodule_export]
+    use super::geometry::validate_intervals_py;
     #[pymodule_export]
     use super::profile::max_weight_with_capacity_profile_py;
 }
@@ -50,6 +89,41 @@ fn nesting_output(inputs: &[Field]) -> PolarsResult<Field> {
 fn lanes_output(inputs: &[Field]) -> PolarsResult<Field> {
     let [start, _] = input_pair(inputs, "assign_lanes")?;
     Ok(Field::new(start.name().clone(), DataType::UInt32))
+}
+
+fn clusters_output(inputs: &[Field]) -> PolarsResult<Field> {
+    let [start, _] = input_pair(inputs, "cluster_intervals")?;
+    Ok(Field::new(start.name().clone(), DataType::UInt32))
+}
+
+#[derive(serde::Deserialize)]
+struct ClusterOptions {
+    include_touching: bool,
+}
+
+#[pyo3_polars::derive::polars_expr(output_type_func = clusters_output)]
+fn cluster_intervals_plugin(inputs: &[Series], kwargs: ClusterOptions) -> PolarsResult<Series> {
+    let [starts, ends] = input_pair(inputs, "cluster_intervals")?;
+    cluster_intervals(starts, ends, kwargs.include_touching)
+}
+
+/// Label connected interval components in original row order.
+///
+/// Nonempty half-open intervals connect by strict overlap, or also by touching
+/// when `include_touching` is true. Every empty row is an isolated singleton.
+/// IDs are non-null UInt32, contiguous from zero, in first-original-row order.
+/// Matching integer, Date and Datetime inputs retain exact physical endpoints.
+/// All chunks form one collection. See [`intervals_core::cluster_intervals`].
+///
+/// # Errors
+/// Rejects unequal lengths, nulls, unsupported or mismatched logical dtypes,
+/// reversed intervals and IDs exceeding UInt32. Reports original row indices.
+pub fn cluster_intervals(
+    starts: &Series,
+    ends: &Series,
+    include_touching: bool,
+) -> PolarsResult<Series> {
+    evaluate(starts, ends, Algorithm::Cluster(include_touching))
 }
 
 fn coverage_output(inputs: &[Field]) -> PolarsResult<Field> {
@@ -658,6 +732,7 @@ fn integer_values(values: &Series) -> PolarsResult<Vec<i128>> {
 
 #[derive(Clone, Copy)]
 enum Algorithm<'a> {
+    Cluster(bool),
     Coverage(usize),
     Stabbing,
     OverlapCount,
@@ -676,6 +751,7 @@ enum Algorithm<'a> {
 impl Algorithm<'_> {
     fn name(self) -> &'static str {
         match self {
+            Self::Cluster(_) => "cluster_intervals",
             Self::Coverage(_) => "max_k_coverage",
             Self::Stabbing => "minimum_stabbing_points",
             Self::OverlapCount => "overlap_count",
@@ -693,42 +769,68 @@ impl Algorithm<'_> {
     }
 }
 
-fn evaluate(starts: &Series, ends: &Series, algorithm: Algorithm<'_>) -> PolarsResult<Series> {
-    let name = algorithm.name();
-    polars_ensure!(
-        starts.len() == ends.len(),
-        ShapeMismatch: "{} requires equal lengths, got {} starts and {} ends", name,
-        starts.len(), ends.len()
-    );
-    polars_ensure!(
-        starts.dtype() == ends.dtype(),
-        InvalidOperation: "{} requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}", name,
-        starts.dtype(), ends.dtype()
-    );
-    match starts.dtype() {
-        DataType::Int8 => evaluate_typed(starts.i8()?, ends.i8()?, algorithm),
-        DataType::Int16 => evaluate_typed(starts.i16()?, ends.i16()?, algorithm),
-        DataType::Int32 => evaluate_typed(starts.i32()?, ends.i32()?, algorithm),
-        DataType::Int64 => evaluate_typed(starts.i64()?, ends.i64()?, algorithm),
-        DataType::UInt8 => evaluate_typed(starts.u8()?, ends.u8()?, algorithm),
-        DataType::UInt16 => evaluate_typed(starts.u16()?, ends.u16()?, algorithm),
-        DataType::UInt32 => evaluate_typed(starts.u32()?, ends.u32()?, algorithm),
-        DataType::UInt64 => evaluate_typed(starts.u64()?, ends.u64()?, algorithm),
-        DataType::Date => evaluate_typed(
-            starts.date()?.physical(),
-            ends.date()?.physical(),
-            algorithm,
-        ),
-        DataType::Datetime(_, _) => evaluate_typed(
-            starts.datetime()?.physical(),
-            ends.datetime()?.physical(),
-            algorithm,
-        ),
-        dtype => polars_bail!(
-            InvalidOperation: "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
-            name, dtype
-        ),
+fn validate_endpoint_pair(starts: &Series, ends: &Series, name: &str) -> PolarsResult<()> {
+    polars_ensure!(starts.len() == ends.len(), ShapeMismatch:
+        "{} requires equal lengths, got {} starts and {} ends", name, starts.len(), ends.len());
+    polars_ensure!(starts.dtype() == ends.dtype(), InvalidOperation:
+        "{} requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
+        name, starts.dtype(), ends.dtype());
+    polars_ensure!(matches!(starts.dtype(),
+        DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
+        DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
+        DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
+        "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
+        name, starts.dtype());
+    Ok(())
+}
+
+fn endpoint_values<'a, T: PolarsIntegerType>(
+    starts: &'a ChunkedArray<T>,
+    ends: &'a ChunkedArray<T>,
+    name: &str,
+) -> PolarsResult<[Cow<'a, [T::Native]>; 2]> {
+    polars_ensure!(starts.null_count() == 0 && ends.null_count() == 0, ComputeError:
+        "{} does not support null endpoints", name);
+    // Borrow contiguous inputs; collect only columns spanning multiple chunks.
+    Ok([starts, ends].map(|column| {
+        column
+            .cont_slice()
+            .map(Cow::Borrowed)
+            .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
+    }))
+}
+
+fn validate_group_keys(
+    keys: &[Series],
+    len: usize,
+    name: &str,
+    reserved: &[&str],
+) -> PolarsResult<()> {
+    for (index, key) in keys.iter().enumerate() {
+        polars_ensure!(key.len() == len, ShapeMismatch:
+            "{} requires equal interval and group key lengths", name);
+        polars_ensure!(!reserved.contains(&key.name().as_str()), InvalidOperation:
+            "{} group keys cannot use reserved output names {}", name, reserved.join("/"));
+        polars_ensure!(!keys[..index].iter().any(|other| other.name() == key.name()), InvalidOperation:
+            "{} requires distinct group keys", name);
+        polars_ensure!(matches!(key.dtype(),
+            DataType::String | DataType::Boolean |
+            DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
+            DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
+            DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
+            "{} requires String, Boolean, 8/16/32/64-bit integer, Date, or Datetime group keys, got {}",
+            name, key.dtype());
     }
+    Ok(())
+}
+
+fn evaluate(starts: &Series, ends: &Series, algorithm: Algorithm<'_>) -> PolarsResult<Series> {
+    dispatch_endpoints!(
+        starts,
+        ends,
+        algorithm.name(),
+        |left, right| evaluate_typed(left, right, algorithm)
+    )
 }
 
 fn evaluate_typed<T>(
@@ -740,18 +842,13 @@ where
     T: PolarsIntegerType,
     T::Native: intervals_core::DiscreteEndpoint + intervals_core::CoverageEndpoint + TryFrom<i128>,
 {
-    polars_ensure!(
-        starts.null_count() == 0 && ends.null_count() == 0,
-        ComputeError: "{} does not support null endpoints", algorithm.name()
-    );
-    // Borrow contiguous inputs; only materialize columns spanning multiple chunks.
-    let [starts, ends] = [starts, ends].map(|column| {
-        column
-            .cont_slice()
-            .map(Cow::Borrowed)
-            .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
-    });
+    let [starts, ends] = endpoint_values(starts, ends, algorithm.name())?;
     match algorithm {
+        Algorithm::Cluster(include_touching) => {
+            let labels = intervals_core::cluster_intervals(&starts, &ends, include_touching)
+                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(Series::from_vec(algorithm.name().into(), labels))
+        }
         Algorithm::Coverage(k) => {
             let mask = intervals_core::max_k_coverage(&starts, &ends, k)
                 .map_err(|error| polars_err!(ComputeError: "{error}"))?;

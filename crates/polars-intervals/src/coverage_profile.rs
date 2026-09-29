@@ -1,10 +1,12 @@
 use super::cover::{TargetValue, scalar_physical};
-use super::{integer_values, validate_integer_dtype};
+use super::{
+    endpoint_values, integer_values, validate_endpoint_pair, validate_group_keys,
+    validate_integer_dtype,
+};
 use intervals_core::{CoverageSegment, IntervalError};
 use polars::prelude::*;
 use pyo3::prelude::*;
 use pyo3_polars::{PyDataFrame, PySeries};
-use std::borrow::Cow;
 
 const NAME: &str = "coverage_profile";
 
@@ -59,11 +61,7 @@ fn evaluate(
     domain: Option<(i128, i128)>,
     include_zero: bool,
 ) -> PolarsResult<DataFrame> {
-    polars_ensure!(starts.len() == ends.len(), ShapeMismatch:
-        "{} requires equal lengths, got {} starts and {} ends", NAME, starts.len(), ends.len());
-    polars_ensure!(starts.dtype() == ends.dtype(), InvalidOperation:
-        "{} requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
-        NAME, starts.dtype(), ends.dtype());
+    validate_endpoint_pair(starts, ends, NAME)?;
     let weights = weights
         .map(|weights| {
             validate_integer_dtype(weights.dtype(), NAME, "weight")?;
@@ -74,50 +72,16 @@ fn evaluate(
             integer_values(weights)
         })
         .transpose()?;
-    for (index, key) in keys.iter().enumerate() {
-        polars_ensure!(key.len() == starts.len(), ShapeMismatch:
-            "{} requires equal interval and group key lengths", NAME);
-        polars_ensure!(!["start", "end", "load"].contains(&key.name().as_str()), InvalidOperation:
-            "{} group keys cannot use reserved output names start/end/load", NAME);
-        polars_ensure!(!keys[..index].iter().any(|other| other.name() == key.name()), InvalidOperation:
-            "{} requires distinct group keys", NAME);
-        polars_ensure!(matches!(key.dtype(),
-            DataType::String | DataType::Boolean |
-            DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
-            DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
-            DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
-            "{} requires String, Boolean, 8/16/32/64-bit integer, Date, or Datetime group keys, got {}",
-            NAME, key.dtype());
-    }
-    macro_rules! dispatch {
-        ($left:expr, $right:expr) => {
-            evaluate_typed(
-                $left,
-                $right,
-                weights.as_deref(),
-                keys,
-                domain,
-                include_zero,
-                starts.dtype(),
-            )
-        };
-    }
-    match starts.dtype() {
-        DataType::Int8 => dispatch!(starts.i8()?, ends.i8()?),
-        DataType::Int16 => dispatch!(starts.i16()?, ends.i16()?),
-        DataType::Int32 => dispatch!(starts.i32()?, ends.i32()?),
-        DataType::Int64 => dispatch!(starts.i64()?, ends.i64()?),
-        DataType::UInt8 => dispatch!(starts.u8()?, ends.u8()?),
-        DataType::UInt16 => dispatch!(starts.u16()?, ends.u16()?),
-        DataType::UInt32 => dispatch!(starts.u32()?, ends.u32()?),
-        DataType::UInt64 => dispatch!(starts.u64()?, ends.u64()?),
-        DataType::Date => dispatch!(starts.date()?.physical(), ends.date()?.physical()),
-        DataType::Datetime(_, _) => {
-            dispatch!(starts.datetime()?.physical(), ends.datetime()?.physical())
-        }
-        dtype => polars_bail!(InvalidOperation:
-            "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}", NAME, dtype),
-    }
+    validate_group_keys(keys, starts.len(), NAME, &["start", "end", "load"])?;
+    dispatch_endpoints!(starts, ends, NAME, |left, right| evaluate_typed(
+        left,
+        right,
+        weights.as_deref(),
+        keys,
+        domain,
+        include_zero,
+        starts.dtype(),
+    ))
 }
 
 fn evaluate_typed<T>(
@@ -134,14 +98,7 @@ where
     T::Native: Ord + TryFrom<i128>,
     ChunkedArray<T>: IntoSeries,
 {
-    polars_ensure!(starts.null_count() == 0 && ends.null_count() == 0, ComputeError:
-        "{} does not support null endpoints", NAME);
-    let [starts, ends] = [starts, ends].map(|column| {
-        column
-            .cont_slice()
-            .map(Cow::Borrowed)
-            .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
-    });
+    let [starts, ends] = endpoint_values(starts, ends, NAME)?;
     let domain = domain
         .map(|(left, right)| -> PolarsResult<_> {
             let convert = |value| {

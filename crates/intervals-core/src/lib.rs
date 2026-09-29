@@ -12,6 +12,7 @@
 //! [`minimum_dominating_set`] and [`minimum_cost_dominating_set`] dominate interval vertices.
 //! [`minimum_stabbing_points`] hits every discrete interval with the fewest points.
 //! [`coverage_profile`] and [`weighted_coverage_profile`] return exact load segments.
+//! [`cluster_intervals`], [`merge_intervals`] and [`interval_gaps`] describe interval geometry.
 
 #![forbid(unsafe_code)]
 
@@ -46,6 +47,8 @@ mod coverage;
 pub use coverage::{CoverageEndpoint, max_k_coverage};
 mod coverage_profile;
 pub use coverage_profile::{CoverageSegment, coverage_profile, weighted_coverage_profile};
+mod geometry;
+pub use geometry::{cluster_intervals, interval_gaps, merge_intervals};
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -59,6 +62,8 @@ pub enum IntervalError {
     EmptyInterval { index: usize },
     /// More than `u32::MAX + 1` lanes are required.
     TooManyLanes,
+    /// More than `u32::MAX + 1` interval components are required.
+    TooManyClusters,
     /// Lane IDs must be contiguous from zero and smaller than the row count.
     InvalidLaneId { index: usize, lane: u32 },
     /// Two nonempty intervals in the same lane overlap.
@@ -102,6 +107,7 @@ impl fmt::Display for IntervalError {
                 write!(f, "cannot stab empty interval at index {index}")
             }
             Self::TooManyLanes => write!(f, "lane IDs exceed the UInt32 range"),
+            Self::TooManyClusters => write!(f, "cluster IDs exceed the UInt32 range"),
             Self::InvalidLaneId { index, lane } => write!(
                 f,
                 "invalid lane ID {lane} at index {index}: IDs must be contiguous from zero and smaller than the row count"
@@ -157,6 +163,23 @@ fn validate_lengths<T>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
             ("starts", starts.len()),
             ("ends", ends.len()),
         ]));
+    }
+    Ok(())
+}
+
+/// Validate matching interval slices without sorting or discarding empty rows.
+///
+/// # Errors
+///
+/// Returns [`IntervalError::LengthMismatch`] for unequal lengths or
+/// [`IntervalError::InvalidInterval`] for the first original row whose start
+/// exceeds its end. Empty intervals are valid.
+pub fn validate_intervals<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
+    validate_lengths(starts, ends)?;
+    for (index, (&start, &end)) in starts.iter().zip(ends).enumerate() {
+        if start > end {
+            return Err(IntervalError::InvalidInterval { index });
+        }
     }
     Ok(())
 }
