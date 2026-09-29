@@ -15,9 +15,7 @@ import polars_intervals as pi
 
 appointments = pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
 result = (
-    appointments.lazy()
-    .with_columns(pi.overlap_count("start", "end").alias("overlaps"))
-    .collect()
+    appointments.lazy().with_columns(pi.overlap_count("start", "end").alias("overlaps")).collect()
 )
 
 print(result["overlaps"].to_list())  # [1, 2, 1]
@@ -182,9 +180,7 @@ the row itself; duplicate nonempty rows count one another.
 ```python
 intervals = pl.DataFrame({"start": [0, 2, 4], "end": [10, 5, 12]})
 result = (
-    intervals.lazy()
-    .with_columns(pi.containment_count("start", "end").alias("contained"))
-    .collect()
+    intervals.lazy().with_columns(pi.containment_count("start", "end").alias("contained")).collect()
 )
 
 print(result["contained"].to_list())  # [1, 0, 0]
@@ -213,11 +209,7 @@ row. Outermost intervals have depth zero; each containment step adds one:
 
 ```python
 intervals = pl.DataFrame({"start": [0, 2, 2, 3], "end": [10, 8, 8, 7]})
-result = (
-    intervals.lazy()
-    .with_columns(pi.nesting_depth("start", "end").alias("depth"))
-    .collect()
-)
+result = intervals.lazy().with_columns(pi.nesting_depth("start", "end").alias("depth")).collect()
 
 print(result["depth"].to_list())  # [0, 1, 1, 2]
 ```
@@ -249,11 +241,7 @@ calendar or a track in a timeline. Intervals in the same lane do not overlap.
 
 ```python
 appointments = pl.DataFrame({"start": [0, 1, 2], "end": [2, 3, 4]})
-result = (
-    appointments.lazy()
-    .with_columns(pi.assign_lanes("start", "end").alias("lane"))
-    .collect()
-)
+result = appointments.lazy().with_columns(pi.assign_lanes("start", "end").alias("lane")).collect()
 
 print(result["lane"].to_list())  # [0, 1, 0]
 ```
@@ -276,9 +264,7 @@ the **number of rows** more evenly between them:
 ```python
 intervals = pl.DataFrame({"start": [0, 0, 1, 2, 3, 4], "end": [10, 10, 1, 2, 3, 4]})
 result = (
-    intervals.lazy()
-    .with_columns(pi.assign_balanced_lanes("start", "end").alias("lane"))
-    .collect()
+    intervals.lazy().with_columns(pi.assign_balanced_lanes("start", "end").alias("lane")).collect()
 )
 
 print(sorted(result["lane"].value_counts()["count"].to_list()))  # [3, 3]
@@ -299,9 +285,7 @@ To improve an existing assignment, pass its column as `initial_lanes`:
 ```python
 original = intervals.lazy().with_columns(pi.assign_lanes("start", "end").alias("lane"))
 rebalanced = original.with_columns(
-    pi.assign_balanced_lanes(
-        "start", "end", initial_lanes="lane", max_work=100_000
-    ).alias("lane")
+    pi.assign_balanced_lanes("start", "end", initial_lanes="lane", max_work=100_000).alias("lane")
 ).collect()
 ```
 
@@ -347,9 +331,7 @@ jobs = pl.DataFrame(
     }
 )
 chosen = (
-    jobs.lazy()
-    .filter(pi.max_weight_non_overlapping("start", "end", weight="revenue"))
-    .collect()
+    jobs.lazy().filter(pi.max_weight_non_overlapping("start", "end", weight="revenue")).collect()
 )
 
 print(chosen["revenue"].sum())  # 30
@@ -370,9 +352,7 @@ to overlap. Using the same jobs:
 ```python
 chosen = (
     jobs.lazy()
-    .filter(
-        pi.max_weight_with_capacity("start", "end", weight="revenue", capacity=2)
-    )
+    .filter(pi.max_weight_with_capacity("start", "end", weight="revenue", capacity=2))
     .collect()
 )
 
@@ -462,15 +442,9 @@ For nonempty intervals, the selected rows share a common point. With no
 `weight` argument, it selects as many mutually overlapping rows as possible:
 
 ```python
-intervals = pl.DataFrame(
-    {"start": [0, 1, 2, 10], "end": [5, 4, 3, 11], "value": [1, 1, 1, 9]}
-)
+intervals = pl.DataFrame({"start": [0, 1, 2, 10], "end": [5, 4, 3, 11], "value": [1, 1, 1, 9]})
 most_rows = intervals.lazy().filter(pi.max_weight_clique("start", "end")).collect()
-most_value = (
-    intervals.lazy()
-    .filter(pi.max_weight_clique("start", "end", weight="value"))
-    .collect()
-)
+most_value = intervals.lazy().filter(pi.max_weight_clique("start", "end", weight="value")).collect()
 
 print(most_rows["start"].to_list())  # [0, 1, 2]
 print(most_value["start"].to_list())  # [10]
@@ -527,16 +501,10 @@ An infeasible group raises an error.
 cost. If costs tie, it chooses fewer intervals:
 
 ```python
-intervals = pl.DataFrame(
-    {"start": [0, 0, 5], "end": [10, 5, 10], "cost": [100, 10, 10]}
-)
+intervals = pl.DataFrame({"start": [0, 0, 5], "end": [10, 5, 10], "cost": [100, 10, 10]})
 chosen = (
     intervals.lazy()
-    .filter(
-        pi.minimum_cost_cover(
-            "start", "end", cost="cost", target_start=0, target_end=10
-        )
-    )
+    .filter(pi.minimum_cost_cover("start", "end", cost="cost", target_start=0, target_end=10))
     .collect()
 )
 
@@ -605,9 +573,7 @@ interval. A point hits an interval when `start <= point < end`:
 ```python
 intervals = pl.DataFrame({"start": [0, 2, 5], "end": [4, 6, 9]})
 result = (
-    intervals.lazy()
-    .select(pi.minimum_stabbing_points("start", "end").alias("points"))
-    .collect()
+    intervals.lazy().select(pi.minimum_stabbing_points("start", "end").alias("points")).collect()
 )
 
 print(result["points"].to_list())  # [[3, 8]]
@@ -649,18 +615,10 @@ target to be covered.
 With no `cost` argument, every row costs one, so it selects the fewest rows:
 
 ```python
-intervals = pl.DataFrame(
-    {"start": [0, 3, 6], "end": [4, 7, 10], "price": [1, 10, 1]}
-)
-fewest_rows = (
-    intervals.lazy()
-    .filter(pi.minimum_cost_dominating_set("start", "end"))
-    .collect()
-)
+intervals = pl.DataFrame({"start": [0, 3, 6], "end": [4, 7, 10], "price": [1, 10, 1]})
+fewest_rows = intervals.lazy().filter(pi.minimum_cost_dominating_set("start", "end")).collect()
 lowest_cost = (
-    intervals.lazy()
-    .filter(pi.minimum_cost_dominating_set("start", "end", cost="price"))
-    .collect()
+    intervals.lazy().filter(pi.minimum_cost_dominating_set("start", "end", cost="price")).collect()
 )
 
 print(fewest_rows["start"].to_list())  # [3]
