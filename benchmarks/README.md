@@ -12,6 +12,7 @@ release plugin. Summary and plotting scripts only read saved results.
 
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
+| [`minimum_cost_dominating_set.py`](minimum_cost_dominating_set.py) | End-to-end benchmark | Integer/temporal, grouped and multichunk inputs → checked release collection samples and provenance | [Dominating set](../docs/domination-benchmarks.md) |
 | [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated, sharded interval instances | [Interval-graph corpora](#interval-graph-corpora) |
 | [`test_generate_interval_graphs.py`](test_generate_interval_graphs.py) | Corpus checks | Tiny deterministic instances and local fixtures → structural and reproducibility checks | [Interval-graph corpora](#interval-graph-corpora) |
 | [`nesting_depth.py`](nesting_depth.py) | End-to-end benchmark | Exact analytic families, integer/temporal and grouped inputs → verified collection samples and environment metadata | [Nesting depth](../docs/nesting-depth-benchmarks.md) |
@@ -28,12 +29,22 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
-They time production only. Removed candidates and runners are preserved in the
+Except for the dominating-set comparisons described below, they time production
+only. Removed candidates and runners are preserved in the
 [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
 Historical metadata may reference a base revision with uncommitted feature
 changes. Consult each run's source hashes and cleanup notes for differences
 between the snapshot and the measured sources; see the
 [provenance guidance](../docs/benchmarking.md#measurement-rules).
+
+The dominating-set runner is `cargo bench -p intervals-core --bench
+minimum_cost_dominating_set --locked`. `DOMINATION_CSV` must name a new absolute
+output path. `DOMINATION_SIZES`, `DOMINATION_SEEDS`, `DOMINATION_DTYPES`,
+`DOMINATION_METHODS`, and `DOMINATION_CASES` accept comma-separated selections;
+`DOMINATION_SAMPLES` and `DOMINATION_WARMUPS` default to five and two. It compares
+complete production, covering, fused covering, heap DP and direct greedy calls,
+plus a bounded quadratic reference, with separate allocator instrumentation.
+See the [report](../docs/domination-benchmarks.md) and [proofs](domination-notes.md).
 
 The maximum-weight clique runner is `cargo bench -p intervals-core --bench
 max_weight_clique --locked`. It times the production functions, including

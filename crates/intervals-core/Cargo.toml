@@ -50,3 +50,7 @@ harness = false
 [[bench]]
 name = "max_weight_clique"
 harness = false
+
+[[bench]]
+name = "minimum_cost_dominating_set"
+harness = false

@@ -6,7 +6,7 @@ import pytest
 
 from .dtypes import ENDPOINT_DTYPES
 
-# A non-null integer column of the frame's length, for weight and lane arguments.
+# A non-null integer column of the frame's length, for weight, cost, and lane arguments.
 ROWS = pl.int_range(pl.len())
 # Fast-path settings (k=0, capacity=0, max_work=0) must validate like the rest.
 ALGORITHMS = {
@@ -19,6 +19,8 @@ ALGORITHMS = {
     "max_k_coverage_k0": lambda s, e: pi.max_k_coverage(s, e, k=0),
     "max_k_coverage_k2": lambda s, e: pi.max_k_coverage(s, e, k=2),
     "minimum_stabbing_points": pi.minimum_stabbing_points,
+    "domination_units": pi.minimum_cost_dominating_set,
+    "domination_costs": lambda s, e: pi.minimum_cost_dominating_set(s, e, cost=ROWS),
     "max_weight_non_overlapping": lambda s, e: pi.max_weight_non_overlapping(s, e, weight=ROWS),
     "capacity_0": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=0),
     "capacity_2": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=2),
@@ -82,8 +84,11 @@ def test_unsupported_dtypes_even_when_empty(algorithm, dtype):
             frame.select(algorithm("start", "end"))
 
 
-@pytest.mark.parametrize("start", [pl.col("start").head(1), pl.lit(1, dtype=pl.Int64)])
-def test_lengths_must_match_without_broadcasting(algorithm, start):
+@pytest.mark.parametrize("argument", ["start", "end"])
+@pytest.mark.parametrize("scalar", [False, True])
+def test_lengths_must_match_without_broadcasting(algorithm, argument, scalar):
     frame = pl.DataFrame({"start": [0, 1], "end": [3, 4]})
+    args = {"start": pl.col("start"), "end": pl.col("end")}
+    args[argument] = pl.lit(1, dtype=pl.Int64) if scalar else args[argument].head(1)
     with pytest.raises(pl.exceptions.PolarsError, match="equal lengths"):
-        frame.select(algorithm(start, "end"))
+        frame.select(algorithm(args["start"], args["end"]))

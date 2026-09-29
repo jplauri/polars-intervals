@@ -49,6 +49,7 @@ Or with uv: `uv add polars-intervals`.
 | [`max_k_coverage`](https://jplauri.github.io/polars-intervals/usage/#select-maximum-coverage-with-a-budget) | Maximize the total measure covered by at most `k` intervals. |
 | [`minimum_cover`](https://jplauri.github.io/polars-intervals/usage/#cover-one-continuous-target) | Cover a target with the fewest intervals. |
 | [`minimum_cost_cover`](https://jplauri.github.io/polars-intervals/usage/#cover-at-minimum-cost) | Cover a target at minimum total cost. |
+| [`minimum_cost_dominating_set`](https://jplauri.github.io/polars-intervals/usage/#select-a-minimum-cost-dominating-set) | Select minimum-cost representatives that dominate every interval vertex. |
 | [`minimum_stabbing_points`](https://jplauri.github.io/polars-intervals/usage/#minimum-stabbing-points) | Find the fewest points that hit every interval. |
 
 ## Examples
@@ -116,6 +117,19 @@ Select at most `k` intervals whose union has maximum total measure. Among
 maximum-coverage solutions, use the fewest intervals. The result is an exact,
 deterministic Boolean mask in original row order; empty intervals are never
 selected. See the [benchmarks and linked design notes](https://jplauri.github.io/polars-intervals/coverage-benchmarks/).
+
+### Select a minimum-cost dominating set
+
+```python
+df = pl.DataFrame({"start": [0, 3, 6], "end": [4, 7, 10], "price": [1, 10, 1]})
+df.filter(pi.minimum_cost_dominating_set("start", "end"))  # Middle row, unit costs.
+df.filter(pi.minimum_cost_dominating_set("start", "end", cost="price"))  # Outer two.
+```
+
+Every row must be selected or overlap a selected row. Minimize total cost,
+then selected count. Empty intervals are isolated and **all** must be selected,
+even at zero cost. Omitted costs are units; an existing `cost` column has no
+effect. See [semantics and grouped examples](https://jplauri.github.io/polars-intervals/usage/#select-a-minimum-cost-dominating-set).
 
 ### Select a maximum-weight clique
 

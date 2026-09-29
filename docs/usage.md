@@ -4,6 +4,73 @@ Most interval operations take column names or Polars expressions for eager or
 lazy queries. Capacity-profile selection takes two eager DataFrames and returns
 a Series. See the [API reference](api.md) for full parameter and return types.
 
+## Select a minimum-cost dominating set
+
+```python
+import polars as pl
+import polars_intervals as pi
+
+df = pl.DataFrame({"start": [0, 3, 6], "end": [4, 7, 10], "price": [1, 10, 1]})
+df.filter(pi.minimum_cost_dominating_set("start", "end"))
+# [3,7): one representative dominates all three vertices with unit costs.
+df.filter(pi.minimum_cost_dominating_set("start", "end", cost="price"))
+# [0,4) and [6,10): total cost 2 beats the middle row's cost 10.
+```
+
+This is ordinary graph domination: every input row is both a demand and a
+selectable candidate. A selected row dominates itself. Distinct nonempty
+intervals overlap exactly when `s_i < e_j and s_j < e_i`; touching intervals
+do not overlap. Selected representatives can overlap or be disjoint. This
+covers input vertices by overlap, not every point of a continuous coordinate
+target as `minimum_cost_cover` does.
+
+Every empty `[x,x)` row is isolated and must be selected, including duplicate
+empties, empties inside nonempty intervals, and zero-cost empties. Nonempty
+duplicates can share a representative. The objective minimizes **(total cost,
+selected count)** in that order; zero costs remain valid, and the count
+tie-break removes redundant selections. A nonempty input always selects at
+least one row. Empty input returns an empty mask.
+
+Omitting `cost`, or passing `cost=None`, uses implicit unit costs without a
+ones column. A column named `cost` is never implicitly read. Explicit costs
+must be nonnegative signed or unsigned 8/16/32/64-bit integers with one value
+per row. Costs use checked, exact `i128` accumulation, including mandatory
+empties. Overflow in an inferior alternative does not reject a representable
+optimum. Nulls, scalar broadcasting, negative costs, and implicit casts are
+unsupported. Endpoints must have identical Int8/16/32/64, UInt8/16/32/64,
+Date, or Datetime dtypes, including units and timezones. All rows are validated
+before optimization, including rows later omitted from the selection.
+
+The non-null Boolean mask preserves original row order in eager/lazy `select`,
+`with_columns`, and `filter`. All chunks form one instance, also with the
+streaming engine. For separate group instances:
+
+```python
+grouped = df.with_columns(pl.Series("group", ["a", "a", "a"]))
+result = (
+    grouped.lazy()
+    .with_columns(
+        pi.minimum_cost_dominating_set("start", "end", cost="price").over("group").alias("selected")
+    )
+    .collect()
+)
+lists = grouped.group_by("group").agg(
+    pi.minimum_cost_dominating_set("start", "end", cost="price").alias("selected")
+)
+```
+
+Filtering before optimization changes **both demands and candidates**. Results
+are deterministic for identical logical inputs across chunking and eager/lazy
+execution. Tied masks need not match after row permutation, between unit and
+explicit-cost modes, or across releases; no smallest-index-set promise is made.
+
+Sorting, reduction, optimization, and reconstruction together use `O(n log n)`
+time and `O(n)` extra space, without graph edges or coordinate arithmetic.
+General costs use a target-prefix heap dynamic program; implicit units and
+uniform explicit costs use the direct minimum-cardinality greedy sweep.
+See [benchmarks](domination-benchmarks.md) and their linked correctness notes
+for the production choice and independent tests.
+
 ## Select maximum coverage with a budget
 
 ```python

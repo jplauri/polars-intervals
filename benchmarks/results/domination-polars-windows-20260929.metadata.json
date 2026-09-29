@@ -1,0 +1,174 @@
+{
+  "timestamp_utc": "2026-09-29T04:57:42.653202+00:00",
+  "command": [
+    "benchmarks/minimum_cost_dominating_set.py",
+    "--output",
+    "benchmarks/results/domination-polars-windows-20260929",
+    "--sizes",
+    "0",
+    "8",
+    "64",
+    "1000",
+    "10000",
+    "100000",
+    "--seeds",
+    "7",
+    "41",
+    "--samples",
+    "5",
+    "--warmups",
+    "2"
+  ],
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+  "logical_cpus": 24,
+  "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+  "polars": "1.44.2",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+  "revision": "d742de3e57fdc523d1673e81106ca6d5109127bb",
+  "polars_threads": 1,
+  "thread_settings": {
+    "POLARS_MAX_THREADS": "1",
+    "RAYON_NUM_THREADS": null,
+    "CARGO_BUILD_JOBS": "2"
+  },
+  "native_sha256": "71258cd611e2e17d869f228d10f154da652c20e24f8e06ddd94fa1237ab32a83",
+  "release_sha256": "71258cd611e2e17d869f228d10f154da652c20e24f8e06ddd94fa1237ab32a83",
+  "source_sha256": {
+    "Cargo.toml": "f9aa1b57de86ef9b31d9c8a1f556f97880133264239deacad738bd10182964af",
+    "Cargo.lock": "5629288b59113ac4d3d8bdff3afe78d24e3c4c72d8c82a06466edb2edc71073a",
+    "rust-toolchain.toml": "86810d0ace88a635a96ed7a8d7d432afa6950c0c0b99f78f6e905ed9616a9882",
+    "crates\\intervals-core\\Cargo.toml": "0889ee77e56673bf7c77a572a0d0ec29d748b52fcdf72b90ce1baa3381a6fae8",
+    "crates\\polars-intervals\\Cargo.toml": "fc1f36cc4b80664432fc511bd109d00ba5d327afc8ce66897c54dd88ddc15acc",
+    "crates\\intervals-core\\src\\balance.rs": "7a1c73011b2a0dc71cc2b7161b85bc3b720240ef5c2025cd3976dce0d1be69b5",
+    "crates\\intervals-core\\src\\capacity.rs": "ff68400bc227ed60e17abfdeb4047c3da4ea817dd628eb464b5b744e99cb2890",
+    "crates\\intervals-core\\src\\capacity_profile.rs": "a00504174a326c1f90326c2a6962b6de922009fd0814adefd4d14875fc38125d",
+    "crates\\intervals-core\\src\\clique.rs": "2a61aba50cddabbfea17e39e8b7eb5434339bcb313064aa21fb4405fa3162438",
+    "crates\\intervals-core\\src\\containment.rs": "83104f9c157cdb45e084b1adbd1c83943f983ca0254ffdbf304a1d244e82bc13",
+    "crates\\intervals-core\\src\\cover.rs": "9128ac972f0b55d297c72ed262bd02e22f88038750d3b8bac33a99975f9051d9",
+    "crates\\intervals-core\\src\\coverage.rs": "3af72ad0d3b7b7cbbf54aa79db38a3533a35e989a8430b9f027d2f4e1f4ec07e",
+    "crates\\intervals-core\\src\\domination.rs": "d0dc71fedac68b4a8a52f7f42d224e6f3346df94a3873934f238b6940286c081",
+    "crates\\intervals-core\\src\\lanes.rs": "af289c1add48cfd6be7255bf7c7d23d58621c2dd9c939c0a59f822d03384b754",
+    "crates\\intervals-core\\src\\lib.rs": "ee31d19edd8fd269ffdd28f7dc8ada2eceed5120259c60457072208eac7f8a5c",
+    "crates\\intervals-core\\src\\nesting.rs": "d9f1767744e10301af4d7a69786bdbd55cd58ce8e2f0d59e96bf5e4be1a96f56",
+    "crates\\intervals-core\\src\\stabbing.rs": "6a4771542535cac24c7852171384257845cffad6e1771d860dc9cac7944a9d19",
+    "crates\\intervals-core\\src\\weighted.rs": "ab8e0d3a3b182054438eb0825665756b917b5afc5696990b2d151a33e2f010f5",
+    "crates\\polars-intervals\\src\\cover.rs": "33212bca8b245864d65cfed6062c81e65df8676315b4b0aa8880db13799c5c1d",
+    "crates\\polars-intervals\\src\\domination.rs": "1cd817a7732ac53979420eb03b448240bd49496e1f34360635c18795de7b8f9f",
+    "crates\\polars-intervals\\src\\lib.rs": "a1397ddba682f36e34d38548458f3dfa818654e8170377a5ae30bebcce515587",
+    "crates\\polars-intervals\\src\\profile.rs": "cc608db5987ff5368fadee5ec045efe8e4eaef742134dec8e6da4e2893819f9e",
+    "benchmarks\\minimum_cost_dominating_set.py": "bc57faee9f198ffbd0ba627b70204b4723dd709cae402412d0ae181ca50a6a35",
+    "python\\polars_intervals\\__init__.py": "e3835336b87398e14edf741dfc8aadf9e1cb3ecf747234d188c755805a8ea140"
+  },
+  "sizes": [
+    0,
+    8,
+    64,
+    1000,
+    10000,
+    100000
+  ],
+  "seeds": [
+    7,
+    41
+  ],
+  "samples": 5,
+  "warmups": 2,
+  "cases": [
+    [
+      "path",
+      "start",
+      "i64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "path",
+      "shuffled",
+      "i64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "disjoint",
+      "shuffled",
+      "u64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "nested",
+      "reverse",
+      "i64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "clique",
+      "shuffled",
+      "date",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "duplicate",
+      "shuffled",
+      "datetime_us",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "path",
+      "shuffled",
+      "datetime_ns_utc",
+      1,
+      7,
+      "streaming"
+    ],
+    [
+      "empty",
+      "start",
+      "i64",
+      1,
+      1,
+      "auto"
+    ],
+    [
+      "many_empty",
+      "shuffled",
+      "i64",
+      1,
+      7,
+      "auto"
+    ],
+    [
+      "path",
+      "shuffled",
+      "i64",
+      32,
+      7,
+      "auto"
+    ],
+    [
+      "duplicate",
+      "shuffled",
+      "date",
+      32,
+      1,
+      "streaming"
+    ]
+  ],
+  "scope": "Prepared lazy collect, including plan optimization, validation/extraction, algorithm, reconstruction and mask. Excludes generation, checks and returned-result destruction; internal cleanup is timed.",
+  "memory": "Not measured; core runner measures requested live heap separately.",
+  "verification": "Every timed mask checked outside timing with original adjacency; subset optima for groups <=12 and analytic optima on labeled families. Other large weighted cases are feasibility-only. Determinism and unit/ones/zero objective agreement also checked.",
+  "chunks": "Requested target; each column uses step=max(1,n//chunks+column), so boundaries differ.",
+  "status": "completed",
+  "timing_samples": 2640,
+  "timing_sha256": "57aa7cf2411ff77decbb3b52f76017c18df619dfe8ecbdc763334f0b13d04257"
+}

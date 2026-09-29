@@ -17,6 +17,7 @@ report identifies its timing scope, workload, tradeoffs, and missing coverage.
 | [Capacity profiles](capacity-profile-benchmarks.md) | Polars collections and Rust selection under changing capacity |
 | [Minimum covering](covering-benchmarks.md) | Polars collections and Rust candidates for fewest-interval covering |
 | [Minimum-cost covering](cost-covering-benchmarks.md) | Polars collections and Rust candidates for minimum-cost covering |
+| [Minimum-cost dominating set](domination-benchmarks.md) | Reduction, fused covering, heap DP and greedy comparisons, plus release Polars collections |
 | [Minimum stabbing points](stabbing-benchmarks.md) | Polars collections and Rust candidates for interval hitting sets |
 | [Maximum k-coverage](coverage-benchmarks.md) | Polars collections and Rust candidates for maximum covered measure |
 

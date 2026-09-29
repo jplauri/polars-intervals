@@ -9,6 +9,7 @@
 //! [`max_weight_non_overlapping`] selects an exact maximum-weight schedule.
 //! [`max_weight_clique`] and [`max_clique`] select one exact maximum clique.
 //! [`minimum_cover`] and [`minimum_cost_cover`] cover one continuous target exactly.
+//! [`minimum_dominating_set`] and [`minimum_cost_dominating_set`] dominate interval vertices.
 //! [`minimum_stabbing_points`] hits every discrete interval with the fewest points.
 
 #![forbid(unsafe_code)]
@@ -36,6 +37,8 @@ mod capacity_profile;
 pub use capacity_profile::max_weight_with_capacity_profile;
 mod cover;
 pub use cover::{minimum_cost_cover, minimum_cover};
+mod domination;
+pub use domination::{minimum_cost_dominating_set, minimum_dominating_set};
 mod stabbing;
 pub use stabbing::{DiscreteEndpoint, minimum_stabbing_points};
 mod coverage;

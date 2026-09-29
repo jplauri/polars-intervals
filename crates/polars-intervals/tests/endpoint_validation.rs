@@ -7,7 +7,7 @@ use support::{endpoint_dtypes, typed_series};
 
 type Adapter = fn(&Series, &Series) -> PolarsResult<Series>;
 
-// Non-null integer columns of the starts' length, for weight and lane arguments.
+// Non-null integer columns of the starts' length, for weight, cost, and lane arguments.
 fn ones(starts: &Series) -> Series {
     Series::new("w".into(), vec![1i64; starts.len()])
 }
@@ -17,7 +17,7 @@ fn zeros(starts: &Series) -> Series {
 }
 
 // Fast-path settings (k=0, capacity=0, max_work=0) must validate like the rest.
-const ADAPTERS: [(&str, Adapter); 13] = [
+const ADAPTERS: [(&str, Adapter); 15] = [
     ("overlap_count", overlap_count),
     ("containment_count", containment_count),
     ("nesting_depth", nesting_depth),
@@ -31,6 +31,12 @@ const ADAPTERS: [(&str, Adapter); 13] = [
     ("max_k_coverage_k0", |s, e| max_k_coverage(s, e, 0)),
     ("max_k_coverage_k2", |s, e| max_k_coverage(s, e, 2)),
     ("minimum_stabbing_points", minimum_stabbing_points),
+    ("domination_units", |s, e| {
+        minimum_cost_dominating_set(s, e, None)
+    }),
+    ("domination_costs", |s, e| {
+        minimum_cost_dominating_set(s, e, Some(&ones(s)))
+    }),
     ("max_weight_clique", |s, e| max_weight_clique(s, e, None)),
     ("max_weight_non_overlapping", |s, e| {
         max_weight_non_overlapping(s, e, &ones(s))

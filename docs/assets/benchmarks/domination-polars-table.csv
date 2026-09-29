@@ -1,0 +1,29 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_engine,workload_seed,workload_method,method,x,median,min,max,samples
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,mixed,8,0.0702,0.0667,0.0737,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,mixed,1000,0.1795,0.1787,0.18109999999999998,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,mixed,100000,17.952299999999997,17.673199999999998,18.5368,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,ones,8,0.07289999999999999,0.0701,0.10239999999999999,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,ones,1000,0.12319999999999999,0.1186,0.13319999999999999,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,ones,100000,8.767,8.553099999999999,9.1594,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,units,8,0.0639,0.0572,0.0668,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,units,1000,0.1146,0.11159999999999999,0.1261,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,units,100000,7.971699999999999,7.793399999999999,8.1229,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,zero,8,0.0727,0.0683,0.0873,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,zero,1000,0.1245,0.11839999999999999,0.1348,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,zero,100000,8.7156,8.6328,9.2251,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,7,production,mixed,100000,6.6696,6.5572,6.901,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,7,production,ones,100000,2.0877,1.9696,2.2636,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,7,production,units,100000,1.4051,0.988,1.5295999999999998,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,7,production,zero,100000,2.096,2.0,4.0447999999999995,5
+"Chain, shuffled UTC datetimes, streaming",path,shuffled,datetime_ns_utc,1,7,streaming,7,production,mixed,100000,19.1912,18.793,19.837899999999998,5
+"Chain, shuffled UTC datetimes, streaming",path,shuffled,datetime_ns_utc,1,7,streaming,7,production,ones,100000,9.8788,9.3965,10.139,5
+"Chain, shuffled UTC datetimes, streaming",path,shuffled,datetime_ns_utc,1,7,streaming,7,production,units,100000,9.0131,8.8361,9.0504,5
+"Chain, shuffled UTC datetimes, streaming",path,shuffled,datetime_ns_utc,1,7,streaming,7,production,zero,100000,10.4238,9.524099999999999,11.2434,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,mixed,1000,0.5018,0.45439999999999997,0.7331,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,mixed,100000,14.3056,14.047899999999998,15.718499999999999,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,ones,1000,0.4814,0.39749999999999996,0.5152,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,ones,100000,8.6083,8.4987,8.8988,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,units,1000,0.38489999999999996,0.3464,0.5068,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,units,100000,7.943899999999999,7.5028,8.2087,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,zero,1000,0.4734,0.4224,0.5749,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,zero,100000,8.8354,8.4786,9.1985,5
