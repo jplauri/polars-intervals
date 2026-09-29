@@ -9,8 +9,8 @@ benchmarking. Run checks appropriate to the files changed.
   tables; keep operation-specific regressions in their own suites.
 - Preserve each operation's empty-row, zero-value and tie semantics; they differ
   between algorithms. Validate every row before pruning or fast paths. Preserve
-  exact integer/temporal types, original row order and whole-collection/group
-  execution across chunks, including streaming.
+  exact integer/temporal types and whole-collection/group execution across chunks,
+  including streaming. Preserve original row order for row-aligned outputs.
 - Test optimizers against an independent oracle for the original problem.
   Candidates sharing a reduction do not independently validate that reduction.
   For tied optima, compare feasibility and objective unless the mask is specified.
