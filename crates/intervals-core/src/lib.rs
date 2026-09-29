@@ -11,6 +11,7 @@
 //! [`minimum_cover`] and [`minimum_cost_cover`] cover one continuous target exactly.
 //! [`minimum_dominating_set`] and [`minimum_cost_dominating_set`] dominate interval vertices.
 //! [`minimum_stabbing_points`] hits every discrete interval with the fewest points.
+//! [`coverage_profile`] and [`weighted_coverage_profile`] return exact load segments.
 
 #![forbid(unsafe_code)]
 
@@ -43,6 +44,8 @@ mod stabbing;
 pub use stabbing::{DiscreteEndpoint, minimum_stabbing_points};
 mod coverage;
 pub use coverage::{CoverageEndpoint, max_k_coverage};
+mod coverage_profile;
+pub use coverage_profile::{CoverageSegment, coverage_profile, weighted_coverage_profile};
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -78,6 +81,12 @@ pub enum IntervalError {
     NegativeCost { index: usize },
     /// Every feasible cover costs more than `i128::MAX`.
     CostOverflow,
+    /// Coverage quantities must be nonnegative, even on irrelevant rows.
+    NegativeLoad { index: usize },
+    /// A positive-length coverage segment's load exceeds `i128::MAX`.
+    LoadOverflow,
+    /// The coverage domain starts after it ends.
+    InvalidDomain,
 }
 
 impl fmt::Display for IntervalError {
@@ -130,6 +139,12 @@ impl fmt::Display for IntervalError {
             Self::CostOverflow => {
                 write!(f, "minimum cover cost exceeds the i128 accumulator range")
             }
+            Self::NegativeLoad { index } => write!(
+                f,
+                "load at index {index} is negative; loads must be nonnegative"
+            ),
+            Self::LoadOverflow => write!(f, "coverage load exceeds the i128 accumulator range"),
+            Self::InvalidDomain => write!(f, "domain start is greater than domain end"),
         }
     }
 }

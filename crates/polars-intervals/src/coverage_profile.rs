@@ -1,0 +1,285 @@
+use super::cover::{TargetValue, scalar_physical};
+use super::{integer_values, validate_integer_dtype};
+use intervals_core::{CoverageSegment, IntervalError};
+use polars::prelude::*;
+use pyo3::prelude::*;
+use pyo3_polars::{PyDataFrame, PySeries};
+use std::borrow::Cow;
+
+const NAME: &str = "coverage_profile";
+
+/// Compute the canonical half-open coverage/load function as new segment rows.
+///
+/// Omitted weights mean units, without allocating a ones column. Explicit
+/// weights are nonnegative 8/16/32/64-bit integers. Output columns are the
+/// supplied keys, `start`, `end`, and non-null `Int128` `load`. Endpoint/key
+/// logical dtypes and Datetime metadata are preserved exactly.
+///
+/// All chunks form one collection per key tuple. Native grouping retains null
+/// keys and first-appearance order. With no keys there is one collection even
+/// for empty input; grouped empty input has no groups. Key names must be distinct
+/// and cannot be `start`, `end`, or `load`.
+///
+/// An optional scalar domain clips contributions after every row is validated.
+/// Otherwise each group's nonempty intervals, including zero weights, establish
+/// its domain. Empty intervals never establish a domain or contribute. Full
+/// mode partitions that domain; sparse mode omits zero segments. Equal touching
+/// loads are coalesced. See [`intervals_core::coverage_profile`] for the sweep,
+/// checked arithmetic and `O(n log n + z)` time / `O(n + z)` space bounds.
+///
+/// # Errors
+/// Rejects unequal lengths, null endpoints/weights, unsupported or mismatched
+/// dtypes, invalid grouping keys, reversed intervals/domains, negative weights,
+/// and unrepresentable loads inside the domain. Row errors refer to original
+/// input indices, including rows that are empty, zero, or clipped away.
+pub fn coverage_profile(
+    starts: &Series,
+    ends: &Series,
+    weights: Option<&Series>,
+    keys: &[Series],
+    domain: Option<(&Scalar, &Scalar)>,
+    include_zero: bool,
+) -> PolarsResult<DataFrame> {
+    let domain = domain
+        .map(|(left, right)| -> PolarsResult<_> {
+            Ok((
+                scalar_physical(left, starts.dtype())?,
+                scalar_physical(right, starts.dtype())?,
+            ))
+        })
+        .transpose()?;
+    evaluate(starts, ends, weights, keys, domain, include_zero)
+}
+
+fn evaluate(
+    starts: &Series,
+    ends: &Series,
+    weights: Option<&Series>,
+    keys: &[Series],
+    domain: Option<(i128, i128)>,
+    include_zero: bool,
+) -> PolarsResult<DataFrame> {
+    polars_ensure!(starts.len() == ends.len(), ShapeMismatch:
+        "{} requires equal lengths, got {} starts and {} ends", NAME, starts.len(), ends.len());
+    polars_ensure!(starts.dtype() == ends.dtype(), InvalidOperation:
+        "{} requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
+        NAME, starts.dtype(), ends.dtype());
+    let weights = weights
+        .map(|weights| {
+            validate_integer_dtype(weights.dtype(), NAME, "weight")?;
+            polars_ensure!(weights.len() == starts.len(), ShapeMismatch:
+                "{} requires equal interval and weight lengths", NAME);
+            polars_ensure!(weights.null_count() == 0, ComputeError:
+                "{} does not support null weights", NAME);
+            integer_values(weights)
+        })
+        .transpose()?;
+    for (index, key) in keys.iter().enumerate() {
+        polars_ensure!(key.len() == starts.len(), ShapeMismatch:
+            "{} requires equal interval and group key lengths", NAME);
+        polars_ensure!(!["start", "end", "load"].contains(&key.name().as_str()), InvalidOperation:
+            "{} group keys cannot use reserved output names start/end/load", NAME);
+        polars_ensure!(!keys[..index].iter().any(|other| other.name() == key.name()), InvalidOperation:
+            "{} requires distinct group keys", NAME);
+        polars_ensure!(matches!(key.dtype(),
+            DataType::String | DataType::Boolean |
+            DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
+            DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
+            DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
+            "{} requires String, Boolean, 8/16/32/64-bit integer, Date, or Datetime group keys, got {}",
+            NAME, key.dtype());
+    }
+    macro_rules! dispatch {
+        ($left:expr, $right:expr) => {
+            evaluate_typed(
+                $left,
+                $right,
+                weights.as_deref(),
+                keys,
+                domain,
+                include_zero,
+                starts.dtype(),
+            )
+        };
+    }
+    match starts.dtype() {
+        DataType::Int8 => dispatch!(starts.i8()?, ends.i8()?),
+        DataType::Int16 => dispatch!(starts.i16()?, ends.i16()?),
+        DataType::Int32 => dispatch!(starts.i32()?, ends.i32()?),
+        DataType::Int64 => dispatch!(starts.i64()?, ends.i64()?),
+        DataType::UInt8 => dispatch!(starts.u8()?, ends.u8()?),
+        DataType::UInt16 => dispatch!(starts.u16()?, ends.u16()?),
+        DataType::UInt32 => dispatch!(starts.u32()?, ends.u32()?),
+        DataType::UInt64 => dispatch!(starts.u64()?, ends.u64()?),
+        DataType::Date => dispatch!(starts.date()?.physical(), ends.date()?.physical()),
+        DataType::Datetime(_, _) => {
+            dispatch!(starts.datetime()?.physical(), ends.datetime()?.physical())
+        }
+        dtype => polars_bail!(InvalidOperation:
+            "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}", NAME, dtype),
+    }
+}
+
+fn evaluate_typed<T>(
+    starts: &ChunkedArray<T>,
+    ends: &ChunkedArray<T>,
+    weights: Option<&[i128]>,
+    keys: &[Series],
+    domain: Option<(i128, i128)>,
+    include_zero: bool,
+    dtype: &DataType,
+) -> PolarsResult<DataFrame>
+where
+    T: PolarsIntegerType,
+    T::Native: Ord + TryFrom<i128>,
+    ChunkedArray<T>: IntoSeries,
+{
+    polars_ensure!(starts.null_count() == 0 && ends.null_count() == 0, ComputeError:
+        "{} does not support null endpoints", NAME);
+    let [starts, ends] = [starts, ends].map(|column| {
+        column
+            .cont_slice()
+            .map(Cow::Borrowed)
+            .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
+    });
+    let domain = domain
+        .map(|(left, right)| -> PolarsResult<_> {
+            let convert = |value| {
+                T::Native::try_from(value)
+                    .map_err(|_| polars_err!(InvalidOperation: "domain bound is outside endpoint dtype range"))
+            };
+            Ok((convert(left)?, convert(right)?))
+        })
+        .transpose()?;
+    // Validate before partitioning, so row diagnostics retain original indices
+    // even for groups with no output. Ungrouped calls use core validation directly.
+    if !keys.is_empty() {
+        for (index, (&start, &end)) in starts.iter().zip(ends.iter()).enumerate() {
+            if start > end {
+                return Err(
+                    polars_err!(ComputeError: "{}", IntervalError::InvalidInterval { index }),
+                );
+            }
+            if weights.is_some_and(|weights| weights[index] < 0) {
+                return Err(polars_err!(ComputeError: "{}", IntervalError::NegativeLoad { index }));
+            }
+        }
+    }
+    if domain.is_some_and(|(left, right)| left > right) {
+        return Err(polars_err!(ComputeError: "{}", IntervalError::InvalidDomain));
+    }
+    let solve = |starts: &[T::Native], ends: &[T::Native], weights: Option<&[i128]>| {
+        match weights {
+            Some(weights) => intervals_core::weighted_coverage_profile(
+                starts,
+                ends,
+                weights,
+                domain,
+                include_zero,
+            ),
+            None => intervals_core::coverage_profile(starts, ends, domain, include_zero),
+        }
+        .map_err(|error| polars_err!(ComputeError: "{error}"))
+    };
+    let mut output = Vec::<CoverageSegment<T::Native>>::new();
+    let mut key_rows = Vec::new();
+    if keys.is_empty() {
+        output = solve(&starts, &ends, weights)?;
+    } else {
+        let frame = DataFrame::new(
+            starts.len(),
+            keys.iter().cloned().map(IntoColumn::into_column).collect(),
+        )?;
+        let groups = frame.group_by_stable(keys.iter().map(|key| key.name().as_str()))?;
+        // Reuse scratch across groups; each gather includes all chunks.
+        let (mut group_starts, mut group_ends, mut group_weights) =
+            (Vec::new(), Vec::new(), Vec::new());
+        for group in groups.get_groups().iter() {
+            group_starts.clear();
+            group_ends.clear();
+            group_weights.clear();
+            let mut gather = |row: IdxSize| {
+                let row = row as usize;
+                group_starts.push(starts[row]);
+                group_ends.push(ends[row]);
+                if let Some(weights) = weights {
+                    group_weights.push(weights[row]);
+                }
+            };
+            match &group {
+                GroupsIndicator::Idx((_, rows)) => rows.iter().copied().for_each(gather),
+                GroupsIndicator::Slice([first, len]) => {
+                    (*first..*first + *len).for_each(&mut gather);
+                }
+            }
+            let segments = solve(
+                &group_starts,
+                &group_ends,
+                weights.map(|_| group_weights.as_slice()),
+            )?;
+            key_rows.extend(std::iter::repeat_n(group.first(), segments.len()));
+            output.extend(segments);
+        }
+    }
+    let key_rows = IdxCa::from_vec("".into(), key_rows);
+    let mut columns = keys
+        .iter()
+        .map(|key| key.take(&key_rows).map(IntoColumn::into_column))
+        .collect::<PolarsResult<Vec<_>>>()?;
+    for (name, values) in [
+        (
+            "start",
+            output.iter().map(|segment| segment.start).collect(),
+        ),
+        ("end", output.iter().map(|segment| segment.end).collect()),
+    ] {
+        let physical = ChunkedArray::<T>::from_vec(name.into(), values).into_series();
+        let logical = match dtype {
+            DataType::Datetime(unit, zone) => physical.into_datetime(*unit, zone.clone()),
+            dtype => physical.cast(dtype)?,
+        };
+        columns.push(logical.into_column());
+    }
+    let height = output.len();
+    columns.push(
+        Int128Chunked::from_iter_values(
+            "load".into(),
+            output.into_iter().map(|segment| segment.load),
+        )
+        .into_column(),
+    );
+    DataFrame::new(height, columns)
+}
+
+#[pyo3::pyfunction(name = "coverage_profile", signature = (starts, ends, weights, keys, domain, include_zero))]
+pub(crate) fn coverage_profile_py(
+    py: Python<'_>,
+    starts: PySeries,
+    ends: PySeries,
+    weights: Option<PySeries>,
+    keys: Vec<PySeries>,
+    domain: Option<(TargetValue, TargetValue)>,
+    include_zero: bool,
+) -> PyResult<PyDataFrame> {
+    let result = py.detach(|| {
+        let domain = domain
+            .map(|(left, right)| -> PolarsResult<_> {
+                Ok((
+                    left.physical(starts.0.dtype())?,
+                    right.physical(starts.0.dtype())?,
+                ))
+            })
+            .transpose()?;
+        evaluate(
+            &starts.0,
+            &ends.0,
+            weights.as_ref().map(|weights| &weights.0),
+            &keys.into_iter().map(|key| key.0).collect::<Vec<_>>(),
+            domain,
+            include_zero,
+        )
+    });
+    result
+        .map(PyDataFrame)
+        .map_err(|error| super::profile::python_error(py, error))
+}

@@ -54,3 +54,7 @@ harness = false
 [[bench]]
 name = "minimum_cost_dominating_set"
 harness = false
+
+[[bench]]
+name = "coverage_profile"
+harness = false

@@ -3,18 +3,22 @@ use super::{
 };
 use polars::prelude::*;
 
-#[derive(serde::Deserialize)]
-struct TargetValue {
+#[derive(serde::Deserialize, pyo3::FromPyObject)]
+#[pyo3(from_item_all)]
+pub(crate) struct TargetValue {
     kind: String,
     // Decimal text avoids serde-pickle's signed-64-bit integer limit.
     value: String,
+    #[pyo3(default)]
     dtype: Option<String>,
+    #[pyo3(default)]
     unit: Option<String>,
+    #[pyo3(default)]
     timezone: Option<String>,
 }
 
 impl TargetValue {
-    fn physical(&self, dtype: &DataType) -> PolarsResult<i128> {
+    pub(crate) fn physical(&self, dtype: &DataType) -> PolarsResult<i128> {
         let compatible = match (self.kind.as_str(), dtype) {
             ("integer", dtype) if dtype.is_integer() => self
                 .dtype
@@ -68,7 +72,7 @@ fn minimum_cost_cover_plugin(inputs: &[Series], kwargs: CoverOptions) -> PolarsR
     evaluate_cost_cover(starts, ends, costs, left, right)
 }
 
-fn scalar_physical(target: &Scalar, dtype: &DataType) -> PolarsResult<i128> {
+pub(crate) fn scalar_physical(target: &Scalar, dtype: &DataType) -> PolarsResult<i128> {
     polars_ensure!(target.dtype() == dtype, InvalidOperation:
         "target scalar must exactly match endpoint dtype {} (including Datetime unit and timezone)", dtype);
     match target.as_any_value().to_physical() {

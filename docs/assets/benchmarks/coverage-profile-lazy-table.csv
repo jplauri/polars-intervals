@@ -1,0 +1,25 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_weights,workload_domain,workload_include_zero,workload_seed,method,x,median,min,max,samples
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,lazy,8,0.1414,0.1383,0.1495,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,lazy,1000,0.1475,0.1449,0.1552,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,lazy,100000,1.5825,1.5715999999999999,1.7195,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,lazy_streaming,8,0.2286,0.2253,0.4468,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,lazy_streaming,1000,0.2339,0.23129999999999998,0.27499999999999997,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,lazy_streaming,100000,1.7115,1.4977,1.9648999999999999,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,native,8,1.5946,1.3988,1.7784,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,native,1000,1.4983,1.4588999999999999,1.5034999999999998,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,native,100000,40.9655,39.8411,46.847,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,production,8,0.0506,0.0477,0.0802,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,production,1000,0.0578,0.056799999999999996,0.0583,5
+"Short intervals, start ordered, units",sequencing,start,i64,0,1,units,inferred,False,7,production,100000,1.2381,1.1939,1.3603999999999998,5
+"Variable durations, ordered, weighted",booking,start,i64,0,1,mixed,inferred,False,7,lazy,100000,9.1098,7.5817,10.277,5
+"Variable durations, ordered, weighted",booking,start,i64,0,1,mixed,inferred,False,7,lazy_streaming,100000,9.4125,7.9832,9.9446,5
+"Variable durations, ordered, weighted",booking,start,i64,0,1,mixed,inferred,False,7,native,100000,78.95819999999999,58.8296,90.4476,5
+"Variable durations, ordered, weighted",booking,start,i64,0,1,mixed,inferred,False,7,production,100000,8.7034,7.6006,9.754,5
+"32 resources, shuffled, clipped, weighted",booking,shuffled,i64,32,7,mixed,partial,True,7,lazy,100000,5.781899999999999,5.6143,5.903499999999999,5
+"32 resources, shuffled, clipped, weighted",booking,shuffled,i64,32,7,mixed,partial,True,7,lazy_streaming,100000,5.8039,5.5207,5.992299999999999,5
+"32 resources, shuffled, clipped, weighted",booking,shuffled,i64,32,7,mixed,partial,True,7,native,100000,20.9654,18.7807,24.007299999999997,5
+"32 resources, shuffled, clipped, weighted",booking,shuffled,i64,32,7,mixed,partial,True,7,production,100000,5.3833,5.239599999999999,7.3004,5
+"1,000 timestamp groups, shuffled, units",sequencing,shuffled,datetime_ns,1000,7,units,inferred,False,7,lazy,100000,6.3057,6.035299999999999,6.7432,5
+"1,000 timestamp groups, shuffled, units",sequencing,shuffled,datetime_ns,1000,7,units,inferred,False,7,lazy_streaming,100000,6.3804,6.143599999999999,6.5595,5
+"1,000 timestamp groups, shuffled, units",sequencing,shuffled,datetime_ns,1000,7,units,inferred,False,7,native,100000,53.0304,47.183499999999995,63.0094,5
+"1,000 timestamp groups, shuffled, units",sequencing,shuffled,datetime_ns,1000,7,units,inferred,False,7,production,100000,5.8283,5.555899999999999,6.1133999999999995,5

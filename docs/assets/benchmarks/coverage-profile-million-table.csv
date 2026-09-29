@@ -1,0 +1,12 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_weights,workload_domain,workload_include_zero,workload_seed,method,x,median,min,max,samples
+"Short intervals, shuffled, units",sequencing,shuffled,i64,0,1,units,inferred,False,7,native,1000000,1226.4156,1193.8,1299.5853,5
+"Short intervals, shuffled, units",sequencing,shuffled,i64,0,1,units,inferred,False,7,native_count,1000000,1514.8182,1430.8613,1568.7247,5
+"Short intervals, shuffled, units",sequencing,shuffled,i64,0,1,units,inferred,False,7,production,1000000,45.4726,44.8154,46.5165,5
+"All overlap, shuffled, weighted",clique,shuffled,i64,0,1,mixed,inferred,False,7,native,1000000,66.008,61.968799999999995,66.7297,5
+"All overlap, shuffled, weighted",clique,shuffled,i64,0,1,mixed,inferred,False,7,production,1000000,24.334799999999998,23.6964,24.749599999999997,5
+"Repeated dates, shuffled, units",repeated,shuffled,date,0,1,units,inferred,True,7,native,1000000,117.6313,112.1402,123.8771,5
+"Repeated dates, shuffled, units",repeated,shuffled,date,0,1,units,inferred,True,7,native_count,1000000,90.1109,86.7868,101.532,5
+"Repeated dates, shuffled, units",repeated,shuffled,date,0,1,units,inferred,True,7,production,1000000,26.130699999999997,25.6375,26.484499999999997,5
+"1,000 timestamp groups, shuffled, units",sequencing,shuffled,datetime_ns,1000,7,units,inferred,False,7,native,1000000,988.0414,981.3924999999999,1054.1949,5
+"1,000 timestamp groups, shuffled, units",sequencing,shuffled,datetime_ns,1000,7,units,inferred,False,7,native_count,1000000,1292.2122,1256.8708,1304.1971999999998,5
+"1,000 timestamp groups, shuffled, units",sequencing,shuffled,datetime_ns,1000,7,units,inferred,False,7,production,1000000,77.4628,74.0045,79.7869,5

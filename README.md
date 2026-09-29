@@ -23,6 +23,7 @@ Or with uv: `uv add polars-intervals`.
 | Function | Description |
 | --- | --- |
 | [`overlap_count`](https://jplauri.github.io/polars-intervals/usage/#count-overlaps) | Count the other intervals overlapping each interval. |
+| [`coverage_profile`](https://jplauri.github.io/polars-intervals/coverage-profile/) | Return exact coverage-depth or resource-load segments from an eager or lazy frame, optionally grouped and clipped to an observation horizon. |
 | [`containment_count`](https://jplauri.github.io/polars-intervals/usage/#count-containment) | Count the other intervals contained by each interval. |
 | [`nesting_depth`](https://jplauri.github.io/polars-intervals/usage/#nesting-depth) | Length of the longest strict containment chain above each interval. |
 

@@ -4,6 +4,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for builds, checks and Windows setup.
 Check current `master` and existing patterns before expensive implementation or
 benchmarking. Run checks appropriate to the files changed.
 
+- Write documentation in short, direct sentences. Avoid heavy use of semicolons.
 - Reuse core validation, Polars extraction/dispatch, Python `_plugin`, and
   `benchmarks/provenance.py`. Extend the shared Rust/Python endpoint-validation
   tables; keep operation-specific regressions in their own suites.

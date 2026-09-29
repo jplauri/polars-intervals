@@ -1,0 +1,11 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_weights,workload_domain,workload_include_zero,workload_seed,method,x,median,min,max,samples
+"Short intervals, shuffled, units",sequencing,shuffled,i64,0,1,units,inferred,False,7,native,1000000,236.7507,206.188,299.1263,5
+"Short intervals, shuffled, units",sequencing,shuffled,i64,0,1,units,inferred,False,7,native_count,1000000,352.85499999999996,330.16569999999996,383.5848,5
+"Short intervals, shuffled, units",sequencing,shuffled,i64,0,1,units,inferred,False,7,production,1000000,50.909299999999995,49.1169,53.7459,5
+"All overlap, shuffled, weighted",clique,shuffled,i64,0,1,mixed,inferred,False,7,native,1000000,66.1608,65.4923,87.60289999999999,5
+"All overlap, shuffled, weighted",clique,shuffled,i64,0,1,mixed,inferred,False,7,production,1000000,30.0063,29.416999999999998,31.4743,5
+"Repeated dates, shuffled, units",repeated,shuffled,date,0,1,units,inferred,True,7,native,1000000,68.5363,65.9055,75.29079999999999,5
+"Repeated dates, shuffled, units",repeated,shuffled,date,0,1,units,inferred,True,7,native_count,1000000,58.5749,54.353699999999996,61.3146,5
+"Repeated dates, shuffled, units",repeated,shuffled,date,0,1,units,inferred,True,7,production,1000000,29.6666,29.197799999999997,30.0889,5
+"32 resources, shuffled, clipped, weighted",booking,shuffled,i64,32,7,mixed,partial,True,7,native,1000000,120.3544,117.90419999999999,131.3198,5
+"32 resources, shuffled, clipped, weighted",booking,shuffled,i64,32,7,mixed,partial,True,7,production,1000000,95.6081,93.9165,97.73469999999999,5

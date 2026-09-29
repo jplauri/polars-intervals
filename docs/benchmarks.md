@@ -7,6 +7,7 @@ report identifies its timing scope, workload, tradeoffs, and missing coverage.
 | Operation | What was measured |
 | --- | --- |
 | [Overlap counting](overlap-count-benchmarks.md) | Complete Polars collections against native counting expressions |
+| [Coverage and load profiles](coverage-profile-benchmarks.md) | Canonical segments from Rust sweeps and complete eager/lazy grouped Polars calls |
 | [Containment counting](containment-benchmarks.md) | Polars collections and separate Rust candidate comparisons |
 | [Nesting depth](nesting-depth-benchmarks.md) | Polars collections and separate Rust candidate comparisons |
 | [Lane assignment](assign-lanes-benchmarks.md) | Rust candidates for assigning the fewest nonoverlapping lanes |

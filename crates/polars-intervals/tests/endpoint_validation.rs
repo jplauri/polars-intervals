@@ -17,7 +17,15 @@ fn zeros(starts: &Series) -> Series {
 }
 
 // Fast-path settings (k=0, capacity=0, max_work=0) must validate like the rest.
-const ADAPTERS: [(&str, Adapter); 15] = [
+const ADAPTERS: [(&str, Adapter); 17] = [
+    ("coverage_profile_units", |s, e| {
+        coverage_profile(s, e, None, &[], None, false)
+            .map(|frame| frame["load"].as_materialized_series().clone())
+    }),
+    ("coverage_profile_weights", |s, e| {
+        coverage_profile(s, e, Some(&ones(s)), &[], None, true)
+            .map(|frame| frame["load"].as_materialized_series().clone())
+    }),
     ("overlap_count", overlap_count),
     ("containment_count", containment_count),
     ("nesting_depth", nesting_depth),

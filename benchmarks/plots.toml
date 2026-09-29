@@ -1,5 +1,106 @@
 # Paths are relative to the repository root. Each source is exactly one run.
 # List every independent workload dimension so every table case must explicitly fix it.
+[sources.coverage_profile_core]
+path = "benchmarks/results/coverage-profile-core-final-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["dtype", "family", "order", "weights", "domain", "include_zero", "seed", "weight_dtype"]
+
+[sources.coverage_profile_lazy]
+path = "benchmarks/results/coverage-profile-ponytail-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "weights", "domain", "include_zero", "seed"]
+
+[[tables]]
+id = "coverage-profile-lazy-table"
+source = "coverage_profile_lazy"
+value = "ns"
+divisor = 1000000
+ylabel = "Complete call, including lazy plan construction (ms)"
+methods = { production = "Eager", lazy = "Lazy, auto engine", lazy_streaming = "Lazy, streaming engine", native = "Polars event sums" }
+cases = [
+  { label = "Short intervals, start ordered, units", sizes = [8, 1000, 100000], filters = { family = "sequencing", order = "start", dtype = "i64", groups = 0, chunks = 1, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "Variable durations, ordered, weighted", sizes = [100000], filters = { family = "booking", order = "start", dtype = "i64", groups = 0, chunks = 1, weights = "mixed", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "32 resources, shuffled, clipped, weighted", sizes = [100000], filters = { family = "booking", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, weights = "mixed", domain = "partial", include_zero = true, seed = 7 } },
+  { label = "1,000 timestamp groups, shuffled, units", sizes = [100000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+]
+
+[sources.coverage_profile_polars]
+path = "benchmarks/results/coverage-profile-polars-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "weights", "domain", "include_zero", "seed"]
+
+[sources.coverage_profile_million]
+path = "benchmarks/results/coverage-profile-polars-million-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "weights", "domain", "include_zero", "seed"]
+
+[sources.coverage_profile_threads24]
+path = "benchmarks/results/coverage-profile-polars-threads24-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "weights", "domain", "include_zero", "seed"]
+
+[[tables]]
+id = "coverage-profile-polars-table"
+source = "coverage_profile_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Complete eager call (ms)"
+methods = { production = "Package", native = "Polars event sums", native_count = "Polars event counts" }
+cases = [
+  { label = "Short intervals, start ordered, units", sizes = [8, 1000, 100000], filters = { family = "sequencing", order = "start", dtype = "i64", groups = 0, chunks = 1, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "Short intervals, shuffled, units", sizes = [100000], filters = { family = "sequencing", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "Variable durations, ordered, weighted", sizes = [100000], methods = { production = "Package", native = "Polars event sums" }, filters = { family = "booking", order = "start", dtype = "i64", groups = 0, chunks = 1, weights = "mixed", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "32 resources, shuffled, clipped, weighted", sizes = [100000], methods = { production = "Package", native = "Polars event sums" }, filters = { family = "booking", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, weights = "mixed", domain = "partial", include_zero = true, seed = 7 } },
+  { label = "1,000 timestamp groups, shuffled, units", sizes = [100000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+]
+
+[[tables]]
+id = "coverage-profile-million-table"
+source = "coverage_profile_million"
+value = "ns"
+divisor = 1000000
+ylabel = "Complete eager call (ms)"
+methods = { production = "Package", native = "Polars event sums", native_count = "Polars event counts" }
+cases = [
+  { label = "Short intervals, shuffled, units", sizes = [1000000], filters = { family = "sequencing", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "All overlap, shuffled, weighted", sizes = [1000000], methods = { production = "Package", native = "Polars event sums" }, filters = { family = "clique", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, weights = "mixed", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "Repeated dates, shuffled, units", sizes = [1000000], filters = { family = "repeated", order = "shuffled", dtype = "date", groups = 0, chunks = 1, weights = "units", domain = "inferred", include_zero = true, seed = 7 } },
+  { label = "1,000 timestamp groups, shuffled, units", sizes = [1000000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+]
+
+[[tables]]
+id = "coverage-profile-threads24-table"
+source = "coverage_profile_threads24"
+value = "ns"
+divisor = 1000000
+ylabel = "Complete eager call (ms)"
+methods = { production = "Package", native = "Polars event sums", native_count = "Polars event counts" }
+cases = [
+  { label = "Short intervals, shuffled, units", sizes = [1000000], filters = { family = "sequencing", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "All overlap, shuffled, weighted", sizes = [1000000], methods = { production = "Package", native = "Polars event sums" }, filters = { family = "clique", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, weights = "mixed", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "Repeated dates, shuffled, units", sizes = [1000000], filters = { family = "repeated", order = "shuffled", dtype = "date", groups = 0, chunks = 1, weights = "units", domain = "inferred", include_zero = true, seed = 7 } },
+  { label = "32 resources, shuffled, clipped, weighted", sizes = [1000000], methods = { production = "Package", native = "Polars event sums" }, filters = { family = "booking", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, weights = "mixed", domain = "partial", include_zero = true, seed = 7 } },
+]
+
+[[tables]]
+id = "coverage-profile-core-table"
+source = "coverage_profile_core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Complete Rust call (ms)"
+methods = { production = "B: package streams", events = "A: events", heap = "C: active-end heap", streams_indices = "B: weighted indices" }
+cases = [
+  { label = "Short intervals, ordered, units", sizes = [1000000], methods = { production = "B: package streams", events = "A: events", heap = "C: active-end heap" }, filters = { dtype = "i64", family = "sequencing", order = "start", weights = "units", domain = "inferred", include_zero = "false", seed = 7, weight_dtype = "unit" } },
+  { label = "Nested, ordered, units", sizes = [1000000], methods = { production = "B: package streams", events = "A: events", heap = "C: active-end heap" }, filters = { dtype = "i64", family = "nesting", order = "start", weights = "units", domain = "inferred", include_zero = "false", seed = 7, weight_dtype = "unit" } },
+  { label = "Variable durations, ordered, weighted", sizes = [1000000], filters = { dtype = "i64", family = "booking", order = "start", weights = "heterogeneous", domain = "inferred", include_zero = "false", seed = 7, weight_dtype = "i128" } },
+  { label = "Variable durations, shuffled, weighted", sizes = [1000000], filters = { dtype = "i64", family = "booking", order = "shuffled", weights = "skewed", domain = "inferred", include_zero = "false", seed = 7, weight_dtype = "i128" } },
+  { label = "Repeated endpoints, shuffled, weighted", sizes = [100000, 1000000], filters = { dtype = "i64", family = "repeated", order = "shuffled", weights = "heterogeneous", domain = "inferred", include_zero = "false", seed = 7, weight_dtype = "i128" } },
+]
 [sources.domination_core]
 path = "benchmarks/results/domination-core-production-windows-20260929.csv"
 x = "n"

@@ -158,19 +158,23 @@ pub(crate) fn max_weight_with_capacity_profile_py(
     });
     match result {
         Ok(series) => Ok(PySeries(series)),
-        Err(error) => {
-            // Match the expression API's public Polars exceptions. PyPolarsErr uses
-            // its own exception classes, which are not polars.exceptions subclasses.
-            let class = match &error {
-                PolarsError::InvalidOperation(_) => "InvalidOperationError",
-                PolarsError::ShapeMismatch(_) => "ShapeError",
-                _ => "ComputeError",
-            };
-            let exception = py
-                .import("polars.exceptions")?
-                .getattr(class)?
-                .call1((error.to_string(),))?;
-            Err(PyErr::from_value(exception))
-        }
+        Err(error) => Err(python_error(py, error)),
+    }
+}
+
+pub(crate) fn python_error(py: Python<'_>, error: PolarsError) -> PyErr {
+    // Match the expression API's public Polars exceptions. PyPolarsErr uses
+    // its own exception classes, which are not polars.exceptions subclasses.
+    let class = match &error {
+        PolarsError::InvalidOperation(_) => "InvalidOperationError",
+        PolarsError::ShapeMismatch(_) => "ShapeError",
+        _ => "ComputeError",
+    };
+    match py
+        .import("polars.exceptions")
+        .and_then(|module| module.getattr(class)?.call1((error.to_string(),)))
+    {
+        Ok(exception) => PyErr::from_value(exception),
+        Err(error) => error,
     }
 }

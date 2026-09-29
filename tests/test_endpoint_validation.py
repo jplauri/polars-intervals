@@ -24,19 +24,26 @@ ALGORITHMS = {
     "max_weight_non_overlapping": lambda s, e: pi.max_weight_non_overlapping(s, e, weight=ROWS),
     "capacity_0": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=0),
     "capacity_2": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=2),
+    "coverage_profile": pi.coverage_profile,
 }
 pytestmark = pytest.mark.parametrize("algorithm", ALGORITHMS.values(), ids=ALGORITHMS.keys())
+
+
+def evaluate(frame, algorithm, start="start", end="end"):
+    if algorithm is pi.coverage_profile:
+        return algorithm(frame, start=start, end=end)
+    return frame.select(algorithm(start, end))
 
 
 @pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
 def test_reversed_and_null_endpoints(algorithm, dtype):
     frame = pl.DataFrame({"start": [0, 3, 4], "end": [1, 2, 1]}).cast(dtype)
     with pytest.raises(pl.exceptions.ComputeError, match="index 1"):
-        frame.select(algorithm("start", "end"))
+        evaluate(frame, algorithm)
     for columns in (["start"], ["end"], ["start", "end"]):
         nulls = frame.with_columns(pl.lit(None, dtype=dtype).alias(name) for name in columns)
         with pytest.raises(pl.exceptions.ComputeError, match="null endpoints"):
-            nulls.select(algorithm("start", "end"))
+            evaluate(nulls, algorithm)
 
 
 @pytest.mark.parametrize(
@@ -65,7 +72,7 @@ def test_logical_dtypes_must_match_exactly(algorithm, start_dtype, end_dtype):
             with pytest.raises(
                 pl.exceptions.PolarsError, match="matching integer, Date, or Datetime"
             ):
-                frame.select(algorithm(start, end))
+                evaluate(frame, algorithm, start, end)
 
 
 CHECKED = [pl.Float32, pl.Float64, pl.Boolean, pl.String, pl.Null, pl.Time, pl.Duration("us")]
@@ -81,7 +88,7 @@ def test_unsupported_dtypes_even_when_empty(algorithm, dtype):
     for values in ([None], []):
         frame = pl.DataFrame({name: pl.Series(values, dtype=dtype) for name in ("start", "end")})
         with pytest.raises(pl.exceptions.PolarsError, match=message):
-            frame.select(algorithm("start", "end"))
+            evaluate(frame, algorithm)
 
 
 @pytest.mark.parametrize("argument", ["start", "end"])
@@ -90,5 +97,11 @@ def test_lengths_must_match_without_broadcasting(algorithm, argument, scalar):
     frame = pl.DataFrame({"start": [0, 1], "end": [3, 4]})
     args = {"start": pl.col("start"), "end": pl.col("end")}
     args[argument] = pl.lit(1, dtype=pl.Int64) if scalar else args[argument].head(1)
+    if algorithm is pi.coverage_profile:
+        # DataFrames enforce column lengths; direct Series mismatch coverage is
+        # in the Rust integration suite. Expressions are rejected explicitly.
+        with pytest.raises(TypeError, match="strings"):
+            evaluate(frame, algorithm, args["start"], args["end"])
+        return
     with pytest.raises(pl.exceptions.PolarsError, match="equal lengths"):
         frame.select(algorithm(args["start"], args["end"]))
