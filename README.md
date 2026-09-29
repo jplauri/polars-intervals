@@ -27,6 +27,17 @@ Or with uv: `uv add polars-intervals`.
 | [`containment_count`](https://jplauri.github.io/polars-intervals/usage/#count-containment) | Count the other intervals contained by each interval. |
 | [`nesting_depth`](https://jplauri.github.io/polars-intervals/usage/#nesting-depth) | Length of the longest strict containment chain above each interval. |
 
+### Interval geometry
+
+| Function | Description |
+| --- | --- |
+| [`cluster_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Label connected records in original row order, optionally joining touching intervals. |
+| [`merge_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Return the exact union as maximal ranges, always joining touching ranges. |
+| [`interval_gaps`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Return uncovered ranges inside required scalar bounds. |
+
+Clustering is an expression. Union and gaps accept eager or lazy frames and
+optional group keys. See the [worked examples](https://jplauri.github.io/polars-intervals/interval-geometry/).
+
 ### Lane assignment
 
 | Function | Description |

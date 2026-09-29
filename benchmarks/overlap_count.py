@@ -1,7 +1,6 @@
 """Standalone benchmark; see docs/overlap-count-benchmarks.md for methodology and usage."""
 
 import argparse
-import ctypes
 import gc
 import json
 import os
@@ -20,7 +19,7 @@ import polars as pl
 import polars_intervals as pi
 from polars.plugins import register_plugin_function
 from polars.testing import assert_frame_equal
-from provenance import environment, sha256
+from provenance import environment, resident_memory, sha256
 
 
 def plugin_query(
@@ -349,50 +348,6 @@ def measure(
             for name, values in samples.items()
         },
     }, expected
-
-
-def resident_memory() -> dict:
-    """OS process high-water mark; no sampling thread and no extra dependency."""
-    if sys.platform == "win32":
-        from ctypes import wintypes
-
-        class Counters(ctypes.Structure):
-            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD)] + [
-                (name, ctypes.c_size_t)
-                for name in (
-                    "PeakWorkingSetSize",
-                    "WorkingSetSize",
-                    "QuotaPeakPagedPoolUsage",
-                    "QuotaPagedPoolUsage",
-                    "QuotaPeakNonPagedPoolUsage",
-                    "QuotaNonPagedPoolUsage",
-                    "PagefileUsage",
-                    "PeakPagefileUsage",
-                )
-            ]
-
-        counters = Counters()
-        counters.cb = ctypes.sizeof(counters)
-        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
-        kernel.GetCurrentProcess.restype = wintypes.HANDLE
-        psapi = ctypes.WinDLL("psapi", use_last_error=True)
-        psapi.GetProcessMemoryInfo.argtypes = [
-            wintypes.HANDLE,
-            ctypes.POINTER(Counters),
-            wintypes.DWORD,
-        ]
-        if not psapi.GetProcessMemoryInfo(
-            kernel.GetCurrentProcess(), ctypes.byref(counters), counters.cb
-        ):
-            raise ctypes.WinError(ctypes.get_last_error())
-        return {"rss_bytes": counters.WorkingSetSize, "peak_rss_bytes": counters.PeakWorkingSetSize}
-    import resource
-
-    scale = 1 if sys.platform == "darwin" else 1024
-    return {
-        "rss_bytes": None,
-        "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * scale,
-    }
 
 
 def memory_worker(

@@ -1,5 +1,6 @@
 """Run provenance shared by the benchmark runners: environment and file hashes."""
 
+import ctypes
 import hashlib
 import os
 import platform
@@ -45,4 +46,48 @@ def environment():
         "rustc": command("rustc", "-Vv"),
         "revision": command("git", "rev-parse", "HEAD"),
         "git_status": command("git", "status", "--porcelain"),
+    }
+
+
+def resident_memory() -> dict:
+    """OS process high-water mark; no sampling thread and no extra dependency."""
+    if sys.platform == "win32":
+        from ctypes import wintypes
+
+        class Counters(ctypes.Structure):
+            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD)] + [
+                (name, ctypes.c_size_t)
+                for name in (
+                    "PeakWorkingSetSize",
+                    "WorkingSetSize",
+                    "QuotaPeakPagedPoolUsage",
+                    "QuotaPagedPoolUsage",
+                    "QuotaPeakNonPagedPoolUsage",
+                    "QuotaNonPagedPoolUsage",
+                    "PagefileUsage",
+                    "PeakPagefileUsage",
+                )
+            ]
+
+        counters = Counters()
+        counters.cb = ctypes.sizeof(counters)
+        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel.GetCurrentProcess.restype = wintypes.HANDLE
+        psapi = ctypes.WinDLL("psapi", use_last_error=True)
+        psapi.GetProcessMemoryInfo.argtypes = [
+            wintypes.HANDLE,
+            ctypes.POINTER(Counters),
+            wintypes.DWORD,
+        ]
+        if not psapi.GetProcessMemoryInfo(
+            kernel.GetCurrentProcess(), ctypes.byref(counters), counters.cb
+        ):
+            raise ctypes.WinError(ctypes.get_last_error())
+        return {"rss_bytes": counters.WorkingSetSize, "peak_rss_bytes": counters.PeakWorkingSetSize}
+    import resource
+
+    scale = 1 if sys.platform == "darwin" else 1024
+    return {
+        "rss_bytes": None,
+        "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * scale,
     }

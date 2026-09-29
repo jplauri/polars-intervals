@@ -9,10 +9,15 @@ from time import perf_counter_ns
 
 import polars as pl
 import polars_intervals as pi
-from coverage_profile_native import native_profile
 from polars.testing import assert_frame_equal
 from polars_intervals import _internal
-from provenance import ROOT, environment, sha256
+
+if __package__:
+    from .coverage_profile_native import native_profile
+    from .provenance import ROOT, environment, sha256
+else:
+    from coverage_profile_native import native_profile
+    from provenance import ROOT, environment, sha256
 
 # family, order, dtype, groups (0=ungrouped), chunks, load, domain, include_zero
 CASES = [

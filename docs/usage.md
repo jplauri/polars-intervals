@@ -80,6 +80,11 @@ computed from the full input, add it with `with_columns` first, then filter.
 
 ## Choose an algorithm
 
+For connected components, exact union, and uncovered ranges, see
+[Clustering, union, and bounded gaps](interval-geometry.md). Clustering returns
+one ID per row. Union and gaps return segment frames and support eager and lazy
+pipelines.
+
 | Task | Algorithms |
 | --- | --- |
 | [Inspect interval relationships](#inspect-interval-relationships) | Count overlaps, count contained rows, measure nesting depth |

@@ -1,1 +1,4 @@
 docs/assets/benchmarks/* linguist-generated=true
+
+# Preserve measured bytes and their hashes across checkout platforms.
+benchmarks/results/interval-geometry-* -text whitespace=cr-at-eol linguist-generated=true
