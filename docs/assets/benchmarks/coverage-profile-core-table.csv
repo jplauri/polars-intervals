@@ -1,0 +1,23 @@
+case,workload_dtype,workload_family,workload_order,workload_weights,workload_domain,workload_include_zero,workload_seed,workload_weight_dtype,method,x,median,min,max,samples
+"Short intervals, ordered, units",i64,sequencing,start,units,inferred,false,7,unit,events,1000000,88.83109999999999,87.8389,94.3528,5
+"Short intervals, ordered, units",i64,sequencing,start,units,inferred,false,7,unit,heap,1000000,46.6978,46.0836,53.1425,5
+"Short intervals, ordered, units",i64,sequencing,start,units,inferred,false,7,unit,production,1000000,44.4544,43.7541,46.0594,5
+"Nested, ordered, units",i64,nesting,start,units,inferred,false,7,unit,events,1000000,93.0743,92.89099999999999,94.2854,5
+"Nested, ordered, units",i64,nesting,start,units,inferred,false,7,unit,heap,1000000,120.8455,119.7237,121.81009999999999,5
+"Nested, ordered, units",i64,nesting,start,units,inferred,false,7,unit,production,1000000,44.5116,44.4133,44.8103,5
+"Variable durations, ordered, weighted",i64,booking,start,heterogeneous,inferred,false,7,i128,events,1000000,103.8287,102.63159999999999,106.5445,5
+"Variable durations, ordered, weighted",i64,booking,start,heterogeneous,inferred,false,7,i128,heap,1000000,69.43979999999999,68.0274,69.8758,5
+"Variable durations, ordered, weighted",i64,booking,start,heterogeneous,inferred,false,7,i128,production,1000000,94.1039,93.567,96.1165,5
+"Variable durations, ordered, weighted",i64,booking,start,heterogeneous,inferred,false,7,i128,streams_indices,1000000,75.0051,74.6374,76.5829,5
+"Variable durations, shuffled, weighted",i64,booking,shuffled,skewed,inferred,false,7,i128,events,1000000,135.2609,133.1867,136.3674,5
+"Variable durations, shuffled, weighted",i64,booking,shuffled,skewed,inferred,false,7,i128,heap,1000000,213.1448,207.2455,214.4405,5
+"Variable durations, shuffled, weighted",i64,booking,shuffled,skewed,inferred,false,7,i128,production,1000000,130.64239999999998,129.5686,132.5944,5
+"Variable durations, shuffled, weighted",i64,booking,shuffled,skewed,inferred,false,7,i128,streams_indices,1000000,254.38539999999998,252.4255,261.5596,5
+"Repeated endpoints, shuffled, weighted",i64,repeated,shuffled,heterogeneous,inferred,false,7,i128,events,100000,3.0471,3.0013,3.2706999999999997,5
+"Repeated endpoints, shuffled, weighted",i64,repeated,shuffled,heterogeneous,inferred,false,7,i128,events,1000000,55.0989,54.349599999999995,56.556,5
+"Repeated endpoints, shuffled, weighted",i64,repeated,shuffled,heterogeneous,inferred,false,7,i128,heap,100000,8.902899999999999,8.513399999999999,9.4513,5
+"Repeated endpoints, shuffled, weighted",i64,repeated,shuffled,heterogeneous,inferred,false,7,i128,heap,1000000,216.7804,213.9125,223.368,5
+"Repeated endpoints, shuffled, weighted",i64,repeated,shuffled,heterogeneous,inferred,false,7,i128,production,100000,3.2186,3.1260999999999997,3.3884,5
+"Repeated endpoints, shuffled, weighted",i64,repeated,shuffled,heterogeneous,inferred,false,7,i128,production,1000000,48.6453,47.6811,49.9788,5
+"Repeated endpoints, shuffled, weighted",i64,repeated,shuffled,heterogeneous,inferred,false,7,i128,streams_indices,100000,2.5882,2.4377999999999997,2.6519,5
+"Repeated endpoints, shuffled, weighted",i64,repeated,shuffled,heterogeneous,inferred,false,7,i128,streams_indices,1000000,78.6651,77.5967,80.9662,5

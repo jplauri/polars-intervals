@@ -70,9 +70,13 @@ Selection masks choose one optimal solution; when several solutions tie,
 the particular rows chosen are not guaranteed across releases or row
 permutations.
 
-The [capacity-profile function](#select-with-a-capacity-profile) is the
-exception to the expression interface: it takes eager DataFrames and returns
-a Boolean Series. Collect lazy inputs explicitly before calling it.
+Two functions take frames directly. The
+[capacity-profile selector](#select-with-a-capacity-profile) takes eager
+DataFrames and returns a Boolean Series; collect its inputs explicitly.
+[`coverage_profile`](coverage-profile.md) accepts either a DataFrame or a
+LazyFrame and returns the corresponding frame type, with new segments describing
+coverage depth or resource load. It supports groups and zero-load gaps. Lazy
+queries defer its whole-collection native solve until execution.
 
 ### Count within groups
 

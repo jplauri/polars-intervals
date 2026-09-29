@@ -45,10 +45,12 @@ theme:
 nav:
   - Getting started: index.md
   - Usage: usage.md
+  - Coverage and load profiles: coverage-profile.md
   - API reference: api.md
   - Benchmarks:
       - Overview: benchmarks.md
       - Overlap counting: overlap-count-benchmarks.md
+      - Coverage and load profiles: coverage-profile-benchmarks.md
       - Containment counting: containment-benchmarks.md
       - Nesting depth: nesting-depth-benchmarks.md
       - Lane assignment: assign-lanes-benchmarks.md

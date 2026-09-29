@@ -1,0 +1,274 @@
+{
+  "timestamp_utc": "2026-09-29T15:59:44.444597+00:00",
+  "command": [
+    "benchmarks/coverage_profile.py",
+    "--lazy",
+    "--output",
+    "benchmarks/results/coverage-profile-ponytail-million-20260929",
+    "--sizes",
+    "1000000",
+    "--cases",
+    "15",
+    "16",
+    "--seeds",
+    "7",
+    "41",
+    "--samples",
+    "5",
+    "--warmups",
+    "2"
+  ],
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+  "logical_cpus": 24,
+  "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "D:\\polars-intervals\\.venv\\Scripts\\python.exe",
+  "polars": "1.44.2",
+  "polars_threads": 1,
+  "thread_environment": {
+    "POLARS_MAX_THREADS": "1",
+    "RAYON_NUM_THREADS": null,
+    "CARGO_BUILD_JOBS": null
+  },
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+  "revision": "2b2a2666386c971f6e8d63cbf47cd7a405d1f41b",
+  "git_status": "M .github/scripts/release_checks.py\n M README.md\n M benchmarks/README.md\n M benchmarks/plots.toml\n M crates/intervals-core/Cargo.toml\n M crates/intervals-core/src/lib.rs\n M crates/polars-intervals/src/cover.rs\n M crates/polars-intervals/src/lib.rs\n M crates/polars-intervals/src/profile.rs\n M crates/polars-intervals/tests/endpoint_validation.rs\n M docs/benchmarking.md\n M docs/benchmarks.md\n M docs/usage.md\n M mkdocs.yml\n M python/polars_intervals/__init__.py\n M tests/test_endpoint_validation.py\n?? benchmarks/coverage-profile-notes.md\n?? benchmarks/coverage_profile.py\n?? benchmarks/coverage_profile_core.py\n?? benchmarks/coverage_profile_native.py\n?? benchmarks/results/coverage-profile-core-20260929.csv\n?? benchmarks/results/coverage-profile-core-20260929.metadata.json\n?? benchmarks/results/coverage-profile-core-20260929.sources.zip\n?? benchmarks/results/coverage-profile-core-final-20260929.csv\n?? benchmarks/results/coverage-profile-core-final-20260929.metadata.json\n?? benchmarks/results/coverage-profile-core-final-20260929.sources.zip\n?? benchmarks/results/coverage-profile-core-i128-20260929.csv\n?? benchmarks/results/coverage-profile-core-i128-20260929.metadata.json\n?? benchmarks/results/coverage-profile-core-i128-20260929.sources.zip\n?? benchmarks/results/coverage-profile-lazy-20260929.csv\n?? benchmarks/results/coverage-profile-lazy-20260929.metadata.json\n?? benchmarks/results/coverage-profile-lazy-20260929.sources.zip\n?? benchmarks/results/coverage-profile-lazy-verification-20260929.md\n?? benchmarks/results/coverage-profile-polars-20260929.csv\n?? benchmarks/results/coverage-profile-polars-20260929.metadata.json\n?? benchmarks/results/coverage-profile-polars-20260929.sources.zip\n?? benchmarks/results/coverage-profile-polars-million-20260929.csv\n?? benchmarks/results/coverage-profile-polars-million-20260929.metadata.json\n?? benchmarks/results/coverage-profile-polars-million-20260929.sources.zip\n?? benchmarks/results/coverage-profile-polars-threads24-20260929.csv\n?? benchmarks/results/coverage-profile-polars-threads24-20260929.metadata.json\n?? benchmarks/results/coverage-profile-polars-threads24-20260929.sources.zip\n?? benchmarks/results/coverage-profile-ponytail-20260929.csv\n?? benchmarks/results/coverage-profile-ponytail-20260929.metadata.json\n?? benchmarks/results/coverage-profile-ponytail-20260929.sources.zip\n?? benchmarks/results/coverage-profile-verification-20260929.md\n?? benchmarks/test_coverage_profile.py\n?? crates/intervals-core/benches/coverage_profile.rs\n?? crates/intervals-core/benches/support/coverage_profile_candidates.rs\n?? crates/intervals-core/src/coverage_profile.rs\n?? crates/intervals-core/tests/coverage_profile.rs\n?? crates/intervals-core/tests/coverage_profile_candidates.rs\n?? crates/polars-intervals/src/coverage_profile.rs\n?? crates/polars-intervals/tests/coverage_profile.rs\n?? docs/assets/benchmarks/coverage-profile-core-table.csv\n?? docs/assets/benchmarks/coverage-profile-core-table.md\n?? docs/assets/benchmarks/coverage-profile-lazy-table.csv\n?? docs/assets/benchmarks/coverage-profile-lazy-table.md\n?? docs/assets/benchmarks/coverage-profile-million-table.csv\n?? docs/assets/benchmarks/coverage-profile-million-table.md\n?? docs/assets/benchmarks/coverage-profile-polars-table.csv\n?? docs/assets/benchmarks/coverage-profile-polars-table.md\n?? docs/assets/benchmarks/coverage-profile-threads24-table.csv\n?? docs/assets/benchmarks/coverage-profile-threads24-table.md\n?? docs/coverage-profile-benchmarks.md\n?? docs/coverage-profile.md\n?? tests/test_coverage_profile.py\n?? tests/test_coverage_profile_lazy.py",
+  "settings": {
+    "output": "benchmarks\\results\\coverage-profile-ponytail-million-20260929",
+    "sizes": [
+      1000000
+    ],
+    "seeds": [
+      7,
+      41
+    ],
+    "cases": [
+      15,
+      16
+    ],
+    "samples": 5,
+    "warmups": 2,
+    "lazy": true
+  },
+  "cases": [
+    [
+      "sequencing",
+      "start",
+      "i64",
+      0,
+      1,
+      "units",
+      "inferred",
+      false
+    ],
+    [
+      "sequencing",
+      "shuffled",
+      "i64",
+      0,
+      1,
+      "units",
+      "inferred",
+      false
+    ],
+    [
+      "sequencing",
+      "start",
+      "i64",
+      0,
+      1,
+      "ones",
+      "inferred",
+      false
+    ],
+    [
+      "booking",
+      "start",
+      "i64",
+      0,
+      1,
+      "mixed",
+      "inferred",
+      false
+    ],
+    [
+      "booking",
+      "end",
+      "i64",
+      0,
+      1,
+      "mixed",
+      "partial",
+      true
+    ],
+    [
+      "booking",
+      "partial",
+      "datetime_ns",
+      0,
+      7,
+      "mixed",
+      "extended",
+      true
+    ],
+    [
+      "disjoint",
+      "shuffled",
+      "u64",
+      0,
+      1,
+      "uniform",
+      "extended",
+      true
+    ],
+    [
+      "touching",
+      "reverse",
+      "i64",
+      0,
+      1,
+      "units",
+      "inferred",
+      false
+    ],
+    [
+      "nested",
+      "start",
+      "i64",
+      0,
+      1,
+      "units",
+      "inferred",
+      false
+    ],
+    [
+      "clique",
+      "shuffled",
+      "i64",
+      0,
+      1,
+      "mixed",
+      "inferred",
+      false
+    ],
+    [
+      "repeated",
+      "shuffled",
+      "date",
+      0,
+      1,
+      "units",
+      "inferred",
+      true
+    ],
+    [
+      "sparse",
+      "shuffled",
+      "u64",
+      0,
+      1,
+      "mixed",
+      "inferred",
+      false
+    ],
+    [
+      "empty",
+      "start",
+      "i64",
+      0,
+      1,
+      "units",
+      "extended",
+      true
+    ],
+    [
+      "zero",
+      "start",
+      "i64",
+      0,
+      1,
+      "mixed",
+      "inferred",
+      false
+    ],
+    [
+      "booking",
+      "shuffled",
+      "i64",
+      0,
+      1,
+      "mixed",
+      "outside",
+      true
+    ],
+    [
+      "booking",
+      "shuffled",
+      "i64",
+      32,
+      7,
+      "mixed",
+      "partial",
+      true
+    ],
+    [
+      "sequencing",
+      "shuffled",
+      "datetime_ns",
+      1000,
+      7,
+      "units",
+      "inferred",
+      false
+    ],
+    [
+      "repeated",
+      "shuffled",
+      "date",
+      32,
+      1,
+      "mixed",
+      "extended",
+      true
+    ]
+  ],
+  "scope": "Complete eager public/native calls including argument checks, native validation, partitioning, clipping, planning, sorting, scan, coalescing, output and key assembly. Fixture creation, correctness checks, and output destruction excluded.",
+  "lazy_execution": "The lazy and lazy_streaming methods also construct df.lazy(), the coverage_profile plan and schema, and collect inside timing. Both execute the profile as a blocking whole-frame operation; lazy_streaming selects Polars' streaming engine for the surrounding query, not independent batch profiling.",
+  "memory": "Not measured end-to-end. Separate Rust requested-live-heap instrumentation excludes FFI/Polars grouping and output Series.",
+  "verification": "Every timed output matches the complete production output outside timing. Independent small membership/tick oracles live in tests and benchmarks/test_coverage_profile.py; large instances use candidate agreement only.",
+  "u_definition": "Distinct contributing clipped endpoints plus nonempty domain bounds per group. m excludes zero/empty/clipped-away rows; omega counts contributing rows. Inferred bounds include zero-weight nonempty intervals.",
+  "fixture_counts": "groups is the requested group count (0 means ungrouped), chunks is the per-column split target. Observed_groups and column_chunks record actual counts; small collections may have fewer observed groups and different chunk counts. Grouped partial domains use the per-group coordinate horizon.",
+  "baseline_omissions": "No claimed omissions for valid public fixtures; invalid error classes/text may differ. Public <=64-bit weights and addressable row counts cannot overflow i128; wider core overflow tests are separate. Native uses signed subtraction because unary Int128 negation is unsupported in Polars 1.44.2.",
+  "native_sha256": "3409adcbd34c571e73f99f54107799236d097af1d47f4d5d6af1086f24058699",
+  "release_sha256": "3409adcbd34c571e73f99f54107799236d097af1d47f4d5d6af1086f24058699",
+  "source_sha256": {
+    "crates\\intervals-core\\src\\balance.rs": "94d03298007f52075b7bf0296e4bd240424409d7f9c420241798ee83728b12e5",
+    "crates\\intervals-core\\src\\capacity.rs": "1a82e6bd128b5c14c17675102f00ce2f4d1ddac9dae1bce6b3836fb2bd42a4fc",
+    "crates\\intervals-core\\src\\capacity_profile.rs": "a0d76da5c8f98df02fa0dd412d5c4ee0de05ed13ae26bdb5e29ce803ef86c739",
+    "crates\\intervals-core\\src\\clique.rs": "2eba32502514635d6ce1b6ab08c78f169d3e7e04df556aff437a186ba0d2c58a",
+    "crates\\intervals-core\\src\\containment.rs": "1be611f26925f32c131534118929c67783d6f3f26eed73db7ded581a73c12ad9",
+    "crates\\intervals-core\\src\\cover.rs": "caba93747929f03b780a05ecddc3a8557c03fb40fb9a4eeadc7e112e37925cab",
+    "crates\\intervals-core\\src\\coverage.rs": "0606183afbeae32663c05096f188c841f847cf01a5be2571b569ce8a8476d57e",
+    "crates\\intervals-core\\src\\coverage_profile.rs": "95042088ead1bdc0e3b4cd75875f199c1a151d1ec40dfe9e924b4d301bef76a3",
+    "crates\\intervals-core\\src\\domination.rs": "c3efd97356d54d5633b2d0250b42219546b4861fc8c303dadf5ff1696a3c9421",
+    "crates\\intervals-core\\src\\lanes.rs": "6ec75dec2df12e0a2c30010a28aefd431e299fb47377e2f5634386bdae0a9fba",
+    "crates\\intervals-core\\src\\lib.rs": "742dfc3d12216ff144536790db16bb98093dce8dd74e2a69aa2784f7c61403c8",
+    "crates\\intervals-core\\src\\nesting.rs": "a0452a9b51e79f9a5eb63dd9283b07de450e8bf9abcc1daa4d4f5b0a6ae8383e",
+    "crates\\intervals-core\\src\\stabbing.rs": "c3ceb0262e70c14ecb7690ca37a25e89f5c442424af54acb35a8af7d0acb37d0",
+    "crates\\intervals-core\\src\\weighted.rs": "19c013c229d4e203caf1898cb2b7a62da910f02400c3f2e7954c9b571b4cfbea",
+    "crates\\polars-intervals\\src\\cover.rs": "fe2ed289aad01ff04ebe200ad8f423f41ffc50f719b88dca041999e21d32ba84",
+    "crates\\polars-intervals\\src\\coverage_profile.rs": "c2f8158aba0f51a4f1dbf8b227a0ad1bb2293a8ace3129e4f10475315ee0f0e6",
+    "crates\\polars-intervals\\src\\domination.rs": "45d8b068293ddaad5901fad6e1d6b7aa0872b67bab851f0ffb226b1e5918d9c7",
+    "crates\\polars-intervals\\src\\lib.rs": "ea51beaf043e13a9fc23dd794e430d91c090c34e7ad39cce60cd0a6c26bea557",
+    "crates\\polars-intervals\\src\\profile.rs": "f06fef066c59565da39623a0008d86642d7e306bdb5dace49661b550054b3540",
+    "crates\\intervals-core\\Cargo.toml": "96da10439e110b04f8b6452e54b4e0b56168600a62e94470efbacc43f7974350",
+    "crates\\polars-intervals\\Cargo.toml": "fc1f36cc4b80664432fc511bd109d00ba5d327afc8ce66897c54dd88ddc15acc",
+    "Cargo.lock": "5629288b59113ac4d3d8bdff3afe78d24e3c4c72d8c82a06466edb2edc71073a",
+    "benchmarks\\coverage_profile.py": "67b04d9a3092b036453f1e1ac3aab445cd9e3c7aa22f4b2a810b3da342ed570f",
+    "benchmarks\\coverage_profile_native.py": "8cc90279a587c599cf7d95a78ce840b83f1bdddb28bca01156c46d8e85370b81",
+    "python\\polars_intervals\\__init__.py": "5576c58695ce0945e3301bf80796a373b64dbcaca5f30b779f2af916dbd8a4e3"
+  },
+  "status": "complete",
+  "source_archive": "coverage-profile-ponytail-million-20260929.sources.zip",
+  "source_archive_sha256": "810dd7fe1c8b6b2e8df38e2ee190a19695bff1c5332867cce11a6f8e00864025"
+}

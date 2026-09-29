@@ -12,6 +12,9 @@ release plugin. Summary and plotting scripts only read saved results.
 
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
+| [`coverage_profile.py`](coverage_profile.py) | End-to-end benchmark | Complete release calls against native Polars event sums/count aggregation, with optional lazy/streaming-engine collection, validation, groups and output assembly → raw samples and provenance | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
+| [`coverage_profile_core.py`](coverage_profile_core.py) | Core comparison runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples, source archive and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
+| [`test_coverage_profile.py`](test_coverage_profile.py) | Baseline checks | Direct membership oracle on small grouped, temporal and wide-load inputs → native Polars baseline validation | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`minimum_cost_dominating_set.py`](minimum_cost_dominating_set.py) | End-to-end benchmark | Integer/temporal, grouped and multichunk inputs → checked release collection samples and provenance | [Dominating set](../docs/domination-benchmarks.md) |
 | [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated, sharded interval instances | [Interval-graph corpora](#interval-graph-corpora) |
 | [`test_generate_interval_graphs.py`](test_generate_interval_graphs.py) | Corpus checks | Tiny deterministic instances and local fixtures → structural and reproducibility checks | [Interval-graph corpora](#interval-graph-corpora) |
@@ -29,7 +32,7 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
-Except for the dominating-set comparisons described below, they time production
+Except for the dominating-set and coverage-profile comparisons, they time production
 only. Removed candidates and runners are preserved in the
 [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
 Historical metadata may reference a base revision with uncommitted feature
@@ -62,6 +65,31 @@ The runner checks that the installed native extension matches the local Cargo
 release library, records hashes and environment metadata, preserves existing
 results, and rotates unit/explicit-unit/positive/mixed-weight measurements.
 Use `--sizes`, `--seeds`, `--samples`, and `--warmups` for focused repeat runs.
+
+Coverage/load profiles compare complete A event, B independent-stream, and C
+active-end heap calls. Weighted index streams are an additional B layout
+comparison against production's contiguous records. Earlier flat-record
+experiments remain in the archived source snapshots. The implementations in `benches/support/coverage_profile_candidates.rs`
+are private to benchmarks and tests; only one engine is exposed by the package.
+See [correctness and design notes](coverage-profile-notes.md). Run core
+comparisons with `uv run --no-sync python benchmarks/coverage_profile_core.py --help`
+and complete Polars comparisons with:
+
+```sh
+uv run --no-sync python benchmarks/coverage_profile.py --output benchmarks/results/coverage-profile-polars-new
+uv run --no-sync python benchmarks/coverage_profile.py --lazy --output benchmarks/results/coverage-profile-lazy-new
+```
+
+The runner rejects stale/different release binaries. `--lazy` adds lazy query
+construction and collection under both engines; the profile itself remains a
+whole-collection native call. It times argument checks,
+validation, native grouping, clipping, sweep/planning, canonical coalescing and
+output construction. Output destruction is excluded for Python and included
+for Rust. The native competitor uses signed Int128 subtraction before aggregation
+because this Polars build does not implement Int128 unary negation. Unit count
+aggregation is measured separately. Core memory measures requested live heap,
+not process RSS or complete Polars allocations. Cases are synthetic; see each
+run's metadata and full raw samples for measured coverage and omissions.
 
 The lane-balancing core runner uses `cargo bench -p intervals-core --bench
 balance_lanes --locked`. Set `BALANCE_CSV` and `BALANCE_QUALITY_CSV` to new

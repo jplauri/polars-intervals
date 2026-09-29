@@ -54,7 +54,9 @@ the fastest baseline independently per case.
 workloads, not every application or platform. Keep losses, skips, bounded
 baselines, and missing types visible. Preserve raw samples, environment, settings,
 revisions/source hashes, and historical evidence in `benchmarks/results/`.
-Core runners time production only. Removed candidates and their runners remain
+Most core runners time production only. The coverage-profile runner retains
+private event, heap and weighted-index comparisons because they are needed to
+reproduce its production decision. Removed older candidates and their runners remain
 available in the [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb).
 Some run metadata records a base revision with uncommitted feature changes, so
 that revision may not contain the benchmark code. Use the snapshot to recover

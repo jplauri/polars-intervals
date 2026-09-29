@@ -18,9 +18,13 @@ mod domination;
 pub use domination::minimum_cost_dominating_set;
 mod profile;
 pub use profile::max_weight_with_capacity_profile;
+mod coverage_profile;
+pub use coverage_profile::coverage_profile;
 
 #[pyo3::pymodule]
 mod _internal {
+    #[pymodule_export]
+    use super::coverage_profile::coverage_profile_py;
     #[pymodule_export]
     use super::profile::max_weight_with_capacity_profile_py;
 }

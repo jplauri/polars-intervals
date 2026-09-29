@@ -11,6 +11,7 @@ __all__ = [
     "assign_balanced_lanes",
     "assign_lanes",
     "containment_count",
+    "coverage_profile",
     "max_k_coverage",
     "max_weight_clique",
     "max_weight_non_overlapping",
@@ -45,6 +46,211 @@ def _nonnegative(value: int, name: str, limit: int, range_name: str) -> str:
     if not 0 <= value <= limit:
         raise ValueError(f"{name} must be nonnegative and fit in {range_name}")
     return str(value)
+
+
+def coverage_profile(
+    intervals: pl.DataFrame | pl.LazyFrame,
+    *,
+    start: str = "start",
+    end: str = "end",
+    weight: str | None = None,
+    by: str | list[str] | None = None,
+    domain_start: int | date | datetime | pl.Series | None = None,
+    domain_end: int | date | datetime | pl.Series | None = None,
+    include_zero: bool = False,
+) -> pl.DataFrame | pl.LazyFrame:
+    """Compute exact coverage depth or resource load as canonical segment rows.
+
+    For each coordinate ``t``, load is the sum of quantities on intervals with
+    ``start <= t < end``. Omitted/None weights mean one per interval; columns
+    named weight or load are ignored unless explicitly selected. A quantity is
+    constant throughout its interval, not profit or quantity per unit duration.
+
+    Args:
+        intervals: Polars DataFrame or LazyFrame. Lazy input returns a deferred
+            LazyFrame without collecting input rows during construction.
+        start: Input start column name.
+        end: Input end column name, with exactly the same logical dtype as start.
+        weight: Optional nonnegative integer quantity column name.
+        by: One group column or an ordered list of distinct group column names.
+            None and [] solve one ungrouped collection.
+        domain_start: Inclusive scalar domain bound; supply both bounds or neither.
+        domain_end: Exclusive scalar domain bound. See minimum_cover's scalar
+            rules: typed singleton Series preserve exact dtype/unit/timezone;
+            Python datetime values have microsecond resolution.
+        include_zero: Include zero-load gaps and tails inside the defined domain.
+
+    Returns:
+        pl.DataFrame | pl.LazyFrame: Same frame kind as the input, with columns
+            ``[group keys..., start, end, load]``. New segment
+            endpoints preserve the input endpoint dtype and load is always
+            non-null Int128, including empty results. Groups appear in first
+            input appearance order; segments are sorted by start within groups.
+
+    Raises:
+        TypeError: For non-frame input, invalid column/options types or unsupported
+            domain scalar types. include_zero must be a Boolean.
+        ValueError: For duplicate/reserved group names, a missing domain bound,
+            or a target Series that is not one non-null value.
+        polars.exceptions.PolarsError: For missing columns, null endpoints or
+            quantities, mismatched/unsupported dtypes, reversed intervals/bounds,
+            negative quantities or load exceeding Int128. Invalid row indices
+            refer to the original input rows at the profile boundary, including
+            grouped calls. For lazy input, arguments and schema are checked at
+            construction; row values and native domain checks run at execution.
+
+    Notes:
+        Endpoints support Int8/16/32/64, UInt8/16/32/64, Date and Datetime with
+        exactly matching unit/timezone metadata. Quantities support only those
+        8/16/32/64-bit integers. No implicit casts, null filling or broadcasting
+        occur. Group keys support String, Boolean, those integers, Date and
+        Datetime, including null keys. Keys cannot use reserved output names
+        start/end/load. All chunks form one instance per observed key tuple.
+
+        Segments are half-open and nonempty. Touching equal loads coalesce even
+        when the contributing rows change; equal loads across omitted gaps do
+        not. Duplicates contribute independently. Empty intervals contribute
+        neither load nor domain bounds, including empty rows with large weights.
+
+        Without explicit bounds, each group's domain is the hull of ALL its
+        nonempty intervals, including zero-weight intervals. Empty-only input
+        has no inferred domain. With bounds, intervals are clipped after every
+        input row is validated. Equal bounds produce no segments. Ungrouped empty
+        input with nonempty bounds produces one zero segment in full mode;
+        grouped empty input has no observed groups and always produces zero rows.
+        There is no infinite zero tail. Overflow outside a clipped domain is
+        irrelevant, while validation errors outside it still reject the call.
+
+        The native sweep uses exact checked Int128 loads without integrating
+        duration times load. Time is O(n log n + z), space O(n + z) for n input
+        rows and z output segments; verified ordered endpoint streams permit
+        linear work. Grouping, gathering and output assembly run natively with
+        the GIL released. Lazy input resolves its schema during construction and
+        defers the same native solve until execution. All rows and chunks are
+        materialized at that boundary, including with the streaming engine:
+        this is a whole-collection operation, not a streaming profile algorithm.
+        Input expressions and filters before the call define the collection.
+        Downstream filters, projections and slices stay after the profile node.
+        Polars may eliminate an unneeded node entirely, such as for head(0) or
+        a constant-false filter; validation runs only when that node executes.
+
+        Coverage is a function over coordinates. It is distinct from per-row
+        overlap_count, a selected maximum-weight clique, and row selection.
+        Existing APIs accepting only 64-bit quantities require explicit checked
+        narrowing, e.g. ``profile.with_columns(pl.col("load").cast(pl.UInt64,
+        strict=True))`` when every output load fits; never narrow silently.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({"start": [0, 2, 5], "end": [4, 5, 7], "demand": [2, 3, 3]})
+        >>> pi.coverage_profile(df).rows()
+        [(0, 2, 1), (2, 4, 2), (4, 7, 1)]
+        >>> pi.coverage_profile(df, weight="demand").rows()
+        [(0, 2, 2), (2, 4, 5), (4, 7, 3)]
+        >>> pi.coverage_profile(
+        ...     df, weight="demand", domain_start=-1, domain_end=8, include_zero=True,
+        ... ).rows()
+        [(-1, 0, 0), (0, 2, 2), (2, 4, 5), (4, 7, 3), (7, 8, 0)]
+        >>> grouped = df.with_columns(pl.Series("resource", ["a", "b", "a"]))
+        >>> pi.coverage_profile(grouped, by="resource", weight="demand").rows()
+        [('a', 0, 4, 2), ('a', 5, 7, 3), ('b', 2, 5, 3)]
+        >>> query = pi.coverage_profile(df.lazy(), weight="demand")
+        >>> isinstance(query, pl.LazyFrame)
+        True
+        >>> query.filter(pl.col("load") >= 3).collect().rows()
+        [(2, 4, 5), (4, 7, 3)]
+    """
+    from polars_intervals._internal import coverage_profile as solve
+
+    if not isinstance(intervals, (pl.DataFrame, pl.LazyFrame)):
+        raise TypeError("intervals must be a Polars DataFrame or LazyFrame")
+    if not isinstance(start, str) or not isinstance(end, str):
+        raise TypeError("start and end column names must be strings")
+    if weight is not None and not isinstance(weight, str):
+        raise TypeError("weight must be a column name or None")
+    if not isinstance(include_zero, bool):
+        raise TypeError("include_zero must be a Boolean")
+    if by is None:
+        by = []
+    elif isinstance(by, str):
+        by = [by]
+    elif not isinstance(by, list) or not all(isinstance(key, str) for key in by):
+        raise TypeError("by must be a column name or a list of column names")
+    if len(set(by)) != len(by):
+        raise ValueError("by must contain distinct group keys")
+    if any(key in {"start", "end", "load"} for key in by):
+        raise ValueError("group keys cannot use reserved output names start/end/load")
+    # Freeze caller-owned arguments before capturing them in a deferred plan.
+    by = tuple(by)
+    if (domain_start is None) != (domain_end is None):
+        raise ValueError("domain_start and domain_end must both be supplied or both omitted")
+    domain = None if domain_start is None else (_target(domain_start), _target(domain_end))
+    if isinstance(intervals, pl.LazyFrame):
+        required = list(dict.fromkeys([start, end, *by, *([] if weight is None else [weight])]))
+        # by_name treats '*' and regex-looking source names literally.
+        intervals = intervals.select(pl.selectors.by_name(required))
+        schema = intervals.collect_schema()
+        endpoint_dtypes = (schema[start], schema[end])
+        weight_dtype = None if weight is None else schema[weight]
+        key_dtypes = [schema[key] for key in by]
+    else:
+        starts, ends = intervals[start], intervals[end]
+        weights = None if weight is None else intervals[weight]
+        keys = [intervals[key] for key in by]
+        endpoint_dtypes = (starts.dtype, ends.dtype)
+        weight_dtype = None if weights is None else weights.dtype
+        key_dtypes = [key.dtype for key in keys]
+    # Guard optional Arrow types before PySeries imports them at the FFI boundary.
+    # Rust independently validates all supported columns and computes the profile.
+    for dtype in endpoint_dtypes:
+        if dtype not in _INTEGERS and dtype != pl.Date and not isinstance(dtype, pl.Datetime):
+            raise pl.exceptions.InvalidOperationError(
+                "coverage_profile requires an 8-, 16-, 32-, or 64-bit "
+                f"integer dtype, Date, or Datetime, got {dtype}"
+            )
+    if weight_dtype is not None and weight_dtype not in _INTEGERS:
+        raise pl.exceptions.InvalidOperationError(
+            "coverage_profile requires an 8-, 16-, 32-, or 64-bit "
+            f"integer weight dtype, got {weight_dtype}"
+        )
+    for dtype in key_dtypes:
+        if dtype not in (*_INTEGERS, pl.String, pl.Boolean, pl.Date) and not isinstance(
+            dtype, pl.Datetime
+        ):
+            raise pl.exceptions.InvalidOperationError(
+                "coverage_profile requires String, Boolean, 8/16/32/64-bit integer, "
+                f"Date, or Datetime group keys, got {dtype}"
+            )
+    if isinstance(intervals, pl.LazyFrame):
+        if endpoint_dtypes[0] != endpoint_dtypes[1]:
+            raise pl.exceptions.InvalidOperationError(
+                "coverage_profile requires matching integer, Date, or Datetime dtypes "
+                "(including Datetime time unit and timezone)"
+            )
+        output_schema = {
+            **{key: schema[key] for key in by},
+            "start": endpoint_dtypes[0],
+            "end": endpoint_dtypes[1],
+            "load": pl.Int128,
+        }
+        return intervals.map_batches(
+            lambda frame: solve(
+                frame[start],
+                frame[end],
+                None if weight is None else frame[weight],
+                [frame[key] for key in by],
+                domain,
+                include_zero,
+            ),
+            schema=output_schema,
+            validate_output_schema=True,
+            predicate_pushdown=False,
+            projection_pushdown=False,
+            slice_pushdown=False,
+            streamable=False,
+        )
+    return solve(starts, ends, weights, keys, domain, include_zero)
 
 
 def minimum_cost_dominating_set(
