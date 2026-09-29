@@ -1,22 +1,22 @@
 case,workload_scenario,workload_groups,workload_order,workload_dtype,method,x,median,min,max,samples
-"Sparse, 1 group",sparse,1,shuffled,int64,native_asof,100000,12.2384,11.5179,20.3948,9
-"Sparse, 1 group",sparse,1,shuffled,int64,native_asof,3000000,339.309,336.1475,395.0317,9
-"Sparse, 1 group",sparse,1,shuffled,int64,native_expr,100000,10.5388,10.2687,11.1963,9
-"Sparse, 1 group",sparse,1,shuffled,int64,native_expr,3000000,764.0769,735.9671,840.6521,9
-"Sparse, 1 group",sparse,1,shuffled,int64,plugin,100000,6.1535,5.7008,6.2829,9
-"Sparse, 1 group",sparse,1,shuffled,int64,plugin,3000000,243.6929,236.9456,250.2388,9
-"Dense, 1 group",dense,1,shuffled,int64,native_asof,3000000,339.3123,332.2087,402.3972,9
-"Dense, 1 group",dense,1,shuffled,int64,native_expr,3000000,422.4607,407.6339,486.6582,9
-"Dense, 1 group",dense,1,shuffled,int64,plugin,3000000,176.3273,170.1476,185.6253,9
-"Sparse, 100 groups",sparse,100,shuffled,int64,native_asof,1000,3.6951,3.4261,4.3809,9
-"Sparse, 100 groups",sparse,100,shuffled,int64,native_asof,3000000,577.3752,568.7298,641.9252,9
-"Sparse, 100 groups",sparse,100,shuffled,int64,native_expr,1000,1.0424,0.8492,1.1112,9
-"Sparse, 100 groups",sparse,100,shuffled,int64,native_expr,3000000,383.9547,379.5321,408.6318,9
-"Sparse, 100 groups",sparse,100,shuffled,int64,plugin,1000,1.0561,0.9796,1.2267,9
-"Sparse, 100 groups",sparse,100,shuffled,int64,plugin,3000000,213.6552,197.9522,255.9344,9
-"Dense, 100 groups",dense,100,shuffled,int64,native_asof,1000,4.0653,3.319,4.8186,9
-"Dense, 100 groups",dense,100,shuffled,int64,native_asof,3000000,612.4634,584.3346,675.655,9
-"Dense, 100 groups",dense,100,shuffled,int64,native_expr,1000,1.0385,0.9022,1.1466,9
-"Dense, 100 groups",dense,100,shuffled,int64,native_expr,3000000,376.4252,352.4669,386.5951,9
-"Dense, 100 groups",dense,100,shuffled,int64,plugin,1000,1.1373,0.971,1.2078,9
-"Dense, 100 groups",dense,100,shuffled,int64,plugin,3000000,166.8921,157.585,212.7228,9
+"Few overlaps, 1 group",sparse,1,shuffled,int64,native_asof,100000,12.2384,11.5179,20.3948,9
+"Few overlaps, 1 group",sparse,1,shuffled,int64,native_asof,3000000,339.309,336.1475,395.0317,9
+"Few overlaps, 1 group",sparse,1,shuffled,int64,native_expr,100000,10.5388,10.2687,11.1963,9
+"Few overlaps, 1 group",sparse,1,shuffled,int64,native_expr,3000000,764.0769,735.9671,840.6521,9
+"Few overlaps, 1 group",sparse,1,shuffled,int64,plugin,100000,6.1535,5.7008,6.2829,9
+"Few overlaps, 1 group",sparse,1,shuffled,int64,plugin,3000000,243.6929,236.9456,250.2388,9
+"Many overlaps, 1 group",dense,1,shuffled,int64,native_asof,3000000,339.3123,332.2087,402.3972,9
+"Many overlaps, 1 group",dense,1,shuffled,int64,native_expr,3000000,422.4607,407.6339,486.6582,9
+"Many overlaps, 1 group",dense,1,shuffled,int64,plugin,3000000,176.3273,170.1476,185.6253,9
+"Few overlaps, 100 groups",sparse,100,shuffled,int64,native_asof,1000,3.6951,3.4261,4.3809,9
+"Few overlaps, 100 groups",sparse,100,shuffled,int64,native_asof,3000000,577.3752,568.7298,641.9252,9
+"Few overlaps, 100 groups",sparse,100,shuffled,int64,native_expr,1000,1.0424,0.8492,1.1112,9
+"Few overlaps, 100 groups",sparse,100,shuffled,int64,native_expr,3000000,383.9547,379.5321,408.6318,9
+"Few overlaps, 100 groups",sparse,100,shuffled,int64,plugin,1000,1.0561,0.9796,1.2267,9
+"Few overlaps, 100 groups",sparse,100,shuffled,int64,plugin,3000000,213.6552,197.9522,255.9344,9
+"Many overlaps, 100 groups",dense,100,shuffled,int64,native_asof,1000,4.0653,3.319,4.8186,9
+"Many overlaps, 100 groups",dense,100,shuffled,int64,native_asof,3000000,612.4634,584.3346,675.655,9
+"Many overlaps, 100 groups",dense,100,shuffled,int64,native_expr,1000,1.0385,0.9022,1.1466,9
+"Many overlaps, 100 groups",dense,100,shuffled,int64,native_expr,3000000,376.4252,352.4669,386.5951,9
+"Many overlaps, 100 groups",dense,100,shuffled,int64,plugin,1000,1.1373,0.971,1.2078,9
+"Many overlaps, 100 groups",dense,100,shuffled,int64,plugin,3000000,166.8921,157.585,212.7228,9

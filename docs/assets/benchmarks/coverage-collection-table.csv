@@ -1,13 +1,13 @@
 case,workload_family,workload_order,workload_k,method,x,median,min,max,samples
-"Staircase, sorted, k=8",staircase,sorted,8,Date,10000,1.0134999999999998,0.9421999999999999,1.1060999999999999,3
-"Staircase, sorted, k=8",staircase,sorted,8,Date,1000000,117.39489999999999,115.0007,118.6777,3
-"Staircase, sorted, k=8",staircase,sorted,8,"Datetime(time_unit='us', time_zone=None)",10000,1.1219999999999999,1.1104,1.123,3
-"Staircase, sorted, k=8",staircase,sorted,8,"Datetime(time_unit='us', time_zone=None)",1000000,125.6978,119.72789999999999,127.5761,3
-"Staircase, sorted, k=8",staircase,sorted,8,Int64,10000,1.0753,1.001,1.0799999999999998,3
-"Staircase, sorted, k=8",staircase,sorted,8,Int64,1000000,125.2586,122.13029999999999,126.68339999999999,3
-"Staircase, shuffled, k=8",staircase,shuffled,8,Date,1000000,139.2545,137.5694,140.0807,3
-"Staircase, shuffled, k=8",staircase,shuffled,8,"Datetime(time_unit='us', time_zone=None)",1000000,164.32559999999998,160.4331,165.6477,3
-"Staircase, shuffled, k=8",staircase,shuffled,8,Int64,1000000,160.8724,157.6841,163.483,3
-"Staircase, shuffled, k=64",staircase,shuffled,64,Date,1000000,630.0534,627.0231,648.8562,3
-"Staircase, shuffled, k=64",staircase,shuffled,64,"Datetime(time_unit='us', time_zone=None)",1000000,688.7368,680.8965,689.0545999999999,3
-"Staircase, shuffled, k=64",staircase,shuffled,64,Int64,1000000,680.9259,678.9356,683.0688,3
+"Overlapping steps, sorted, select up to 8",staircase,sorted,8,Date,10000,1.0134999999999998,0.9421999999999999,1.1060999999999999,3
+"Overlapping steps, sorted, select up to 8",staircase,sorted,8,Date,1000000,117.39489999999999,115.0007,118.6777,3
+"Overlapping steps, sorted, select up to 8",staircase,sorted,8,"Datetime(time_unit='us', time_zone=None)",10000,1.1219999999999999,1.1104,1.123,3
+"Overlapping steps, sorted, select up to 8",staircase,sorted,8,"Datetime(time_unit='us', time_zone=None)",1000000,125.6978,119.72789999999999,127.5761,3
+"Overlapping steps, sorted, select up to 8",staircase,sorted,8,Int64,10000,1.0753,1.001,1.0799999999999998,3
+"Overlapping steps, sorted, select up to 8",staircase,sorted,8,Int64,1000000,125.2586,122.13029999999999,126.68339999999999,3
+"Overlapping steps, shuffled, select up to 8",staircase,shuffled,8,Date,1000000,139.2545,137.5694,140.0807,3
+"Overlapping steps, shuffled, select up to 8",staircase,shuffled,8,"Datetime(time_unit='us', time_zone=None)",1000000,164.32559999999998,160.4331,165.6477,3
+"Overlapping steps, shuffled, select up to 8",staircase,shuffled,8,Int64,1000000,160.8724,157.6841,163.483,3
+"Overlapping steps, shuffled, select up to 64",staircase,shuffled,64,Date,1000000,630.0534,627.0231,648.8562,3
+"Overlapping steps, shuffled, select up to 64",staircase,shuffled,64,"Datetime(time_unit='us', time_zone=None)",1000000,688.7368,680.8965,689.0545999999999,3
+"Overlapping steps, shuffled, select up to 64",staircase,shuffled,64,Int64,1000000,680.9259,678.9356,683.0688,3

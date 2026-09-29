@@ -1,86 +1,90 @@
 # Lane balancing benchmarks
 
+[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+
 ## Summary
 
-The [balanced constructor](usage.md#balance-lane-row-counts) reduced row-count
-spread `D` on **108 of 132 scaling instances**, reaching the certified optimum on
-all 24 planted cases. It preserves minimum lane count and never worsens `(D,Q)`
-against existing `assign_lanes`, with additional runtime that can be substantial.
-The default 100,000-unit budget polishes the best baseline/forward/backward seed;
-balance remains heuristic.
-
-These runs predate interface consolidation. The recorded “repair” method now
-uses `assign_balanced_lanes(..., initial_lanes=...)`. Algorithms are unchanged;
-saved measurements, hashes and verification records retain their original provenance.
+[`assign_balanced_lanes`](api.md#polars_intervals.assign_balanced_lanes) places
+intervals in the fewest possible lanes without overlaps within a lane, then
+tries to distribute the row counts evenly. In three selected examples with
+**100,000 intervals, balancing took 3.76–24.1 ms**, compared with 0.91–1.39 ms for
+ordinary lane assignment. In a separate suite of 132 generated datasets, it
+made the row counts more even in **108 cases**. It never worsens the starting
+balance, but it does not guarantee the most evenly balanced arrangement possible.
 
 ## Results
 
-Polars collection · one thread · one warmup, median of five samples ·
-[quality-run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-quality-windows-20260928.metadata.json)
+**Complete Polars queries · one thread · median of 5 samples after warmup ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-quality-windows-20260928.metadata.json)**
 
-Measurements include lazy optimization, endpoint/lane validation, preprocessing,
-search and materialization. Constructing repair's original baseline, input
-preparation, independent validation and final Series destruction are outside
-timing. Each repeat repairs the same original coloring.
+Ordinary assignment uses `assign_lanes`. New balanced assignment uses
+`assign_balanced_lanes` with its default settings. Improving existing lanes uses
+the same function with `initial_lanes` supplied. Its times exclude creating the
+original assignment.
 
 --8<-- "docs/assets/benchmarks/balance-polars-table.md"
 
-| Same workload | Baseline D | Repaired D | Balanced D |
+In the eight-lane example, ordinary assignment put 99,993 rows in one lane and
+one row in each of the others. New balanced assignment produced **12,500 rows in
+every lane**, taking 3.76 ms instead of 0.91 ms. Improving the existing assignment
+did not achieve that improvement with the default search limit.
+
+The table below shows the difference between the largest and smallest lane's
+row counts on the same inputs. Smaller is better, and zero means equal counts.
+
+| Input | Ordinary assignment | Improve existing lanes | New balanced assignment |
 | --- | ---: | ---: | ---: |
-| Interior empties | 9 | 1 | 1 |
-| Late clique, 100,000 rows | 99,992 | 99,992 | 0 |
-| Forced star, 100,000 rows | 99,998 | 99,998 | 99,998 |
-| Nearly clique, 100,000 rows | 49,999 | 49,999 | 49,999 |
+| 11 rows, including 9 empty intervals | 9 | 1 | 1 |
+| 100,000 rows needing 8 lanes | 99,992 | 99,992 | 0 |
+| One long interval overlapping 99,999 short ones | 99,998 | 99,998 | 99,998 |
+| 50,000 long intervals overlapping 50,000 short ones | 49,999 | 49,999 | 49,999 |
 
-These [quality records](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-quality-windows-20260928.quality.csv)
-show both gains and cost without improvement. The late-clique constructor reaches
-equity at 4.13× baseline runtime; the nearly-clique case costs 17.4× with unchanged
-balance. Ratios mean candidate median / existing-production median; above one is
-slower. The simultaneous-flip supplied assignment improves `(19,15)` to `(17,17)`.
+The last two examples show the cost of searching without improving balance.
+Their overlaps force uneven lane sizes when using the minimum number of lanes.
+In the last example, balanced assignment takes 24.1 ms compared with 1.39 ms.
+The [saved quality results](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-quality-windows-20260928.quality.csv)
+include the lane counts behind these comparisons.
 
-Rust core · two warmups, median of five samples ·
-[core metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-core-windows-20260928.metadata.json)
+<details markdown="1">
+<summary>Algorithm-only timings and search settings</summary>
 
-Core calls include validation, copying, seed preparation and output construction;
-output destruction is excluded. Requested-live-heap peaks are measured separately
-with allocator tracking enabled, including the output but excluding caller inputs,
-allocator overhead, stack and process RSS. Tracking is disabled during timing.
+**Rust algorithm only · median of 5 samples after two warmups ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-core-windows-20260928.metadata.json)**
+
+“Initial choices only” selects the best starting assignment without further
+search. The other columns correspond to the user-facing operations above.
+These inputs differ from the Polars examples.
 
 --8<-- "docs/assets/benchmarks/balance-core-table.md"
 
-Across 60 core fixtures, 100,000 units improved constructor quality over 10,000
-units in four cases; 1,000,000 units improved two further cases. Splitting the
-default budget across three seeds won zero cases and lost three. Individual
-forward/backward seeds can regress: both gave `D=874` on 1,000-row stars against
-baseline `D=6`. Retaining the baseline prevents that loss. Full
-[budget/quality records](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-core-windows-20260928.quality.csv)
-justify the conservative default without claiming quality saturation.
+The default `max_work=100_000` limits search effort, not elapsed milliseconds.
+Across 60 algorithm test cases, increasing it from 10,000 to 100,000 improved
+balance in four cases. Increasing it to one million improved two more.
+More search can help, but does not guarantee improvement. Input checks and
+preparation still take time outside that search limit.
+
+</details>
 
 ## Coverage and limitations
 
-The matrix covers both smoke seeds, exact/scaling suites, regressions and separate
-tiny JAIST all/connected populations. `exact` names a corpus, not an oracle result.
-Capped exhaustive oracles, planted certificates and equity witnesses establish
-known optima; other gaps stay unknown. Independent concurrency/per-lane checks
-validate every output. Quality counts instances, not timing repeats, and
-overlapping corpora are not pooled. Baseline repair hit only 12/24 certified
-scaling optima; its worst additive gap was 711, versus zero for construction.
+Balance measures numbers of rows, including empty intervals. It does not measure
+the total duration of intervals in each lane. Every output is checked for
+overlaps within lanes and for the minimum lane count.
 
-A separate run checks Date, timezone-aware Datetime, four-group windows, slices,
-unequal chunks, and auto/streaming collection. These order-preserving variants
-exercise execution semantics; they do not create independent graph populations.
-Large cliques stop at equity. Large nearly-clique cases retain bounded search.
-Public Polars results expose no work counters: non-equitable positive-budget stops
-remain `not_exposed`. Core diagnostics distinguish completed pairwise fixed points
-from budget/scratch stops.
+Of the 132 datasets in the separate size-scaling suite, 24 were constructed with
+a known best balance. New balanced assignment reached it in all 24. Improving
+ordinary assignments reached it in 12. The best possible balance is unknown for
+the remaining 108 datasets, so improvement alone does not establish optimality.
 
-For three or more lanes, pairwise optimality does not imply globally optimal
-balance: the supplied `(15,16,17)` gadget coloring remains stuck despite a verified
-`(16,16,16)` witness. Optional component relabeling and three-color search are absent.
-Full JAIST downloads, other platforms and million-row runs were not measured here.
-See the [shared methodology](benchmarking.md) and
-[implementation notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/balance-lanes-notes.md)
-for exact budget units, oracle caps, timing scopes and limitations.
+Other tests cover small datasets whose assignments can be checked exhaustively,
+Date/Datetime endpoints, groups and streaming queries. A supplied three-lane
+example remains at counts 15, 16 and 17 even though 16 in every lane is possible.
+This demonstrates a real limit of the search. Million-row performance and other
+machines were not measured here.
+
+The saved runs use older names for the same construction and improvement modes.
+The [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/balance-lanes-notes.md)
+retain their mapping, detailed quality checks and measurement boundaries.
 
 ## Reproduce and data
 
@@ -99,9 +103,9 @@ cargo bench -p intervals-core --bench balance_lanes --locked
 ```
 
 Set `POLARS_MAX_THREADS=1` before Python. Use fresh output prefixes and run
-benchmarks sequentially after compilation; runner metadata records native/source
-hashes, dirty revision, settings and corpus hashes. The core environment variables
-in the supporting notes select the recorded size/budget matrix.
+benchmarks one at a time after compilation. The runner saves the build version,
+settings and dataset identifiers. The supporting notes list the settings needed
+to reproduce the complete run.
 
 </details>
 
@@ -110,5 +114,5 @@ Saved [quality](https://github.com/jplauri/polars-intervals/blob/master/benchmar
 and [execution-variant](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-workloads-windows-20260928.metadata.json)
 records link raw samples, provenance and source hashes. The
 [verification log](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-verification-windows-20260928.md)
-records executed checks. Generated shards stay outside version control; table
-downloads retain sample ranges and exact medians.
+records executed checks. Generated datasets stay outside version control.
+Table downloads retain sample ranges and exact medians.

@@ -141,7 +141,10 @@ method/size combinations remain missing.
    and run metadata without overwriting historical evidence.
 2. Copy the [report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md)
    into `docs/`. Keep **Summary → Results → Coverage and limitations → Reproduce
-   and data**, aiming for roughly 400–600 visible words without padding.
+   and data**. Start with the method name, explain its purpose, then give a
+   measured input size and runtime. Write for readers who have not seen the
+   implementation or benchmark setup. Follow the template's editorial guidance
+   for clear table labels, result quality and meaningful limitations.
 3. Add source mappings and a small representative table to `plots.toml`, including
    important production losses. Put end-to-end Polars results before separately
    labelled Rust comparisons. Give each set a scope line and metadata link.

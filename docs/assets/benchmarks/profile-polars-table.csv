@@ -2,12 +2,12 @@ case,workload_m,workload_pattern,workload_algorithm,method,x,median,min,max,samp
 Constant capacity 4,1,constant,profile,Date,1000000,56.543299999999995,55.942099999999996,56.812,3
 Constant capacity 4,1,constant,profile,"Datetime(time_unit='us', time_zone=None)",1000000,71.0457,70.7775,71.8715,3
 Constant capacity 4,1,constant,profile,Int64,1000000,77.5649,72.53399999999999,79.5626,3
-Sufficient capacity,1,high,profile,Date,1000000,31.177699999999998,31.136799999999997,32.1034,3
-Sufficient capacity,1,high,profile,"Datetime(time_unit='us', time_zone=None)",1000000,43.2673,42.588,43.278099999999995,3
-Sufficient capacity,1,high,profile,Int64,1000000,46.7179,45.0978,47.869,3
-Variable capacity 2/4/6/8,3125,varying,profile,Date,100000,13.0824,12.8666,13.274799999999999,3
-Variable capacity 2/4/6/8,3125,varying,profile,"Datetime(time_unit='us', time_zone=None)",100000,13.8993,13.7411,14.3532,3
-Variable capacity 2/4/6/8,3125,varying,profile,Int64,100000,14.28,14.248,14.313899999999999,3
-"Variable capacity 2/4/6/8, larger",31250,varying,profile,Date,1000000,146.4067,145.8902,146.9989,3
-"Variable capacity 2/4/6/8, larger",31250,varying,profile,"Datetime(time_unit='us', time_zone=None)",1000000,160.07729999999998,159.7716,163.02249999999998,3
-"Variable capacity 2/4/6/8, larger",31250,varying,profile,Int64,1000000,160.231,159.3628,166.533,3
+Enough capacity for all,1,high,profile,Date,1000000,31.177699999999998,31.136799999999997,32.1034,3
+Enough capacity for all,1,high,profile,"Datetime(time_unit='us', time_zone=None)",1000000,43.2673,42.588,43.278099999999995,3
+Enough capacity for all,1,high,profile,Int64,1000000,46.7179,45.0978,47.869,3
+"Capacity varies: 2, 4, 6, 8",3125,varying,profile,Date,100000,13.0824,12.8666,13.274799999999999,3
+"Capacity varies: 2, 4, 6, 8",3125,varying,profile,"Datetime(time_unit='us', time_zone=None)",100000,13.8993,13.7411,14.3532,3
+"Capacity varies: 2, 4, 6, 8",3125,varying,profile,Int64,100000,14.28,14.248,14.313899999999999,3
+"Capacity varies: 2, 4, 6, 8 (larger input)",31250,varying,profile,Date,1000000,146.4067,145.8902,146.9989,3
+"Capacity varies: 2, 4, 6, 8 (larger input)",31250,varying,profile,"Datetime(time_unit='us', time_zone=None)",1000000,160.07729999999998,159.7716,163.02249999999998,3
+"Capacity varies: 2, 4, 6, 8 (larger input)",31250,varying,profile,Int64,1000000,160.231,159.3628,166.533,3

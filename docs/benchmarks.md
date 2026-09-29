@@ -1,7 +1,7 @@
 # Benchmarks
 
 Saved measurements compare the production implementation with native Polars
-expressions or Rust candidates. Start with an operation's results table; each
+expressions or Rust candidates. Start with an operation's results table. Each
 report identifies its timing scope, workload, tradeoffs, and missing coverage.
 
 | Operation | What was measured |
@@ -22,14 +22,14 @@ report identifies its timing scope, workload, tradeoffs, and missing coverage.
 
 ## Hardware
 
-Published runs use the maintainer's fixed home machine: **AMD Ryzen 9 3900X,
+Published runs use a fixed machine: **AMD Ryzen 9 3900X,
 12 physical cores / 24 logical processors, 32 GiB RAM** (about 31.9 GiB usable),
 running Windows 11 x86-64. The original hardware records remain in each run's
 metadata for provenance.
 
 Thread counts, sample counts, software versions, builds, and instrumentation vary
 between runs. Read the scope line beside each result set and follow its metadata
-link for the exact settings; Rust core timings and complete Polars collections
+link for the exact settings. Rust core timings and complete Polars collections
 are separate measurements.
 
 ## Reading and reproducing results
