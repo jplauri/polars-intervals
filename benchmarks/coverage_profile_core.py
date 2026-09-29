@@ -158,12 +158,11 @@ def main():
                 metadata["returncode"] = 1
                 metadata["error"] = "No samples emitted; check the selected cases and sizes"
     metadata["source_archive_sha256"] = sha256(archive_path)
-    metadata["sources_unchanged_during_run"] = all(
-        sha256(ROOT / path) == digest for path, digest in metadata["source_sha256"].items()
-    )
-    metadata["changed_sources_during_run"] = [
+    changed = [
         path for path, digest in metadata["source_sha256"].items() if sha256(ROOT / path) != digest
     ]
+    metadata["sources_unchanged_during_run"] = not changed
+    metadata["changed_sources_during_run"] = changed
     if output.exists():
         metadata["raw_sha256"] = sha256(output)
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")

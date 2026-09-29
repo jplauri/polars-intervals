@@ -19,6 +19,12 @@ and canonical segments, with linear processing when both streams are ordered.
 The choice trades higher weighted-record memory for faster large shuffled calls;
 an active-end heap wins on some ordered weighted core workloads.
 
+The timing tables below predate removal of the Rust core's explicit sortedness
+guards. A [focused before/after follow-up](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-sort-review-20260929.md)
+retains the simpler standard-library calls without claiming a speedup. Outputs
+and allocations matched, while timing differences varied across repeat runs.
+No new end-to-end Polars timings were taken for that cleanup.
+
 ## Results
 
 Complete calls including query construction and collection · one Polars thread ·
@@ -47,9 +53,10 @@ timestamp groups, the same calls took **77.6 / 78.6 / 78.8 ms**, versus
 The broader eager comparisons below predate the lazy wrapper and the native
 baseline's join simplification. Their Python
 source snapshots are preserved and their timings are not relabeled as the
-updated wrapper. The Rust engine is unchanged; the focused follow-up above
-measures the current public eager and lazy routes against the simplified
-baseline. The original lazy follow-up also retains its earlier baseline source
+updated wrapper. The Rust engine was unchanged in that follow-up, which measures
+the eager and lazy routes against the simplified baseline. Those measurements
+predate the sort-guard cleanup described above. The original lazy follow-up
+also retains its earlier baseline source
 snapshot; none of those saved timings are attributed to the changed baseline.
 Native count comparisons remain available in the current raw samples.
 
@@ -129,8 +136,9 @@ stores two index arrays and reads caller endpoints and quantities indirectly.
 Each candidate validates and clips before accumulating, emits the full profile,
 and coalesces canonically. No sorting or preparation is supplied for free.
 
-The retained production engine is B. Both streams are checked for sortedness
-independently. Ordered streams have linear work, including validation and
+The retained production engine is B. Each stream uses the standard library sort,
+which detects ordered inputs in linear time on the pinned Rust toolchain.
+Ordered streams have linear work, including validation and
 output. Units do not allocate a quantity vector. Weighted records were selected
 for repeatable gains on large shuffled inputs, accepting higher allocation and
 losses on some ordered or repeated-coordinate cases. There are no size thresholds
@@ -164,7 +172,7 @@ costs of the contiguous weighted layout, not whole-process memory measurements.
 The initial broad run used index streams as its provisional `production` label.
 Its timings are historical, and are not attributed to the final implementation.
 A separate i128 follow-up evaluated the adapter's actual quantity width before
-the storage decision. The table above uses a fresh run of the final public core.
+the storage decision. The table above predates the later sort-guard cleanup.
 See the [proof and layout notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/coverage-profile-notes.md).
 
 </details>

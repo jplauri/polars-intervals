@@ -62,12 +62,8 @@ where
             departures.push(end);
         }
     }
-    if !arrivals.is_sorted() {
-        arrivals.sort_unstable();
-    }
-    if !departures.is_sorted() {
-        departures.sort_unstable();
-    }
+    arrivals.sort_unstable();
+    departures.sort_unstable();
     sweep(
         arrivals.into_iter().map(|t| (t, 1)),
         departures.into_iter().map(|t| (t, 1)),
@@ -130,12 +126,8 @@ where
     }
     // Natural-alignment records keep comparisons and sweep reads contiguous.
     // Their extra storage trades off against index streams' random source reads.
-    if !arrivals.is_sorted_by_key(|&(coordinate, _)| coordinate) {
-        arrivals.sort_unstable_by_key(|&(coordinate, _)| coordinate);
-    }
-    if !departures.is_sorted_by_key(|&(coordinate, _)| coordinate) {
-        departures.sort_unstable_by_key(|&(coordinate, _)| coordinate);
-    }
+    arrivals.sort_unstable_by_key(|&(coordinate, _)| coordinate);
+    departures.sort_unstable_by_key(|&(coordinate, _)| coordinate);
     sweep(
         arrivals
             .into_iter()

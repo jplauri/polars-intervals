@@ -78,10 +78,11 @@ so complete core time is `O(n + m log m + z)`, with `z <= u - 1` for a nonempty
 domain. The extra storage is `O(m + z)`. A numeric coordinate span does not enter
 either bound.
 
-Each stream is checked for sortedness separately. Sorted starts alone do not
-imply sorted ends. If both streams are already ordered, checks and the sweep
-take `O(n + z)` total time, including validation and clipping. Clipped coordinates
-are stored in each stream and both sortedness checks are included in timing.
+Each stream is sorted independently. The pinned Rust standard library detects
+ordered inputs in linear time, so no separate sortedness guards are needed.
+Sorted starts alone do not imply sorted ends. When both streams are ordered,
+the complete call takes `O(n + z)` time, including validation and clipping.
+Clipped coordinates are stored in each stream, and sorting is included in timing.
 
 Unit mode stores two endpoint-only vectors and generates unit deltas during the
 merge. It allocates no ones vector. Weighted mode stores two contiguous vectors
