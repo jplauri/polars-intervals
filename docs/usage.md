@@ -32,7 +32,7 @@ and excludes its end. An interval with `start == end` is empty. Empty intervals
 overlap nothing.
 
 Endpoints must be non-null, with `start <= end` in every row. Both columns must
-have the same dtype:
+have the same dtype, and nothing is cast for you:
 
 | Endpoint type | Requirement |
 | --- | --- |
@@ -40,28 +40,14 @@ have the same dtype:
 | `Date` | Both columns must be `Date` |
 | `Datetime` | The same time unit and timezone |
 
-Nothing is cast automatically, so cast mismatched columns yourself. Weights,
-costs, and capacities must be integers.
-
 ### Column names, expressions, and results
 
 Most functions accept column names such as `"start"` or expressions such as
 `pl.col("start")`, and return an expression for an eager or lazy query. The
 input does not need to be sorted.
 
-| Result you need | Use the expression in |
-| --- | --- |
-| A count, depth, or lane for each row | `with_columns(...)` |
-| Only the chosen intervals | `filter(...)` |
-| A selection flag alongside every row | `with_columns(...)` |
-| Points that hit all intervals | `select(...)` |
-
-When several selections are equally good, which one you get may change between
-releases.
-
-The [capacity-profile selector](#select-with-a-capacity-profile) takes
-DataFrames instead of expressions. [`coverage_profile`](coverage-profile.md)
-has its own page.
+Selections return a Boolean mask. Use it in `filter` to keep the chosen rows,
+or in `with_columns` to flag them.
 
 ### Count within groups
 
@@ -101,6 +87,7 @@ computed from the full input, add it with `with_columns` first, then filter.
 | [Select intervals by weight](#select-intervals-by-weight) | Choose a schedule with one or more slots, or choose a mutually overlapping set |
 | [Covering and coverage](#covering-and-coverage) | Cover a target, maximize covered length with a budget, or hit every interval with points |
 | [Choose representative intervals](#choose-representative-intervals) | Select rows so every input row is selected or overlaps a selected row |
+| [Coverage and load profiles](coverage-profile.md) | Measure how much is active at each coordinate |
 
 The [API reference](api.md) has full signatures and edge cases.
 
@@ -109,7 +96,7 @@ The [API reference](api.md) has full signatures and edge cases.
 ### Count overlaps
 
 `overlap_count` counts how many other intervals overlap each row, as in the
-[first example](#a-first-example). Duplicate rows count each other.
+[first example](#a-first-example).
 
 [API reference](api.md#polars_intervals.overlap_count) |
 [Benchmarks](overlap-count-benchmarks.md)
@@ -168,8 +155,7 @@ result = appointments.lazy().with_columns(pi.assign_lanes("start", "end").alias(
 print(result["lane"].to_list())  # [0, 1, 0]
 ```
 
-The first and last appointments touch, so they share a lane. Lane numbers may
-change with input order or between releases.
+The first and last appointments touch, so they share a lane.
 
 [API reference](api.md#polars_intervals.assign_lanes) |
 [Benchmarks](assign-lanes-benchmarks.md)
@@ -191,17 +177,6 @@ print(sorted(result["lane"].value_counts()["count"].to_list()))  # [3, 3]
 The two long intervals need two lanes, and the four empty rows are split
 between them. Balancing is a heuristic, so the most even split is not
 guaranteed.
-
-To improve an existing assignment, pass its column as `initial_lanes`:
-
-```python
-original = intervals.lazy().with_columns(pi.assign_lanes("start", "end").alias("lane"))
-rebalanced = original.with_columns(
-    pi.assign_balanced_lanes("start", "end", initial_lanes="lane").alias("lane")
-).collect()
-```
-
-`max_work` caps how much balancing work is done.
 
 [API reference](api.md#polars_intervals.assign_balanced_lanes) |
 [Measured quality, runtime, and work limits](balance-lanes-benchmarks.md)
@@ -302,8 +277,6 @@ greater weight.
 
 ## Covering and coverage
 
-Choose a covering operation when the covered coordinates matter.
-
 ### Cover one continuous target
 
 `minimum_cover` selects the fewest intervals needed to cover a target:
@@ -319,8 +292,7 @@ chosen = (
 print(chosen.rows())  # [(0, 6), (6, 10)]
 ```
 
-Selected intervals may extend beyond the target. If the target cannot be fully
-covered, the query raises an error.
+If the target cannot be fully covered, the query raises an error.
 
 [API reference](api.md#polars_intervals.minimum_cover) |
 [Benchmarks](covering-benchmarks.md)
@@ -346,17 +318,6 @@ full-length interval.
 
 [API reference](api.md#polars_intervals.minimum_cost_cover) |
 [Benchmarks](cost-covering-benchmarks.md)
-
-#### Date and Datetime targets
-
-Targets can be Python dates or datetimes. Python datetimes match microsecond
-`Datetime` columns. For another time unit, pass a one-element Series with the
-endpoint dtype:
-
-```python
-target_start = pl.Series([0], dtype=pl.Int64).cast(pl.Datetime("ns", "UTC"))
-target_end = pl.Series([100], dtype=pl.Int64).cast(pl.Datetime("ns", "UTC"))
-```
 
 ### Select maximum coverage with a budget
 
