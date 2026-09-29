@@ -93,6 +93,6 @@ notes explain the independent correctness checks.
     ```
 
     `CLIQUE_SIZES`, `CLIQUE_CASES`, `CLIQUE_SEEDS`, `CLIQUE_DTYPES`,
-    `CLIQUE_WEIGHT_DTYPES`, `CLIQUE_METHODS`, `CLIQUE_SAMPLES`, and
+    `CLIQUE_WEIGHT_DTYPES`, `CLIQUE_SAMPLES`, and
     `CLIQUE_WARMUPS` select focused core runs. Run metadata records the settings
     actually used. Regenerate tables with the [reporting commands](benchmarking.md#generate-plots).

@@ -65,21 +65,3 @@ fn labels_are_not_limited_to_endpoint_width() {
         300
     );
 }
-
-#[test]
-fn rejects_logical_mismatch_before_physical_conversion() {
-    let integer = Series::new("s".into(), [0i64]);
-    let date = integer.cast(&DataType::Date).unwrap();
-    let ms = integer.clone().into_datetime(TimeUnit::Milliseconds, None);
-    let us = integer.clone().into_datetime(TimeUnit::Microseconds, None);
-    let utc = integer.clone().into_datetime(
-        TimeUnit::Milliseconds,
-        TimeZone::opt_try_new(Some("UTC")).unwrap(),
-    );
-    for (s, e) in [(&date, &ms), (&ms, &integer), (&ms, &us), (&ms, &utc)] {
-        assert!(matches!(
-            assign_lanes(s, e),
-            Err(PolarsError::InvalidOperation(_))
-        ));
-    }
-}

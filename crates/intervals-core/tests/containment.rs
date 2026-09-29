@@ -4,14 +4,11 @@ mod reference;
 
 use intervals_core::{IntervalError, containment_counts};
 use proptest::prelude::*;
-use reference::{Counter, Fenwick, Segment, indirect, naive, packed};
+use reference::naive;
 
 fn check<T: Ord + Copy + std::fmt::Debug>(s: &[T], e: &[T], expected: &[usize]) {
     assert_eq!(naive(s, e), expected);
     assert_eq!(containment_counts(s, e).unwrap(), expected);
-    assert_eq!(packed::<_, Fenwick>(s, e).unwrap().counts, expected);
-    assert_eq!(indirect(s, e).unwrap().counts, expected);
-    assert_eq!(packed::<_, Segment>(s, e).unwrap().counts, expected);
 }
 
 #[test]
@@ -131,10 +128,10 @@ fn length_mismatch_precedes_interval_validation() {
     ] {
         assert_eq!(
             containment_counts(s, e),
-            Err(IntervalError::LengthMismatch {
-                starts_len: s.len(),
-                ends_len: e.len()
-            })
+            Err(IntervalError::LengthMismatch([
+                ("starts", s.len()),
+                ("ends", e.len())
+            ]))
         );
     }
 }
@@ -153,7 +150,7 @@ proptest! {
     #![proptest_config(ProptestConfig::with_cases(512))]
 
     #[test]
-    fn exact_agreement_with_naive_and_all_candidates((s, e) in collection()) {
+    fn exact_agreement_with_naive((s, e) in collection()) {
         check(&s, &e, &naive(&s, &e));
     }
 
@@ -304,54 +301,6 @@ proptest! {
         }
         prop_assert_eq!(counts(&s, &e).iter().sum::<usize>(), incoming.iter().sum::<usize>());
     }
-
-    #[test]
-    fn counter_random_operations(
-        n in 1usize..=32,
-        ops in prop::collection::vec((any::<usize>(), any::<bool>()), 0..200),
-    ) {
-        let mut fenwick = Fenwick::new(n);
-        let mut segment = Segment::new(n);
-        let mut array = vec![0usize; n];
-        for (index, update) in ops {
-            if update {
-                let i = index % n;
-                fenwick.add(i);
-                segment.add(i);
-                array[i] += 1;
-            } else {
-                let end = index % (n + 1);
-                let expected: usize = array[..end].iter().sum();
-                prop_assert_eq!(fenwick.prefix(end), expected);
-                prop_assert_eq!(segment.prefix(end), expected);
-            }
-        }
-    }
-}
-
-fn counter_boundaries<C: Counter>() {
-    assert_eq!(C::new(0).prefix(0), 0);
-    let mut t = C::new(4);
-    t.add(0);
-    t.add(3);
-    t.add(3);
-    assert_eq!(
-        (t.prefix(0), t.prefix(1), t.prefix(3), t.prefix(4)),
-        (0, 1, 1, 3)
-    );
-    let mut t = C::new(1);
-    for _ in 0..9 {
-        t.add(0);
-    }
-    assert_eq!(t.prefix(1), 9);
-}
-#[test]
-fn fenwick_empty_boundaries_repeated_updates_and_all_equal() {
-    counter_boundaries::<Fenwick>();
-}
-#[test]
-fn segment_empty_boundaries_repeated_updates_and_all_equal() {
-    counter_boundaries::<Segment>();
 }
 
 #[test]

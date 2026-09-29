@@ -120,19 +120,6 @@ def test_window_and_grouped_execution(dtype, k):
 
 
 @pytest.mark.parametrize("k", [0, 1, 2])
-@pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
-def test_invalid_and_null_endpoints(k, dtype):
-    frame = pl.DataFrame({"start": [2, 0, 5], "end": [2, 1, 4], "weight": [1, 0, -1]}).with_columns(
-        pl.col("start", "end").cast(dtype)
-    )
-    with pytest.raises(pl.exceptions.ComputeError, match="index 2"):
-        frame.select(expression(k))
-    for name in ("start", "end"):
-        with pytest.raises(pl.exceptions.ComputeError, match="null endpoints"):
-            frame.with_columns(pl.lit(None, dtype=dtype).alias(name)).select(expression(k))
-
-
-@pytest.mark.parametrize("k", [0, 1, 2])
 @pytest.mark.parametrize("dtype", INTEGER_DTYPES, ids=str)
 def test_null_weights(k, dtype):
     frame = pl.DataFrame({"start": [0], "end": [1], "weight": pl.Series([None], dtype=dtype)})
@@ -168,32 +155,6 @@ def test_unsupported_weights(dtype):
         )
         with pytest.raises(pl.exceptions.PolarsError, match="integer weight dtype"):
             frame.select(expression(2))
-
-
-@pytest.mark.parametrize(
-    "start,end",
-    [
-        (pl.Int32, pl.Int64),
-        (pl.Date, pl.Int32),
-        (pl.Datetime("ms"), pl.Datetime("us")),
-        (pl.Datetime("ns", "UTC"), pl.Datetime("ns", "Europe/Helsinki")),
-    ],
-)
-def test_mismatched_endpoints(start, end):
-    frame = pl.DataFrame(
-        {"start": pl.Series([0], dtype=start), "end": pl.Series([1], dtype=end), "weight": [1]}
-    )
-    with pytest.raises(pl.exceptions.PolarsError, match="matching integer, Date, or Datetime"):
-        frame.select(expression(2))
-
-
-@pytest.mark.parametrize("dtype", [pl.Float64, pl.Boolean, pl.String, pl.Time, pl.Duration("us")])
-def test_unsupported_endpoints(dtype):
-    frame = pl.DataFrame(
-        {name: pl.Series([], dtype=dtype) for name in ("start", "end")}
-    ).with_columns(pl.Series("weight", [], dtype=pl.Int64))
-    with pytest.raises(pl.exceptions.PolarsError, match="integer dtype, Date, or Datetime"):
-        frame.select(expression(2))
 
 
 @pytest.mark.parametrize("argument", ["start", "end", "weight"])

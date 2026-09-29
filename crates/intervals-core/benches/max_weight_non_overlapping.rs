@@ -1,18 +1,19 @@
 //! cargo bench -p intervals-core --bench max_weight_non_overlapping --locked
+#[path = "support/random.rs"]
+mod random;
 #[path = "support/weighted.rs"]
 mod weighted;
 
+use random::{random, shuffle};
 use std::hint::black_box;
 use std::time::Instant;
-use weighted::{CANDIDATES, random, shuffle, suffix_optimum, verify};
+use weighted::{suffix_optimum, verify};
 
 fn main() {
     if cfg!(debug_assertions) {
         panic!("run this benchmark in release mode");
     }
-    println!(
-        "family,order,weights,n,objective,algorithm,sample,ns,preprocessing_ns,optimization_ns,reconstruction_ns,peak_buffer_bytes,buffer_allocations"
-    );
+    println!("family,order,weights,n,objective,algorithm,sample,ns");
     let mut seed = 42;
     // Optional maximum size allows a fast reproducibility smoke run.
     let max_n = std::env::var("WEIGHTED_BENCH_MAX_N")
@@ -87,35 +88,24 @@ fn main() {
                     let e: Vec<_> = intervals.iter().map(|r| r.1).collect();
                     let w: Vec<_> = intervals.iter().map(|r| r.2).collect();
                     let expected = suffix_optimum(&s, &e, &w);
-                    // Independently validate every candidate before any timing is accepted.
-                    for (_, run) in CANDIDATES {
-                        let result = run(&s, &e, &w).unwrap();
-                        assert_eq!(verify(&s, &e, &w, &result.mask), expected);
-                    }
-                    let production =
-                        intervals_core::max_weight_non_overlapping(&s, &e, &w).unwrap();
-                    assert_eq!(verify(&s, &e, &w, &production), expected);
-                    let mut methods = CANDIDATES;
                     for sample in 0..7 {
-                        shuffle(&mut methods, &mut seed);
-                        for (name, run) in methods {
-                            let begin = Instant::now();
-                            let result = black_box(
-                                run(black_box(&s), black_box(&e), black_box(&w)).unwrap(),
+                        let begin = Instant::now();
+                        let mask = black_box(
+                            intervals_core::max_weight_non_overlapping(
+                                black_box(&s),
+                                black_box(&e),
+                                black_box(&w),
+                            )
+                            .unwrap(),
+                        );
+                        let ns = begin.elapsed().as_nanos();
+                        // Every output is independently validated, outside timing.
+                        assert_eq!(verify(&s, &e, &w, &mask), expected);
+                        if sample >= 2 {
+                            println!(
+                                "{family},{order},{distribution},{n},{expected},production,{},{ns}",
+                                sample - 2
                             );
-                            let ns = begin.elapsed().as_nanos();
-                            assert_eq!(verify(&s, &e, &w, &result.mask), expected);
-                            if sample >= 2 {
-                                println!(
-                                    "{family},{order},{distribution},{n},{expected},{name},{},{ns},{},{},{},{},{}",
-                                    sample - 2,
-                                    result.preprocessing_ns,
-                                    result.optimization_ns,
-                                    result.reconstruction_ns,
-                                    result.peak_buffer_bytes,
-                                    result.buffer_allocations
-                                );
-                            }
                         }
                     }
                 }

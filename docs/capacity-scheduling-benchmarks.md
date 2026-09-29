@@ -82,7 +82,6 @@ omissions are in the [supporting notes](https://github.com/jplauri/polars-interv
 
 ```sh
 cargo bench -p intervals-core --bench max_weight_with_capacity --locked > benchmarks/results/capacity-local.csv
-uv run --no-sync python benchmarks/capacity_summary.py benchmarks/results/capacity-local.csv
 python -I /path/to/checkout/benchmarks/capacity_temporal.py > capacity-temporal-local.csv
 ```
 

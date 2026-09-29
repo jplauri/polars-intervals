@@ -507,9 +507,9 @@ domain has measure at most `u64::MAX`, safely within `i128`.
 
 ### Candidate implementations
 
-All experimental code lives in `crates/intervals-core/benches/support/coverage.rs`
-and is also compiled into the oracle/property tests. Only the selected kernel
-is linked into the public library.
+These experimental kernels were removed after selection; check out the revision
+recorded with the saved coverage runs to reproduce them. Only the selected kernel
+is in the library.
 
 | Candidate | Layout / computation |
 | --- | --- |

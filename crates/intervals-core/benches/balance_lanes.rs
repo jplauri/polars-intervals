@@ -7,13 +7,9 @@
 //! requested-live-heap measurement, not RSS or tracked buffer capacity.
 #[path = "support/allocations.rs"]
 mod allocations;
-#[allow(dead_code)]
 mod support;
 
-use intervals_core::{
-    BalanceDiagnostics, BalanceSeed, assign_balanced_lanes_with_diagnostics, assign_lanes,
-    balanced_lane_seed,
-};
+use intervals_core::{BalanceDiagnostics, assign_balanced_lanes_with_diagnostics, assign_lanes};
 use std::{hint::black_box, io::Write, time::Instant};
 
 #[global_allocator]
@@ -48,56 +44,14 @@ fn run(s: &[i64], e: &[i64], baseline: &[u32], method: &str, budget: u64) -> Out
         diagnostics: None,
         work: None,
     };
-    match method {
-        "baseline" => result.lanes = assign_lanes(s, e).unwrap(),
-        "forward" | "backward" | "best_seed" => {
-            let seed = match method {
-                "forward" => BalanceSeed::Forward,
-                "backward" => BalanceSeed::Backward,
-                _ => BalanceSeed::Best,
-            };
-            result.lanes = balanced_lane_seed(s, e, seed).unwrap();
-        }
-        "repair" | "balanced" => {
-            let measured = if method == "repair" {
-                assign_balanced_lanes_with_diagnostics(s, e, Some(baseline), budget).unwrap()
-            } else {
-                assign_balanced_lanes_with_diagnostics(s, e, None, budget).unwrap()
-            };
-            result.lanes = measured.lanes;
-            result.work = Some(measured.diagnostics.work);
-            result.diagnostics = Some(measured.diagnostics);
-        }
-        "multi_seed_experiment" => {
-            // Benchmark-only policy experiment, reusing production functions.
-            // Three independent repairs SHARE this per-call budget; no algorithm
-            // copy, and no extra budget per seed. Includes repeated preparation.
-            result.lanes = baseline.to_vec();
-            let mut best = score(baseline);
-            let mut work = 0;
-            for i in 0..3 {
-                let initial = match i {
-                    0 => baseline.to_vec(),
-                    1 => balanced_lane_seed(s, e, BalanceSeed::Forward).unwrap(),
-                    _ => balanced_lane_seed(s, e, BalanceSeed::Backward).unwrap(),
-                };
-                let measured = assign_balanced_lanes_with_diagnostics(
-                    s,
-                    e,
-                    Some(&initial),
-                    budget / 3 + u64::from(i < budget % 3),
-                )
-                .unwrap();
-                work += measured.diagnostics.work;
-                let candidate = score(&measured.lanes);
-                if (candidate.0, candidate.1) < (best.0, best.1) {
-                    best = candidate;
-                    result.lanes = measured.lanes;
-                }
-            }
-            result.work = Some(work);
-        }
-        _ => unreachable!(),
+    if method == "baseline" {
+        result.lanes = assign_lanes(s, e).unwrap();
+    } else {
+        let initial = (method == "repair").then_some(baseline);
+        let measured = assign_balanced_lanes_with_diagnostics(s, e, initial, budget).unwrap();
+        result.lanes = measured.lanes;
+        result.work = Some(measured.diagnostics.work);
+        result.diagnostics = Some(measured.diagnostics);
     }
     result
 }
@@ -142,15 +96,7 @@ fn main() {
         .unwrap_or_else(|_| "7".to_owned())
         .parse()
         .unwrap();
-    let methods = [
-        "baseline",
-        "forward",
-        "backward",
-        "best_seed",
-        "repair",
-        "balanced",
-        "multi_seed_experiment",
-    ];
+    let methods = ["baseline", "repair", "balanced"];
     let mut state = 42;
     for n in sizes {
         for family in &families {
@@ -206,22 +152,13 @@ fn main() {
                 let omega = if empty == n { 0 } else { minimum };
                 let mut options = Vec::new();
                 for method in methods {
-                    let work_options: &[u64] =
-                        if ["repair", "balanced", "multi_seed_experiment"].contains(&method) {
-                            &budgets
-                        } else {
-                            &[0]
-                        };
+                    let work_options: &[u64] = if method == "baseline" { &[0] } else { &budgets };
                     for &budget in work_options {
                         let (result, peak, allocations) =
                             allocations::measure(|| run(&s, &e, &baseline, method, budget));
                         support::verify(&s, &e, &result.lanes, minimum);
                         let (d, q, k, min, max) = score(&result.lanes);
-                        if ["repair", "balanced", "best_seed", "multi_seed_experiment"]
-                            .contains(&method)
-                        {
-                            assert!((d, q) <= (starting.0, starting.1));
-                        }
+                        assert!((d, q) <= (starting.0, starting.1));
                         let delta = usize::from(k > 0 && !n.is_multiple_of(k));
                         let work = result.work.map_or_else(String::new, |v| v.to_string());
                         let diagnostics = result.diagnostics.as_ref().map_or_else(

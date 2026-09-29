@@ -3,15 +3,12 @@
 import argparse
 import ctypes
 import gc
-import hashlib
 import json
 import os
-import platform
 import random
 import subprocess
 import sys
 from array import array
-from datetime import UTC, datetime
 from importlib.metadata import version
 from itertools import accumulate
 from pathlib import Path
@@ -23,6 +20,7 @@ import polars as pl
 import polars_intervals as pi
 from polars.plugins import register_plugin_function
 from polars.testing import assert_frame_equal
+from provenance import environment, sha256
 
 
 def plugin_query(
@@ -478,11 +476,7 @@ def measure_memory(
 
 def plugin_hashes(path: Path) -> dict[str, str]:
     paths = [path] if path.is_file() else path.iterdir()
-    return {
-        path.name: hashlib.sha256(path.read_bytes()).hexdigest()
-        for path in paths
-        if path.suffix in (".pyd", ".so")
-    }
+    return {path.name: sha256(path) for path in paths if path.suffix in (".pyd", ".so")}
 
 
 def main() -> None:
@@ -533,32 +527,15 @@ def main() -> None:
     repo = Path(__file__).resolve().parents[1]
     report = {
         "environment": {
-            "timestamp_utc": datetime.now(UTC).isoformat(),
-            "git_commit": subprocess.check_output(
-                ["git", "rev-parse", "HEAD"], cwd=repo, text=True
-            ).strip(),
-            "git_dirty": bool(
-                subprocess.check_output(
-                    ["git", "status", "--porcelain"], cwd=repo, text=True
-                ).strip()
-            ),
-            "python": platform.python_version(),
-            "polars": pl.__version__,
+            **environment(),
             "polars_intervals": version("polars-intervals"),
-            "platform": platform.platform(),
-            "processor": platform.processor(),
-            "logical_cpus": os.cpu_count(),
-            "polars_threads": pl.thread_pool_size(),
             "engine": "in-memory",
-            "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            "script_sha256": sha256(Path(__file__)),
             "plugin_binary_sha256": plugin_hashes(Path(pi.__file__).parent),
             "reference_plugin_binary_sha256": (
                 plugin_hashes(args.compare_plugin) if args.compare_plugin else None
             ),
-            "core_source_sha256": hashlib.sha256(
-                (repo / "crates/intervals-core/src/lib.rs").read_bytes()
-            ).hexdigest(),
-            "rustc": subprocess.check_output(["rustc", "--version"], text=True).strip(),
+            "core_source_sha256": sha256(repo / "crates/intervals-core/src/lib.rs"),
             "rustflags": os.environ.get("RUSTFLAGS", ""),
         },
         "configuration": {

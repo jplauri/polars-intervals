@@ -1,4 +1,4 @@
-use crate::IntervalError;
+use crate::{IntervalError, validate_lengths};
 
 /// Select a globally maximum-weight subset of mutually non-overlapping intervals.
 ///
@@ -18,8 +18,7 @@ use crate::IntervalError;
 ///
 /// # Errors
 ///
-/// Returns [`IntervalError::LengthMismatch`] or
-/// [`IntervalError::WeightLengthMismatch`] for unequal lengths,
+/// Returns [`IntervalError::LengthMismatch`] for unequal lengths,
 /// [`IntervalError::InvalidInterval`] for the first reversed original row
 /// (even if its weight is nonpositive), or [`IntervalError::WeightOverflow`]
 /// if the optimal total cannot be represented in `i128`.
@@ -44,17 +43,12 @@ where
     W: Copy,
     i128: From<W>,
 {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
     if starts.len() != weights.len() {
-        return Err(IntervalError::WeightLengthMismatch {
-            intervals_len: starts.len(),
-            weights_len: weights.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("intervals", starts.len()),
+            ("weights", weights.len()),
+        ]));
     }
     let mut order = Vec::with_capacity(starts.len());
     let mut selected = vec![false; starts.len()];

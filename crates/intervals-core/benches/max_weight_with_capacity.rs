@@ -1,23 +1,47 @@
 //! cargo bench -p intervals-core --bench max_weight_with_capacity --locked
 #[path = "support/allocations.rs"]
 mod allocations;
-#[path = "support/capacity_candidates.rs"]
-mod candidates;
-#[path = "../src/capacity.rs"]
-#[allow(dead_code)] // test-only invariant helpers in the directly included source
-mod capacity;
 #[path = "support/random.rs"]
 mod random;
 #[path = "support/capacity_reference.rs"]
 mod reference;
 use random::{random, shuffle};
 
-use intervals_core::{IntervalError, max_weight_non_overlapping};
+use intervals_core::{max_weight_non_overlapping, max_weight_with_capacity};
 use std::hint::black_box;
 use std::time::Instant;
 
 #[global_allocator]
 static ALLOCATOR: allocations::Allocator = allocations::Allocator;
+
+// Workload descriptors over positive nonempty rows: peak concurrency, and
+// overlap components in which touching rows are separate.
+fn structure(s: &[i64], e: &[i64], w: &[i64]) -> (usize, usize) {
+    let mut rows: Vec<_> = (0..s.len())
+        .filter(|&i| s[i] < e[i] && w[i] > 0)
+        .map(|i| (s[i], e[i]))
+        .collect();
+    rows.sort_unstable();
+    let mut events: Vec<_> = rows
+        .iter()
+        .flat_map(|&(s, e)| [(s, 1i64), (e, -1)])
+        .collect();
+    events.sort_unstable();
+    let (mut live, mut peak) = (0, 0);
+    for (_, delta) in events {
+        live += delta;
+        peak = peak.max(live);
+    }
+    let mut components = 0;
+    let mut reach = None;
+    for (s, e) in rows {
+        if reach.is_none_or(|r| s >= r) {
+            components += 1;
+        }
+        reach = Some(reach.map_or(e, |r: i64| r.max(e)));
+    }
+    (peak as usize, components)
+}
 
 fn data(n: usize, family: &str, distribution: &str) -> (Vec<i64>, Vec<i64>, Vec<i64>) {
     let mut state = 42;
@@ -80,7 +104,7 @@ fn main() {
         .unwrap_or(3);
     let only = std::env::var("CAPACITY_BENCH_FAMILY").ok();
     println!(
-        "family,order,weights,n,k,concurrency,components,objective,algorithm,sample,ns,preprocessing_ns,flow_ns,reconstruction_ns,peak_allocated_bytes,allocations"
+        "family,order,weights,n,k,concurrency,components,objective,algorithm,sample,ns,peak_allocated_bytes,allocations"
     );
     let mut state = 73;
     for n in [0, 1_000, 10_000, 100_000, 1_000_000]
@@ -133,33 +157,19 @@ fn main() {
                     let s: Vec<_> = permutation.iter().map(|&i| ss[i]).collect();
                     let e: Vec<_> = permutation.iter().map(|&i| ee[i]).collect();
                     let w: Vec<_> = permutation.iter().map(|&i| ww[i]).collect();
-                    let prep = capacity::prepare(&s, &e, &w, 1).unwrap();
-                    let peak = capacity::concurrency(&prep.rows);
-                    let count = capacity::components(&prep.rows).len();
+                    let (peak, count) = structure(&s, &e, &w);
                     let mut capacities = vec![0usize, 1, 2, 4, 8, 16, 64];
                     capacities.extend([peak.saturating_sub(1), peak, peak.saturating_add(1)]);
                     capacities.sort_unstable();
                     capacities.dedup();
-                    drop(prep);
                     for k in capacities {
-                        // Bound forced-flow n*k work, including near-clique
+                        // Bound the reference flow's n*k work, including near-clique
                         // capacities. The full suite reports these omissions.
                         if n.saturating_mul(k.min(peak)) > 2_000_000 {
                             eprintln!(
-                                "omitted forced-flow work budget: {family}/{distribution}/{order} n={n} k={k} peak={peak}"
+                                "omitted reference-flow work budget: {family}/{distribution}/{order} n={n} k={k} peak={peak}"
                             );
                             continue;
-                        }
-                        let mut methods = vec![
-                            "production",
-                            "whole",
-                            "whole_guarded",
-                            "components",
-                            "parallel",
-                            "generic",
-                        ];
-                        if k == 1 {
-                            methods.push("capacity_one");
                         }
                         let expected =
                             reference::verify(&s, &e, &w, k, &reference::solve(&s, &e, &w, k));
@@ -199,73 +209,36 @@ fn main() {
                             );
                         }
                         // Brute force an independently chosen small restriction
-                        // of EVERY case, cross-checking every candidate.
+                        // of EVERY case.
                         let tiny = n.min(10);
-                        let oracle = reference::brute_force(&s[..tiny], &e[..tiny], &w[..tiny], k);
-                        for &method in &methods {
-                            let small = candidates::run::<false>(
-                                method,
-                                &s[..tiny],
-                                &e[..tiny],
-                                &w[..tiny],
+                        let (ts, te, tw) = (&s[..tiny], &e[..tiny], &w[..tiny]);
+                        assert_eq!(
+                            reference::verify(
+                                ts,
+                                te,
+                                tw,
                                 k,
-                            );
-                            assert_eq!(
-                                reference::verify(
-                                    &s[..tiny],
-                                    &e[..tiny],
-                                    &w[..tiny],
-                                    k,
-                                    &small.mask
-                                ),
-                                oracle
-                            );
-                        }
-                        let mut memory = std::collections::BTreeMap::new();
-                        for &method in &methods {
-                            let (result, bytes, allocs) = allocations::measure(|| {
-                                candidates::run::<true>(method, &s, &e, &w, k)
-                            });
-                            assert_eq!(
-                                reference::verify(&s, &e, &w, k, &result.mask),
-                                expected,
-                                "{method}"
-                            );
-                            memory.insert(
-                                method,
-                                (
-                                    bytes,
-                                    allocs,
-                                    result.preparation_ns,
-                                    result.flow_ns,
-                                    result.reconstruction_ns,
-                                ),
-                            );
-                        }
-                        // Verified untimed calls above warm each candidate.
+                                &max_weight_with_capacity(ts, te, tw, k).unwrap()
+                            ),
+                            reference::brute_force(ts, te, tw, k)
+                        );
+                        let (mask, bytes, allocs) =
+                            allocations::measure(|| max_weight_with_capacity(&s, &e, &w, k));
+                        assert_eq!(reference::verify(&s, &e, &w, k, &mask.unwrap()), expected);
+                        // The verified untimed call above warms the kernel.
                         for sample in 0..samples {
-                            shuffle(&mut methods, &mut state);
-                            for &method in &methods {
-                                let begin = Instant::now();
-                                let result = black_box(candidates::run::<false>(
-                                    method,
-                                    black_box(&s),
-                                    black_box(&e),
-                                    black_box(&w),
-                                    k,
-                                ));
-                                let ns = begin.elapsed().as_nanos();
-                                assert_eq!(
-                                    reference::verify(&s, &e, &w, k, &result.mask),
-                                    expected
-                                );
-                                let (bytes, allocs, preparation_ns, flow_ns, reconstruction_ns) =
-                                    memory[method];
-                                println!(
-                                    "{family},{order},{distribution},{n},{k},{peak},{count},{expected},{method},{sample},{ns},{},{},{},{bytes},{allocs}",
-                                    preparation_ns, flow_ns, reconstruction_ns
-                                );
-                            }
+                            let begin = Instant::now();
+                            let mask = black_box(max_weight_with_capacity(
+                                black_box(&s),
+                                black_box(&e),
+                                black_box(&w),
+                                k,
+                            ));
+                            let ns = begin.elapsed().as_nanos();
+                            assert_eq!(reference::verify(&s, &e, &w, k, &mask.unwrap()), expected);
+                            println!(
+                                "{family},{order},{distribution},{n},{k},{peak},{count},{expected},production,{sample},{ns},{bytes},{allocs}"
+                            );
                         }
                     }
                 }

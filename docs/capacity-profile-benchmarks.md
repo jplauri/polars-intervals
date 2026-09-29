@@ -85,14 +85,13 @@ retain memory comparisons, earlier experiments and validation details.
 
 ```sh
 cargo bench -p intervals-core --bench max_weight_with_capacity_profile --locked > benchmarks/results/capacity-profile-local.csv
-uv run --no-sync python benchmarks/capacity_profile_summary.py benchmarks/results/capacity-profile-local.csv
 python -I /path/to/checkout/benchmarks/capacity_profile_temporal.py > capacity-profile-temporal-local.csv
 ```
 
 `PROFILE_BENCH_MAX_N`, `PROFILE_BENCH_MIN_N`, `PROFILE_BENCH_MIN_M`,
-`PROFILE_BENCH_SAMPLES`, `PROFILE_BENCH_FAMILY` and `PROFILE_BENCH_METHODS`
-restrict the core run. Run the temporal command with the installed release
-wheel's Python from outside the checkout, following the shared setup.
+`PROFILE_BENCH_SAMPLES` and `PROFILE_BENCH_FAMILY` restrict the core run. Run the
+temporal command with the installed release wheel's Python from outside the
+checkout, following the shared setup.
 
 </details>
 

@@ -1,9 +1,6 @@
 use intervals_core::{DiscreteEndpoint, IntervalError, minimum_stabbing_points};
 use proptest::prelude::*;
 
-#[path = "../benches/support/stabbing.rs"]
-#[allow(dead_code)] // Phase timings are read by the release benchmark, not correctness tests.
-mod candidates;
 #[path = "support/stabbing.rs"]
 mod oracle;
 
@@ -15,9 +12,6 @@ fn solve(rows: &[(i64, i64)]) -> Vec<i64> {
 fn check(rows: &[(i64, i64)], expected: &[i64]) {
     let (s, e): (Vec<_>, Vec<_>) = rows.iter().copied().unzip();
     assert_eq!(minimum_stabbing_points(&s, &e).unwrap(), expected);
-    for method in ["A", "B", "C"] {
-        assert_eq!(candidates::run(&s, &e, method).unwrap().points, expected);
-    }
     assert_eq!(oracle::packing(&s, &e), expected.len());
 }
 
@@ -107,9 +101,6 @@ fn empty_interval_reports_original_index() {
             error.to_string(),
             format!("cannot stab empty interval at index {index}")
         );
-        for method in ["A", "B", "C"] {
-            assert_eq!(candidates::run(&s, &e, method).err(), Some(error));
-        }
     }
 }
 #[test]
@@ -121,10 +112,10 @@ fn invalid_interval_and_lengths() {
     for (s, e) in [(vec![1], vec![]), (vec![], vec![1])] {
         assert_eq!(
             minimum_stabbing_points(&s, &e),
-            Err(IntervalError::LengthMismatch {
-                starts_len: s.len(),
-                ends_len: e.len()
-            })
+            Err(IntervalError::LengthMismatch([
+                ("starts", s.len()),
+                ("ends", e.len())
+            ]))
         );
     }
 }

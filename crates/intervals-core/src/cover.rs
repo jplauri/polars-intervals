@@ -14,10 +14,10 @@ pub(crate) fn prepare<T: Ord + Copy>(
     right: T,
 ) -> Result<Vec<Candidate<T>>, IntervalError> {
     if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("starts", starts.len()),
+            ("ends", ends.len()),
+        ]));
     }
     if left > right {
         return Err(IntervalError::InvalidTarget);
@@ -142,10 +142,10 @@ where
     i128: From<W>,
 {
     if costs.len() != len {
-        return Err(IntervalError::CostLengthMismatch {
-            intervals_len: len,
-            costs_len: costs.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("intervals", len),
+            ("costs", costs.len()),
+        ]));
     }
     for (index, &cost) in costs.iter().enumerate() {
         if i128::from(cost) < 0 {
@@ -235,7 +235,7 @@ pub(crate) fn reconstruct(back: &[Option<(usize, usize)>], mask: &mut [bool]) ->
 /// and predecessor coordinate order; a particular tied mask is not an API guarantee.
 ///
 /// # Errors
-/// Besides [`minimum_cover`]'s errors: [`IntervalError::CostLengthMismatch`],
+/// Besides [`minimum_cover`]'s errors: [`IntervalError::LengthMismatch`] for costs,
 /// [`IntervalError::NegativeCost`], and [`IntervalError::CostOverflow`].
 ///
 /// ```

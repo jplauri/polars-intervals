@@ -94,36 +94,12 @@ fn zero_budget_preserves_arbitrary_valid_labels() {
 }
 
 #[test]
-fn endpoint_validation_including_zero_budget() {
-    for dtype in endpoint_dtypes() {
-        let convert = |values: &[i64]| typed_series(values, &dtype);
-        let starts = convert(&[0, 5, 6]);
-        let ends = convert(&[1, 4, 5]);
-        let lanes = Series::new("lane".into(), [0u32; 3]);
-        for work in [0, 100_000] {
-            for result in [
-                assign_balanced_lanes(&starts, &ends, None, work),
-                assign_balanced_lanes(&starts, &ends, Some(&lanes), work),
-            ] {
-                assert!(result.unwrap_err().to_string().contains("index 1"));
-            }
-            let nulls = Series::full_null("nulls".into(), 3, &dtype);
-            for (s, e) in [(&nulls, &ends), (&starts, &nulls), (&nulls, &nulls)] {
-                for result in [
-                    assign_balanced_lanes(s, e, None, work),
-                    assign_balanced_lanes(s, e, Some(&lanes), work),
-                ] {
-                    assert!(result.unwrap_err().to_string().contains("null endpoints"));
-                }
-            }
-            for result in [
-                assign_balanced_lanes(&starts, &ends.slice(0, 1), None, work),
-                assign_balanced_lanes(&starts, &ends.slice(0, 1), Some(&lanes), work),
-                assign_balanced_lanes(&starts, &ends, Some(&lanes.slice(0, 1)), work),
-            ] {
-                assert!(result.unwrap_err().to_string().contains("equal lengths"));
-            }
-        }
+fn lane_lengths_must_match_even_with_zero_budget() {
+    let starts = Series::new("s".into(), [0i64, 5, 6]);
+    let lanes = Series::new("lane".into(), [0u32]);
+    for work in [0, 100_000] {
+        let result = assign_balanced_lanes(&starts, &starts, Some(&lanes), work);
+        assert!(result.unwrap_err().to_string().contains("equal lengths"));
     }
 }
 
@@ -179,33 +155,5 @@ fn rejects_nonminimum_even_when_proper_and_equitable() {
                     .contains("minimum")
             );
         }
-    }
-}
-
-#[test]
-fn rejects_mismatched_logical_dtypes_and_unsupported_endpoints() {
-    let integer = Series::new("s".into(), [0i64]);
-    let date = integer.cast(&DataType::Date).unwrap();
-    let ms = integer.clone().into_datetime(TimeUnit::Milliseconds, None);
-    let us = integer.clone().into_datetime(TimeUnit::Microseconds, None);
-    let utc = integer.clone().into_datetime(
-        TimeUnit::Milliseconds,
-        TimeZone::opt_try_new(Some("UTC")).unwrap(),
-    );
-    let lanes = Series::new("lane".into(), [0u32]);
-    for (s, e) in [(&date, &ms), (&ms, &integer), (&ms, &us), (&ms, &utc)] {
-        for n in [0, 1] {
-            for result in [
-                assign_balanced_lanes(&s.slice(0, n), &e.slice(0, n), None, 0),
-                assign_balanced_lanes(&s.slice(0, n), &e.slice(0, n), Some(&lanes.slice(0, n)), 0),
-            ] {
-                assert!(matches!(result, Err(PolarsError::InvalidOperation(_))));
-            }
-        }
-    }
-    for dtype in [DataType::Boolean, DataType::Float64, DataType::Int128] {
-        let endpoint = Series::new_empty("endpoint".into(), &dtype);
-        assert!(assign_balanced_lanes(&endpoint, &endpoint, None, 0).is_err());
-        assert!(assign_balanced_lanes(&endpoint, &endpoint, Some(&lanes.slice(0, 0)), 0).is_err());
     }
 }

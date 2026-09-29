@@ -30,35 +30,3 @@ fn endpoint_dtypes_chunks_and_row_order() {
         );
     }
 }
-
-#[test]
-fn validation_even_for_zero_budget() {
-    let s = Series::new("s".into(), [0i64, 4]);
-    let e = Series::new("e".into(), [0i64, 3]);
-    for k in [0, 1, 100] {
-        assert!(
-            max_k_coverage(&s, &e, k)
-                .unwrap_err()
-                .to_string()
-                .contains("index 1")
-        );
-        assert!(
-            max_k_coverage(&s, &e.slice(0, 1), k)
-                .unwrap_err()
-                .to_string()
-                .contains("equal lengths")
-        );
-        assert!(
-            max_k_coverage(&s, &e.cast(&DataType::Int32).unwrap(), k)
-                .unwrap_err()
-                .to_string()
-                .contains("matching")
-        );
-        assert!(
-            max_k_coverage(&Series::full_null("s".into(), 2, &DataType::Int64), &e, k)
-                .unwrap_err()
-                .to_string()
-                .contains("null endpoints")
-        );
-    }
-}

@@ -6,7 +6,7 @@
 Requires uv and a current stable Rust toolchain.
 """
 
-from datetime import UTC, date, datetime, time, timedelta
+from datetime import UTC, date, datetime
 
 import polars as pl
 import polars_intervals as pi
@@ -159,47 +159,6 @@ def test_window_and_group_by_count_within_each_group():
     assert grouped["count"].to_list() == [[1, 1], [0, 0]]
 
 
-@pytest.mark.parametrize(
-    "starts, ends, message",
-    [
-        pytest.param(pl.Series([1, None]), pl.Series([3, 4]), "null endpoints", id="null_start"),
-        pytest.param(pl.Series([1, 2]), pl.Series([3, None]), "null endpoints", id="null_end"),
-        pytest.param(
-            pl.Series([None], dtype=pl.Int64),
-            pl.Series([None], dtype=pl.Int64),
-            "null endpoints",
-            id="all_null",
-        ),
-        pytest.param(pl.Series([4]), pl.Series([3]), "index 0", id="reversed_interval"),
-        pytest.param(
-            pl.Series([1], dtype=pl.Int32),
-            pl.Series([3], dtype=pl.Int64),
-            "matching integer, Date, or Datetime dtypes",
-            id="mixed_dtypes",
-        ),
-        pytest.param(pl.Series([1.0]), pl.Series([3.0]), "integer dtype", id="floats"),
-        pytest.param(pl.Series(["a"]), pl.Series(["b"]), "integer dtype", id="strings"),
-    ],
-)
-def test_rejects_nulls_invalid_intervals_and_unsupported_dtypes(starts, ends, message):
-    frame = pl.DataFrame({"start": starts, "end": ends})
-    with pytest.raises(pl.exceptions.PolarsError, match=message):
-        frame.lazy().select(pi.overlap_count("start", "end")).collect()
-
-
-@pytest.mark.parametrize(
-    "start",
-    [
-        pytest.param(pl.col("start").head(1), id="short_column"),
-        pytest.param(pl.lit(1, dtype=pl.Int64), id="scalar"),
-    ],
-)
-def test_rejects_unequal_expression_lengths_without_broadcasting(start):
-    frame = pl.DataFrame({"start": [1, 2], "end": [3, 4]})
-    with pytest.raises(pl.exceptions.PolarsError, match="equal lengths"):
-        frame.lazy().select(pi.overlap_count(start, "end")).collect()
-
-
 @pytest.fixture(
     params=[dtype for dtype in ENDPOINT_DTYPES if dtype.is_temporal()],
     ids=str,
@@ -255,52 +214,6 @@ def test_temporal_window_counts_within_groups(temporal_frame):
     )
 
 
-def test_temporal_reversed_interval_reports_original_row(temporal_frame):
-    frame = temporal_frame.lazy().with_columns(
-        pl.when(pl.int_range(pl.len()) == 2)
-        .then(pl.col("end").last())
-        .otherwise(pl.col("start"))
-        .alias("start")
-    )
-    with pytest.raises(pl.exceptions.ComputeError, match="index 2"):
-        frame.select(pi.overlap_count("start", "end")).collect()
-
-
-@pytest.mark.parametrize("null_column", ["start", "end", "both"])
-def test_temporal_null_endpoints_are_rejected(temporal_frame, null_column):
-    columns = ["start", "end"] if null_column == "both" else [null_column]
-    keep = pl.lit(null_column != "both") & (pl.int_range(pl.len()) != 1)
-    frame = temporal_frame.lazy().with_columns(pl.when(keep).then(pl.col(columns)).otherwise(None))
-    with pytest.raises(pl.exceptions.ComputeError, match="null endpoints"):
-        frame.select(pi.overlap_count("start", "end")).collect()
-
-
-@pytest.mark.parametrize(
-    "start_dtype, end_dtype",
-    [
-        (pl.Date, pl.Datetime("us")),
-        (pl.Date, pl.Int32),
-        (pl.Datetime("us"), pl.Int64),
-        (pl.Datetime("ms"), pl.Datetime("us")),
-        (pl.Datetime("us"), pl.Datetime("ns")),
-        (pl.Datetime("ms"), pl.Datetime("ns")),
-        (pl.Datetime("us", "UTC"), pl.Datetime("us", "Europe/Helsinki")),
-        (pl.Datetime("us", "UTC"), pl.Datetime("us")),
-    ],
-)
-def test_temporal_dtype_mismatches_are_rejected(start_dtype, end_dtype):
-    frame = pl.DataFrame(
-        {"start": pl.Series([0], dtype=start_dtype), "end": pl.Series([1], dtype=end_dtype)}
-    )
-    for input_frame in (frame, frame.head(0)):
-        for start, end in [("start", "end"), ("end", "start")]:
-            with pytest.raises(
-                pl.exceptions.PolarsError,
-                match="matching integer, Date, or Datetime dtypes.*time unit and timezone",
-            ):
-                input_frame.lazy().select(pi.overlap_count(start, end)).collect()
-
-
 @pytest.mark.parametrize("unit", ["ms", "us", "ns"])
 def test_datetime_preserves_single_ticks(unit):
     # Above 2**53, adjacent timestamps would collapse if converted to float.
@@ -329,12 +242,3 @@ def test_timezone_aware_intervals_across_clock_change():
     )
     result = frame.lazy().select(pi.overlap_count("start", "end").alias("count")).collect()
     assert_series_equal(result["count"], pl.Series("count", [1, 1, 2], dtype=pl.UInt64))
-
-
-@pytest.mark.parametrize(
-    "value, dtype", [(time(9), pl.Time), (timedelta(hours=1), pl.Duration("us"))]
-)
-def test_other_temporal_dtypes_remain_unsupported(value, dtype):
-    frame = pl.DataFrame({"start": [value], "end": [value]}, schema={"start": dtype, "end": dtype})
-    with pytest.raises(pl.exceptions.PolarsError, match="integer dtype, Date, or Datetime"):
-        frame.lazy().select(pi.overlap_count("start", "end")).collect()

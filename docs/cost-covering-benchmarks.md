@@ -80,7 +80,6 @@ for the full checks and timing scope.
 
 ```sh
 cargo bench -p intervals-core --bench covering --locked > benchmarks/results/covering-local.csv
-uv run --no-sync python benchmarks/covering_summary.py benchmarks/results/covering-local.csv
 python -I /path/to/checkout/benchmarks/covering_temporal.py > covering-temporal-local.csv
 ```
 

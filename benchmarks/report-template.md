@@ -31,7 +31,7 @@ accessible through the generated downloads.
 Explain the main takeaway without reciting every cell. Describe effects readers
 recognize, such as input order, overlap, grouping, capacity or selection limits,
 before internal causes. For heuristics, connect runtime to the quality gained
-on the same inputs. Use at most one plot when it makes a useful comparison clearer.
+on the same inputs.
 
 Put measured Polars operations before algorithm-only comparisons. Keep detailed
 algorithm comparisons in an expandable block within Results or in supporting

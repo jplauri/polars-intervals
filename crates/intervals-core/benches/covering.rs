@@ -6,7 +6,7 @@ use std::time::Instant;
 #[path = "support/allocations.rs"]
 mod allocations;
 #[path = "support/covering.rs"]
-mod candidates;
+mod oracle;
 #[path = "support/random.rs"]
 mod random;
 use random::{random, shuffle};
@@ -89,8 +89,8 @@ fn verify<T: Ord + Copy>(
     match result {
         Ok(mask) => {
             assert_eq!(mask.len(), s.len());
-            assert!(candidates::covers(s, e, mask, left, right));
-            Some(candidates::objective(w, mask))
+            assert!(oracle::covers(s, e, mask, left, right));
+            Some(oracle::objective(w, mask))
         }
         Err(error) => {
             assert_eq!(*error, IntervalError::InfeasibleCover);
@@ -109,9 +109,7 @@ fn main() {
         .map(|s| s.parse::<usize>().unwrap())
         .unwrap_or(3);
     let mut seed = 20260926;
-    println!(
-        "family,order,costs,n,method,sample,total_ns,preprocessing_ns,optimization_ns,reconstruction_ns,peak_bytes,allocations"
-    );
+    println!("family,order,costs,n,method,sample,total_ns,peak_bytes,allocations");
     for n in [1_000, 10_000, 100_000, 1_000_000]
         .into_iter()
         .filter(|&n| n <= maximum)
@@ -249,26 +247,22 @@ fn measure<T: Ord + Copy>(
         right,
         &intervals_core::minimum_cost_cover(starts, ends, costs, left, right),
     );
-    let mut methods = vec!["MC-A", "MC-B", "MC-C", "MC-A-detect", "MCC-A", "MCC-B"];
-    if n <= 1_000 {
-        methods.push("MCC-C");
-    }
+    let mut methods = ["minimum_cover", "minimum_cost_cover"];
     let run = |method: &str| {
-        if method.starts_with("MCC") {
-            candidates::weighted(
+        if method == "minimum_cost_cover" {
+            intervals_core::minimum_cost_cover(
                 black_box(starts),
                 black_box(ends),
                 black_box(costs),
                 left,
                 right,
-                method,
             )
         } else {
-            candidates::cardinality(black_box(starts), black_box(ends), left, right, method)
+            intervals_core::minimum_cover(black_box(starts), black_box(ends), left, right)
         }
     };
     let check = |method: &str, result: &Result<Vec<bool>, IntervalError>| {
-        let (weights, expected) = if method.starts_with("MCC") {
+        let (weights, expected) = if method == "minimum_cost_cover" {
             (costs, expected_mcc)
         } else {
             (unit.as_slice(), expected_mc)
@@ -276,24 +270,21 @@ fn measure<T: Ord + Copy>(
         assert_eq!(verify(starts, ends, weights, left, right, result), expected);
     };
     let mut memory = std::collections::BTreeMap::new();
-    for &method in &methods {
+    for method in methods {
         let (result, peak, allocs) = allocations::measure(|| run(method));
-        check(method, &result.result);
+        check(method, &result);
         memory.insert(method, (peak, allocs));
     }
-    // Allocation pass warms each candidate; alternate timed execution order.
+    // The allocation pass warms each method; alternate timed execution order.
     for sample in 0..samples {
         shuffle(&mut methods, seed);
-        for &method in &methods {
+        for method in methods {
             let begin = Instant::now();
             let result = black_box(run(method));
             let total = begin.elapsed().as_nanos();
-            check(method, &result.result);
+            check(method, &result);
             let (peak, allocs) = memory[method];
-            println!(
-                "{case},{n},{method},{sample},{total},{},{},{},{peak},{allocs}",
-                result.preprocessing_ns, result.optimization_ns, result.reconstruction_ns
-            );
+            println!("{case},{n},{method},{sample},{total},{peak},{allocs}");
         }
     }
 }

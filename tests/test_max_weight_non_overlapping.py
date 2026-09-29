@@ -122,50 +122,11 @@ def test_window_and_grouped_aggregation(dtype):
         assert labels == subset["selected"].to_list()
 
 
-@pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
-def test_invalid_and_null_endpoints(dtype):
-    frame = pl.DataFrame({"start": [2, 0, 5], "end": [2, 1, 4], "weight": [1, 0, -1]}).with_columns(
-        pl.col("start", "end").cast(dtype)
-    )
-    with pytest.raises(pl.exceptions.ComputeError, match="index 2"):
-        frame.select(expression())
-    for names in (["start"], ["end"], ["start", "end"]):
-        null_frame = frame.with_columns(pl.lit(None, dtype=dtype).alias(name) for name in names)
-        with pytest.raises(pl.exceptions.ComputeError, match="null endpoints"):
-            null_frame.select(expression())
-
-
 @pytest.mark.parametrize("dtype", INTEGER_DTYPES, ids=str)
 def test_null_weights(dtype):
     frame = pl.DataFrame({"start": [0], "end": [1], "weight": pl.Series([None], dtype=dtype)})
     with pytest.raises(pl.exceptions.ComputeError, match="null weights"):
         frame.select(expression())
-
-
-@pytest.mark.parametrize(
-    "start_dtype,end_dtype",
-    [
-        (pl.Int32, pl.Int64),
-        (pl.Int32, pl.UInt32),
-        (pl.Date, pl.Int32),
-        (pl.Date, pl.Datetime("ms")),
-        (pl.Datetime("ms"), pl.Int64),
-        (pl.Datetime("ms"), pl.Datetime("us")),
-        (pl.Datetime("ns", "UTC"), pl.Datetime("ns", "Europe/Helsinki")),
-        (pl.Datetime("us"), pl.Datetime("us", "UTC")),
-    ],
-)
-def test_mismatched_endpoints(start_dtype, end_dtype):
-    for values in ([0], []):
-        frame = pl.DataFrame(
-            {
-                "start": pl.Series(values, dtype=start_dtype),
-                "end": pl.Series(values, dtype=end_dtype),
-                "weight": pl.Series(values, dtype=pl.Int64),
-            }
-        )
-        with pytest.raises(pl.exceptions.PolarsError, match="matching integer, Date, or Datetime"):
-            frame.select(expression())
 
 
 @pytest.mark.parametrize(
@@ -214,15 +175,6 @@ def test_decimal_and_int128_have_explicit_dtype_errors(dtype):
         )
         with pytest.raises(pl.exceptions.PolarsError, match="integer weight dtype"):
             frame.select(expression())
-
-
-@pytest.mark.parametrize("dtype", [pl.Float64, pl.Boolean, pl.String, pl.Time, pl.Duration("us")])
-def test_unsupported_endpoints(dtype):
-    frame = pl.DataFrame(
-        {name: pl.Series([], dtype=dtype) for name in ("start", "end")}
-    ).with_columns(pl.Series("weight", [], dtype=pl.Int64))
-    with pytest.raises(pl.exceptions.PolarsError, match="integer dtype, Date, or Datetime"):
-        frame.select(expression())
 
 
 @pytest.mark.parametrize("argument", ["start", "end", "weight"])

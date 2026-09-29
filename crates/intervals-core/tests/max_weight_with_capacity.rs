@@ -138,18 +138,15 @@ fn validation_and_integer_boundaries() {
     for k in [0, 1, 2, usize::MAX] {
         assert_eq!(
             solve(&[0], &[], &[1], k),
-            Err(IntervalError::LengthMismatch {
-                starts_len: 1,
-                ends_len: 0
-            })
+            Err(IntervalError::LengthMismatch([("starts", 1), ("ends", 0)]))
         );
         for weights in [vec![], vec![1, 2]] {
             assert_eq!(
                 solve(&[0], &[1], &weights, k),
-                Err(IntervalError::WeightLengthMismatch {
-                    intervals_len: 1,
-                    weights_len: weights.len()
-                })
+                Err(IntervalError::LengthMismatch([
+                    ("intervals", 1),
+                    ("weights", weights.len())
+                ]))
             );
         }
         assert_eq!(

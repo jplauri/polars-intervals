@@ -7,10 +7,7 @@ Lazy optimization/planning, collection and result Series retrieval are timed.
 
 import argparse
 import csv
-import hashlib
 import json
-import os
-import platform
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,6 +15,7 @@ from time import perf_counter_ns
 
 import polars as pl
 import polars_intervals as pi
+from provenance import environment, sha256
 
 
 def fixture(n, groups, family, order, dtype):
@@ -135,18 +133,11 @@ def main():
         Path(pi.__file__).parent.glob("*.so")
     )
     metadata = {
-        "timestamp_utc": datetime.now(UTC).isoformat(),
-        "platform": platform.platform(),
-        "python": sys.version,
-        "executable": sys.executable,
+        **environment(),
         "working_directory": str(Path.cwd()),
-        "arguments": sys.argv,
-        "polars": pl.__version__,
-        "threads": pl.thread_pool_size(),
-        "POLARS_MAX_THREADS": os.environ.get("POLARS_MAX_THREADS"),
         "plugin": pi.__file__,
-        "native_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in native_files},
-        "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "native_sha256": {p.name: sha256(p) for p in native_files},
+        "runner_sha256": sha256(Path(__file__)),
         "cases": len(cases),
         "warmups": 1,
         "samples": args.repeats,

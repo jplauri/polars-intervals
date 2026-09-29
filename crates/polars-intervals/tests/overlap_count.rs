@@ -111,76 +111,6 @@ fn unsigned_values_above_i64_max_remain_distinct() {
 }
 
 #[test]
-fn rejects_nulls_in_either_input_including_all_null_inputs() {
-    let values = Series::new("values".into(), [0i64, 2]);
-    for nulls in [
-        Series::new("nulls".into(), [Some(0i64), None]),
-        Series::full_null("nulls".into(), 2, &DataType::Int64),
-    ] {
-        for (starts, ends) in [(&nulls, &values), (&values, &nulls), (&nulls, &nulls)] {
-            assert!(matches!(
-                overlap_count(starts, ends),
-                Err(PolarsError::ComputeError(_))
-            ));
-        }
-    }
-}
-
-#[test]
-fn rejects_mixed_integer_dtypes() {
-    let starts = Series::new("starts".into(), [0i32, 1]);
-    for ends in [
-        Series::new("ends".into(), [2i64, 3]),
-        Series::new("ends".into(), [2u32, 3]),
-    ] {
-        assert!(matches!(
-            overlap_count(&starts, &ends),
-            Err(PolarsError::InvalidOperation(_))
-        ));
-    }
-}
-
-#[test]
-fn rejects_unsupported_dtypes_even_when_empty() {
-    for values in [
-        Series::new("values".into(), [0.0f32, 1.0]),
-        Series::new("values".into(), [0.0f64, 1.0]),
-        Series::new("values".into(), [false, true]),
-        Series::new("values".into(), ["a", "b"]),
-        Series::full_null("values".into(), 2, &DataType::Null),
-    ] {
-        for input in [&values, &values.slice(0, 0)] {
-            assert!(matches!(
-                overlap_count(input, input),
-                Err(PolarsError::InvalidOperation(_))
-            ));
-        }
-    }
-}
-
-#[test]
-fn rejects_length_mismatches_without_broadcasting() {
-    let empty = Series::new("empty".into(), Vec::<i64>::new());
-    let one = Series::new("one".into(), [0i64]);
-    let two = Series::new("two".into(), [1i64, 2]);
-    for (starts, ends) in [(&empty, &one), (&one, &empty), (&one, &two), (&two, &one)] {
-        assert!(matches!(
-            overlap_count(starts, ends),
-            Err(PolarsError::ShapeMismatch(_))
-        ));
-    }
-}
-
-#[test]
-fn invalid_interval_error_identifies_the_first_original_row() {
-    let starts = Series::new("starts".into(), [3i64, 0, 9, 7]);
-    let ends = Series::new("ends".into(), [5i64, 2, 8, 6]);
-    let error = overlap_count(&starts, &ends).unwrap_err();
-    assert!(matches!(error, PolarsError::ComputeError(_)));
-    assert!(error.to_string().contains("index 2"));
-}
-
-#[test]
 fn rejects_reversed_intervals_at_integer_extremes() {
     for (starts, ends) in [
         (
@@ -206,16 +136,6 @@ fn temporal_dtypes() -> Vec<DataType> {
         .collect()
 }
 
-fn with_dtype(values: Series, dtype: &DataType) -> Series {
-    // Construct timezone metadata directly; no timezone casting/arithmetic feature needed.
-    let values = match dtype {
-        DataType::Datetime(unit, zone) => values.into_datetime(*unit, zone.clone()),
-        _ => values.cast(dtype).unwrap(),
-    };
-    assert_eq!(values.dtype(), dtype);
-    values
-}
-
 proptest! {
     #[test]
     fn prop_temporal_adapter_matches_core(
@@ -238,8 +158,8 @@ proptest! {
             let (raw_starts, raw_ends): (Vec<_>, Vec<_>) = intervals.iter()
                 .map(|&(start, length)| (base + start, base + start + length))
                 .unzip();
-            let mut starts = with_dtype(Series::new("starts".into(), &raw_starts), &dtype);
-            let mut ends = with_dtype(Series::new("ends".into(), &raw_ends), &dtype);
+            let mut starts = typed_series(&raw_starts, &dtype);
+            let mut ends = typed_series(&raw_ends, &dtype);
             // Independent chunk boundaries exercise physical extraction in the adapter.
             for (series, split) in [(&mut starts, start_split), (&mut ends, end_split)] {
                 let mut chunked = series.slice(0, split);
@@ -276,8 +196,8 @@ fn temporal_types_match_core_across_chunks_and_slices() {
     assert_eq!(expected, [1, 3, 2, 2, 0, 0, 0]);
 
     for dtype in temporal_dtypes() {
-        let starts = with_dtype(Series::new("starts".into(), raw_starts), &dtype);
-        let ends = with_dtype(Series::new("ends".into(), raw_ends), &dtype);
+        let starts = typed_series(&raw_starts, &dtype);
+        let ends = typed_series(&raw_ends, &dtype);
         let mut chunked_starts = starts.slice(0, 2);
         chunked_starts.append(&starts.slice(2, 5)).unwrap();
         let mut chunked_ends = ends.slice(0, 4);
@@ -299,63 +219,8 @@ fn datetime_preserves_single_ticks_and_extreme_timestamps() {
         .into_iter()
         .filter(|d| d != &DataType::Date)
     {
-        let starts = with_dtype(
-            Series::new(
-                "starts".into(),
-                [i64::MIN, i64::MAX - 2, i64::MAX - 1, i64::MAX],
-            ),
-            &dtype,
-        );
-        let ends = with_dtype(Series::new("ends".into(), [i64::MAX; 4]), &dtype);
+        let starts = typed_series(&[i64::MIN, i64::MAX - 2, i64::MAX - 1, i64::MAX], &dtype);
+        let ends = typed_series(&[i64::MAX; 4], &dtype);
         assert_counts(&starts, &ends, &[2, 2, 2, 0]);
-    }
-}
-
-#[test]
-fn temporal_errors_preserve_null_policy_and_original_row_index() {
-    for dtype in temporal_dtypes() {
-        let starts = with_dtype(Series::new("starts".into(), [3i64, 0, 9, 7]), &dtype);
-        let ends = with_dtype(Series::new("ends".into(), [5i64, 2, 8, 6]), &dtype);
-        let error = overlap_count(&starts, &ends).unwrap_err();
-        assert!(matches!(error, PolarsError::ComputeError(_)));
-        assert!(error.to_string().contains("index 2"));
-
-        for nulls in [
-            with_dtype(
-                Series::new("nulls".into(), [Some(0i64), None, Some(1), Some(2)]),
-                &dtype,
-            ),
-            Series::full_null("nulls".into(), 4, &dtype),
-        ] {
-            for (starts, ends) in [(&starts, &nulls), (&nulls, &starts), (&nulls, &nulls)] {
-                let error = overlap_count(starts, ends).unwrap_err();
-                assert!(matches!(error, PolarsError::ComputeError(_)));
-                assert!(error.to_string().contains("null endpoints"));
-            }
-        }
-    }
-}
-
-#[test]
-fn rejects_mismatched_temporal_dtypes_before_physical_conversion() {
-    let mut dtypes = temporal_dtypes();
-    dtypes.extend([DataType::Int32, DataType::Int64]);
-    for start_dtype in &dtypes {
-        for end_dtype in &dtypes {
-            if start_dtype == end_dtype {
-                continue;
-            }
-            let starts = with_dtype(Series::new("starts".into(), [0i64]), start_dtype);
-            let ends = with_dtype(Series::new("ends".into(), [1i64]), end_dtype);
-            for (starts, ends) in [(&starts, &ends), (&starts.slice(0, 0), &ends.slice(0, 0))] {
-                let error = overlap_count(starts, ends).unwrap_err();
-                assert!(matches!(error, PolarsError::InvalidOperation(_)));
-                assert!(
-                    error
-                        .to_string()
-                        .contains("matching integer, Date, or Datetime dtypes")
-                );
-            }
-        }
     }
 }

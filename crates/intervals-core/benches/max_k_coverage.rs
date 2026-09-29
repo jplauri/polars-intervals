@@ -1,7 +1,5 @@
 #[path = "support/allocations.rs"]
 mod allocations;
-#[path = "support/coverage.rs"]
-mod candidates;
 #[path = "../tests/support/coverage.rs"]
 mod oracle;
 #[path = "support/random.rs"]
@@ -75,17 +73,11 @@ fn main() {
         for k in [0, 1, 2, 4, 10] {
             let best = oracle::brute(&s, &e, k);
             assert_eq!(oracle::quadratic(&s, &e, k), best);
-            for method in candidates::METHODS {
-                assert_eq!(
-                    oracle::objective(&s, &e, &candidates::run(&s, &e, k, method).mask),
-                    best
-                );
-            }
+            let mask = intervals_core::max_k_coverage(&s, &e, k).unwrap();
+            assert_eq!(oracle::objective(&s, &e, &mask), best);
         }
     }
-    println!(
-        "family,order,n,k,method,sample,total_ns,sort_ns,preprocess_ns,dp_ns,reconstruct_ns,peak_bytes,allocations,measure,count"
-    );
+    println!("family,order,n,k,method,sample,total_ns,peak_bytes,allocations,measure,count");
     let families = [
         "disjoint",
         "identical",
@@ -114,7 +106,7 @@ fn main() {
                 continue;
             }
             // Large cases deliberately cover both retained-size extremes and
-            // input order. The smaller matrix covers every structure/candidate.
+            // input order. The smaller matrix covers every structure.
             if n == 1_000_000
                 && !["disjoint", "dense", "staircase", "dominated", "components"].contains(&family)
             {
@@ -142,51 +134,32 @@ fn main() {
                     &[0, 1, 2, 3, 4, 8, 16, 32, 64]
                 };
                 for &k in budgets {
-                    let reference = candidates::run(&s, &e, k, "rolling");
-                    let expected = oracle::objective(&s, &e, &reference.mask);
-                    assert_eq!(expected, (reference.score.0, reference.score.1.0));
-                    drop(reference);
-                    for &method in candidates::METHODS {
-                        // Bound full tables to ~256 MB; replay to 30M state
-                        // updates; convolution to manageable component counts.
-                        if ["full", "unpruned"].contains(&method) && n * k > 4_000_000 {
-                            continue;
-                        }
-                        if method == "recompute" && n * k * k > 30_000_000 {
-                            continue;
-                        }
-                        if method == "components" && (n > 10_000 || k > 64) {
-                            continue;
-                        }
-                        let checked = candidates::run(&s, &e, k, method);
+                    let (mask, peak, allocs) =
+                        allocations::measure(|| intervals_core::max_k_coverage(&s, &e, k));
+                    let mask = mask.unwrap();
+                    let expected = oracle::objective(&s, &e, &mask);
+                    assert!(expected.1 <= k);
+                    // The independent O(k n²) reference stays affordable here.
+                    if n * n * k.min(n) <= 64_000_000 {
                         assert_eq!(
-                            oracle::objective(&s, &e, &checked.mask),
+                            oracle::quadratic(&s, &e, k),
                             expected,
-                            "{family}/{order}/{n}/{k}/{method}"
+                            "{family}/{order}/{n}/{k}"
                         );
-                        if method != "production" {
-                            assert_eq!((checked.score.0, checked.score.1.0), expected);
-                        }
-                        drop(checked);
-                        let (memory, peak, allocs) =
-                            allocations::measure(|| candidates::run(&s, &e, k, method));
-                        assert_eq!(oracle::objective(&s, &e, &memory.mask), expected);
-                        drop(memory);
-                        for sample in 0..3 {
-                            let begin = Instant::now();
-                            let result =
-                                black_box(candidates::run(black_box(&s), black_box(&e), k, method));
-                            let total = begin.elapsed().as_nanos();
-                            println!(
-                                "{family},{order},{n},{k},{method},{sample},{total},{},{},{},{},{peak},{allocs},{},{}",
-                                result.sort.as_nanos(),
-                                result.preprocess.as_nanos(),
-                                result.dp.as_nanos(),
-                                result.reconstruct.as_nanos(),
-                                expected.0,
-                                expected.1
-                            );
-                        }
+                    }
+                    for sample in 0..3 {
+                        let begin = Instant::now();
+                        let result = black_box(intervals_core::max_k_coverage(
+                            black_box(&s),
+                            black_box(&e),
+                            k,
+                        ));
+                        let total = begin.elapsed().as_nanos();
+                        assert_eq!(result.unwrap(), mask);
+                        println!(
+                            "{family},{order},{n},{k},production,{sample},{total},{peak},{allocs},{},{}",
+                            expected.0, expected.1
+                        );
                     }
                 }
             }

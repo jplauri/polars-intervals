@@ -3,7 +3,7 @@
 See the [benchmark overview](../docs/benchmarks.md) for compact results tables.
 
 [Running and publishing benchmarks](../docs/benchmarking.md) covers setup,
-table/plot generation, and the four-section checklist for adding an operation.
+table generation, and the four-section checklist for adding an operation.
 
 ## Python scripts
 
@@ -17,28 +17,27 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`nesting_depth.py`](nesting_depth.py) | End-to-end benchmark | Exact analytic families, integer/temporal and grouped inputs → verified collection samples and environment metadata | [Nesting depth](../docs/nesting-depth-benchmarks.md) |
 | [`balance_lanes.py`](balance_lanes.py) | End-to-end benchmark | Existing interval corpora → independently checked row-count quality, collection samples and provenance | [Lane balancing](../docs/balance-lanes-benchmarks.md) |
 | [`test_balance_lanes.py`](test_balance_lanes.py) | Runner checks | Tiny offline records → oracle, scoring, baseline alignment and aggregation checks | [Lane balancing notes](balance-lanes-notes.md) |
-| [`coverage_summary.py`](coverage_summary.py) | Report generator | Core candidate CSV → median runtime and allocation CSV | [Maximum k-coverage](../docs/coverage-benchmarks.md) |
 | [`coverage_temporal.py`](coverage_temporal.py) | End-to-end benchmark | Integer/temporal fixtures → raw timing CSV | [Maximum k-coverage](../docs/coverage-benchmarks.md) |
 | [`overlap_count.py`](overlap_count.py) | End-to-end benchmark | Generated workloads → timing samples, RSS and environment in JSON | [Overlap counting](../docs/overlap-count-benchmarks.md) |
 | [`containment_count.py`](containment_count.py) | End-to-end benchmark | Generated workloads → samples, native plans and pair-count safety skips in JSON | [Containment counting](../docs/containment-benchmarks.md) |
-| [`weighted_summary.py`](weighted_summary.py) | Report generator | Candidate CSV argument → runtime ratios and tables on stdout | [Weighted scheduling](../docs/weighted-scheduling-benchmarks.md) |
-| [`capacity_summary.py`](capacity_summary.py) | Report generator | Candidate CSV arguments (default: recorded run) → median timing/allocation CSV on stdout | [Capacity scheduling](../docs/capacity-scheduling-benchmarks.md) |
 | [`capacity_temporal.py`](capacity_temporal.py) | End-to-end benchmark | Integer/temporal cliques → raw timing CSV on stdout | [Capacity scheduling](../docs/capacity-scheduling-benchmarks.md) |
-| [`capacity_profile_summary.py`](capacity_profile_summary.py) | Report generator | Profile candidate CSVs → median runtime, flow and allocation metrics | [Capacity profiles](../docs/capacity-profile-benchmarks.md) |
 | [`capacity_profile_temporal.py`](capacity_profile_temporal.py) | End-to-end benchmark | Integer/temporal profiles → verified release-native timing CSV | [Capacity profiles](../docs/capacity-profile-benchmarks.md) |
-| [`covering_summary.py`](covering_summary.py) | Report generator | Candidate CSV argument (default: recorded run) → ratios and tables on stdout | [Covering](../docs/covering-benchmarks.md), [cost covering](../docs/cost-covering-benchmarks.md) |
 | [`covering_temporal.py`](covering_temporal.py) | End-to-end benchmark | Integer/temporal covering fixtures → raw timing CSV on stdout | [Covering](../docs/covering-benchmarks.md), [cost covering](../docs/cost-covering-benchmarks.md) |
-| [`stabbing_summary.py`](stabbing_summary.py) | Report generator | Recorded core and optional temporal CSVs in `results/` → median/ratio tables on stdout | [Stabbing points](../docs/stabbing-benchmarks.md) |
 | [`stabbing_temporal.py`](stabbing_temporal.py) | End-to-end benchmark | Integer/temporal fixtures → raw timing CSV on stdout | [Stabbing points](../docs/stabbing-benchmarks.md) |
-| [`plot.py`](plot.py) | Shared report generator | [`plots.toml`](plots.toml) and saved CSV/JSON → compact Markdown tables, exact summary CSV, optional SVG | [Reporting workflow](../docs/benchmarking.md#generate-plots) |
-| [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Plot workflow](../docs/benchmarking.md#generate-plots) |
+| [`plot.py`](plot.py) | Shared report generator | [`plots.toml`](plots.toml) and saved CSV/JSON → compact Markdown tables and exact summary CSV | [Reporting workflow](../docs/benchmarking.md#generate-plots) |
+| [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
 
-Rust candidate runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
+Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
+They time production only. Removed candidates and runners are preserved in the
+[pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
+Historical metadata may reference a base revision with uncommitted feature
+changes. Consult each run's source hashes and cleanup notes for differences
+between the snapshot and the measured sources; see the
+[provenance guidance](../docs/benchmarking.md#measurement-rules).
 
 The maximum-weight clique runner is `cargo bench -p intervals-core --bench
-max_weight_clique --locked`. It compares the actual production functions with
-private event, separate-stream, heap and small quadratic candidates, including
-unit-weight paths and separate allocator measurements. See the
+max_weight_clique --locked`. It times the production functions, including
+unit-weight paths, with separate allocator measurements. See the
 [clique report](../docs/clique-benchmarks.md) and [correctness notes](clique-notes.md).
 [`max_weight_clique.py`](max_weight_clique.py) times complete Polars collections
 with numeric/temporal, grouped and multichunk fixtures. After the documented
@@ -58,12 +57,10 @@ balance_lanes --locked`. Set `BALANCE_CSV` and `BALANCE_QUALITY_CSV` to new
 absolute output paths (Cargo runs inside the crate directory);
 `BALANCE_SIZES`, `BALANCE_BUDGETS`, and `BALANCE_FAMILIES` accept
 comma-separated lists, and `BALANCE_SAMPLES` selects repeated timing samples.
-It compares the existing baseline, forward/backward/best seeds, baseline repair,
-the public balanced constructor, and a benchmark-only shared-budget multiseed
-experiment. The public constructor and repair now share `assign_balanced_lanes`:
-omit `initial_lanes` to construct, or supply it to repair. Saved measurements
-predate that interface consolidation and preserve their original metadata.
-Quality and untimed requested-heap measurements are separate from
+It times the existing baseline, repair of that baseline, and the public balanced
+constructor: `assign_balanced_lanes` constructs without `initial_lanes` and
+repairs with it. Saved measurements also include seed and multiseed ablations
+that are no longer run. Quality and untimed requested-heap measurements are separate from
 raw timings. See [the balancing notes](balance-lanes-notes.md) for scopes and
 the [report](../docs/balance-lanes-benchmarks.md) for measured settings.
 They do not require Python or the Polars plugin. Each report names its Cargo
@@ -191,7 +188,7 @@ uv run --locked --only-group dev ruff format --check benchmarks
 uv run --locked --only-group dev python -m unittest discover -s benchmarks -p "test_generate_interval_graphs.py"
 ```
 
-## Regenerate tables and optional plots
+## Regenerate tables
 
 ```sh
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
@@ -204,6 +201,6 @@ change. The documentation CI build regenerates the assets before building the si
 
 Start a report from [report-template.md](report-template.md): Summary, Results,
 Coverage and limitations, Reproduce and data. Register a small representative
-table in [plots.toml](plots.toml), including important losses; a plot is optional.
+table in [plots.toml](plots.toml), including important losses.
 See the [adding an operation checklist](../docs/benchmarking.md#adding-an-operation)
 for scope lines, shared methodology, supporting notes, and navigation.
