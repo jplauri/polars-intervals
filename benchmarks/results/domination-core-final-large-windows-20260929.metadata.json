@@ -1,0 +1,42 @@
+{
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cpu": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+  "logical_cpus": 24,
+  "hardware": "{\n    \"Name\":  \"AMD Ryzen 9 3900X 12-Core Processor            \",\n    \"NumberOfCores\":  12,\n    \"NumberOfLogicalProcessors\":  24\n}\n",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8\n",
+  "revision": "d742de3e57fdc523d1673e81106ca6d5109127bb",
+  "source_sha256": {
+    "crates/intervals-core/src/domination.rs": "d0dc71fedac68b4a8a52f7f42d224e6f3346df94a3873934f238b6940286c081",
+    "crates/intervals-core/src/cover.rs": "9128ac972f0b55d297c72ed262bd02e22f88038750d3b8bac33a99975f9051d9",
+    "crates/intervals-core/benches/support/domination.rs": "a7621a8c03fc7cdfbacc11210f333a59bc93e59b7ee5cdcf16ea3cd823b19f74",
+    "crates/intervals-core/benches/minimum_cost_dominating_set.rs": "e104c8630984bb5a8b16f42ec53f1e23f3683ed1b9cdd4814bab9bf913d9f59d",
+    "Cargo.lock": "5629288b59113ac4d3d8bdff3afe78d24e3c4c72d8c82a06466edb2edc71073a",
+    "rust-toolchain.toml": "86810d0ace88a635a96ed7a8d7d432afa6950c0c0b99f78f6e905ed9616a9882",
+    "crates/intervals-core/benches/support/allocations.rs": "a6adeab442ae00fce6e180ac65109e85805451d44580ef936c6e2c4f2db501b9"
+  },
+  "environment": {
+    "DOMINATION_CASES": "disjoint-shuffled-positive,path-shuffled-mixed,clique-shuffled-positive,nested-end-positive,star-reverse-expensive_hub,path-start-units,touching-reverse-units",
+    "DOMINATION_CSV": "D:\\polars-intervals\\benchmarks\\results\\domination-core-final-large-windows-20260929.csv",
+    "DOMINATION_DTYPES": "i64",
+    "DOMINATION_METHODS": "production,reduction,fused",
+    "DOMINATION_SAMPLES": "5",
+    "DOMINATION_SEEDS": "7,41",
+    "DOMINATION_SIZES": "1000000",
+    "DOMINATION_WARMUPS": "2"
+  },
+  "command": "cargo bench -p intervals-core --bench minimum_cost_dominating_set --locked",
+  "scope": "Complete core calls including validation, reduction, allocation, optimizer, reconstruction and output; excludes generation, correctness checks and returned-mask destruction; internal temporary destruction is timed. Separate untimed allocator call measures requested live heap and allocations excluding caller inputs, overhead, stack and RSS. Every timed output checked outside timing. Sequential candidates rotate per sample.",
+  "production": "Final public entry points: heap for heterogeneous costs, direct greedy for unit/uniform costs",
+  "status": "completed",
+  "thread_settings": {
+    "algorithm_threads": 1,
+    "candidate_execution": "sequential, rotating per sample",
+    "CARGO_BUILD_JOBS": "2"
+  },
+  "memory": "Peak requested live heap and allocation count from existing instrumentation in a separate untimed call; excludes inputs, allocator bookkeeping, stack, process RSS. Internal buffers and output are included.",
+  "correctness": "Every timed output checked by independent O(n log n) original-graph domination. CSV evidence distinguishes original graph subset optimum (n<=12), analytic known optimum, and cross-candidate optimum agreement.",
+  "timestamp_utc": "2026-09-29T04:56:39.273070+00:00",
+  "timing_sha256": "23afb7e7214c32a9ee9ffe80a2624ce0a9af04f78170431ee1996f14b73350f1",
+  "samples_written": 210,
+  "cost_dtype": "i64 explicit costs; implicit unit mode has no cost slice"
+}

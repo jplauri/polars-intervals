@@ -1,5 +1,48 @@
 # Paths are relative to the repository root. Each source is exactly one run.
 # List every independent workload dimension so every table case or chart must explicitly fix it.
+[sources.domination_core]
+path = "benchmarks/results/domination-core-production-windows-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["dtype", "family", "order", "costs", "seed"]
+
+[sources.domination_polars]
+path = "benchmarks/results/domination-polars-windows-20260929.timings.csv"
+x = "n"
+method = "costs"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "engine", "seed", "method"]
+
+[[tables]]
+id = "domination-polars-table"
+source = "domination_polars"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Polars collection time (ms)"
+methods = { units = "Implicit units", ones = "Explicit ones", zero = "All zero", mixed = "Mixed costs" }
+cases = [
+  { label = "Shuffled Int64 path", sizes = [8, 1000, 100000], filters = { family = "path", order = "shuffled", dtype = "i64", groups = 1, chunks = 1, engine = "auto", seed = 7, method = "production" } },
+  { label = "Full clique, shuffled Date", sizes = [100000], filters = { family = "clique", order = "shuffled", dtype = "date", groups = 1, chunks = 1, engine = "auto", seed = 7, method = "production" } },
+  { label = "Path, shuffled UTC ns, streaming chunks", sizes = [100000], filters = { family = "path", order = "shuffled", dtype = "datetime_ns_utc", groups = 1, chunks = 7, engine = "streaming", seed = 7, method = "production" } },
+  { label = "32 interleaved groups, shuffled Int64 path", sizes = [1000, 100000], filters = { family = "path", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, engine = "auto", seed = 7, method = "production" } },
+]
+
+[[tables]]
+id = "domination-core-table"
+source = "domination_core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Core call time (ms)"
+methods = { production = "Production", reduction = "Reduction + cover", fused = "Fused cover", heap = "Heap DP" }
+cases = [
+  { label = "Shuffled disjoint, positive costs", sizes = [100000], filters = { dtype = "i64", family = "disjoint", order = "shuffled", costs = "positive", seed = 7 } },
+  { label = "Shuffled path, mixed costs", sizes = [100000], filters = { dtype = "i64", family = "path", order = "shuffled", costs = "mixed", seed = 7 } },
+  { label = "Clique, shuffled, positive costs", sizes = [100000], filters = { dtype = "i64", family = "clique", order = "shuffled", costs = "positive", seed = 7 } },
+  { label = "Nested, end sorted, positive costs", sizes = [100000], filters = { dtype = "i64", family = "nested", order = "end", costs = "positive", seed = 7 } },
+  { label = "Duplicate geometries, reversed, units", sizes = [100000], filters = { dtype = "i64", family = "duplicate", order = "reverse", costs = "units", seed = 7 } },
+  { label = "Path, start sorted, units", sizes = [1000, 100000], filters = { dtype = "i64", family = "path", order = "start", costs = "units", seed = 7 } },
+  { label = "Shuffled path, explicit zero costs", sizes = [100000], filters = { dtype = "i64", family = "path", order = "shuffled", costs = "zero", seed = 7 } },
+]
+
 [sources.clique_core]
 path = "benchmarks/results/clique-core-windows-20260928.csv"
 x = "n"

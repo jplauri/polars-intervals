@@ -16,11 +16,111 @@ __all__ = [
     "max_weight_with_capacity",
     "max_weight_with_capacity_profile",
     "minimum_cost_cover",
+    "minimum_cost_dominating_set",
     "minimum_cover",
     "minimum_stabbing_points",
     "nesting_depth",
     "overlap_count",
 ]
+
+
+def minimum_cost_dominating_set(
+    start: str | pl.Expr,
+    end: str | pl.Expr,
+    *,
+    cost: str | pl.Expr | None = None,
+) -> pl.Expr:
+    """Select an exact minimum-cost dominating set of the interval graph.
+
+    Every input row is both a vertex requiring domination and a candidate.
+    Each row must be selected or overlap a selected row. Selected vertices
+    dominate themselves. Costs are minimized first; among equal-cost sets,
+    the set with the fewest selected rows wins.
+
+    Args:
+        start: Column name or expression producing integer, Date, or Datetime starts.
+        end: Column name or expression producing ends with the same logical dtype.
+        cost: Nonnegative integer column or expression. Omitted or None means
+            unit costs, without constructing a ones column. A column named
+            ``cost`` is not used implicitly. Zero costs are valid.
+
+    Returns:
+        pl.Expr: Non-null Boolean mask, one value per original row. Empty input
+            returns an empty mask. Every nonempty input selects at least one row.
+            Identical logical inputs give deterministic results across chunks
+            and eager/lazy execution. Tied masks may change across releases or
+            row permutations; the objective is always exact.
+
+    Raises:
+        polars.exceptions.PolarsError: For unequal lengths, nulls, unsupported
+            or mismatched dtypes, negative costs, reversed intervals, or an
+            optimal total exceeding i128. Reversed intervals and negative
+            costs report their original zero-based collection/group row index.
+            Every row is validated before reduction or fast paths.
+
+    Notes:
+        Intervals are half-open ``[start, end)``. Distinct rows overlap exactly
+        when both are nonempty and ``s_i < e_j and s_j < e_i``. Touching rows do
+        not overlap. Every empty row ``[x, x)`` is an isolated vertex and MUST
+        be selected, including duplicate empties, zero-cost empties, and
+        empties geometrically inside nonempty intervals.
+
+        This is ordinary domination. Selected nonempty intervals may overlap
+        or be disjoint. It covers input vertices by overlap, not every point
+        of a continuous coordinate target; use ``minimum_cost_cover`` for that.
+
+        Endpoints must have identical Int8/16/32/64, UInt8/16/32/64, Date, or
+        Datetime dtypes, including Datetime unit and timezone metadata. Explicit
+        costs accept only Int8/16/32/64 or UInt8/16/32/64. Physical integer
+        precision is retained; costs use checked i128 arithmetic. There is no
+        implicit casting, null filling, or scalar broadcasting.
+
+        All chunks form one collection, including with the streaming engine.
+        ``.over("group")`` solves each whole group and preserves row alignment;
+        grouped aggregation returns lists of Boolean values. Filtering BEFORE
+        optimization changes both the demand vertices and selectable candidates.
+
+        The Rust core takes O(n log n) time and O(n) extra space, including
+        validation and reconstruction. Unit and uniform explicit costs (including zero) use
+        greedy selection: for the earliest-ending undominated interval, choose
+        its furthest-reaching overlapping representative. Heterogeneous costs
+        use a min-heap prefix dynamic program after reduction to interval
+        covering. Nonempty inclusion-minimal intervals suffice as domination
+        targets: every other interval contains one. Each candidate overlaps a
+        consecutive block of these targets. Every original nonempty row remains
+        eligible as a candidate.
+
+    Examples:
+        Unit costs choose the middle of a three-row path. With an expensive
+        middle row, the two outer rows are cheaper:
+
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> df = pl.DataFrame({
+        ...     "start": [0, 3, 6], "end": [4, 7, 10], "price": [1, 10, 1],
+        ... })
+        >>> df.select(pi.minimum_cost_dominating_set("start", "end")).to_series().to_list()
+        [False, True, False]
+        >>> df.filter(pi.minimum_cost_dominating_set("start", "end", cost="price"))["start"].to_list()
+        [0, 6]
+        >>> grouped = df.with_columns(pl.lit("a").alias("group"))
+        >>> grouped.lazy().with_columns(
+        ...     pi.minimum_cost_dominating_set(pl.col("start"), pl.col("end"), cost="price")
+        ...     .over("group").alias("selected")
+        ... ).collect()["selected"].to_list()
+        [True, False, True]
+        >>> empties = pl.DataFrame({"start": [2, 2], "end": [2, 2], "price": [0, 0]})
+        >>> empties.select(
+        ...     pi.minimum_cost_dominating_set("start", "end", cost="price")
+        ... ).to_series().to_list()
+        [True, True]
+    """
+    return register_plugin_function(
+        plugin_path=Path(__file__).parent,
+        function_name="minimum_cost_dominating_set_plugin",
+        args=[start, end] if cost is None else [start, end, cost],
+        is_elementwise=False,
+    )
 
 
 def max_weight_with_capacity_profile(

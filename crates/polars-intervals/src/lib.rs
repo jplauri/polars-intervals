@@ -6,6 +6,7 @@
 //! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
 //! to the core and Python expressions.
 //! [`minimum_cover`] and [`minimum_cost_cover`] select exact continuous target covers.
+//! [`minimum_cost_dominating_set`] selects rows dominating every interval vertex.
 //! [`minimum_stabbing_points`] returns one optimal list of discrete hitting points.
 
 use polars::prelude::*;
@@ -13,6 +14,8 @@ use std::borrow::Cow;
 
 mod cover;
 pub use cover::{minimum_cost_cover, minimum_cover};
+mod domination;
+pub use domination::minimum_cost_dominating_set;
 mod profile;
 pub use profile::max_weight_with_capacity_profile;
 
@@ -660,6 +663,7 @@ enum Algorithm<'a> {
     AssignBalancedLanes(Option<&'a [u32]>, u64),
     MaxWeight(&'a [i128]),
     Clique(Option<&'a [i128]>),
+    DominatingSet(Option<&'a [i128]>),
     Capacity(&'a [i128], usize),
     Cover(i128, i128),
     CostCover(&'a [i128], i128, i128),
@@ -677,6 +681,7 @@ impl Algorithm<'_> {
             Self::AssignBalancedLanes(_, _) => "assign_balanced_lanes",
             Self::MaxWeight(_) => "max_weight_non_overlapping",
             Self::Clique(_) => "max_weight_clique",
+            Self::DominatingSet(_) => "minimum_cost_dominating_set",
             Self::Capacity(_, _) => "max_weight_with_capacity",
             Self::Cover(_, _) => "minimum_cover",
             Self::CostCover(_, _, _) => "minimum_cost_cover",
@@ -783,6 +788,14 @@ where
             let mask = match weights {
                 Some(weights) => intervals_core::max_weight_clique(&starts, &ends, weights),
                 None => intervals_core::max_clique(&starts, &ends),
+            }
+            .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            Ok(Series::new(algorithm.name().into(), mask))
+        }
+        Algorithm::DominatingSet(costs) => {
+            let mask = match costs {
+                Some(costs) => intervals_core::minimum_cost_dominating_set(&starts, &ends, costs),
+                None => intervals_core::minimum_dominating_set(&starts, &ends),
             }
             .map_err(|error| polars_err!(ComputeError: "{error}"))?;
             Ok(Series::new(algorithm.name().into(), mask))

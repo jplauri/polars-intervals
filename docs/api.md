@@ -25,3 +25,5 @@
 ::: polars_intervals.minimum_cover
 
 ::: polars_intervals.minimum_cost_cover
+
+::: polars_intervals.minimum_cost_dominating_set

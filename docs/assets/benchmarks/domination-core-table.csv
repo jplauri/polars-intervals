@@ -1,0 +1,33 @@
+case,workload_dtype,workload_family,workload_order,workload_costs,workload_seed,method,x,median,min,max,samples
+"Shuffled disjoint, positive costs",i64,disjoint,shuffled,positive,7,fused,100000,18.619799999999998,18.310399999999998,19.8808,5
+"Shuffled disjoint, positive costs",i64,disjoint,shuffled,positive,7,heap,100000,14.452,14.146099999999999,14.819799999999999,5
+"Shuffled disjoint, positive costs",i64,disjoint,shuffled,positive,7,production,100000,14.798399999999999,14.5327,14.9009,5
+"Shuffled disjoint, positive costs",i64,disjoint,shuffled,positive,7,reduction,100000,23.41,22.8771,24.5562,5
+"Shuffled path, mixed costs",i64,path,shuffled,mixed,7,fused,100000,19.613,19.2171,20.000899999999998,5
+"Shuffled path, mixed costs",i64,path,shuffled,mixed,7,heap,100000,16.4374,15.931199999999999,16.7912,5
+"Shuffled path, mixed costs",i64,path,shuffled,mixed,7,production,100000,16.3719,16.174,16.4941,5
+"Shuffled path, mixed costs",i64,path,shuffled,mixed,7,reduction,100000,23.7795,22.903399999999998,24.6486,5
+"Clique, shuffled, positive costs",i64,clique,shuffled,positive,7,fused,100000,14.1916,13.8568,14.3395,5
+"Clique, shuffled, positive costs",i64,clique,shuffled,positive,7,heap,100000,15.392399999999999,15.157499999999999,16.1037,5
+"Clique, shuffled, positive costs",i64,clique,shuffled,positive,7,production,100000,15.461799999999998,15.153599999999999,16.0988,5
+"Clique, shuffled, positive costs",i64,clique,shuffled,positive,7,reduction,100000,12.7926,12.596,13.2523,5
+"Nested, end sorted, positive costs",i64,nested,end,positive,7,fused,100000,2.8179,2.7222999999999997,2.9572,5
+"Nested, end sorted, positive costs",i64,nested,end,positive,7,heap,100000,5.5987,5.462899999999999,5.6640999999999995,5
+"Nested, end sorted, positive costs",i64,nested,end,positive,7,production,100000,5.4284,5.3799,5.6004,5
+"Nested, end sorted, positive costs",i64,nested,end,positive,7,reduction,100000,4.3597,4.255599999999999,4.451,5
+"Duplicate geometries, reversed, units",i64,duplicate,reverse,units,7,fused,100000,4.9403999999999995,4.604299999999999,5.838299999999999,5
+"Duplicate geometries, reversed, units",i64,duplicate,reverse,units,7,heap,100000,9.2951,9.0938,9.5832,5
+"Duplicate geometries, reversed, units",i64,duplicate,reverse,units,7,production,100000,5.721299999999999,5.4487,6.019299999999999,5
+"Duplicate geometries, reversed, units",i64,duplicate,reverse,units,7,reduction,100000,8.966099999999999,8.9344,10.5635,5
+"Path, start sorted, units",i64,path,start,units,7,fused,1000,0.0314,0.0314,0.0315,5
+"Path, start sorted, units",i64,path,start,units,7,fused,100000,7.5363999999999995,7.3766,7.6292,5
+"Path, start sorted, units",i64,path,start,units,7,heap,1000,0.0545,0.054299999999999994,0.059899999999999995,5
+"Path, start sorted, units",i64,path,start,units,7,heap,100000,9.9897,9.8612,10.2966,5
+"Path, start sorted, units",i64,path,start,units,7,production,1000,0.0056,0.0056,0.0059,5
+"Path, start sorted, units",i64,path,start,units,7,production,100000,0.6855,0.6425,0.9245,5
+"Path, start sorted, units",i64,path,start,units,7,reduction,1000,0.035699999999999996,0.0355,0.0359,5
+"Path, start sorted, units",i64,path,start,units,7,reduction,100000,9.0003,8.7235,9.4049,5
+"Shuffled path, explicit zero costs",i64,path,shuffled,zero,7,fused,100000,21.555999999999997,21.234199999999998,22.260199999999998,5
+"Shuffled path, explicit zero costs",i64,path,shuffled,zero,7,heap,100000,14.9385,14.8522,15.5261,5
+"Shuffled path, explicit zero costs",i64,path,shuffled,zero,7,production,100000,7.7798,7.6155,7.908399999999999,5
+"Shuffled path, explicit zero costs",i64,path,shuffled,zero,7,reduction,100000,23.8924,23.421799999999998,24.025499999999997,5
