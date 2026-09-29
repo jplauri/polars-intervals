@@ -3,8 +3,11 @@
 mod allocations;
 #[path = "support/domination.rs"]
 mod candidates;
+#[path = "support/random.rs"]
+mod random;
 
 use intervals_core::IntervalError;
+use random::{random, shuffle};
 use std::{hint::black_box, io::Write, time::Instant};
 
 #[global_allocator]
@@ -34,13 +37,6 @@ const CASES: &[(&str, &str, &str, bool)] = &[
     ("many_empty", "partial", "positive", true),
     ("sparse", "shuffled", "units", true),
 ];
-
-fn random(state: &mut u64) -> u64 {
-    *state ^= *state << 13;
-    *state ^= *state >> 7;
-    *state ^= *state << 17;
-    *state
-}
 
 fn dataset(
     family: &str,
@@ -115,11 +111,7 @@ fn dataset(
                 chunk.reverse();
             }
         }
-        "shuffled" => {
-            for i in (1..n).rev() {
-                rows.swap(i, random(&mut rng) as usize % (i + 1));
-            }
-        }
+        "shuffled" => shuffle(&mut rows, &mut rng),
         _ => unreachable!(),
     }
     let (mut s, mut e, mut c) = (

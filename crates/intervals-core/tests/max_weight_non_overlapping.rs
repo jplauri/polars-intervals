@@ -1,9 +1,12 @@
+#[path = "../benches/support/random.rs"]
+mod random;
 #[path = "../benches/support/weighted.rs"]
 mod weighted;
 
 use intervals_core::{IntervalError, max_weight_non_overlapping as solve};
 use proptest::prelude::*;
-use weighted::{CANDIDATES, shuffle, suffix_optimum, verify};
+use random::shuffle;
+use weighted::{suffix_optimum, verify};
 
 // Deliberately independent: enumerate every subset and every selected pair.
 fn brute_force(s: &[i64], e: &[i64], w: &[i64]) -> i128 {
@@ -36,11 +39,6 @@ fn check(s: &[i64], e: &[i64], w: &[i64]) -> (Vec<bool>, i128) {
     let mask = solve(s, e, w).unwrap();
     assert_eq!(verify(s, e, w, &mask), expected);
     assert_eq!(mask, solve(s, e, w).unwrap());
-    for (name, run) in CANDIDATES {
-        let result = run(s, e, w).unwrap();
-        assert_eq!(verify(s, e, w, &result.mask), expected, "{name}");
-        assert_eq!(result.mask, run(s, e, w).unwrap().mask, "{name}");
-    }
     (mask, expected)
 }
 
@@ -142,46 +140,26 @@ fn integer_boundaries_and_generic_endpoints() {
 fn validation_and_error_messages() {
     assert_eq!(
         solve(&[1], &[], &[0]),
-        Err(IntervalError::LengthMismatch {
-            starts_len: 1,
-            ends_len: 0
-        })
+        Err(IntervalError::LengthMismatch([("starts", 1), ("ends", 0)]))
     );
     for w in [vec![], vec![1, 2]] {
         assert_eq!(
             solve(&[1], &[2], &w),
-            Err(IntervalError::WeightLengthMismatch {
-                intervals_len: 1,
-                weights_len: w.len(),
-            })
+            Err(IntervalError::LengthMismatch([
+                ("intervals", 1),
+                ("weights", w.len())
+            ]))
         );
     }
     assert_eq!(
         solve(&[9, 0, 5, 3], &[10, 0, 4, 2], &[1, 0, -1, 2]),
         Err(IntervalError::InvalidInterval { index: 2 })
     );
-    for (_, run) in CANDIDATES {
-        assert!(matches!(
-            run(&[1], &[], &[1]),
-            Err(IntervalError::LengthMismatch { .. })
-        ));
-        assert!(matches!(
-            run(&[1], &[2], &[]),
-            Err(IntervalError::WeightLengthMismatch { .. })
-        ));
-        assert!(matches!(
-            run(&[9, 0, 5], &[10, 0, 4], &[1, 0, -1]),
-            Err(IntervalError::InvalidInterval { index: 2 })
-        ));
-    }
     assert!(IntervalError::WeightOverflow.to_string().contains("i128"));
     assert!(
-        IntervalError::WeightLengthMismatch {
-            intervals_len: 1,
-            weights_len: 2
-        }
-        .to_string()
-        .contains("1 intervals, 2 weights")
+        IntervalError::LengthMismatch([("intervals", 1), ("weights", 2)])
+            .to_string()
+            .contains("1 intervals, 2 weights")
     );
 }
 

@@ -3,9 +3,6 @@ use crate::{IntervalError, assign_lanes};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
-/// Default deterministic refinement budget used by the expression API.
-pub const DEFAULT_BALANCE_WORK: u64 = 100_000;
-
 /// Why bounded balancing stopped. Only `PairwiseFixedPoint` certifies a complete
 /// no-improvement pass; it does not certify a globally optimal coloring.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -37,15 +34,6 @@ pub struct BalanceDiagnostics {
 pub struct BalanceResult {
     pub lanes: Vec<u32>,
     pub diagnostics: BalanceDiagnostics,
-}
-
-/// Construction-only benchmark scope; `Best` includes the old baseline.
-#[doc(hidden)]
-#[derive(Clone, Copy, Debug)]
-pub enum BalanceSeed {
-    Forward,
-    Backward,
-    Best,
 }
 
 /// Construct or improve a proper minimum-lane coloring, balancing row counts.
@@ -134,22 +122,6 @@ pub fn assign_balanced_lanes_with_diagnostics<T: Ord + Copy>(
     Ok(refine(starts, ends, &order, lanes, max_work))
 }
 
-#[doc(hidden)]
-pub fn balanced_lane_seed<T: Ord + Copy>(
-    starts: &[T],
-    ends: &[T],
-    seed: BalanceSeed,
-) -> Result<Vec<u32>, IntervalError> {
-    let baseline = assign_lanes(starts, ends)?;
-    let order = sorted_nonempty(starts, ends);
-    let k = lane_count(&baseline);
-    Ok(match seed {
-        BalanceSeed::Forward => sweep(starts, ends, &order, k),
-        BalanceSeed::Backward => backward_seed(starts, ends, k),
-        BalanceSeed::Best => best_seed(starts, ends, &order, baseline),
-    })
-}
-
 fn sorted_nonempty<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Vec<usize> {
     let mut order: Vec<_> = (0..starts.len()).filter(|&i| starts[i] < ends[i]).collect();
     order.sort_unstable_by_key(|&i| (starts[i], i));
@@ -188,10 +160,10 @@ fn validate_coloring<T: Ord + Copy>(
     minimum: usize,
 ) -> Result<(), IntervalError> {
     if starts.len() != lanes.len() {
-        return Err(IntervalError::LaneLengthMismatch {
-            intervals_len: starts.len(),
-            lanes_len: lanes.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("intervals", starts.len()),
+            ("lanes", lanes.len()),
+        ]));
     }
     // Check before any maximum-label-indexed allocation: scratch is at most n.
     for (index, &lane) in lanes.iter().enumerate() {
@@ -303,6 +275,19 @@ struct Budget {
 }
 
 impl Budget {
+    fn new(limit: u64) -> Self {
+        Self {
+            limit,
+            diagnostics: BalanceDiagnostics {
+                work: 0,
+                pairs: 0,
+                flips: 0,
+                skips: 0,
+                stop_reason: BalanceStopReason::BudgetExhausted,
+            },
+        }
+    }
+
     fn charge(&mut self, amount: usize) -> bool {
         let Ok(amount) = u64::try_from(amount) else {
             return false;
@@ -322,6 +307,34 @@ struct Coloring {
     nonempty: Vec<usize>,
 }
 
+impl Coloring {
+    // Each lane lists its nonempty rows in start order, then its empty rows.
+    fn new<T: Ord>(
+        starts: &[T],
+        ends: &[T],
+        order: &[usize],
+        lanes: Vec<u32>,
+        sizes: Vec<usize>,
+    ) -> Self {
+        let mut rows: Vec<Vec<usize>> = sizes.iter().map(|&n| Vec::with_capacity(n)).collect();
+        for &i in order {
+            rows[lanes[i] as usize].push(i);
+        }
+        let nonempty = rows.iter().map(Vec::len).collect();
+        for i in 0..starts.len() {
+            if starts[i] == ends[i] {
+                rows[lanes[i] as usize].push(i);
+            }
+        }
+        Self {
+            lanes,
+            sizes,
+            rows,
+            nonempty,
+        }
+    }
+}
+
 fn refine<T: Ord + Copy>(
     starts: &[T],
     ends: &[T],
@@ -331,18 +344,8 @@ fn refine<T: Ord + Copy>(
 ) -> BalanceResult {
     let sizes = counts(&lanes);
     let k = sizes.len();
-    let delta = usize::from(k > 0 && !lanes.len().is_multiple_of(k));
-    let mut budget = Budget {
-        limit: max_work,
-        diagnostics: BalanceDiagnostics {
-            work: 0,
-            pairs: 0,
-            flips: 0,
-            skips: 0,
-            stop_reason: BalanceStopReason::BudgetExhausted,
-        },
-    };
-    if score(&sizes).0 <= delta {
+    let mut budget = Budget::new(max_work);
+    if equitable(&sizes, lanes.len()) {
         budget.diagnostics.stop_reason = BalanceStopReason::Equity;
         return BalanceResult {
             lanes,
@@ -355,22 +358,7 @@ fn refine<T: Ord + Copy>(
             diagnostics: budget.diagnostics,
         };
     }
-    let mut rows: Vec<Vec<usize>> = sizes.iter().map(|&n| Vec::with_capacity(n)).collect();
-    for &i in order {
-        rows[lanes[i] as usize].push(i);
-    }
-    let nonempty = rows.iter().map(Vec::len).collect();
-    for i in 0..starts.len() {
-        if starts[i] == ends[i] {
-            rows[lanes[i] as usize].push(i);
-        }
-    }
-    let mut coloring = Coloring {
-        lanes,
-        sizes,
-        rows,
-        nonempty,
-    };
+    let mut coloring = Coloring::new(starts, ends, order, lanes, sizes);
     let mut priority: Vec<_> = (0..k).collect();
     'search: loop {
         // Charge a conservative comparison-sort bound and scan/restart overhead.
@@ -392,7 +380,7 @@ fn refine<T: Ord + Copy>(
                 match repair_pair(starts, ends, &mut coloring, a, b, &mut budget) {
                     Ok(false) => {}
                     Ok(true) => {
-                        if score(&coloring.sizes).0 <= delta {
+                        if equitable(&coloring.sizes, coloring.lanes.len()) {
                             budget.diagnostics.stop_reason = BalanceStopReason::Equity;
                             break 'search;
                         }
@@ -659,6 +647,16 @@ mod tests {
     }
 
     #[test]
+    fn global_palette_available_before_late_clique() {
+        let s = [0, 1, 2, 3, 4, 10, 10, 10];
+        let e = [1, 2, 3, 4, 5, 11, 11, 11];
+        let baseline = assign_lanes(&s, &e).unwrap();
+        let forward = sweep(&s, &e, &sorted_nonempty(&s, &e), lane_count(&baseline));
+        assert_eq!(score(&counts(&forward)).0, 1);
+        assert!(score(&counts(&baseline)).0 > 1);
+    }
+
+    #[test]
     fn primary_spread_beats_smaller_square_sum() {
         // Same total and palette: spread wins even though Q is larger.
         assert!(score(&[2, 2, 6, 6, 6]) < score(&[1, 5, 5, 5, 6]));
@@ -667,35 +665,11 @@ mod tests {
 
     fn coloring(starts: &[i32], ends: &[i32], lanes: Vec<u32>) -> Coloring {
         let sizes = counts(&lanes);
-        let mut rows = vec![Vec::new(); sizes.len()];
-        for row in sorted_nonempty(starts, ends) {
-            rows[lanes[row] as usize].push(row);
-        }
-        let nonempty = rows.iter().map(Vec::len).collect();
-        for row in 0..starts.len() {
-            if starts[row] == ends[row] {
-                rows[lanes[row] as usize].push(row);
-            }
-        }
-        Coloring {
-            lanes,
-            sizes,
-            rows,
-            nonempty,
-        }
+        Coloring::new(starts, ends, &sorted_nonempty(starts, ends), lanes, sizes)
     }
 
     fn budget() -> Budget {
-        Budget {
-            limit: 1_000_000,
-            diagnostics: BalanceDiagnostics {
-                work: 0,
-                pairs: 0,
-                flips: 0,
-                skips: 0,
-                stop_reason: BalanceStopReason::BudgetExhausted,
-            },
-        }
+        Budget::new(1_000_000)
     }
 
     #[test]

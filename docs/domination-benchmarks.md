@@ -4,31 +4,45 @@
 
 ## Summary
 
-[`minimum_cost_dominating_set`](usage.md#select-a-minimum-cost-dominating-set)
-uses an exact minimal-target reduction and heap prefix dynamic program for
-general costs, with a direct cardinality greedy sweep for implicit units and
-uniform explicit costs, including zero. Both take `O(n log n)` time and `O(n)`
-space including validation, sorting and reconstruction. In complete-call
-comparisons, heap DP won materially on weighted disjoint/path/star inputs;
-covering remains better on some clique and nesting workloads.
+[`minimum_cost_dominating_set`](api.md#polars_intervals.minimum_cost_dominating_set)
+selects the cheapest representatives so every interval is selected or overlaps
+a selected interval. Equal-cost solutions use the fewest rows. On a synthetic
+chain of **100,000 shuffled integer intervals**, complete Polars queries took
+**7.97 ms without a cost column** and **18.0 ms with varying costs**. Each interval
+in this chain overlaps only its immediate neighbors. Uniform costs allow a
+faster greedy algorithm. Both modes return an exact optimum, but overlap
+patterns and input order affect runtime.
 
 ## Results
 
-**Release Polars collections · one Polars thread · median of 5 samples · seed 7.**
-[Metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-polars-windows-20260929.metadata.json)
-records source hashes and workload settings.
+**Complete Polars queries · one Polars thread · median of 5 samples · seed 7 ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-polars-windows-20260929.metadata.json)**
+
+“No cost column” assigns unit costs. Supplying ones asks for the same objective.
+All-zero costs still require the fewest representatives. “Varying costs” includes
+zero and positive values. Grouped row counts are totals across 32 independent
+chains. Integer endpoints use Int64, and UTC datetimes retain nanosecond precision.
 
 --8<-- "docs/assets/benchmarks/domination-polars-table.md"
 
-These include plan optimization, validation/extraction, the algorithm and
-Boolean output. Tiny and grouped rows expose expression and per-group overhead;
-numeric, Date and exact Datetime values exercise the same typed adapter.
+Query times include optimization, validation, input extraction, selection and
+Boolean output. Building inputs and queries is excluded. Tiny grouped inputs
+show the overhead of solving each group. When all intervals overlap one another,
+only one representative is needed, and this date example is faster than the chain.
 
-**Rust core · one thread · median of 5 samples · seed 7.** Complete calls include
+<details markdown="1">
+<summary>Underlying algorithm and memory comparisons</summary>
+
+**Rust algorithm only · one thread · median of 5 samples · seed 7 ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-production-windows-20260929.metadata.json)**
+
+Complete calls include
 validation, sorting, optimization, allocation, reconstruction and internal
 cleanup. Returned-mask destruction and correctness checks are excluded.
-[Final-production metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-production-windows-20260929.metadata.json)
-identifies the measured source.
+The package uses greedy selection for uniform costs and a heap prefix solver
+otherwise. Alternatives transform overlap demands into a covering problem,
+either calling the existing cover solver or sharing its preparation work.
+The heap comparison uses that solver even on uniform-cost inputs.
 
 --8<-- "docs/assets/benchmarks/domination-core-table.md"
 
@@ -36,26 +50,23 @@ The million-row [final-production repeat](https://github.com/jplauri/polars-inte
 found production versus fused-cover medians of 193/255 ms for shuffled disjoint rows,
 209/298 ms for mixed-cost paths, and 125/207 ms for expensive-hub stars
 (Int64, seed 7). The corresponding requested live heap was about 66/122 MB.
-Losses matter: full cliques took 205/169 ms and 116/66 MB; deep nesting took
-57.8/34.0 ms and 75.3/49.2 MB. Nesting has `m=1`; proper paths and full
-proper cliques can have `m=n`. All nonempty candidates remain eligible.
+Full cliques took 205/169 ms and 116/66 MB. Deep nesting took 57.8/34.0 ms
+and 75.3/49.2 MB. These are meaningful losses for the package algorithm.
 
 Direct greedy reduced a million-row sorted unit path to 10.1 ms versus
 96.3 ms for fused covering. Explicit ones/zeros on 100k shuffled paths also
 benefited. Reversed duplicate geometries are a visible unit-greedy loss
-against fused covering. The report retains these losses instead of tuning
-dispatch thresholds. The earlier candidate comparison showed the same pattern.
-Separate runs and seeds remain separate; sample ranges
-are descriptive, and small differences do not establish a reliable winner.
+against fused covering. The earlier candidate comparison showed the same pattern.
+Runs and seeds remain separate. Small differences do not establish a reliable winner.
+
+</details>
 
 ## Coverage and limitations
 
-The matrix spans tiny inputs through one million core rows, two seeds,
-Int64/UInt64 endpoints, five orders, units/ones/zeros/mixed/skewed costs,
-empty mixtures, sparse extrema, overlapping minimal targets and disconnected
-components. Final production is remeasured after selection. Polars covers
-numeric/temporal types, interleaved groups, mismatched chunks and streaming.
-Polars timings stop at 100k rows; the million-row measurements are core-only.
+The synthetic inputs cover two seeds, integer and temporal endpoints, five row
+orders, uniform and varying costs, empty rows, extreme coordinates and disconnected
+groups. Polars also covers mismatched chunks and streaming. **Polars timings stop
+at 100,000 rows**. Million-row measurements cover only the Rust algorithm.
 
 Every timed output is checked outside timing. Original-graph subset oracles
 cover tiny instances; suitable families have analytic optima. Other core rows
@@ -64,12 +75,16 @@ large nonanalytic weighted Polars rows are explicitly `feasibility_only`.
 [Proofs and verification details](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/domination-notes.md)
 distinguish these guarantees.
 
-Memory is separately instrumented [**requested live heap**](benchmarking.md#memory-metrics),
-not RSS or buffer capacity. It excludes inputs, allocator overhead and stack.
-Buried expired heap proposals can consume `O(n)` memory. Results characterize synthetic
-inputs on the [shared Windows machine](benchmarks.md#hardware), not every
-application. No process RSS, other operating systems, literature challenger,
-candidate coalescing or parallel optimizer was measured.
+Memory is [**requested live heap**](benchmarking.md#memory-metrics), excluding inputs,
+allocator overhead, stack and the rest of the process. At one million rows the
+package requested about 66 MB versus 122 MB for fused covering on weighted chains,
+but 116 MB versus 66 MB when all intervals overlap. Results describe the
+[shared Windows machine](benchmarks.md#hardware). Other operating systems and
+whole-process memory were not measured.
+
+The saved measurements predate the shared-helper cleanup. The selected algorithms
+are unchanged. [Source and cleanup notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/domination-notes.md#measurement-sources-and-cleanup)
+identify the measured build and later changes.
 
 ## Reproduce and data
 

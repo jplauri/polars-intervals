@@ -58,3 +58,28 @@ unit/uniform costs. It retains measured losses on cliques, nesting and reversed
 unit duplicates. Million-row Polars, process RSS, other operating systems,
 candidate coalescing and the optional literature challenger were not measured.
 See the report and design notes for proofs, exact results and limitations.
+
+## After the Ponytail pass and integration with master
+
+The measured implementation is preserved in commit `510cd44`. The feature was
+then integrated with `edf743b`, including shared validation, Python registration,
+benchmark provenance and endpoint test tables. Duplicate RNG code and dead
+forwarding helpers were removed. Historical raw results and metadata were not
+rewritten, and all five recorded CSV hashes were verified unchanged.
+
+The following checks were rerun on the integrated sources:
+
+| Check | Result |
+| --- | --- |
+| Workspace Rust tests and doctests | 395 passed; upstream cleanup consolidated existing tests |
+| Domination proptests with `PROPTEST_CASES=2048` | All 24 tests passed |
+| Workspace formatting, all-target Clippy, warnings-as-errors Rust documentation | Passed |
+| Release plugin rebuild | Passed using the explicit release command above |
+| Full Python suite and docstrings against the rebuilt plugin | 2,950 passed, including shared endpoint validation |
+| Ruff check/format, lockfile check and CI helper tests | Passed |
+| Table generation, six reporting tests and strict documentation build | Passed |
+| Core runner smoke, sizes 0 and 8, both integer dtypes, all eligible candidates | 478 samples checked successfully |
+| Release Polars runner smoke, sizes 0 and 8, all cases/cost modes | 88 samples checked successfully, including installed/release library hash equality |
+
+Smoke outputs live under ignored `target/` paths and are correctness checks,
+not replacements for the published performance measurements.

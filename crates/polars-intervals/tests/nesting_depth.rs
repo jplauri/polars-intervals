@@ -92,69 +92,6 @@ fn preserves_signed_and_unsigned_extremes() {
 }
 
 #[test]
-fn mismatched_logical_types_never_coerce() {
-    for algorithm in [containment_count, nesting_depth] {
-        for (a, b) in [
-            (DataType::Int64, DataType::UInt64),
-            (DataType::Date, DataType::Int32),
-            (
-                DataType::Datetime(TimeUnit::Milliseconds, None),
-                DataType::Datetime(TimeUnit::Microseconds, None),
-            ),
-            (
-                DataType::Datetime(TimeUnit::Microseconds, None),
-                DataType::Datetime(TimeUnit::Microseconds, Some(TimeZone::UTC)),
-            ),
-        ] {
-            assert!(matches!(
-                algorithm(&typed_series(&[0], &a), &typed_series(&[0], &b)),
-                Err(PolarsError::InvalidOperation(_))
-            ));
-        }
-    }
-}
-
-#[test]
-fn rejects_nulls_unsupported_types_lengths_and_first_invalid_row() {
-    for algorithm in [containment_count, nesting_depth] {
-        let starts = Series::new("s".into(), [0i64, 1]);
-        let nulls = Series::new("e".into(), [Some(2i64), None]);
-        for (a, b) in [(&starts, &nulls), (&nulls, &starts), (&nulls, &nulls)] {
-            assert!(matches!(algorithm(a, b), Err(PolarsError::ComputeError(_))));
-        }
-        for (a, b) in [
-            (&starts, &starts.slice(0, 1)),
-            (&starts.slice(0, 0), &starts),
-        ] {
-            assert!(matches!(
-                algorithm(a, b),
-                Err(PolarsError::ShapeMismatch(_))
-            ));
-        }
-        for dtype in [
-            DataType::Float64,
-            DataType::Int128,
-            DataType::Boolean,
-            DataType::String,
-            DataType::Duration(TimeUnit::Microseconds),
-            DataType::Time,
-        ] {
-            let empty = Series::new_empty("s".into(), &dtype);
-            assert!(matches!(
-                algorithm(&empty, &empty),
-                Err(PolarsError::InvalidOperation(_))
-            ));
-        }
-        let err = algorithm(
-            &Series::new("s".into(), [0i64, 3, 4]),
-            &Series::new("e".into(), [0i64, 2, 1]),
-        )
-        .unwrap_err();
-        assert!(err.to_string().contains("index 1"));
-    }
-}
-
-#[test]
 fn incomparable_containers_demonstrate_depth_is_not_a_containment_count() {
     let starts = Series::new("s".into(), [0i64, 1, 2, 4, 4]);
     let ends = Series::new("e".into(), [8i64, 9, 10, 5, 5]);

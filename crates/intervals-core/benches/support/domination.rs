@@ -10,8 +10,15 @@ mod production;
 pub(crate) use production::{Reduction, reduce};
 pub const METHODS: &[&str] = &["reduction", "fused", "heap", "greedy", "quadratic"];
 
-pub fn target_count<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Result<usize, IntervalError> {
-    Ok(reduce(starts, ends)?.targets.len())
+// Source-included modules cannot access the library's private validator.
+fn validate_lengths<T>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
+    if starts.len() != ends.len() {
+        return Err(IntervalError::LengthMismatch([
+            ("starts", starts.len()),
+            ("ends", ends.len()),
+        ]));
+    }
+    Ok(())
 }
 
 fn value<W: Copy>(costs: Option<&[W]>, row: usize) -> i128
@@ -33,7 +40,7 @@ where
     if method == "reduction" {
         return reduction_cover(starts, ends, costs);
     }
-    production::validate_lengths(starts, ends)?;
+    validate_lengths(starts, ends)?;
     if let Some(costs) = costs {
         cover::validate_costs(costs, starts.len())?;
     }
@@ -41,7 +48,7 @@ where
         // A common nonnegative cost minimizes count, including common zero.
         // Heterogeneous costs require one of the weighted methods.
         assert!(costs.is_none_or(|w| w.iter().all(|&c| i128::from(c) == i128::from(w[0]))));
-        let mask = direct_greedy(starts, ends)?;
+        let mask = production::minimum_dominating_set(starts, ends)?;
         if let Some(costs) = costs {
             production::check_selected_cost(&mask, costs)?;
         }
@@ -91,7 +98,7 @@ fn reduction_cover<T: Ord + Copy, W: Copy>(
 where
     i128: From<W>,
 {
-    production::validate_lengths(starts, ends)?;
+    validate_lengths(starts, ends)?;
     if let Some(costs) = costs {
         cover::validate_costs(costs, starts.len())?;
     }
@@ -149,9 +156,4 @@ where
     } else {
         Err(IntervalError::CostOverflow)
     }
-}
-
-/// The measured direct greedy is now production's unit-cost route.
-pub fn direct_greedy<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Result<Vec<bool>, IntervalError> {
-    production::minimum_dominating_set(starts, ends)
 }

@@ -1,10 +1,9 @@
 #[path = "../benches/support/mod.rs"]
-#[allow(dead_code)]
 mod support;
 
 use intervals_core::{
-    BalanceSeed, BalanceStopReason, IntervalError, assign_balanced_lanes,
-    assign_balanced_lanes_with_diagnostics, assign_lanes, balanced_lane_seed,
+    BalanceStopReason, IntervalError, assign_balanced_lanes,
+    assign_balanced_lanes_with_diagnostics, assign_lanes,
 };
 use proptest::prelude::*;
 
@@ -196,7 +195,7 @@ fn validates_before_all_early_returns() {
     for budget in [0, 1, 100_000] {
         assert!(matches!(
             assign_balanced_lanes(&[1], &[], None, budget),
-            Err(IntervalError::LengthMismatch { .. })
+            Err(IntervalError::LengthMismatch(_))
         ));
         assert_eq!(
             assign_balanced_lanes(&[9, 0, 5, 3], &[10, 0, 4, 2], None, budget),
@@ -204,7 +203,7 @@ fn validates_before_all_early_returns() {
         );
         assert!(matches!(
             assign_balanced_lanes::<i32>(&[], &[], Some(&[0]), budget),
-            Err(IntervalError::LaneLengthMismatch { .. })
+            Err(IntervalError::LengthMismatch([_, ("lanes", _)]))
         ));
         assert!(matches!(
             assign_balanced_lanes(&[0], &[0], Some(&[u32::MAX]), budget),
@@ -282,15 +281,6 @@ fn empty_rows_count_and_move_without_new_lanes() {
         verify(&s, &e, &result);
         assert_eq!(score(&result).0, 0);
     }
-}
-
-#[test]
-fn global_palette_available_before_late_clique() {
-    let s = [0, 1, 2, 3, 4, 10, 10, 10];
-    let e = [1, 2, 3, 4, 5, 11, 11, 11];
-    let forward = balanced_lane_seed(&s, &e, BalanceSeed::Forward).unwrap();
-    assert_eq!(score(&forward).0, 1);
-    assert!(score(&assign_lanes(&s, &e).unwrap()).0 > 1);
 }
 
 #[test]
@@ -398,11 +388,12 @@ proptest! {
         verify(&ps,&pe,&assign_balanced_lanes(&ps, &pe, None, 100_000).unwrap());
     }
     #[test]
-    fn adding_empty_and_repairing_other_valid_seeds((mut s,mut e) in valid(20), x in -10i64..10) {
+    fn adding_empty_and_repairing_other_valid_colorings((mut s,mut e) in valid(20), x in -10i64..10) {
         let old_k = support::optimum(&s,&e); s.extend([x,x]); e.extend([x,x]);
-        prop_assert_eq!(support::optimum(&s,&e),old_k.max(1));
-        for seed in [BalanceSeed::Forward,BalanceSeed::Backward] {
-            let initial = balanced_lane_seed(&s,&e,seed).unwrap();
+        let k = support::optimum(&s,&e);
+        prop_assert_eq!(k,old_k.max(1));
+        let relabeled = assign_lanes(&s,&e).unwrap().iter().map(|&lane| k as u32 - 1 - lane).collect();
+        for initial in [relabeled, assign_balanced_lanes(&s, &e, None, 100_000).unwrap()] {
             let result = assign_balanced_lanes(&s, &e, Some(&initial), 100_000).unwrap(); verify(&s,&e,&result);
             prop_assert!(score(&result) <= score(&initial));
             prop_assert_eq!(assign_balanced_lanes(&s, &e, Some(&initial), 0).unwrap(),initial);

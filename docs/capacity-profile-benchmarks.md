@@ -5,74 +5,78 @@
 ## Summary
 
 [`max_weight_with_capacity_profile`](api.md#polars_intervals.max_weight_with_capacity_profile)
-selects maximum-weight intervals under a changing capacity profile. Production
-chooses between two exact flow formulations and exploits independent components;
-frequent capacity changes can make that choice decisive. Profile normalization
-and conservative parallel thresholds still add overhead in some measured cases.
+selects the highest-weight set of intervals when the allowed number of overlaps
+changes over time. The result is exact. In a benchmark with separate sets of up
+to 32 overlapping intervals, the complete Polars operation took **14.3 ms for
+100,000 integer intervals** and **160 ms for one million**, with capacity varying
+between 2, 4, 6 and 8. Larger interconnected overlap sets and different capacity
+patterns can change the cost substantially.
 
 ## Results
 
-**Complete Polars API · solver uses up to eight workers · Polars pool size unrecorded
-· median of 3 samples · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
+**Complete Polars operation · solver uses up to 8 workers · median of 3 samples ·
+Polars thread count unrecorded · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
+
+The input consists of separate sets of at most 32 mutually overlapping intervals.
+Variable-capacity examples have no available capacity in the gaps between sets.
+“Enough capacity for all” allows every useful interval to be selected. Columns
+compare integer, Date and microsecond Datetime endpoints.
 
 --8<-- "docs/assets/benchmarks/profile-polars-table.md"
 
-Each clique contains at most 32 jobs; variable profiles have zero gaps between
-cliques. Timings include eager API extraction and output construction, excluding
-fixture creation and casts. The separate scalar-expression measurements have a
-different query boundary and do not isolate profile dispatch overhead.
+A changing capacity profile adds work compared with a constant limit on these
+inputs. When capacity is sufficient for every interval, the optimizer can avoid
+the harder selection step. A constant profile uses the simpler constant-capacity
+solver, with some additional time to read and check the profile.
 
-**Rust core · single-threaded formulation comparison · median of 3 samples ·
-[run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
+<details markdown="1">
+<summary>Underlying algorithm comparisons</summary>
 
-Sorted jobs and profile segments, with capacities alternating 4/5. Forced
-candidates include phase clocks; production is uninstrumented:
+**Rust algorithm only · one thread · median of 3 samples ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
+
+The package chooses between two exact optimization methods. “Transshipment” and
+“circulation” are their technical names. This table forces each method on sorted
+inputs where capacity alternates between four and five. More profile segments
+mean more capacity changes to process. The alternatives include internal timing
+instrumentation that the package's direct call does not.
 
 --8<-- "docs/assets/benchmarks/profile-formulations-table.md"
 
-Both references use compact adjacency storage. Transshipment handles capacity
-changes as supplies; circulation starts with jobs selected and corrects excess
-flow. Production chooses circulation for these frequent-change cases. Its
-capacity tightening also prevents large raw capacities from causing unit-by-unit
-augmentation loops.
-
-**Rust core · production serial below 16,384 rows, up to eight workers above ·
-median of 3 samples · [same final run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
-
-Sorted component workloads, capacities alternating 4/5:
+Choosing a suitable method matters much more than small implementation costs
+in these examples. The next table compares solving independent overlap sets
+one at a time with using eight workers. These are sorted integer inputs.
 
 --8<-- "docs/assets/benchmarks/profile-components-table.md"
 
-Forced workers lose at 1K but beat production's conservative serial policy at
-10K. At 1M, production's peak **requested live heap** is 143 MB; forced serial
-and parallel candidates record 125/128 MB, excluding some public-wrapper
-preprocessing. Those memory totals do not isolate the cost of parallelism.
+The package stays single-threaded below 16,384 rows. Forced parallel processing
+loses on the 1,000-row example but wins at 10,000 rows, so that threshold is a
+tradeoff. At one million rows, parallel processing is substantially faster.
 
-Constant profiles delegate to the scalar solver. On 1M sorted disjoint jobs
-with 16 equal-capacity segments, the profile/scalar core calls took 44.6/42.2 ms:
-normalization remains a measured cost even when flow is bypassed.
+</details>
 
 ## Coverage and limitations
 
-The final core run covers 187 workloads and 9,699 samples: job geometry, profile
-patterns and order, zero gaps, signs of weights, segment count and capacity
-magnitude. Constrained global comparisons stop at 10K jobs; components and fast
-paths extend to 1M. These are selected slices, not a full Cartesian matrix.
-No equivalent exact native Polars baseline is provided. The release wheel covers
-Int64, Date, microsecond Datetime and UTC nanoseconds on clique fixtures.
+The final algorithm run covers 187 combinations of input size, overlap pattern,
+capacity changes, segment count, input order and weights. Large interconnected
+selection problems stop at 10,000 intervals. Independent sets and easier cases
+extend to one million. The Polars measurements cover integer and temporal
+endpoints on the separate-overlap-set inputs described above.
 
-Public, scalar and compact-storage candidates include copying packed jobs into
-columns; generic references consume packed jobs directly. Public wrappers have
-no internal phase clocks; their zero phase/graph fields mean unavailable.
-Forced candidates retain instrumentation. Small timing differences across these
-boundaries do not establish a reliable winner.
+Small cases are checked by trying every subset. Full-sized outputs are checked
+against the capacity profile and compared across exact implementations. The
+Polars examples have independently calculable best weights. There is no
+Polars-only comparison.
 
-Independent exhaustive subsets validate small cases and workload restrictions;
-full workloads check feasibility and exact-candidate objective agreement.
-Temporal cliques have an independent top-k oracle. Earlier development slices
-contain historical `production` implementations and are **not** the final run
-shown here; their derivations, checks and contradictory results remain in the
-[design notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#variable-capacity-selection).
+Times include input extraction, validation and output construction, excluding
+data generation and type conversion. Algorithm-only alternatives have different
+input-preparation and instrumentation costs, so small differences need care.
+Their times cannot be subtracted from the Polars totals to estimate overhead.
+
+The million-row parallel example requested 143 MB of live heap storage in the
+package call. This includes output and working storage, but excludes caller
+inputs and the rest of the process. The [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#variable-capacity-selection)
+retain memory comparisons, earlier experiments and validation details.
 
 ## Reproduce and data
 
@@ -81,14 +85,13 @@ shown here; their derivations, checks and contradictory results remain in the
 
 ```sh
 cargo bench -p intervals-core --bench max_weight_with_capacity_profile --locked > benchmarks/results/capacity-profile-local.csv
-uv run --no-sync python benchmarks/capacity_profile_summary.py benchmarks/results/capacity-profile-local.csv
 python -I /path/to/checkout/benchmarks/capacity_profile_temporal.py > capacity-profile-temporal-local.csv
 ```
 
 `PROFILE_BENCH_MAX_N`, `PROFILE_BENCH_MIN_N`, `PROFILE_BENCH_MIN_M`,
-`PROFILE_BENCH_SAMPLES`, `PROFILE_BENCH_FAMILY` and `PROFILE_BENCH_METHODS`
-restrict the core run. Run the temporal command with the installed release
-wheel's Python from outside the checkout, following the shared setup.
+`PROFILE_BENCH_SAMPLES` and `PROFILE_BENCH_FAMILY` restrict the core run. Run the
+temporal command with the installed release wheel's Python from outside the
+checkout, following the shared setup.
 
 </details>
 

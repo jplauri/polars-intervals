@@ -5,68 +5,69 @@
 ## Summary
 
 [`minimum_cover`](api.md#polars_intervals.minimum_cover) selects the fewest
-intervals covering one target. Production's packed greedy sweep outperforms
-indirect sorting on varied shuffled inputs, but loses on some repeated geometry
-and uses more memory. The weighted operation has a separate
-[minimum-cost covering report](cost-covering-benchmarks.md).
+intervals needed to cover a target range without gaps. Complete Polars queries
+took **51–69 ms for one million shuffled integer intervals** in the two displayed
+examples. The selection is exact. Overlap patterns and endpoint types affect
+runtime, and the algorithm trades additional working memory for speed on varied
+inputs. Use [minimum-cost covering](cost-covering-benchmarks.md) when intervals
+have different costs.
 
 ## Results
 
-**Polars collection · single-threaded solver, Polars pool size unrecorded · median
-of 3 samples · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
+**Complete Polars queries · one solver thread · median of 3 samples ·
+Polars thread count unrecorded · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
+
+The first input forms a continuous chain of intervals whose endpoints touch.
+The second has many overlapping intervals. Both are shuffled. Columns compare
+integer, Date and microsecond Datetime endpoints.
 
 --8<-- "docs/assets/benchmarks/cover-polars-table.md"
 
-These installed release-wheel calls time eager selection and Series retrieval,
-including plugin dispatch, validation, physical adaptation and mask construction.
-Input generation, expression construction and casts are excluded. Narrower Date
-records can reduce sorting cost, but the measurements do not isolate dtype
-adaptation. The separate core fixtures differ, so subtracting core runtime from
-collection time would not estimate adapter overhead.
+Both examples finish in well under a tenth of a second at one million rows.
+Date endpoints are faster here. Their smaller stored representation can reduce
+sorting work, but these measurements do not isolate the cost of handling types.
 
-**Rust core · single-threaded · median of 3 samples · internal phase clocks included
-· [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
+<details markdown="1">
+<summary>Underlying algorithm and memory comparisons</summary>
 
-Shuffled inputs; the recorded random costs identify the shared fixture but do
-not affect minimum-cardinality selection.
+**Rust algorithm only · one thread · median of 3 samples ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
+
+The package sorts interval records together. An alternative sorts row indices,
+and another keeps candidate intervals in a heap. All seek the same minimum
+number of intervals. These shuffled inputs differ from the Polars examples,
+and the timings include internal measurement overhead. “32-bit endpoints” uses
+the storage width of Date values without calling Polars.
 
 --8<-- "docs/assets/benchmarks/cover-core-table.md"
 
-Packed and indirect greedy methods differ in sorting records versus original-row
-indices. Heap is a separate greedy implementation. Repeated starts favor indirect
-sorting; mostly irrelevant rows spend little time selecting and do not establish
-a reliable winner from these small differences. Packed storage favors varied
-shuffled geometry at a material memory cost: the 1M Int64 chain uses 26.2 MB of
-peak **requested live heap**, versus 9.39 MB for indirect greedy.
+Sorting records wins on the chain and dense-overlap examples, but sorting
+indices wins when every interval has the same start. On the million-row integer
+chain, the package requests 26.2 MB of live heap storage compared with 9.39 MB
+for the index-sorting alternative. This includes output and working buffers,
+not total process memory.
 
-Production has no explicit sortedness-detection pass. That candidate's benefits
-were inconsistent: it changed the 1M sorted-chain median from 13.9 to 14.1 ms,
-and the sorted Datetime-width dense case from 14.3 to 15.3 ms. Its full results
-remain in the shared raw samples; the main table avoids an almost identical
-extra production series.
+</details>
 
 ## Coverage and limitations
 
-The shared covering suite measures 1K–1M rows across 17 geometry/difficulty
-families, sorted, nearly sorted and shuffled order, plus Date/Datetime physical
-widths. It includes failed covers, gaps, empty and irrelevant rows, duplicates
-and repeated endpoints. The cost-distribution dimension belongs to the shared
-weighted harness; this is a bounded set of slices, not a complete Cartesian
-matrix. Actual release-wheel coverage includes eight integer/temporal dtypes
-on chains, dense overlap, duplicates and irrelevant inputs.
+The shared covering tests span 1,000 to one million rows and seventeen input
+patterns. They include sorted, nearly sorted and shuffled data, duplicates,
+empty intervals, rows outside the target, gaps and targets that cannot be
+covered. Polars tests cover eight integer and temporal endpoint types on a
+smaller selection of patterns. No Polars-only alternative was benchmarked.
 
-Before accepting core timings, each successful mask must independently cover
-the target and each candidate's objective must match production. Exhaustive
-subset optimality checks are restricted to small correctness cases. The temporal
-suite checks coverage and deterministic masks; it is not an independent
-full-size optimum oracle. The [shared correctness details](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/covering-methodology.md)
-keep that distinction explicit.
+Each successful result is checked for complete target coverage. Algorithm
+implementations are also compared for the number of selected intervals.
+Small tests try every subset to verify optimality. Polars tests check coverage
+and repeatable selections, without independently proving optimality at full size.
 
-There is no native Polars expression baseline. Core totals include validation,
-clipping, sorting, selection and temporary-buffer destruction, excluding output
-destruction. Allocation data comes from a separate untimed call. The recorded
-wheel predates adapter cleanup; the measured solvers are unchanged, and metadata
-keeps the original and cleanup source hashes separate.
+Query times include plugin calls, validation, selection and output construction.
+Creating inputs, queries and type conversions is excluded. The measured package
+predates a cleanup of input handling, with the selection algorithm unchanged.
+The separate algorithm and Polars datasets do not support subtracting their times
+to estimate overhead. The [validation notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/covering-methodology.md)
+retain the exact checks and measurement boundaries.
 
 <span id="historical-validation"></span>
 
@@ -77,7 +78,6 @@ keeps the original and cleanup source hashes separate.
 
 ```sh
 cargo bench -p intervals-core --bench covering --locked > benchmarks/results/covering-local.csv
-uv run --no-sync python benchmarks/covering_summary.py benchmarks/results/covering-local.csv
 python -I /path/to/checkout/benchmarks/covering_temporal.py > covering-temporal-local.csv
 ```
 

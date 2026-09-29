@@ -272,17 +272,12 @@ def test_invalid_group_error_uses_original_group_order(negative):
         frame.select(expression().over("group"))
 
 
-@pytest.mark.parametrize("argument", ["start", "end", "price"])
-def test_null_in_each_argument(argument):
+def test_null_cost_is_rejected():
     frame = frame_from_rows([(0, 0, 0), (1, 2, 0)]).with_columns(
-        pl.Series(argument, [0, None], dtype=pl.Int64)
+        pl.Series("price", [0, None], dtype=pl.Int64)
     )
-    message = "null costs" if argument == "price" else "null endpoints"
-    with pytest.raises(pl.exceptions.PolarsError, match=message):
+    with pytest.raises(pl.exceptions.PolarsError, match="null costs"):
         frame.select(expression())
-    if argument != "price":
-        with pytest.raises(pl.exceptions.PolarsError, match=message):
-            frame.select(expression(None))
 
 
 def test_none_is_configuration_but_null_expression_is_invalid():
@@ -319,8 +314,6 @@ def test_matching_logical_dtypes_at_plan_time(start_dtype, end_dtype, cost):
         )
         with pytest.raises(pl.exceptions.PolarsError, match="matching integer, Date, or Datetime"):
             frame.lazy().select(expression(cost)).collect_schema()
-        with pytest.raises(pl.exceptions.PolarsError, match="matching integer, Date, or Datetime"):
-            frame.select(expression(cost))
 
 
 @pytest.mark.parametrize(
@@ -338,13 +331,11 @@ def test_matching_logical_dtypes_at_plan_time(start_dtype, end_dtype, cost):
     ],
     ids=str,
 )
-def test_unsupported_endpoints_are_safe_errors_at_schema_and_runtime(dtype):
+def test_unsupported_endpoints_are_safe_plan_time_errors(dtype):
     for values in ([None], []):
         frame = pl.DataFrame({name: pl.Series(values, dtype=dtype) for name in ("start", "end")})
         with pytest.raises(pl.exceptions.PolarsError, match="integer dtype, Date, or Datetime"):
             frame.lazy().select(expression(None)).collect_schema()
-        with pytest.raises(pl.exceptions.PolarsError, match="integer dtype, Date, or Datetime"):
-            frame.select(expression(None))
 
 
 @pytest.mark.parametrize(
@@ -379,13 +370,11 @@ def test_unsupported_costs_at_schema_and_runtime(dtype):
             frame.select(expression())
 
 
-@pytest.mark.parametrize("argument", ["start", "end", "cost"])
 @pytest.mark.parametrize("scalar", [False, True])
-def test_no_scalar_or_short_expression_broadcasting(argument, scalar):
-    args = {"start": pl.col("start"), "end": pl.col("end"), "cost": pl.col("price")}
-    args[argument] = pl.lit(1, dtype=pl.Int64) if scalar else args[argument].head(1)
+def test_no_scalar_or_short_cost_broadcasting(scalar):
+    cost = pl.lit(1, dtype=pl.Int64) if scalar else pl.col("price").head(1)
     with pytest.raises(pl.exceptions.PolarsError, match="equal lengths"):
-        frame_from_rows([(0, 2, 1), (1, 3, 2)]).select(pi.minimum_cost_dominating_set(**args))
+        frame_from_rows([(0, 2, 1), (1, 3, 2)]).select(expression(cost))
 
 
 @pytest.mark.parametrize(

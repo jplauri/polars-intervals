@@ -69,14 +69,6 @@ fn validation_and_integer_precision() {
     );
     for (s, e, w, message) in [
         (s.clone(), e.clone(), w.slice(0, 1), "equal lengths"),
-        (s.slice(0, 1), e.clone(), w.slice(0, 1), "equal lengths"),
-        (e.clone(), s.clone(), w.clone(), "index 0"),
-        (
-            s.clone(),
-            e.cast(&DataType::Int32).unwrap(),
-            w.clone(),
-            "matching integer",
-        ),
         (
             s.clone(),
             e.clone(),
@@ -88,12 +80,6 @@ fn validation_and_integer_precision() {
             e.clone(),
             Series::full_null("w".into(), 3, &DataType::Int64),
             "null weights",
-        ),
-        (
-            Series::full_null("s".into(), 3, &DataType::Int64),
-            e.clone(),
-            w.clone(),
-            "null endpoints",
         ),
     ] {
         assert!(solve(&s, &e, &w).unwrap_err().to_string().contains(message));

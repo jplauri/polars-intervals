@@ -9,7 +9,7 @@ distinguishes benchmark runners from report generators.
 ## Setup
 
 Follow the [source build prerequisites](contributing.md#build-from-source).
-Rust candidate benchmarks use `cargo bench` without Python or the plugin.
+Rust core benchmarks use `cargo bench` without Python or the plugin.
 Python end-to-end benchmarks need a release build:
 
 ```sh
@@ -54,6 +54,12 @@ the fastest baseline independently per case.
 workloads, not every application or platform. Keep losses, skips, bounded
 baselines, and missing types visible. Preserve raw samples, environment, settings,
 revisions/source hashes, and historical evidence in `benchmarks/results/`.
+Core runners time production only. Removed candidates and their runners remain
+available in the [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb).
+Some run metadata records a base revision with uncommitted feature changes, so
+that revision may not contain the benchmark code. Use the snapshot to recover
+the suite and consult each run's source hashes and cleanup notes for differences
+from the measured sources.
 Discuss repeat runs separately, including meaningful variation or contradictions.
 
 ### Memory metrics
@@ -67,9 +73,9 @@ Discuss repeat runs separately, including meaningful variation or contradictions
 Name the applicable metric and exclusions beside results. Allocation counts,
 buffer capacity, requested heap, and RSS cannot be substituted for one another.
 
-## Generate plots
+## Generate tables { #generate-plots }
 
-The same command generates compact tables and optional plots from saved data;
+The same command generates compact tables from saved data;
 it never runs benchmark suites or builds Rust.
 
 ```sh
@@ -78,10 +84,9 @@ uv run --locked --isolated --only-group plots python -m unittest discover -s ben
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
-The existing generator uses Polars aggregation and Matplotlib for optional SVGs.
-Documentation CI regenerates assets before its strict build. Commit generated
-`docs/assets/benchmarks/<id>.md` and `<id>.csv`; include `<id>.svg` only for a
-configured chart. Markdown snippets are excluded as standalone site pages:
+The generator uses Polars aggregation only. Documentation CI regenerates assets
+before its strict build. Commit generated `docs/assets/benchmarks/<id>.md` and
+`<id>.csv`. Markdown snippets are excluded as standalone site pages:
 
 ```text
 ;--8<-- "docs/assets/benchmarks/overlap-headline.md"
@@ -91,7 +96,7 @@ CSV downloads retain exact medians, min/max, sample counts, and table workload
 dimensions. Missing measurements stay missing. Use `--output PATH` for a preview
 or `--config PATH` for another configuration.
 
-### Configure a table or chart
+### Configure a table
 
 [`benchmarks/plots.toml`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/plots.toml)
 holds source mappings and display choices. Each source is **one run**. CSV files
@@ -130,21 +135,16 @@ rows. It cannot discover a dimension omitted from the source declaration, so
 review that list. A requested size with no samples is an error; missing individual
 method/size combinations remain missing.
 
-Plots are optional. Keep at most one per report, only when it clarifies scaling,
-a crossover, a substantial workload difference, or a runtime/memory tradeoff.
-A `[[charts]]` entry uses the same source/value/divisor/ylabel/methods, one
-`filters` mapping, plus `id`, `title`, `scope`, and `caption`. Runtime plots
-default to a logarithmic y axis and require positive values; memory plots use
-`yscale = "linear"`. Lines show medians and bands show sample ranges. Close
-comparisons usually belong in a table.
-
 ### Adding an operation
 
 1. Reuse an appropriate runner and correctness checks; record samples, omissions,
    and run metadata without overwriting historical evidence.
 2. Copy the [report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md)
    into `docs/`. Keep **Summary → Results → Coverage and limitations → Reproduce
-   and data**, aiming for roughly 400–600 visible words without padding.
+   and data**. Start with the method name, explain its purpose, then give a
+   measured input size and runtime. Write for readers who have not seen the
+   implementation or benchmark setup. Follow the template's editorial guidance
+   for clear table labels, result quality and meaningful limitations.
 3. Add source mappings and a small representative table to `plots.toml`, including
    important production losses. Put end-to-end Polars results before separately
    labelled Rust comparisons. Give each set a scope line and metadata link.

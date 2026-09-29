@@ -1,4 +1,4 @@
-use crate::IntervalError;
+use crate::{IntervalError, validate_lengths};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
@@ -39,12 +39,7 @@ pub fn assign_lanes<T>(starts: &[T], ends: &[T]) -> Result<Vec<u32>, IntervalErr
 where
     T: Ord + Copy,
 {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
     let mut order = Vec::with_capacity(starts.len());
     for (i, (&start, &end)) in starts.iter().zip(ends).enumerate() {
         if start > end {

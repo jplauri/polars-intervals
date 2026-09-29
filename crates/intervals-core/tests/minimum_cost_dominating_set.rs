@@ -359,10 +359,7 @@ fn checked_i128_arithmetic_rejects_only_unrepresentable_optima() {
 fn validation_precedes_pruning_empty_returns_and_uniform_fast_paths() {
     assert_eq!(
         minimum_dominating_set(&[0, 4], &[0]),
-        Err(IntervalError::LengthMismatch {
-            starts_len: 2,
-            ends_len: 1
-        })
+        Err(IntervalError::LengthMismatch([("starts", 2), ("ends", 1)]))
     );
     assert_eq!(
         minimum_dominating_set(&[0, 4], &[0, 3]),
@@ -385,26 +382,23 @@ fn validation_precedes_pruning_empty_returns_and_uniform_fast_paths() {
         };
         assert_eq!(
             run(&[0, 4], &[0], &[1, 1]),
-            Err(IntervalError::LengthMismatch {
-                starts_len: 2,
-                ends_len: 1
-            }),
+            Err(IntervalError::LengthMismatch([("starts", 2), ("ends", 1)])),
             "{method}"
         );
         assert_eq!(
             run(&[0], &[0], &[]),
-            Err(IntervalError::CostLengthMismatch {
-                intervals_len: 1,
-                costs_len: 0
-            }),
+            Err(IntervalError::LengthMismatch([
+                ("intervals", 1),
+                ("costs", 0)
+            ])),
             "{method}"
         );
         assert_eq!(
             run(&[], &[], &[1]),
-            Err(IntervalError::CostLengthMismatch {
-                intervals_len: 0,
-                costs_len: 1
-            }),
+            Err(IntervalError::LengthMismatch([
+                ("intervals", 0),
+                ("costs", 1)
+            ])),
             "{method}"
         );
         for (s, e) in [([0, 0, 4], [10, 0, 3]), ([0, 1, 4], [10, 2, 3])] {

@@ -1,7 +1,7 @@
 case,workload_family,workload_order,workload_method,method,x,median,min,max,samples
-"Touching chain, shuffled",chain,shuffled,minimum_cover,Date,1000000,39.8283,39.5548,41.9571,3
-"Touching chain, shuffled",chain,shuffled,minimum_cover,"Datetime(time_unit='us', time_zone=None)",1000000,52.6123,51.6945,52.9388,3
-"Touching chain, shuffled",chain,shuffled,minimum_cover,Int64,1000000,69.0282,58.116099999999996,69.402,3
-"Dense overlap, shuffled",dense,shuffled,minimum_cover,Date,1000000,36.1915,36.0004,36.5562,3
-"Dense overlap, shuffled",dense,shuffled,minimum_cover,"Datetime(time_unit='us', time_zone=None)",1000000,49.3645,48.9143,49.5999,3
-"Dense overlap, shuffled",dense,shuffled,minimum_cover,Int64,1000000,50.9646,50.7876,51.146699999999996,3
+"End-to-end intervals, shuffled",chain,shuffled,minimum_cover,Date,1000000,39.8283,39.5548,41.9571,3
+"End-to-end intervals, shuffled",chain,shuffled,minimum_cover,"Datetime(time_unit='us', time_zone=None)",1000000,52.6123,51.6945,52.9388,3
+"End-to-end intervals, shuffled",chain,shuffled,minimum_cover,Int64,1000000,69.0282,58.116099999999996,69.402,3
+"Many overlaps, shuffled",dense,shuffled,minimum_cover,Date,1000000,36.1915,36.0004,36.5562,3
+"Many overlaps, shuffled",dense,shuffled,minimum_cover,"Datetime(time_unit='us', time_zone=None)",1000000,49.3645,48.9143,49.5999,3
+"Many overlaps, shuffled",dense,shuffled,minimum_cover,Int64,1000000,50.9646,50.7876,51.146699999999996,3

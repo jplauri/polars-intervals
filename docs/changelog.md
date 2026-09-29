@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- **Breaking Rust API change:** In the unpublished `intervals-core` crate,
+  consolidate the six length-mismatch error variants into
+  `IntervalError::LengthMismatch([(&'static str, usize); 2])` and remove
+  `DEFAULT_BALANCE_WORK`, `BalanceSeed`, and `balanced_lane_seed`.
+  Python APIs and behavior are unchanged.
+
 ## 0.2.0 — September 27, 2026
 
 Expand the native interval APIs with containment, nesting, scheduling, covering,

@@ -116,3 +116,27 @@ The `production` and `final-large` result files measure the final public entry
 points (heap for heterogeneous costs; greedy for units and uniform costs).
 Do not pool these runs. The later production matrix also adds duplicate-heavy
 geometry with costs of 1 versus 1,000,000.
+
+## Measurement sources and cleanup
+
+The saved timings precede the repository-wide cleanup merged in
+[`edf743b`](https://github.com/jplauri/polars-intervals/commit/edf743b).
+The feature snapshot at
+[`510cd44`](https://github.com/jplauri/polars-intervals/commit/510cd44)
+preserves the final measured implementation and runners. Historical metadata
+records the base revision plus per-file source hashes because the feature was
+uncommitted during measurement. Raw samples and their metadata remain unchanged.
+
+The subsequent Ponytail pass reuses shared length validation, Python plugin
+registration, random/shuffle functions and benchmark provenance. It removes an
+unused target-count helper and a greedy forwarding wrapper, and moves shared
+endpoint checks into the existing test tables. It also adopts the current Rust
+length-error representation. The greedy, target reduction and heap recurrence
+are unchanged. The published numbers describe the earlier measured build,
+not a new timing run after these helper changes. Post-cleanup correctness and
+build checks are recorded in
+[the verification record](results/domination-verification-windows-20260929.md).
+
+No literature challenger, candidate-block coalescing or parallel optimizer was
+implemented or measured. The benchmark-only covering alternatives remain here
+to support the requested comparisons and independent candidate checks.

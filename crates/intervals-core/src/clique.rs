@@ -1,4 +1,4 @@
-use crate::IntervalError;
+use crate::{IntervalError, validate_lengths};
 
 /// Select one maximum-cardinality clique of half-open intervals.
 ///
@@ -119,8 +119,7 @@ where
 ///
 /// # Errors
 ///
-/// Returns [`IntervalError::LengthMismatch`] or
-/// [`IntervalError::WeightLengthMismatch`] for unequal lengths,
+/// Returns [`IntervalError::LengthMismatch`] for unequal lengths,
 /// [`IntervalError::InvalidInterval`] for the first reversed original row
 /// (even if its weight is nonpositive), or [`IntervalError::WeightOverflow`]
 /// if a clique objective cannot be represented in `i128`. All rows are
@@ -148,10 +147,10 @@ where
 {
     validate_lengths(starts, ends)?;
     if starts.len() != weights.len() {
-        return Err(IntervalError::WeightLengthMismatch {
-            intervals_len: starts.len(),
-            weights_len: weights.len(),
-        });
+        return Err(IntervalError::LengthMismatch([
+            ("intervals", starts.len()),
+            ("weights", weights.len()),
+        ]));
     }
     let (mut count, mut singleton) = (0, None);
     let mut singleton_weight = 0i128;
@@ -245,16 +244,6 @@ where
             }
         })
         .collect())
-}
-
-fn validate_lengths<T>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
-    Ok(())
 }
 
 fn update_intersection<T: Ord + Copy>(intersection: &mut Option<(T, T)>, start: T, end: T) {

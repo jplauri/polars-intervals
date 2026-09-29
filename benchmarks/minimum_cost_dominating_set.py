@@ -7,24 +7,18 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
 import json
-import os
-import platform
 import random
-import subprocess
-import sys
 from bisect import bisect_left
 from collections import defaultdict
-from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter_ns
 
 import polars as pl
 import polars_intervals as pi
 from polars_intervals import _internal
+from provenance import ROOT, environment, sha256
 
-ROOT = Path(__file__).resolve().parents[1]
 CASES = [
     ("path", "start", "i64", 1, 1, "auto"),
     ("path", "shuffled", "i64", 1, 1, "auto"),
@@ -39,15 +33,6 @@ CASES = [
     ("duplicate", "shuffled", "date", 32, 1, "streaming"),
 ]
 MODES = [("units", None), ("ones", "ones"), ("zero", "zero"), ("mixed", "mixed")]
-
-
-def digest(path):
-    with Path(path).open("rb") as source:
-        return hashlib.file_digest(source, "sha256").hexdigest()
-
-
-def command(*args):
-    return subprocess.check_output(args, cwd=ROOT, text=True).strip()
 
 
 def fixture(n, case, seed):
@@ -191,12 +176,12 @@ def main():
         ),
         None,
     )
-    if release is None or digest(native) != digest(release):
+    if release is None or sha256(native) != sha256(release):
         parser.error("Installed plugin must match the freshly built release library")
     inputs = [ROOT / name for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml")]
-    inputs += list((ROOT / "crates").glob("*/Cargo.toml")) + list(
-        (ROOT / "crates").glob("*/src/*.rs")
-    )
+    for crate in (ROOT / "crates").iterdir():
+        inputs.append(crate / "Cargo.toml")
+        inputs.extend((crate / "src").rglob("*.rs"))
     if any(p.stat().st_mtime_ns > release.stat().st_mtime_ns for p in inputs):
         parser.error("Rust inputs changed; rebuild release first")
     output, meta = (
@@ -209,25 +194,19 @@ def main():
         parser.error("Need nonnegative sizes and positive samples/warmups")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     metadata = {
-        "timestamp_utc": datetime.now(UTC).isoformat(),
-        "command": sys.argv,
-        "platform": platform.platform(),
-        "cpu": platform.processor(),
-        "logical_cpus": os.cpu_count(),
-        "python": sys.version,
-        "polars": pl.__version__,
-        "rustc": command("rustc", "-Vv"),
-        "revision": command("git", "rev-parse", "HEAD"),
-        "polars_threads": pl.thread_pool_size(),
-        "thread_settings": {
-            key: os.getenv(key)
-            for key in ("POLARS_MAX_THREADS", "RAYON_NUM_THREADS", "CARGO_BUILD_JOBS")
-        },
-        "native_sha256": digest(native),
-        "release_sha256": digest(release),
+        **environment(),
+        "native_sha256": sha256(native),
+        "release_library": str(release),
+        "release_sha256": sha256(release),
         "source_sha256": {
-            str(p.relative_to(ROOT)): digest(p)
-            for p in inputs + [Path(__file__), ROOT / "python/polars_intervals/__init__.py"]
+            str(p.relative_to(ROOT)): sha256(p)
+            for p in inputs
+            + [
+                Path(__file__),
+                ROOT / "benchmarks/provenance.py",
+                ROOT / "python/polars_intervals/__init__.py",
+                ROOT / "uv.lock",
+            ]
         },
         "sizes": args.sizes,
         "seeds": args.seeds,
@@ -305,7 +284,7 @@ def main():
                             )
                             count += 1
                     handle.flush()
-    metadata.update(status="completed", timing_samples=count, timing_sha256=digest(output))
+    metadata.update(status="completed", timing_samples=count, timing_sha256=sha256(output))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(f"Saved {count} samples to {output}")
 

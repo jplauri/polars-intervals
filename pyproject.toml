@@ -36,7 +36,7 @@ docs = [
     "mkdocstrings[python]>=1,<2",
     "ruff==0.16.8", # Format API signatures, using the same formatter as development.
 ]
-plots = ["matplotlib>=3.10,<4", "polars>=1.44.1,<1.45"]
+plots = ["polars>=1.44.1,<1.45"]
 
 [tool.maturin]
 manifest-path = "crates/polars-intervals/Cargo.toml"

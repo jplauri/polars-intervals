@@ -1,21 +1,21 @@
 case,workload_family,workload_order,method,x,median,min,max,samples
-"Long/short, sorted",long_short,sorted,balanced,10000,0.8694,0.8598,0.9142,5
-"Long/short, sorted",long_short,sorted,balanced,100000,9.356499999999999,8.8715,9.549199999999999,5
-"Long/short, sorted",long_short,sorted,baseline,10000,0.087,0.0576,0.08739999999999999,5
-"Long/short, sorted",long_short,sorted,baseline,100000,0.6087,0.5986,0.8478,5
-"Long/short, sorted",long_short,sorted,best_seed,10000,0.6728,0.6562,0.7217,5
-"Long/short, sorted",long_short,sorted,best_seed,100000,7.7012,7.6776,8.091,5
-"Long/short, sorted",long_short,sorted,repair,10000,0.29269999999999996,0.2895,0.34759999999999996,5
-"Long/short, sorted",long_short,sorted,repair,100000,2.5863,2.4825,3.8533,5
-"Mixed empties, shuffled",mixed_empty,shuffled,balanced,100000,9.5636,9.3627,10.783,5
-"Mixed empties, shuffled",mixed_empty,shuffled,baseline,100000,3.6157999999999997,3.5732999999999997,3.8108999999999997,5
-"Mixed empties, shuffled",mixed_empty,shuffled,best_seed,100000,9.4635,9.2605,9.8021,5
-"Mixed empties, shuffled",mixed_empty,shuffled,repair,100000,8.012699999999999,7.619199999999999,8.2166,5
-"Stars, sorted",stars,sorted,balanced,1000,0.0727,0.0723,0.073,5
-"Stars, sorted",stars,sorted,baseline,1000,0.0056,0.0056,0.0056,5
-"Stars, sorted",stars,sorted,best_seed,1000,0.06,0.059699999999999996,0.06949999999999999,5
-"Stars, sorted",stars,sorted,repair,1000,0.0242,0.023899999999999998,0.0249,5
-"Clique, shuffled",clique,shuffled,balanced,100000,1.391,1.3146,1.7489999999999999,5
-"Clique, shuffled",clique,shuffled,baseline,100000,0.9248999999999999,0.9065,1.1369,5
-"Clique, shuffled",clique,shuffled,best_seed,100000,2.0206999999999997,1.7903,2.0816,5
-"Clique, shuffled",clique,shuffled,repair,100000,2.1771,2.0846,2.4,5
+"Mixed long and short intervals, sorted",long_short,sorted,balanced,10000,0.8694,0.8598,0.9142,5
+"Mixed long and short intervals, sorted",long_short,sorted,balanced,100000,9.356499999999999,8.8715,9.549199999999999,5
+"Mixed long and short intervals, sorted",long_short,sorted,baseline,10000,0.087,0.0576,0.08739999999999999,5
+"Mixed long and short intervals, sorted",long_short,sorted,baseline,100000,0.6087,0.5986,0.8478,5
+"Mixed long and short intervals, sorted",long_short,sorted,best_seed,10000,0.6728,0.6562,0.7217,5
+"Mixed long and short intervals, sorted",long_short,sorted,best_seed,100000,7.7012,7.6776,8.091,5
+"Mixed long and short intervals, sorted",long_short,sorted,repair,10000,0.29269999999999996,0.2895,0.34759999999999996,5
+"Mixed long and short intervals, sorted",long_short,sorted,repair,100000,2.5863,2.4825,3.8533,5
+"Includes empty intervals, shuffled",mixed_empty,shuffled,balanced,100000,9.5636,9.3627,10.783,5
+"Includes empty intervals, shuffled",mixed_empty,shuffled,baseline,100000,3.6157999999999997,3.5732999999999997,3.8108999999999997,5
+"Includes empty intervals, shuffled",mixed_empty,shuffled,best_seed,100000,9.4635,9.2605,9.8021,5
+"Includes empty intervals, shuffled",mixed_empty,shuffled,repair,100000,8.012699999999999,7.619199999999999,8.2166,5
+"Long intervals spanning short ones, sorted",stars,sorted,balanced,1000,0.0727,0.0723,0.073,5
+"Long intervals spanning short ones, sorted",stars,sorted,baseline,1000,0.0056,0.0056,0.0056,5
+"Long intervals spanning short ones, sorted",stars,sorted,best_seed,1000,0.06,0.059699999999999996,0.06949999999999999,5
+"Long intervals spanning short ones, sorted",stars,sorted,repair,1000,0.0242,0.023899999999999998,0.0249,5
+"All overlap, shuffled",clique,shuffled,balanced,100000,1.391,1.3146,1.7489999999999999,5
+"All overlap, shuffled",clique,shuffled,baseline,100000,0.9248999999999999,0.9065,1.1369,5
+"All overlap, shuffled",clique,shuffled,best_seed,100000,2.0206999999999997,1.7903,2.0816,5
+"All overlap, shuffled",clique,shuffled,repair,100000,2.1771,2.0846,2.4,5

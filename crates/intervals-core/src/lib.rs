@@ -24,8 +24,8 @@ mod lanes;
 pub use lanes::assign_lanes;
 mod balance;
 pub use balance::{
-    BalanceDiagnostics, BalanceResult, BalanceSeed, BalanceStopReason, DEFAULT_BALANCE_WORK,
-    assign_balanced_lanes, assign_balanced_lanes_with_diagnostics, balanced_lane_seed,
+    BalanceDiagnostics, BalanceResult, BalanceStopReason, assign_balanced_lanes,
+    assign_balanced_lanes_with_diagnostics,
 };
 mod weighted;
 pub use weighted::max_weight_non_overlapping;
@@ -47,39 +47,23 @@ pub use coverage::{CoverageEndpoint, max_k_coverage};
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntervalError {
-    /// The start and end slices have different lengths.
-    LengthMismatch { starts_len: usize, ends_len: usize },
+    /// Two related slices differ in length, as `(name, length)` pairs such as
+    /// `[("starts", 3), ("ends", 2)]` or `[("intervals", 3), ("weights", 2)]`.
+    LengthMismatch([(&'static str, usize); 2]),
     /// An interval's start exceeds its end, at the given zero-based row index.
     InvalidInterval { index: usize },
     /// An empty interval cannot contain a stabbing point.
     EmptyInterval { index: usize },
     /// More than `u32::MAX + 1` lanes are required.
     TooManyLanes,
-    /// The lane slice must contain one ID per interval.
-    LaneLengthMismatch {
-        intervals_len: usize,
-        lanes_len: usize,
-    },
     /// Lane IDs must be contiguous from zero and smaller than the row count.
     InvalidLaneId { index: usize, lane: u32 },
     /// Two nonempty intervals in the same lane overlap.
     LaneConflict { first: usize, second: usize },
     /// A supplied coloring does not use the true minimum number of lanes.
     NonMinimumLanes { actual: usize, minimum: usize },
-    /// The weight slice does not contain one value per interval.
-    WeightLengthMismatch {
-        intervals_len: usize,
-        weights_len: usize,
-    },
     /// The optimal objective exceeds the `i128` accumulator range.
     WeightOverflow,
-    /// Capacity-profile start and end columns have different lengths.
-    ProfileLengthMismatch { starts_len: usize, ends_len: usize },
-    /// There must be one capacity per profile segment.
-    CapacityLengthMismatch {
-        segments_len: usize,
-        capacities_len: usize,
-    },
     /// A capacity-profile segment starts after it ends.
     InvalidProfileInterval { index: usize },
     /// Nonempty profile rows overlap, so their capacity is ambiguous.
@@ -90,11 +74,6 @@ pub enum IntervalError {
     InvalidTarget,
     /// No subset continuously covers the target.
     InfeasibleCover,
-    /// There must be one cost per input interval.
-    CostLengthMismatch {
-        intervals_len: usize,
-        costs_len: usize,
-    },
     /// Negative costs are unsupported, including on irrelevant intervals.
     NegativeCost { index: usize },
     /// Every feasible cover costs more than `i128::MAX`.
@@ -104,13 +83,9 @@ pub enum IntervalError {
 impl fmt::Display for IntervalError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::LengthMismatch {
-                starts_len,
-                ends_len,
-            } => write!(
-                f,
-                "start and end lengths differ: {starts_len} starts, {ends_len} ends"
-            ),
+            Self::LengthMismatch([(left, left_len), (right, right_len)]) => {
+                write!(f, "lengths differ: {left_len} {left}, {right_len} {right}")
+            }
             Self::InvalidInterval { index } => {
                 write!(f, "interval at index {index} has start greater than end")
             }
@@ -118,13 +93,6 @@ impl fmt::Display for IntervalError {
                 write!(f, "cannot stab empty interval at index {index}")
             }
             Self::TooManyLanes => write!(f, "lane IDs exceed the UInt32 range"),
-            Self::LaneLengthMismatch {
-                intervals_len,
-                lanes_len,
-            } => write!(
-                f,
-                "interval and lane lengths differ: {intervals_len} intervals, {lanes_len} lanes"
-            ),
             Self::InvalidLaneId { index, lane } => write!(
                 f,
                 "invalid lane ID {lane} at index {index}: IDs must be contiguous from zero and smaller than the row count"
@@ -137,28 +105,7 @@ impl fmt::Display for IntervalError {
                 f,
                 "supplied coloring uses {actual} lanes; the minimum is {minimum}"
             ),
-            Self::WeightLengthMismatch {
-                intervals_len,
-                weights_len,
-            } => write!(
-                f,
-                "interval and weight lengths differ: {intervals_len} intervals, {weights_len} weights"
-            ),
             Self::WeightOverflow => write!(f, "maximum weight exceeds the i128 accumulator range"),
-            Self::ProfileLengthMismatch {
-                starts_len,
-                ends_len,
-            } => write!(
-                f,
-                "profile start and end lengths differ: {starts_len} starts, {ends_len} ends"
-            ),
-            Self::CapacityLengthMismatch {
-                segments_len,
-                capacities_len,
-            } => write!(
-                f,
-                "profile and capacity lengths differ: {segments_len} segments, {capacities_len} capacities"
-            ),
             Self::InvalidProfileInterval { index } => write!(
                 f,
                 "profile interval at index {index} has start greater than end"
@@ -176,13 +123,6 @@ impl fmt::Display for IntervalError {
                 f,
                 "target interval cannot be covered by the supplied intervals"
             ),
-            Self::CostLengthMismatch {
-                intervals_len,
-                costs_len,
-            } => write!(
-                f,
-                "interval and cost lengths differ: {intervals_len} intervals, {costs_len} costs"
-            ),
             Self::NegativeCost { index } => write!(
                 f,
                 "cost at index {index} is negative; costs must be nonnegative"
@@ -195,6 +135,16 @@ impl fmt::Display for IntervalError {
 }
 
 impl std::error::Error for IntervalError {}
+
+fn validate_lengths<T>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
+    if starts.len() != ends.len() {
+        return Err(IntervalError::LengthMismatch([
+            ("starts", starts.len()),
+            ("ends", ends.len()),
+        ]));
+    }
+    Ok(())
+}
 
 /// Counts the other intervals overlapping each interval, in input order.
 ///
@@ -226,12 +176,7 @@ pub fn overlap_counts<T>(starts: &[T], ends: &[T]) -> Result<Vec<usize>, Interva
 where
     T: Ord + Copy,
 {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
 
     let mut sorted_starts = Vec::with_capacity(starts.len());
     let mut sorted_ends = Vec::with_capacity(ends.len());
@@ -448,10 +393,10 @@ mod tests {
         for (starts, ends) in [(&[1][..], &[][..]), (&[][..], &[1][..])] {
             assert_eq!(
                 overlap_counts(starts, ends),
-                Err(IntervalError::LengthMismatch {
-                    starts_len: starts.len(),
-                    ends_len: ends.len(),
-                })
+                Err(IntervalError::LengthMismatch([
+                    ("starts", starts.len()),
+                    ("ends", ends.len())
+                ]))
             );
         }
     }

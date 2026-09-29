@@ -1,65 +1,71 @@
 # Containment counting benchmarks
 
+[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+
 ## Summary
 
-[`containment_count`](usage.md#count-containment) counts contained rows with a
-packed Fenwick tree. The recorded plugin outperforms native run rank on the
-large global examples below, but native expressions win with many tiny groups;
-the packed layout also trades memory and ordered-input performance for faster
-irregular core workloads.
+[`containment_count`](api.md#polars_intervals.containment_count) counts how many
+other intervals each row contains. Complete Polars queries on **three million
+integer intervals took 65 ms to 1.09 seconds** in the displayed examples,
+depending on the data. The Polars-only comparison took 146 ms to 2.01 seconds.
+Many small groups can reverse that advantage. These measurements use an earlier
+package build, before a change that reduced input copying.
 
 ## Results
 
-**Polars collection · 24 threads · median of 5 samples ·
-[run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-polars-rank-runs-windows.json)**
+**Complete Polars queries · 24 Polars threads · median of 5 samples ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-polars-rank-runs-windows.json)**
 
-**Historical adapter:** these samples include unconditional endpoint copies.
-The current shared adapter borrows contiguous columns; it has not been remeasured
-here. Native run rank is an exact, non-pair-materializing Polars alternative.
+The comparison uses Polars ranking expressions to count containment without
+building a row for every matching pair. All endpoints are Int64. “No grouping”
+means that every interval is compared with the full input. Grouped row counts
+are totals across all groups.
 
 --8<-- "docs/assets/benchmarks/containment-polars-table.md"
 
-Each row compares methods from the same follow-up run. Native preprocessing,
-row-order restoration and output materialization are timed; the plugin additionally
-validates public inputs, while native queries assume valid matching endpoints.
-Tiny groups can reverse the result. In the separate original run, the equality
-join took 3.63 ms against the plugin's 7.75 ms on 10K sparse rows in 1,000 groups.
+Repeated intervals are much cheaper than the more irregular inputs in this run.
+The grouped example has only ten rows per group on average. Here, the overhead
+of calling the plugin outweighs its counting advantage. A separate earlier
+join-based comparison also favored Polars on small groups.
 
-**Rust core · single-threaded · median of 5 samples · i64 ·
-[run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-kernels-windows.json)**
+<details markdown="1">
+<summary>Underlying algorithm comparisons</summary>
+
+**Rust algorithm only · one thread · median of 5 samples ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-kernels-windows.json)**
+
+These compare data structures used for counting. The package uses the packed
+Fenwick design, which stores sortable records together. Indirect Fenwick sorts
+row indices instead. The segment tree is another counting structure. These
+timings include internal measurement overhead and exclude Polars.
 
 --8<-- "docs/assets/benchmarks/containment-core-table.md"
 
-These are instrumented candidate implementations: totals include validation,
-compression, sorting, allocation, counting and phase clocks. Packed Fenwick is
-the production design, but it does not win every family or the equally weighted
-all-size comparison. Its lower absolute costs on larger irregular workloads
-motivated the choice; indirect Fenwick saves copying and memory.
+The selected design is faster on the large irregular examples, but loses on
+duplicates. At three million distinct ends its live buffer capacity reaches
+137 MiB, compared with 91.6 MiB for indirect Fenwick. This counts algorithm
+buffers, including output, rather than the memory of the whole process.
+
+</details>
 
 ## Coverage and limitations
 
-Core coverage crosses fourteen structures with 1K–3M rows: containment density,
-duplicates, equal endpoints, empties and input order. Polars additionally covers
-10K/100K total rows in 1–1,000 group windows, Date and UTC Datetime(us). Core and
-Python random fixtures differ, so their timings cannot isolate adapter overhead.
-The original native run also measures prefix rank, dynamic prefix rank and joins;
-all formulations, plans and samples remain linked below. No cross-run speedup
-is implied.
+Algorithm tests cover fourteen input patterns with 1,000 to three million rows,
+including nesting, duplicates, shared endpoints, empty intervals and different
+input orders. Polars tests also cover groups, Date and timezone-aware Datetime.
+Small cases are checked by comparing every pair directly. Larger outputs are
+cross-checked between implementations.
 
-Joins have a **2,000,000 intermediate-row safety cap**, including self-matches;
-missing timings are skips. Even disjoint 3M-row inputs exceed it. Group equality
-joins use a conservative group-size bound; coordinate-band joins include their
-bounded-fixture encoding in timing. Native rank avoids pair materialization and
-has comparable asymptotic complexity; these Polars rank APIs were marked unstable
-at the measured revision.
+Query times include preparing the data for counting and creating the output.
+The plugin validates inputs, while the Polars comparison assumes valid endpoints.
+The current package avoids some copies made by the measured build, but has not
+been remeasured here. The Polars ranking APIs were marked unstable at that time.
 
-**Peak live buffer capacity**, including output, reaches 137 MiB for packed
-Fenwick, 91.6 MiB for indirect Fenwick and 160 MiB for the segment tree at 3M
-distinct ends. This is neither requested-heap instrumentation nor RSS; native
-process memory was not measured. Small fixtures use independent nested-loop
-oracles; full-sized candidates and timed outputs are cross-checked. See
-[validation and memory details](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/containment.md)
-and the shared [methodology](benchmarking.md).
+Some join-based alternatives were skipped when they could create more than two
+million intermediate rows. The ranking comparison above avoids that expansion.
+Algorithm-only and Polars tests use different datasets, so their times cannot
+be subtracted to calculate Polars overhead. Detailed checks and memory accounting
+remain in the [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/containment.md).
 
 ## Reproduce and data
 
@@ -73,8 +79,8 @@ uv run --locked --no-sync python benchmarks/containment_count.py --methods plugi
 
 Use the shared release setup first. To reproduce the original native selection,
 use `--methods plugin rank rank_by join bands equality` and a separate output.
-`CONTAINMENT_SIZES` and `CONTAINMENT_CSV` select kernel sizes and output;
-the Python runner accepts `--sizes` and `--repeats`.
+`CONTAINMENT_SIZES` and `CONTAINMENT_CSV` select algorithm-test sizes and output.
+The Python runner accepts `--sizes` and `--repeats`.
 
 </details>
 

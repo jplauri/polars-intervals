@@ -5,72 +5,68 @@
 ## Summary
 
 [`minimum_stabbing_points`](api.md#polars_intervals.minimum_stabbing_points)
-finds the fewest points hitting every interval. Production's direct scan of
-end-sorted inputs saves both sorting time and record storage; packed sorting is
-its fallback for other input. Indirect sorting is slower on the largest shuffled
-cases but wins some reverse-order workloads and uses fewer temporary bytes for
-Int64 endpoints.
+finds the fewest points needed so that every interval contains at least one
+selected point. Complete Polars queries on **three million non-overlapping
+integer intervals took 26.5 ms when sorted and 139 ms when shuffled**.
+The result is exact. Input order has a large effect because intervals already
+sorted by their ends need less processing.
 
 ## Results
 
-**Polars collection · 24 Polars threads, single-threaded solver · median of 3
-samples · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json)**
+**Complete Polars queries · one solver thread, 24 Polars threads · median of
+3 samples · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json)**
+
+Non-overlapping intervals each need their own point. In the regular overlapping
+inputs, one point can serve several intervals. Sorted rows are ordered by their
+ends. Columns compare integer, Date and microsecond Datetime endpoints.
 
 --8<-- "docs/assets/benchmarks/stabbing-polars-table.md"
 
-Collection includes plugin dispatch, validation, physical adaptation and logical
-list construction. Fixture construction, casts and checks are outside timing.
-Date uses narrower physical records than Int64 and microsecond Datetime. These
-regular dense fixtures differ from the random dense core cases below; subtracting
-their times would not isolate adapter overhead.
+The shuffled three-million-row examples take 79–139 ms across these endpoint
+types. Already sorted inputs take 4–28 ms. Overlap also changes the amount of
+output to create, so input row count alone does not determine runtime.
 
-**Rust core · single-threaded · median of 3 samples · production has no phase
-clocks; candidate totals include them · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json)**
+<details markdown="1">
+<summary>Underlying algorithm and memory comparisons</summary>
 
-Int64 endpoints; production detects end-sorted input before its packed fallback.
-The references always sort packed records or original-row indices.
+**Rust algorithm only · one thread · median of 3 samples · integer endpoints ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/stabbing-environment.json)**
+
+The package detects intervals that are already sorted by their ends. Both
+alternatives always sort, using either interval records or row indices.
+Their times include internal instrumentation that the package call does not.
 
 --8<-- "docs/assets/benchmarks/stabbing-core-table.md"
 
-Input order changes the result more than small differences between production
-and the packed reference. Indirect sorting's reverse-order wins remain relevant;
-the packed fallback was selected for its broader shuffled-input performance.
-The instrumented sortedness-detection candidate is preserved in the samples,
-without adding another almost identical production series to the main table.
-Phase-clock overhead matters most at the smallest sizes.
+The package benefits from sorted input. Sorting row indices can be faster on
+reverse-ordered data, but is slower on the largest shuffled examples. On three
+million non-overlapping integer intervals, the package's peak requested heap
+storage is 32.0 MiB when sorted and 77.8 MiB when shuffled. This includes output
+and sorting buffers, not whole-process memory.
 
-For 3M disjoint Int64 rows, production peak **requested live heap** is 32.0 MiB
-when sorted and 77.8 MiB when shuffled. The extra storage is the packed record
-buffer. Output size matters too: a sorted common-intersection case allocates only
-32 bytes, since it emits one point. These core allocations include output-vector
-capacity and are not plugin process RSS.
+</details>
 
 ## Coverage and limitations
 
-The core covers 1K, 10K, 100K, 1M and 3M rows, twelve geometry families, and
-end-sorted, reverse and shuffled orders. Int64 spans the full matrix; Date's
-physical-width supplement covers disjoint, dense and identical families.
-Equal-end and identical families remain end-sorted even when shuffled or reversed,
-so their order labels still exercise the fast path. Tied ends also affect sorting
-behavior in random reversed fixtures.
+Algorithm tests cover 1,000 to three million rows, twelve interval patterns,
+and sorted, reversed and shuffled orders. Integer endpoints have the widest
+coverage. Polars tests also cover Date and microsecond Datetime endpoints on
+non-overlapping, overlapping and identical intervals.
 
-The installed release-wheel suite measures Int64, Date and microsecond Datetime
-on disjoint, dense and identical inputs, sorted and shuffled. Other Datetime
-units, timezone metadata, chunk adaptation and grouping have correctness tests
-but no matching performance matrix here. No native Polars expression baseline
-is supplied.
+Every output is checked to hit all intervals. A separate algorithm computes the
+minimum number of points using a different approach. Small exhaustive tests
+check both implementations. Polars examples also include independently
+verifiable evidence that fewer points cannot suffice.
 
-Core outputs are checked for coverage, sorted uniqueness and optimum cardinality
-against an independent right-to-left maximum-packing oracle. Small coordinate-
-and interval-subset oracles cross-check it before timing. Temporal checks use
-coverage joins and explicit disjoint-packing certificates, rather than replaying
-the production greedy rule. [Design and validation details](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#minimum-stabbing-points)
-retain the proof and oracle boundaries.
+Timings include validation, processing and output creation. Generating and
+converting inputs is excluded. Algorithm-only and Polars inputs differ, so their
+times cannot be used to calculate Polars overhead. Equal endpoints can leave
+data effectively sorted even after shuffling.
 
-Core totals include validation, materialization, sorting, scanning and temporary
-buffer destruction; output destruction is excluded. Blank production phase
-fields mean unavailable. Cleanup changed the driver and tests, while the
-measured production and candidate implementations remained unchanged.
+Other datetime units, timezones and grouping have correctness tests but no
+matching performance measurements here. No Polars-only alternative was measured.
+The [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#minimum-stabbing-points)
+retain the algorithms, correctness checks and exact measurement boundaries.
 
 <span id="historical-validation"></span>
 
@@ -82,12 +78,11 @@ measured production and candidate implementations remained unchanged.
 ```sh
 cargo bench -p intervals-core --bench minimum_stabbing_points --locked > benchmarks/results/stabbing-local.csv
 python -I /path/to/checkout/benchmarks/stabbing_temporal.py > stabbing-temporal-local.csv
-uv run --no-sync python benchmarks/stabbing_summary.py
 ```
 
 `STABBING_BENCH_MAX` and `STABBING_BENCH_SAMPLES` restrict the core run.
 Run the temporal command with the installed release wheel's Python from outside
-the checkout; the summary command reads the published files.
+the checkout.
 
 </details>
 

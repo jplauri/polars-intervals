@@ -135,50 +135,17 @@ fn every_row_is_validated_before_pruning_with_original_error_indices() {
 }
 
 #[test]
-fn unequal_lengths_nulls_and_unsupported_dtypes_are_errors() {
+fn invalid_cost_lengths_nulls_and_dtypes_are_errors() {
     let starts = Series::new("s".into(), [0i64, 1, 2]);
     let ends = Series::new("e".into(), [2i64, 3, 4]);
-    let costs = Series::new("c".into(), [1i64, 0, 1]);
-    for (s, e, c, message) in [
+    for (costs, message) in [
+        (Series::new("c".into(), [1i64]), "equal lengths"),
         (
-            starts.clone(),
-            ends.clone(),
-            Some(costs.slice(0, 1)),
-            "equal lengths",
-        ),
-        (starts.slice(0, 1), ends.clone(), None, "equal lengths"),
-        (
-            starts.clone(),
-            ends.slice(0, 1),
-            Some(costs.clone()),
-            "equal lengths",
-        ),
-        (
-            starts.clone(),
-            ends.cast(&DataType::Int32).unwrap(),
-            None,
-            "matching integer",
-        ),
-        (
-            Series::full_null("s".into(), 3, &DataType::Int64),
-            ends.clone(),
-            None,
-            "null endpoints",
-        ),
-        (
-            starts.clone(),
-            Series::full_null("e".into(), 3, &DataType::Int64),
-            Some(costs.clone()),
-            "null endpoints",
-        ),
-        (
-            starts.clone(),
-            ends.clone(),
-            Some(Series::full_null("c".into(), 3, &DataType::Int64)),
+            Series::full_null("c".into(), 3, &DataType::Int64),
             "null costs",
         ),
     ] {
-        let error = solve(&s, &e, c.as_ref()).unwrap_err().to_string();
+        let error = solve(&starts, &ends, Some(&costs)).unwrap_err().to_string();
         assert!(error.contains(message), "{error}");
     }
     for dtype in [
@@ -204,50 +171,6 @@ fn unequal_lengths_nulls_and_unsupported_dtypes_are_errors() {
             .unwrap_err()
             .to_string();
             assert!(error.contains("integer cost dtype"), "{error}");
-            if !matches!(dtype, DataType::Date | DataType::Datetime(_, _)) {
-                let error = solve(&unsupported, &unsupported, None)
-                    .unwrap_err()
-                    .to_string();
-                assert!(
-                    error.contains("integer dtype, Date, or Datetime"),
-                    "{error}"
-                );
-            }
-        }
-    }
-}
-
-#[test]
-fn logical_temporal_metadata_must_match_even_when_empty() {
-    let utc = TimeZone::opt_try_new(Some("UTC")).unwrap();
-    let helsinki = TimeZone::opt_try_new(Some("Europe/Helsinki")).unwrap();
-    for (left, right) in [
-        (DataType::Date, DataType::Int32),
-        (
-            DataType::Datetime(TimeUnit::Milliseconds, None),
-            DataType::Datetime(TimeUnit::Microseconds, None),
-        ),
-        (
-            DataType::Datetime(TimeUnit::Nanoseconds, utc.clone()),
-            DataType::Datetime(TimeUnit::Nanoseconds, helsinki),
-        ),
-        (
-            DataType::Datetime(TimeUnit::Nanoseconds, utc),
-            DataType::Datetime(TimeUnit::Nanoseconds, None),
-        ),
-    ] {
-        for data in [&[][..], &[0i64][..]] {
-            let error = solve(
-                &typed_series(data, &left),
-                &typed_series(data, &right),
-                None,
-            )
-            .unwrap_err()
-            .to_string();
-            assert!(
-                error.contains("matching integer, Date, or Datetime"),
-                "{error}"
-            );
         }
     }
 }

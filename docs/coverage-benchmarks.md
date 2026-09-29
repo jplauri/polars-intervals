@@ -1,66 +1,78 @@
 # Maximum k-coverage benchmarks
 
+[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+
 ## Summary
 
-[`max_k_coverage`](usage.md#select-maximum-coverage-with-a-budget) selects an exact
-maximum-coverage subset within an interval budget. Production combines dominance
-pruning, rolling dynamic-programming rows and exact fast paths; measured cost
-rises with retained rows and budget, while reconstruction decisions require
-memory proportional to their product.
+[`max_k_coverage`](api.md#polars_intervals.max_k_coverage) selects at most `k`
+intervals to cover the greatest total length, counting overlaps only once.
+The result is exact. On **one million shuffled integer intervals**, a complete
+Polars query took **161 ms when allowed to select 8 intervals** and **681 ms
+when allowed to select 64**, using the same overlapping input pattern. Allowing
+more selected intervals can increase both runtime and working memory.
 
 ## Results
 
-**Polars collection · 24 threads · median of 3 samples ·
-[run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-environment.json)**
+**Complete Polars queries · 24 Polars threads · median of 3 samples ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-environment.json)**
+
+The inputs form overlapping steps along the coordinate range. The selection
+limit is the most intervals the function may choose. Columns compare integer,
+Date and microsecond Datetime endpoints.
 
 --8<-- "docs/assets/benchmarks/coverage-collection-table.md"
 
-The million-row staircase makes the budget cost visible. Date uses narrower
-physical endpoints; these equivalent coordinate patterns do not establish a
-universal dtype ranking. Collection includes planning, execution and Series
-retrieval, with construction, casts and correctness checks outside timing.
-No equivalent exact native Polars baseline was found or measured.
+On one million integer rows, increasing the limit from 8 to 64 makes this
+example about four times slower. Sorting helps at the smaller limit: the
+sorted example takes 125 ms compared with 161 ms when shuffled. These are
+measured cases, not a fixed scaling rule for every input.
 
-**Rust core · single-threaded · median of 3 samples · i64 ·
-[same run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-environment.json)**
+<details markdown="1">
+<summary>Underlying algorithm and memory comparisons</summary>
+
+**Rust algorithm only · one thread · median of 3 samples · integer endpoints ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-environment.json)**
+
+The package avoids work on intervals that cannot improve the answer. One
+reference uses a simpler version of the same optimization method. Another
+solves independent overlap sets separately. The references include internal
+timing instrumentation and use different input wrappers.
 
 --8<-- "docs/assets/benchmarks/coverage-core-table.md"
 
-Production has no internal phase clocks; references have them and use different
-wrappers. It also specializes retained-record invariants and includes validation
-and exact fast paths. It is therefore not simply an uninstrumented rolling-row
-reference. Component decomposition wins the illustrated larger-budget component
-case, but adds overhead at smaller budgets and on fully disjoint input; it is
-not a production path. The saturation fixture shows the full-union fast path.
+Solving independent sets separately wins at the larger selection limit in this
+example, but adds overhead at the smaller limit. It is not a mode exposed by
+the package. When the limit is sufficient to cover the entire input range,
+the package can skip much of the optimization work.
+
+On the million-row overlapping-step input, the package's peak requested heap
+storage rises from 162 MiB at a limit of 8 to 216 MiB at 64. These are
+algorithm-only allocations, including output and working storage. They do not
+measure the memory of a complete Polars query.
+
+</details>
 
 ## Coverage and limitations
 
-The core run covers 1,506 workloads across seventeen families, three orders,
-1K–1M rows and budgets from zero through 64, with supplemental
-empty and oversized-budget cases. The million-row subset uses five families and
-budgets 0, 1, 8 and 64. Installed-plugin coverage is narrower: disjoint, staircase
-and identical inputs, two orders, three dtypes and six budgets, without group
-windows. Other temporal units and timezone behavior are correctness-tested only.
+The algorithm run covers 1,506 combinations of size, interval pattern, input
+order and selection limit. It spans 1,000 to one million rows and limits from
+zero to 64, with extra tests for limits larger than the input. Only a subset
+of patterns and limits reaches one million rows.
 
-Full/unpruned tables are bounded at four million `nk` cells; replay at thirty
-million `nk²` updates; component experiments at 10K rows and `k<=64`. Missing
-candidate cells are safety omissions. Lower helper cost does not always lower
-total runtime: the shuffled million-row staircase at `k=8` favored binary helper
-lookup over the monotone-sweep reference in the recorded total. Packed records
-also use more memory than indirect records; detailed comparisons remain in the
-[development notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#development-comparisons).
+Small tests try every possible subset. A separate slower optimizer checks
+larger test cases. Benchmark selections are independently combined to verify
+their covered length and compared with reference answers. The Polars examples
+have known best results.
 
-**Peak requested live heap**, measured separately from timing, reaches 162 MiB
-at `k=8` and 216 MiB at `k=64` for the million-row production staircase. At 10K
-shuffled staircase rows and `k=32`, rolling rows use 2.07 MiB versus 21.0 MiB for
-full tables; replay saves memory but can substantially increase runtime. Polars
-memory is unmeasured. See shared [metric definitions](benchmarking.md).
+Polars performance coverage is narrower: three input patterns, sorted and
+shuffled orders, and integer, Date and microsecond Datetime endpoints.
+Grouping and other datetime variants have no matching timings here.
+No equivalent Polars-only optimizer was measured.
 
-Small cases use exhaustive subset oracles; a separate quadratic DP checks larger
-test cases. Full benchmark masks are independently merged to verify objective
-and count against the reference result. Collection fixtures have known optima.
-The saved timings precede a readability refactor after measured commit `1abc545`;
-the recurrence, memory layout and candidate kernels were unchanged.
+Query times include planning, execution and retrieving the selection. Creating
+and converting inputs is excluded. Some slower algorithm comparisons were
+limited to smaller datasets. The [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#maximum-k-coverage)
+retain these limits, memory tradeoffs and correctness checks.
 
 ## Reproduce and data
 

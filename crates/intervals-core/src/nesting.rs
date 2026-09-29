@@ -1,4 +1,4 @@
-use crate::IntervalError;
+use crate::{IntervalError, validate_lengths};
 
 /// Return the length of the longest strict containment chain above each interval.
 ///
@@ -37,12 +37,7 @@ pub fn nesting_depths<T: Ord + Copy>(
     starts: &[T],
     ends: &[T],
 ) -> Result<Vec<usize>, IntervalError> {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
     let mut records = Vec::with_capacity(starts.len());
     for (index, (&start, &end)) in starts.iter().zip(ends).enumerate() {
         if start > end {

@@ -1,4 +1,4 @@
-use crate::IntervalError;
+use crate::{IntervalError, validate_lengths};
 
 /// A discrete ordered endpoint with an exact immediate predecessor.
 ///
@@ -58,12 +58,7 @@ pub fn minimum_stabbing_points<T: DiscreteEndpoint>(
     starts: &[T],
     ends: &[T],
 ) -> Result<Vec<T>, IntervalError> {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
+    validate_lengths(starts, ends)?;
     for (index, (&start, &end)) in starts.iter().zip(ends).enumerate() {
         if start > end {
             return Err(IntervalError::InvalidInterval { index });

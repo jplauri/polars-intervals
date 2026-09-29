@@ -23,10 +23,7 @@ import argparse
 import csv
 import hashlib
 import json
-import os
-import platform
 import statistics
-import subprocess
 import sys
 from collections import Counter, defaultdict
 from datetime import UTC, datetime
@@ -44,8 +41,8 @@ from generate_interval_graphs import (
     structural_stats,
     validate_instance,
 )
+from provenance import ROOT, environment, sha256
 
-ROOT = Path(__file__).resolve().parents[1]
 WORKLOADS = ("integer", "date", "datetime", "grouped", "sliced", "multi_chunk")
 QUALITY_FIELDS = [
     "corpus",
@@ -473,33 +470,18 @@ def validated_result(result, record, groups, expected=None):
     return values
 
 
-def source_hash(path):
-    with path.open("rb") as source:
-        return hashlib.file_digest(source, "sha256").hexdigest()
-
-
-def command_output(*command):
-    try:
-        return subprocess.check_output(
-            command, cwd=ROOT, text=True, stderr=subprocess.STDOUT
-        ).strip()
-    except (OSError, subprocess.CalledProcessError) as error:
-        return f"unavailable: {error}"
-
-
 def run_metadata(args):
-    import polars as pl
     import polars_intervals as pi
 
     corpora = {}
     for path in args.dataset:
         manifest = json.loads((path / "dataset.json").read_text(encoding="ascii"))
-        hashes = {"dataset.json": source_hash(path / "dataset.json")}
+        hashes = {"dataset.json": sha256(path / "dataset.json")}
         for shard in manifest["shards"]:
             target = (path / shard["path"]).resolve()
             if not target.is_relative_to(path.resolve()):
                 raise ValueError("shard path escapes dataset directory")
-            hashes[shard["path"]] = source_hash(target)
+            hashes[shard["path"]] = sha256(target)
         corpora[str(path)] = {"manifest": manifest, "sha256": hashes}
     native = list(Path(pi.__file__).parent.glob("*.pyd")) + list(
         Path(pi.__file__).parent.glob("*.so")
@@ -511,33 +493,19 @@ def run_metadata(args):
     ]
     source_paths.extend((ROOT / "crates").glob("**/*.rs"))
     return {
-        "timestamp_utc": datetime.now(UTC).isoformat(),
+        **environment(),
         "arguments": vars(args),
-        "platform": platform.platform(),
-        "cpu": platform.processor(),
-        "logical_cpus": os.cpu_count(),
-        "python": sys.version,
-        "executable": sys.executable,
-        "polars": pl.__version__,
-        "rustc": command_output("rustc", "--version", "--verbose"),
-        "revision": command_output("git", "rev-parse", "HEAD"),
-        "git_status": command_output("git", "status", "--short"),
         "build_profile": "release (operator-declared)",
         "plugin": pi.__file__,
-        "native_sha256": {p.name: source_hash(p) for p in native},
-        "source_sha256": {str(p.relative_to(ROOT)): source_hash(p) for p in source_paths},
-        "threads": pl.thread_pool_size(),
-        "thread_environment": {
-            name: os.environ.get(name)
-            for name in ("POLARS_MAX_THREADS", "RAYON_NUM_THREADS", "CARGO_BUILD_JOBS")
-        },
+        "native_sha256": {p.name: sha256(p) for p in native},
+        "source_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in source_paths},
         "corpora": corpora,
         "warmups": args.warmups,
         "samples": args.repeats,
         "timed_scope": "Lazy planning/optimization, full collect, plugin validation/preprocessing/refinement and lane Series retrieval. Baseline construction for repair, fixture casts/copies, expression construction, correctness, oracle and output destruction are excluded. Each repair reuses the same original baseline column.",
         "quality_scope": "One logical graph per instance/method/options; grouped workload repeats it four times. No weighting by timing repeats.",
         "diagnostics": "Public Polars Series API exposes no counters or local-optimality status. equity is independently proven from output; all other positive-budget stops are not_exposed. See separate core benchmark.",
-        "comparison_scope": "Public Polars baseline, repair of same baseline, balanced constructor; seed/stage ablations live in the separately timed core benchmark.",
+        "comparison_scope": "Public Polars baseline, repair of same baseline, balanced constructor.",
         "memory": "Not measured; neither buffer capacity nor requested live heap nor RSS is claimed.",
         "runtime_ratio": "candidate median / same-instance baseline median; above 1 means slower",
         "status": "running",

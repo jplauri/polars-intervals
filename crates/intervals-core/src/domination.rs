@@ -1,4 +1,4 @@
-use super::{IntervalError, cover};
+use super::{IntervalError, cover, validate_lengths};
 use std::{cmp::Reverse, collections::BinaryHeap};
 
 /// Select a minimum-cardinality dominating set of half-open intervals.
@@ -145,16 +145,6 @@ pub(crate) struct Reduction<T> {
     // Starts are nondecreasing: mapping reuses the extraction's sorted order.
     pub blocks: Vec<cover::Candidate<usize>>,
     pub empties: Vec<usize>,
-}
-
-pub(crate) fn validate_lengths<T>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch {
-            starts_len: starts.len(),
-            ends_len: ends.len(),
-        });
-    }
-    Ok(())
 }
 
 pub(crate) fn reduce<T: Ord + Copy>(

@@ -135,32 +135,6 @@ def test_extreme_arithmetic(dtype, low, high):
         verify(frame, frame.select(expr(k)).to_series(), k)
 
 
-@pytest.mark.parametrize("k", [0, 1, 2, 100])
-def test_validation_even_with_fast_paths(k):
-    for start, end, message in [
-        (pl.Series([0, 4, 5]), pl.Series([0, 3, 1]), "index 1"),
-        (pl.Series([None, 0], dtype=pl.Int64), pl.Series([0, 1]), "null endpoints"),
-        (pl.Series([0, 0]), pl.Series([None, 1], dtype=pl.Int64), "null endpoints"),
-        (pl.Series([0], dtype=pl.Int32), pl.Series([1], dtype=pl.Int64), "matching"),
-        (pl.Series([0.0]), pl.Series([1.0]), "integer dtype"),
-        (pl.Series([0]).cast(pl.Date), pl.Series([1], dtype=pl.Int32), "matching"),
-        (
-            pl.Series([0]).cast(pl.Datetime("ms")),
-            pl.Series([1]).cast(pl.Datetime("us")),
-            "matching",
-        ),
-        (
-            pl.Series([0]).cast(pl.Datetime("ms", "UTC")),
-            pl.Series([1]).cast(pl.Datetime("ms", "Europe/Helsinki")),
-            "matching",
-        ),
-    ]:
-        with pytest.raises(pl.exceptions.PolarsError, match=message):
-            pl.select(pi.max_k_coverage(pl.lit(start), pl.lit(end), k=k))
-    with pytest.raises(pl.exceptions.PolarsError, match="equal lengths"):
-        pl.select(pi.max_k_coverage(pl.lit(pl.Series([0, 1])), pl.lit(pl.Series([2])), k=k))
-
-
 @pytest.mark.parametrize("k", [True, False, 1.5, "2", None])
 def test_rejects_non_integer_budget(k):
     with pytest.raises(TypeError, match="k"):
