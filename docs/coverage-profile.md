@@ -3,7 +3,7 @@
 [`coverage_profile`](api.md#polars_intervals.coverage_profile) turns intervals
 into new segments describing how much is active at each coordinate. Use it for
 genomic coverage depth, concurrent resource demand, or zero-load periods inside
-an observation horizon. A DataFrame input returns a DataFrame; a LazyFrame input
+an observation horizon. A DataFrame input returns a DataFrame. A LazyFrame input
 returns a LazyFrame that computes the same profile when collected.
 
 ## Coverage depth
@@ -147,8 +147,8 @@ print(query.collect().rows())  # [(2, 4, 10), (4, 7, 6)]
 ```
 
 Constructing this query resolves its schema without computing the profile or
-collecting its input rows. Column/option checks happen during construction;
-row validation and native domain checks happen when the profile executes.
+collecting its input rows. Column and option checks happen during construction.
+Row validation and native domain checks happen when the profile executes.
 `query.collect_schema()` already exposes the exact endpoint/key dtypes and
 Int128 load dtype, including when execution will return no rows.
 
@@ -162,13 +162,13 @@ construction a streaming algorithm with bounded memory.
 Filters, projections and slices after the profile cannot move through it and
 change its input. Filters before it deliberately choose the intervals being
 profiled. As with other lazy operations, Polars may eliminate computation whose
-result is unused, such as a query ending in `.head(0)`; row validation then does
+result is unused, such as a query ending in `.head(0)`. Row validation then does
 not run. An executed profile validates its entire input even for an empty domain
 or when subsequent operations retain only a few segments.
 
-For an eager DataFrame, computation still happens immediately and returns a
-DataFrame. This function returns a frame, so use it directly or with `.pipe()`;
-it is not a column expression for `.with_columns()`.
+For an eager DataFrame, computation happens immediately and returns a DataFrame.
+Call this function directly or with `.pipe()`. It returns a frame, so it cannot
+be used as a column expression in `.with_columns()`.
 
 The core validates in O(n), independently orders positive clipped starts/ends,
 and emits canonical output while merging the two streams. With `m` contributing
@@ -192,5 +192,5 @@ assert again.equals(load)
 
 Do not narrow silently. For example, two overlapping `UInt64::MAX` demands
 produce an exact load of `36893488147419103230`, which cannot be narrowed to
-UInt64. This API constructs only the profile; threshold selection, histograms,
+UInt64. This API constructs only the profile. Threshold selection, histograms,
 integration and scheduling decisions are separate operations.
