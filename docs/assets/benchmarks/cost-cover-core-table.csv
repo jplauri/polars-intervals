@@ -1,11 +1,11 @@
 case,workload_family,workload_order,workload_costs,method,x,median,min,max,samples
-Int64 touching chain,chain,shuffled,random,MCC-A,1000000,188.081,186.5486,188.94709999999998,3
-Int64 touching chain,chain,shuffled,random,MCC-B,1000000,205.3267,201.68609999999998,209.3861,3
-Int64 dense overlap,dense,shuffled,random,MCC-A,1000000,226.49849999999998,224.914,227.6187,3
-Int64 dense overlap,dense,shuffled,random,MCC-B,1000000,389.6285,367.62149999999997,407.4993,3
-Int64 equal starts,equal_starts,shuffled,random,MCC-A,1000000,198.6136,193.10549999999998,208.1411,3
-Int64 equal starts,equal_starts,shuffled,random,MCC-B,1000000,274.1879,273.27709999999996,274.4719,3
-Int64 mostly irrelevant,irrelevant,shuffled,random,MCC-A,1000000,2.0488999999999997,2.0107,2.1698999999999997,3
-Int64 mostly irrelevant,irrelevant,shuffled,random,MCC-B,1000000,2.0385999999999997,2.0112,2.2104,3
-"Date physical width, chain",date32_chain,shuffled,random,MCC-A,1000000,210.87009999999998,176.4757,234.32639999999998,3
-"Date physical width, chain",date32_chain,shuffled,random,MCC-B,1000000,195.9449,189.2869,260.4296,3
+"64-bit endpoints, end-to-end intervals",chain,shuffled,random,MCC-A,1000000,188.081,186.5486,188.94709999999998,3
+"64-bit endpoints, end-to-end intervals",chain,shuffled,random,MCC-B,1000000,205.3267,201.68609999999998,209.3861,3
+"64-bit endpoints, many overlaps",dense,shuffled,random,MCC-A,1000000,226.49849999999998,224.914,227.6187,3
+"64-bit endpoints, many overlaps",dense,shuffled,random,MCC-B,1000000,389.6285,367.62149999999997,407.4993,3
+"64-bit endpoints, same start",equal_starts,shuffled,random,MCC-A,1000000,198.6136,193.10549999999998,208.1411,3
+"64-bit endpoints, same start",equal_starts,shuffled,random,MCC-B,1000000,274.1879,273.27709999999996,274.4719,3
+"64-bit endpoints, mostly outside target",irrelevant,shuffled,random,MCC-A,1000000,2.0488999999999997,2.0107,2.1698999999999997,3
+"64-bit endpoints, mostly outside target",irrelevant,shuffled,random,MCC-B,1000000,2.0385999999999997,2.0112,2.2104,3
+"32-bit endpoints, end-to-end intervals",date32_chain,shuffled,random,MCC-A,1000000,210.87009999999998,176.4757,234.32639999999998,3
+"32-bit endpoints, end-to-end intervals",date32_chain,shuffled,random,MCC-B,1000000,195.9449,189.2869,260.4296,3

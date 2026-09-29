@@ -16,6 +16,41 @@ pip install polars-intervals
 
 Or with uv: `uv add polars-intervals`.
 
+## Algorithms
+
+### Counting and nesting
+
+| Function | Description |
+| --- | --- |
+| [`overlap_count`](https://jplauri.github.io/polars-intervals/usage/#count-overlaps) | Count the other intervals overlapping each interval. |
+| [`containment_count`](https://jplauri.github.io/polars-intervals/usage/#count-containment) | Count the other intervals contained by each interval. |
+| [`nesting_depth`](https://jplauri.github.io/polars-intervals/usage/#nesting-depth) | Length of the longest strict containment chain above each interval. |
+
+### Lane assignment
+
+| Function | Description |
+| --- | --- |
+| [`assign_lanes`](https://jplauri.github.io/polars-intervals/usage/#assign-the-minimum-number-of-lanes) | Assign the fewest lanes with no overlaps within a lane. |
+| [`assign_balanced_lanes`](https://jplauri.github.io/polars-intervals/usage/#balance-lane-row-counts) | Assign the fewest lanes and heuristically balance row counts, optionally improving supplied `initial_lanes`. |
+
+### Weighted selection
+
+| Function | Description |
+| --- | --- |
+| [`max_weight_non_overlapping`](https://jplauri.github.io/polars-intervals/usage/#select-a-globally-maximum-weight-schedule) | Select a non-overlapping subset with maximum total weight. |
+| [`max_weight_clique`](https://jplauri.github.io/polars-intervals/usage/#select-a-maximum-weight-clique) | Select one maximum-weight set of pairwise intersecting intervals. Omitted weights mean units. |
+| [`max_weight_with_capacity`](https://jplauri.github.io/polars-intervals/usage/#select-with-a-simultaneous-capacity) | Maximize total weight under a simultaneous overlap limit. |
+| [`max_weight_with_capacity_profile`](https://jplauri.github.io/polars-intervals/usage/#select-with-a-capacity-profile) | Maximize total weight under a piecewise-constant capacity profile. |
+
+### Coverage and stabbing
+
+| Function | Description |
+| --- | --- |
+| [`max_k_coverage`](https://jplauri.github.io/polars-intervals/usage/#select-maximum-coverage-with-a-budget) | Maximize the total measure covered by at most `k` intervals. |
+| [`minimum_cover`](https://jplauri.github.io/polars-intervals/usage/#cover-one-continuous-target) | Cover a target with the fewest intervals. |
+| [`minimum_cost_cover`](https://jplauri.github.io/polars-intervals/usage/#cover-at-minimum-cost) | Cover a target at minimum total cost. |
+| [`minimum_stabbing_points`](https://jplauri.github.io/polars-intervals/usage/#minimum-stabbing-points) | Find the fewest points that hit every interval. |
+
 ## Examples
 
 ### Count overlaps
@@ -122,23 +157,6 @@ selected = df.filter(
 
 print(selected.rows())  # [(0, 6), (6, 10)]
 ```
-
-## Algorithms
-
-| Function | Description |
-| --- | --- |
-| [`overlap_count`](https://jplauri.github.io/polars-intervals/usage/#count-overlaps) | Count the other intervals overlapping each interval. |
-| [`containment_count`](https://jplauri.github.io/polars-intervals/usage/#count-containment) | Count the other intervals contained by each interval. |
-| [`nesting_depth`](https://jplauri.github.io/polars-intervals/usage/#nesting-depth) | Length of the longest strict containment chain above each interval. |
-| [`assign_lanes`](https://jplauri.github.io/polars-intervals/usage/#assign-the-minimum-number-of-lanes) | Assign the fewest lanes with no overlaps within a lane. |
-| [`assign_balanced_lanes`](https://jplauri.github.io/polars-intervals/usage/#balance-lane-row-counts) | Assign the fewest lanes and heuristically balance row counts, optionally improving supplied `initial_lanes`. |
-| [`max_weight_non_overlapping`](https://jplauri.github.io/polars-intervals/usage/#select-a-globally-maximum-weight-schedule) | Select a non-overlapping subset with maximum total weight. |
-| [`max_weight_clique`](https://jplauri.github.io/polars-intervals/usage/#select-a-maximum-weight-clique) | Select one maximum-weight set of pairwise intersecting intervals; omitted weights mean units. |
-| [`max_weight_with_capacity`](https://jplauri.github.io/polars-intervals/usage/#select-with-a-simultaneous-capacity) | Maximize total weight under a simultaneous overlap limit. |
-| [`max_weight_with_capacity_profile`](https://jplauri.github.io/polars-intervals/usage/#select-with-a-capacity-profile) | Maximize total weight under a piecewise-constant capacity profile. |
-| [`minimum_cover`](https://jplauri.github.io/polars-intervals/usage/#cover-one-continuous-target) | Cover a target with the fewest intervals. |
-| [`minimum_cost_cover`](https://jplauri.github.io/polars-intervals/usage/#cover-at-minimum-cost) | Cover a target at minimum total cost. |
-| [`minimum_stabbing_points`](https://jplauri.github.io/polars-intervals/usage/#minimum-stabbing-points) | Find the fewest points that hit every interval. |
 
 ## Contributing
 

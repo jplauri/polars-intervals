@@ -1,9 +1,9 @@
 case,workload_scenario,workload_groups,workload_dtype,workload_window,method,x,median,min,max,samples
-"Duplicates, global Int64",duplicates,1,Int64,false,plugin,3000000,65.3444,63.7353,68.6953,5
-"Duplicates, global Int64",duplicates,1,Int64,false,rank_runs,3000000,146.4669,131.9365,158.0583,5
-"Sparse, global Int64",sparse,1,Int64,false,plugin,3000000,1089.3406,1070.1125,1242.3214,5
-"Sparse, global Int64",sparse,1,Int64,false,rank_runs,3000000,2012.463,2003.2516,2023.1192,5
-"Mixed, global Int64",mixed,1,Int64,false,plugin,3000000,362.6069,351.9367,403.9675,5
-"Mixed, global Int64",mixed,1,Int64,false,rank_runs,3000000,458.6555,446.6817,481.5702,5
-"Sparse, 1,000 groups, Int64",sparse,1000,Int64,true,plugin,10000,8.7579,8.6439,9.7024,5
-"Sparse, 1,000 groups, Int64",sparse,1000,Int64,true,rank_runs,10000,6.7545,6.2674,7.4748,5
+"Repeated intervals, no grouping",duplicates,1,Int64,false,plugin,3000000,65.3444,63.7353,68.6953,5
+"Repeated intervals, no grouping",duplicates,1,Int64,false,rank_runs,3000000,146.4669,131.9365,158.0583,5
+"Few containments, no grouping",sparse,1,Int64,false,plugin,3000000,1089.3406,1070.1125,1242.3214,5
+"Few containments, no grouping",sparse,1,Int64,false,rank_runs,3000000,2012.463,2003.2516,2023.1192,5
+"Mixed intervals, no grouping",mixed,1,Int64,false,plugin,3000000,362.6069,351.9367,403.9675,5
+"Mixed intervals, no grouping",mixed,1,Int64,false,rank_runs,3000000,458.6555,446.6817,481.5702,5
+"Few containments, 1,000 groups",sparse,1000,Int64,true,plugin,10000,8.7579,8.6439,9.7024,5
+"Few containments, 1,000 groups",sparse,1000,Int64,true,rank_runs,10000,6.7545,6.2674,7.4748,5
