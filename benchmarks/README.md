@@ -28,8 +28,12 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
-They time production only; candidate comparisons in saved runs are reproducible
-from the revision recorded in each run's metadata.
+They time production only. Removed candidates and runners are preserved in the
+[pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
+Historical metadata may reference a base revision with uncommitted feature
+changes. Consult each run's source hashes and cleanup notes for differences
+between the snapshot and the measured sources; see the
+[provenance guidance](../docs/benchmarking.md#measurement-rules).
 
 The maximum-weight clique runner is `cargo bench -p intervals-core --bench
 max_weight_clique --locked`. It times the production functions, including
