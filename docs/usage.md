@@ -45,12 +45,12 @@ Start and end columns must have equal lengths, contain no nulls, and satisfy
 Inputs are not cast, filled, or broadcast automatically. Cast mismatched
 columns explicitly to a type that can hold every endpoint. Floating-point,
 `Time`, and `Duration` endpoints are unsupported. These rules also apply to
-empty inputs: give empty columns a supported dtype.
+empty inputs: give empty columns a supported dtype. Weight, cost, and
+capacity-profile columns must likewise be non-null signed or unsigned integers
+up to 64 bits, with one value per row.
 
-Empty intervals are valid inputs for most operations, but their role depends
-on the question. They overlap nothing and use no scheduling capacity;
-containment compares their endpoints, and stabbing points cannot hit them.
-Each algorithm below explains its empty-interval behavior.
+Empty intervals overlap nothing and use no capacity. Each operation below
+notes any other empty-interval behavior.
 
 ### Column names, expressions, and results
 
@@ -66,17 +66,14 @@ lazy query. You do not need to sort the input first.
 | Points that hit all intervals | `select(pi.minimum_stabbing_points(...))` | One list of coordinates |
 
 Per-row results contain no nulls and stay aligned with the original rows.
-Selection masks choose one optimal solution; when several solutions tie,
-the particular rows chosen are not guaranteed across releases or row
-permutations.
+Selection masks choose one optimal solution. When several solutions tie, the
+particular rows chosen may change across releases or row permutations.
 
 Two functions take frames directly. The
 [capacity-profile selector](#select-with-a-capacity-profile) takes eager
-DataFrames and returns a Boolean Series; collect its inputs explicitly.
-[`coverage_profile`](coverage-profile.md) accepts either a DataFrame or a
-LazyFrame and returns the corresponding frame type, with new segments describing
-coverage depth or resource load. It supports groups and zero-load gaps. Lazy
-queries defer its whole-collection native solve until execution.
+DataFrames and returns a Boolean Series, so collect lazy inputs first.
+[`coverage_profile`](coverage-profile.md) accepts a DataFrame or LazyFrame and
+returns segments of coverage depth or resource load in the same frame type.
 
 ### Count within groups
 
@@ -165,7 +162,7 @@ contained intervals, or levels in a nested collection.
 
 `overlap_count` answers: how many other intervals overlap this row? The
 [first example](#a-first-example) shows the basic query. Each count excludes
-the row itself; duplicate nonempty rows count one another.
+the row itself.
 
 | Input intervals | Overlap counts |
 | --- | --- |
@@ -209,7 +206,7 @@ These endpoint comparisons also apply to duplicates and empty intervals:
 ### Nesting depth
 
 `nesting_depth` measures the longest chain of strict containers **above** each
-row. Outermost intervals have depth zero; each containment step adds one:
+row. Outermost intervals have depth zero, and each containment step adds one:
 
 ```python
 intervals = pl.DataFrame({"start": [0, 2, 2, 3], "end": [10, 8, 8, 7]})
@@ -228,8 +225,7 @@ and `[2, 10)` both contain `[4, 5)`, but neither contains the other. The small
 interval has two containers and depth **1**.
 
 Empty intervals also follow the endpoint comparisons: `[0, 5)` strictly
-contains `[5, 5)`, giving depths `0, 1`. Two identical `[3, 3)` rows both have
-depth zero.
+contains `[5, 5)`, giving depths `0, 1`.
 
 [API reference](api.md#polars_intervals.nesting_depth) |
 [Benchmarks and algorithm notes](nesting-depth-benchmarks.md)
@@ -252,10 +248,7 @@ print(result["lane"].to_list())  # [0, 1, 0]
 
 The first and last appointments touch, so they share a lane. Lane IDs start
 at zero. Their particular numbering may change with input order or across
-releases.
-
-Empty intervals use no capacity and receive lane `0`. An input containing
-only empty intervals uses one lane; an input with no rows uses none.
+releases. Empty intervals receive lane `0`.
 
 [API reference](api.md#polars_intervals.assign_lanes) |
 [Benchmarks](assign-lanes-benchmarks.md)
@@ -274,15 +267,13 @@ result = (
 print(sorted(result["lane"].value_counts()["count"].to_list()))  # [3, 3]
 ```
 
-The two nonempty intervals require two lanes. The four empty rows can go in
-either lane because they conflict with nothing. Unlike `assign_lanes`, this
-function may put empty rows in any existing lane.
+The two nonempty intervals require two lanes. Unlike `assign_lanes`, which
+puts empty rows in lane `0`, this function may spread them across lanes.
 
 Balancing first minimizes the difference between the largest and smallest
-lane row counts, then the sum of squared row counts. It does not balance
-occupied duration. The minimum lane count and absence of conflicts are
-guaranteed; the best possible balance is not. The result never worsens this
-balance score relative to `assign_lanes`, or to a supplied assignment.
+lane row counts, then the sum of squared row counts. It is a heuristic: the
+best possible balance is not guaranteed, but the result never scores worse
+than `assign_lanes` or a supplied assignment.
 
 To improve an existing assignment, pass its column as `initial_lanes`:
 
@@ -298,10 +289,8 @@ integer IDs with a contiguous palette `0..k-1` and no overlaps within a lane.
 An invalid assignment raises an error. With groups, it must be valid and
 minimum within each group.
 
-`max_work` limits refinement work, not elapsed time; its default is `100_000`.
-Validation and initial construction are outside that budget. At zero, supplied
-IDs are returned unchanged after validation, or a baseline assignment is
-constructed if none was supplied. You can pass a result back as `initial_lanes`
+`max_work` (default `100_000`) limits refinement work, not elapsed time.
+`max_work=0` skips refinement. You can pass a result back as `initial_lanes`
 to refine it further.
 
 [API reference](api.md#polars_intervals.assign_balanced_lanes) |
@@ -313,14 +302,14 @@ Use these operations when you can choose a subset of the input rows. A weight
 represents the value of selecting a row, such as revenue or priority. The
 result maximizes the sum of selected weights under the chosen constraint.
 
-Weights must be non-null signed or unsigned 8-, 16-, 32-, or 64-bit integer
-columns or expressions of matching length. They are not cast or broadcast.
-Zero- and negative-weight rows are omitted; selecting nothing is allowed.
+Rows with zero or negative weight are never selected, and selecting nothing
+is allowed.
 All input rows are still validated, including those with nonpositive weights.
 
 The first three algorithms select schedules, progressing from one available
-slot to capacity that changes over time. The final algorithm selects a set
-of mutually overlapping intervals.
+slot to capacity that changes over time. Because empty intervals use no
+capacity, they are always selected when their weight is positive. The final
+algorithm selects a set of mutually overlapping intervals.
 
 ### Select a globally maximum-weight schedule
 
@@ -342,8 +331,6 @@ print(chosen["revenue"].sum())  # 30
 ```
 
 The three shorter jobs earn 30 together, compared with 15 for the long job.
-Touching jobs can run consecutively. Positive-weight empty intervals are
-always selected because they conflict with nothing.
 
 [API reference](api.md#polars_intervals.max_weight_non_overlapping) |
 [Benchmarks](weighted-scheduling-benchmarks.md)
@@ -364,11 +351,8 @@ print(chosen["revenue"].sum())  # 45
 ```
 
 With two slots, the long job can run alongside all three short jobs. Capacity
-one gives the same optimum value as `max_weight_non_overlapping`.
-
-`capacity` is a nonnegative Python integer, excluding Boolean values.
-Positive-weight empty intervals are always selected and use no capacity,
-even at capacity zero.
+one gives the same optimum value as `max_weight_non_overlapping`. `capacity`
+must be a nonnegative integer.
 
 [API reference](api.md#polars_intervals.max_weight_with_capacity) |
 [Benchmarks](capacity-scheduling-benchmarks.md)
@@ -394,10 +378,9 @@ The integer endpoints represent hours. Capacity is three from 9 to 12, one
 from 12 to 14, and four from 14 to 18. The jobs worth 100 and 130 both cross
 the noon bottleneck, so only one can be selected. The chosen jobs earn 280.
 
-This function takes eager DataFrames and returns a Boolean Series named
-`selected`, aligned with the original job rows. The two tables can have
-different row counts. All four endpoint columns must have exactly the same
-supported dtype; matching Date or Datetime columns also work.
+The returned Series is named `selected` and aligned with the job rows. The two
+tables can have different row counts, but all four endpoint columns must share
+one dtype.
 
 Profile segments use the same half-open convention as jobs:
 
@@ -405,10 +388,7 @@ Profile segments use the same half-open convention as jobs:
   even if their capacities agree.
 - Gaps and times outside the profile have zero capacity. A nonempty job
   crossing such a region cannot be selected.
-- Capacities must be non-null, nonnegative integers up to 64 bits. Valid
-  zero-length profile segments have no effect.
-- Positive-weight empty jobs are always selected, including outside the
-  profile, because they consume no capacity.
+- Capacities must be nonnegative. Zero-length profile segments have no effect.
 
 Use `start`, `end`, `weight`, `profile_start`, `profile_end`, and `capacity`
 to choose other column names. If the profile columns already live in `jobs`,
@@ -432,7 +412,7 @@ selected = pi.max_weight_with_capacity_profile(
 print(selected.to_list())  # [False, True, True]
 ```
 
-Job and profile rows still describe independent interval sets; they are not
+Job and profile rows still describe independent interval sets. They are not
 paired by row. A profile constant at `k` across the job horizon gives the
 same optimum value as `max_weight_with_capacity(..., capacity=k)`.
 
@@ -455,14 +435,13 @@ print(most_value["start"].to_list())  # [10]
 ```
 
 The first three rows form the largest clique, but the last row alone has
-greater weight. Omitting `weight` or passing `None` gives every row weight
-one, even if a column named `weight` exists. Explicit weights maximize only
-total weight; there is no secondary preference for more rows.
+greater weight. The default `weight=None` never reads a column named `weight`.
+Explicit weights maximize only total weight, with no secondary preference for
+more rows.
 
 Duplicate nonempty rows are distinct members and their weights add. An empty
-interval is an isolated member: it can be selected alone, but cannot join any
-other row, even another empty interval at the same coordinate. With default
-unit weights, a nonempty collection of empty intervals therefore selects one row.
+interval can only be selected alone: it overlaps nothing, not even another
+empty interval at the same coordinate.
 
 [API reference](api.md#polars_intervals.max_weight_clique) |
 [Benchmarks and correctness notes](clique-benchmarks.md)
@@ -491,10 +470,7 @@ print(chosen.rows())  # [(0, 6), (6, 10)]
 The target is half-open, just like the input intervals. Touching intervals
 can form a continuous cover, and selected intervals may extend beyond the
 target. Empty input intervals are never selected. An empty target selects
-nothing; a target that cannot be fully covered raises an error.
-
-With `.over("group")`, each group must cover the same target independently.
-An infeasible group raises an error.
+nothing. A target that cannot be fully covered, in any group, raises an error.
 
 [API reference](api.md#polars_intervals.minimum_cover) |
 [Benchmarks](covering-benchmarks.md)
@@ -517,9 +493,8 @@ print(chosen["cost"].sum())  # 20
 ```
 
 The two shorter intervals cost 20 together, compared with 100 for the single
-full-length interval. Costs must be non-null, nonnegative signed or unsigned
-integers up to 64 bits, with one value per input row. Zero costs are allowed.
-Target, empty-interval, and grouping rules are the same as for `minimum_cover`.
+full-length interval. Costs must be zero or positive. Target,
+empty-interval, and grouping rules are the same as for `minimum_cover`.
 
 [API reference](api.md#polars_intervals.minimum_cost_cover) |
 [Benchmarks](cost-covering-benchmarks.md)
@@ -557,10 +532,9 @@ The selected intervals cover 18 units. Choosing the longest interval `[0, 10)`
 first would leave either two-interval combination covering only 15 units.
 The function finds an exact optimum.
 
-`k` is a nonnegative Python integer, excluding Boolean values. Among equally
-good coverage solutions, the function selects the fewest rows. Empty intervals
-are never selected, `k=0` selects nothing, and a large budget still omits
-redundant rows. With `.over("group")`, each group gets the same budget.
+`k` must be a nonnegative integer. Among equally good solutions, the function
+selects the fewest rows, so a large budget still omits redundant ones. Empty
+intervals are never selected.
 
 Coverage uses exact physical distance: integer units, days for `Date`, and
 the column's `ms`/`us`/`ns` ticks for `Datetime`, including across timezone
@@ -609,9 +583,8 @@ print(grouped.rows())  # [('a', [3]), ('b', [8])]
 ## Choose representative intervals
 
 Use representatives when every input interval needs to be selected or overlap
-a selected interval. The selected intervals may overlap or be disjoint. This
-represents the input rows; it does not require every coordinate in a continuous
-target to be covered.
+a selected interval. The selected intervals may overlap or be disjoint.
+Unlike covering, there is no continuous target to fill.
 
 ### Select a minimum-cost dominating set
 
@@ -634,19 +607,10 @@ The middle interval overlaps both neighbors and represents itself, so one
 row suffices. With explicit prices, selecting both outer intervals costs 2,
 compared with 10 for the middle row.
 
-Omitting `cost` or passing `None` assigns unit costs, even if a column named
-`cost` exists. Explicit costs must be non-null, nonnegative signed or unsigned
-integers up to 64 bits, with one value per row. Zero costs are valid. Among
-equal-cost solutions, the function selects the fewest rows.
-
-Touching intervals do not overlap. Every empty interval must be selected
-because it overlaps nothing, including duplicate empty rows and zero-cost
-empty rows. Duplicate nonempty intervals can share a representative. Empty
-input returns an empty mask; a nonempty input always selects at least one row.
-
-Use `.over("group")` to choose representatives separately within each group.
-Filtering before selection changes both the rows that need representatives
-and the rows available to represent them.
+The default `cost=None` never reads a column named `cost`. Explicit costs must
+be zero or positive. Among equal-cost solutions, the function
+selects the fewest rows. Every empty interval is selected, since nothing else
+can represent it.
 
 [API reference](api.md#polars_intervals.minimum_cost_dominating_set) |
 [Benchmarks and correctness notes](domination-benchmarks.md)
