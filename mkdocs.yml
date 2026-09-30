@@ -44,9 +44,10 @@ theme:
         name: Switch to light mode
 nav:
   - Getting started: index.md
-  - Usage: usage.md
-  - Coverage and load profiles: coverage-profile.md
-  - Clustering, union, and gaps: interval-geometry.md
+  - Usage:
+      - Overview: usage.md
+      - Coverage and load profiles: coverage-profile.md
+      - Clustering, union, and gaps: interval-geometry.md
   - API reference: api.md
   - Benchmarks:
       - Overview: benchmarks.md

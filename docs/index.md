@@ -43,8 +43,7 @@ Intervals include their start and exclude their end, so touching intervals do no
 
 ## Next steps
 
-- [Usage](usage.md): examples for each operation.
+- [Usage](usage.md): input rules and examples for each operation.
 - [API reference](api.md): parameters, return types, and input requirements.
-- [Clustering, union, and gaps](interval-geometry.md): connected records and exact geometry.
 - [Benchmarks](benchmarks.md): comparisons and plots.
 - [Contributing](contributing.md): source builds and development.
