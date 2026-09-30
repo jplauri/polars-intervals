@@ -39,6 +39,15 @@ impl TargetValue {
     }
 }
 
+pub(crate) fn physical_domain(
+    domain: Option<(TargetValue, TargetValue)>,
+    dtype: &DataType,
+) -> PolarsResult<Option<(i128, i128)>> {
+    domain
+        .map(|(left, right)| Ok((left.physical(dtype)?, right.physical(dtype)?)))
+        .transpose()
+}
+
 #[derive(serde::Deserialize)]
 struct CoverOptions {
     target_start: TargetValue,

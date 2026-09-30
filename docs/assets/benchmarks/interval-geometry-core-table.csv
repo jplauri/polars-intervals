@@ -1,0 +1,21 @@
+case,workload_dtype,workload_family,workload_order,workload_domain,workload_seed,workload_operation,workload_include_touching,method,x,median,min,max,samples
+Strict clusters: sorted disjoint,i64,disjoint,start,full,7,cluster,false,indices_sorted,1000000,13.9376,13.662799999999999,14.1862,5
+Strict clusters: sorted disjoint,i64,disjoint,start,full,7,cluster,false,packed_sorted,1000000,20.8848,20.462799999999998,21.6496,5
+Strict clusters: sorted disjoint,i64,disjoint,start,full,7,cluster,false,production,1000000,3.6601,3.5191,4.0034,5
+Strict clusters: shuffled disjoint,i64,disjoint,shuffled,full,7,cluster,false,indices_sorted,1000000,69.3142,66.932,69.6849,5
+Strict clusters: shuffled disjoint,i64,disjoint,shuffled,full,7,cluster,false,packed_sorted,1000000,57.775999999999996,57.2741,62.018699999999995,5
+Strict clusters: shuffled disjoint,i64,disjoint,shuffled,full,7,cluster,false,production,1000000,53.415099999999995,52.3337,54.303799999999995,5
+Strict clusters: partly ordered spanning rows,i64,spanning,partial,full,7,cluster,false,indices_sorted,1000000,31.4346,31.2212,31.9101,5
+Strict clusters: partly ordered spanning rows,i64,spanning,partial,full,7,cluster,false,packed_sorted,1000000,43.451299999999996,42.836999999999996,44.8536,5
+Strict clusters: partly ordered spanning rows,i64,spanning,partial,full,7,cluster,false,production,1000000,38.1184,37.7014,39.8893,5
+Union: sorted nested,i64,nested,start,full,7,merge,false,indices_sorted,1000000,8.7622,8.7256,8.98,5
+Union: sorted nested,i64,nested,start,full,7,merge,false,packed_sorted,1000000,11.5428,11.197799999999999,11.724499999999999,5
+Union: sorted nested,i64,nested,start,full,7,merge,false,production,1000000,3.9067,3.746,3.9703,5
+Gaps: sorted nested,i64,nested,start,full,7,gaps,false,indices_sorted,1000000,7.7695,7.3468,8.3492,5
+Gaps: sorted nested,i64,nested,start,full,7,gaps,false,materialized,1000000,11.538,11.438799999999999,11.7258,5
+Gaps: sorted nested,i64,nested,start,full,7,gaps,false,packed_sorted,1000000,10.4824,9.803899999999999,10.9465,5
+Gaps: sorted nested,i64,nested,start,full,7,gaps,false,production,1000000,3.0454999999999997,2.5938,3.2866999999999997,5
+Gaps: shuffled disjoint,i64,disjoint,shuffled,full,7,gaps,false,indices_sorted,1000000,65.5647,64.7357,69.30919999999999,5
+Gaps: shuffled disjoint,i64,disjoint,shuffled,full,7,gaps,false,materialized,1000000,45.8089,45.5989,47.3382,5
+Gaps: shuffled disjoint,i64,disjoint,shuffled,full,7,gaps,false,packed_sorted,1000000,38.3929,38.0907,38.5878,5
+Gaps: shuffled disjoint,i64,disjoint,shuffled,full,7,gaps,false,production,1000000,38.623,38.2634,39.8816,5

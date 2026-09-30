@@ -1,10 +1,12 @@
 """Run provenance shared by the benchmark runners: environment and file hashes."""
 
+import ctypes
 import hashlib
 import os
 import platform
 import subprocess
 import sys
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -22,6 +24,58 @@ def command(*args):
         return subprocess.check_output(args, cwd=ROOT, text=True, stderr=subprocess.STDOUT).strip()
     except (OSError, subprocess.CalledProcessError) as error:
         return f"unavailable: {error}"
+
+
+def verify_release(native, release=None):
+    """Return the matching release library and its source inputs, or fail."""
+    release = release or next(
+        (
+            ROOT / "target/release" / name
+            for name in (
+                "polars_intervals.dll",
+                "libpolars_intervals.so",
+                "libpolars_intervals.dylib",
+            )
+            if (ROOT / "target/release" / name).is_file()
+        ),
+        None,
+    )
+    if release is None or not release.is_file() or sha256(native) != sha256(release):
+        raise ValueError("Installed plugin must match the fresh Cargo release library")
+    inputs = [
+        *ROOT.glob("crates/*/src/**/*.rs"),
+        *ROOT.glob("crates/*/Cargo.toml"),
+        *(ROOT / name for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml")),
+    ]
+    if any(path.stat().st_mtime_ns > release.stat().st_mtime_ns for path in inputs):
+        raise ValueError("Rust inputs are newer than the release library; rebuild release first")
+    return release, inputs
+
+
+def build_environment():
+    return {
+        name: os.environ.get(name)
+        for name in (
+            "RUSTFLAGS",
+            "CARGO_ENCODED_RUSTFLAGS",
+            "CARGO_PROFILE_RELEASE_OPT_LEVEL",
+            "CARGO_PROFILE_RELEASE_LTO",
+            "CARGO_PROFILE_RELEASE_CODEGEN_UNITS",
+        )
+    }
+
+
+def archive_sources(archive, paths):
+    """Create a source archive without overwriting an existing measurement."""
+    with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED) as saved:
+        for path in dict.fromkeys(ROOT / path for path in paths):
+            saved.write(path, path.relative_to(ROOT))
+    return {"source_archive": archive.name, "source_archive_sha256": sha256(archive)}
+
+
+def source_changes(hashes):
+    changed = [path for path, digest in hashes.items() if sha256(ROOT / path) != digest]
+    return {"sources_unchanged_during_run": not changed, "changed_sources_during_run": changed}
 
 
 def environment():
@@ -45,4 +99,48 @@ def environment():
         "rustc": command("rustc", "-Vv"),
         "revision": command("git", "rev-parse", "HEAD"),
         "git_status": command("git", "status", "--porcelain"),
+    }
+
+
+def resident_memory() -> dict:
+    """OS process high-water mark; no sampling thread and no extra dependency."""
+    if sys.platform == "win32":
+        from ctypes import wintypes
+
+        class Counters(ctypes.Structure):
+            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD)] + [
+                (name, ctypes.c_size_t)
+                for name in (
+                    "PeakWorkingSetSize",
+                    "WorkingSetSize",
+                    "QuotaPeakPagedPoolUsage",
+                    "QuotaPagedPoolUsage",
+                    "QuotaPeakNonPagedPoolUsage",
+                    "QuotaNonPagedPoolUsage",
+                    "PagefileUsage",
+                    "PeakPagefileUsage",
+                )
+            ]
+
+        counters = Counters()
+        counters.cb = ctypes.sizeof(counters)
+        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel.GetCurrentProcess.restype = wintypes.HANDLE
+        psapi = ctypes.WinDLL("psapi", use_last_error=True)
+        psapi.GetProcessMemoryInfo.argtypes = [
+            wintypes.HANDLE,
+            ctypes.POINTER(Counters),
+            wintypes.DWORD,
+        ]
+        if not psapi.GetProcessMemoryInfo(
+            kernel.GetCurrentProcess(), ctypes.byref(counters), counters.cb
+        ):
+            raise ctypes.WinError(ctypes.get_last_error())
+        return {"rss_bytes": counters.WorkingSetSize, "peak_rss_bytes": counters.PeakWorkingSetSize}
+    import resource
+
+    scale = 1 if sys.platform == "darwin" else 1024
+    return {
+        "rss_bytes": None,
+        "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * scale,
     }

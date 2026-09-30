@@ -58,3 +58,7 @@ harness = false
 [[bench]]
 name = "coverage_profile"
 harness = false
+
+[[bench]]
+name = "geometry"
+harness = false

@@ -1,0 +1,13 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_domain,workload_payload,workload_source,workload_seed,workload_operation,workload_scope,method,x,median,min,max,samples
+Strict clusters: ordered overlapping chain,sequencing,start,i64,0,1,extended,0,memory,7,cluster_strict,lazy_complete,native,1000000,65.23729999999999,64.8973,79.38239999999999,5
+Strict clusters: ordered overlapping chain,sequencing,start,i64,0,1,extended,0,memory,7,cluster_strict,lazy_complete,production,1000000,4.753,4.281,5.0123999999999995,5
+Strict clusters: shuffled overlapping chain,sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,lazy_complete,native,1000000,310.7869,306.7076,325.47729999999996,5
+Strict clusters: shuffled overlapping chain,sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,lazy_complete,production,1000000,44.6935,44.1811,46.1887,5
+Union: sorted nested intervals,nested,start,i64,0,1,partial,0,memory,7,merge,lazy_complete,native,1000000,45.248999999999995,44.400099999999995,45.631099999999996,5
+Union: sorted nested intervals,nested,start,i64,0,1,partial,0,memory,7,merge,lazy_complete,production,1000000,5.2216,4.9916,5.5438,5
+Gaps: shuffled separate UInt64 intervals,disjoint,shuffled,u64,0,1,extended,0,memory,7,gaps,lazy_complete,native,1000000,701.2003,682.0323,713.5957,5
+Gaps: shuffled separate UInt64 intervals,disjoint,shuffled,u64,0,1,extended,0,memory,7,gaps,lazy_complete,production,1000000,44.0863,41.6969,45.1714,5
+"Union: 1,000 timestamp groups",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,merge,lazy_complete,native,1000000,259.2414,246.79659999999998,278.0766,5
+"Union: 1,000 timestamp groups",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,merge,lazy_complete,production,1000000,58.2911,55.983799999999995,61.5819,5
+"Gaps: 8 groups, narrow domain",booking,shuffled,i64,8,7,partial,0,memory,7,gaps,lazy_complete,native,1000000,114.6107,111.56599999999999,121.63119999999999,5
+"Gaps: 8 groups, narrow domain",booking,shuffled,i64,8,7,partial,0,memory,7,gaps,lazy_complete,production,1000000,31.770899999999997,31.6943,34.2354,5

@@ -3,16 +3,20 @@
 import argparse
 import csv
 import json
-import zipfile
 from pathlib import Path
 from time import perf_counter_ns
 
 import polars as pl
 import polars_intervals as pi
-from coverage_profile_native import native_profile
 from polars.testing import assert_frame_equal
 from polars_intervals import _internal
-from provenance import ROOT, environment, sha256
+
+if __package__:
+    from .coverage_profile_native import native_profile
+    from .provenance import ROOT, archive_sources, environment, sha256, verify_release
+else:
+    from coverage_profile_native import native_profile
+    from provenance import ROOT, archive_sources, environment, sha256, verify_release
 
 # family, order, dtype, groups (0=ungrouped), chunks, load, domain, include_zero
 CASES = [
@@ -174,23 +178,10 @@ def main():
     if min(args.sizes) < 0 or args.samples < 1 or args.warmups < 1:
         parser.error("Need nonnegative sizes and positive samples/warmups")
     native = Path(_internal.__file__)
-    release = next(
-        (
-            ROOT / "target/release" / f
-            for f in ("polars_intervals.dll", "libpolars_intervals.so", "libpolars_intervals.dylib")
-            if (ROOT / "target/release" / f).exists()
-        ),
-        None,
-    )
-    if release is None or sha256(native) != sha256(release):
-        parser.error("Installed plugin must match the fresh Cargo release library")
-    inputs = [
-        *[path for crate in (ROOT / "crates").iterdir() for path in (crate / "src").rglob("*.rs")],
-        *ROOT.glob("crates/*/Cargo.toml"),
-        ROOT / "Cargo.lock",
-    ]
-    if any(p.stat().st_mtime_ns > release.stat().st_mtime_ns for p in inputs):
-        parser.error("Rust source is newer than the release build")
+    try:
+        release, inputs = verify_release(native)
+    except ValueError as error:
+        parser.error(str(error))
     csv_path, metadata_path = (
         args.output.with_suffix(".csv"),
         args.output.with_suffix(".metadata.json"),
@@ -230,18 +221,19 @@ def main():
         "status": "running",
     }
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    with zipfile.ZipFile(archive_path, "x", compression=zipfile.ZIP_DEFLATED) as archive:
-        for path in [
-            *metadata["source_sha256"],
-            "Cargo.toml",
-            "rust-toolchain.toml",
-            "uv.lock",
-            "pyproject.toml",
-            "benchmarks/provenance.py",
-        ]:
-            archive.write(ROOT / path, path)
-    metadata["source_archive"] = archive_path.name
-    metadata["source_archive_sha256"] = sha256(archive_path)
+    metadata.update(
+        archive_sources(
+            archive_path,
+            [
+                *metadata["source_sha256"],
+                "Cargo.toml",
+                "rust-toolchain.toml",
+                "uv.lock",
+                "pyproject.toml",
+                "benchmarks/provenance.py",
+            ],
+        )
+    )
     with csv_path.open("w", newline="", encoding="utf-8") as out:
         writer = csv.writer(out)
         writer.writerow(

@@ -17,7 +17,24 @@ fn zeros(starts: &Series) -> Series {
 }
 
 // Fast-path settings (k=0, capacity=0, max_work=0) must validate like the rest.
-const ADAPTERS: [(&str, Adapter); 17] = [
+const ADAPTERS: [(&str, Adapter); 21] = [
+    ("cluster_strict", |s, e| cluster_intervals(s, e, false)),
+    ("cluster_touching", |s, e| cluster_intervals(s, e, true)),
+    ("merge_intervals", |s, e| {
+        merge_intervals(s, e, &[]).map(|frame| frame["start"].as_materialized_series().clone())
+    }),
+    ("interval_gaps_empty_domain", |s, e| {
+        let bound = if endpoint_dtypes().contains(s.dtype()) {
+            Scalar::new(
+                s.dtype().clone(),
+                typed_series(&[0], s.dtype()).get(0)?.into_static(),
+            )
+        } else {
+            Scalar::from(0i64)
+        };
+        interval_gaps(s, e, &[], &bound, &bound)
+            .map(|frame| frame["start"].as_materialized_series().clone())
+    }),
     ("coverage_profile_units", |s, e| {
         coverage_profile(s, e, None, &[], None, false)
             .map(|frame| frame["load"].as_materialized_series().clone())

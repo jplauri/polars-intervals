@@ -10,10 +10,17 @@ import json
 import os
 import platform
 import subprocess
-import zipfile
 from pathlib import Path
 
-from provenance import ROOT, command, environment, sha256
+from provenance import (
+    ROOT,
+    archive_sources,
+    build_environment,
+    command,
+    environment,
+    sha256,
+    source_changes,
+)
 
 
 def main():
@@ -84,16 +91,7 @@ def main():
     metadata = {
         **environment(),
         "cargo_version": command("cargo", "--version"),
-        "build_environment": {
-            name: os.environ.get(name)
-            for name in (
-                "RUSTFLAGS",
-                "CARGO_ENCODED_RUSTFLAGS",
-                "CARGO_PROFILE_RELEASE_OPT_LEVEL",
-                "CARGO_PROFILE_RELEASE_LTO",
-                "CARGO_PROFILE_RELEASE_CODEGEN_UNITS",
-            )
-        },
+        "build_environment": build_environment(),
         "cargo_command": invocation,
         "settings": settings,
         "scope": (
@@ -145,9 +143,7 @@ def main():
         metadata["cpu_name"] = command(
             "powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_Processor).Name"
         )
-    with zipfile.ZipFile(archive_path, "x", compression=zipfile.ZIP_DEFLATED) as archive:
-        for path in paths:
-            archive.write(ROOT / path, path)
+    metadata.update(archive_sources(archive_path, paths))
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     result = subprocess.run(invocation, cwd=ROOT, env={**os.environ, **settings}, check=False)
     metadata["returncode"] = result.returncode
@@ -157,12 +153,7 @@ def main():
             if next(raw, None) is None:
                 metadata["returncode"] = 1
                 metadata["error"] = "No samples emitted; check the selected cases and sizes"
-    metadata["source_archive_sha256"] = sha256(archive_path)
-    changed = [
-        path for path, digest in metadata["source_sha256"].items() if sha256(ROOT / path) != digest
-    ]
-    metadata["sources_unchanged_during_run"] = not changed
-    metadata["changed_sources_during_run"] = changed
+    metadata.update(source_changes(metadata["source_sha256"]))
     if output.exists():
         metadata["raw_sha256"] = sha256(output)
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")

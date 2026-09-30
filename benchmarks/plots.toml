@@ -1,5 +1,92 @@
 # Paths are relative to the repository root. Each source is exactly one run.
 # List every independent workload dimension so every table case must explicitly fix it.
+[sources.interval_geometry_polars]
+path = "benchmarks/results/interval-geometry-polars-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "domain", "payload", "source", "seed", "operation", "scope"]
+
+[[tables]]
+id = "interval-geometry-polars-table"
+source = "interval_geometry_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Complete eager call (ms)"
+methods = { production = "Package", native = "Native Polars" }
+cases = [
+  { label = "Strict clusters: shuffled overlapping chain", sizes = [8, 1000, 100000], filters = { family = "sequencing", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "eager" } },
+  { label = "Touching clusters: reversed touching chain", sizes = [100000], filters = { family = "touching", order = "reverse", dtype = "i64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_touching", scope = "eager" } },
+  { label = "Union: shuffled separate UInt64 intervals", sizes = [100000], filters = { family = "disjoint", order = "shuffled", dtype = "u64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "eager" } },
+  { label = "Gaps: shuffled separate UInt64 intervals", sizes = [100000], filters = { family = "disjoint", order = "shuffled", dtype = "u64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "gaps", scope = "eager" } },
+  { label = "Strict clusters: 1,000 timestamp groups", sizes = [1000, 100000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "eager" } },
+  { label = "Gaps: 32 empty-only observed groups", sizes = [100000], filters = { family = "empty", order = "start", dtype = "i64", groups = 32, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "gaps", scope = "eager" } },
+]
+
+[sources.interval_geometry_million]
+path = "benchmarks/results/interval-geometry-polars-million-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "domain", "payload", "source", "seed", "operation", "scope"]
+
+[[tables]]
+id = "interval-geometry-million-table"
+source = "interval_geometry_million"
+value = "ns"
+divisor = 1000000
+ylabel = "Complete lazy call, including planning (ms)"
+methods = { production = "Package", native = "Native Polars" }
+cases = [
+  { label = "Strict clusters: ordered overlapping chain", sizes = [1000000], filters = { family = "sequencing", order = "start", dtype = "i64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "lazy_complete" } },
+  { label = "Strict clusters: shuffled overlapping chain", sizes = [1000000], filters = { family = "sequencing", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "lazy_complete" } },
+  { label = "Union: sorted nested intervals", sizes = [1000000], filters = { family = "nested", order = "start", dtype = "i64", groups = 0, chunks = 1, domain = "partial", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "lazy_complete" } },
+  { label = "Gaps: shuffled separate UInt64 intervals", sizes = [1000000], filters = { family = "disjoint", order = "shuffled", dtype = "u64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "gaps", scope = "lazy_complete" } },
+  { label = "Union: 1,000 timestamp groups", sizes = [1000000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "lazy_complete" } },
+  { label = "Gaps: 8 groups, narrow domain", sizes = [1000000], filters = { family = "booking", order = "shuffled", dtype = "i64", groups = 8, chunks = 7, domain = "partial", payload = 0, source = "memory", seed = 7, operation = "gaps", scope = "lazy_complete" } },
+]
+
+[sources.interval_geometry_threads24]
+path = "benchmarks/results/interval-geometry-polars-threads24-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "dtype", "groups", "chunks", "domain", "payload", "source", "seed", "operation", "scope"]
+
+[[tables]]
+id = "interval-geometry-threads24-table"
+source = "interval_geometry_threads24"
+value = "ns"
+divisor = 1000000
+ylabel = "Complete lazy call, 24 threads (ms)"
+methods = { production = "Package", native = "Native Polars" }
+cases = [
+  { label = "Strict clusters: 1,000 singleton timestamp groups", sizes = [1000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "lazy_complete" } },
+  { label = "Strict clusters: shuffled overlapping chain", sizes = [100000, 1000000], filters = { family = "sequencing", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "lazy_complete" } },
+  { label = "Union: 1,000 timestamp groups", sizes = [100000, 1000000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "lazy_complete" } },
+  { label = "Gaps: 8 groups, narrow domain", sizes = [100000, 1000000], filters = { family = "booking", order = "shuffled", dtype = "i64", groups = 8, chunks = 7, domain = "partial", payload = 0, source = "memory", seed = 7, operation = "gaps", scope = "lazy_complete" } },
+  { label = "Union: 32 skewed groups", sizes = [1000000], filters = { family = "booking_skew", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, domain = "partial", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "lazy_complete" } },
+]
+
+[sources.interval_geometry_core]
+path = "benchmarks/results/interval-geometry-core-million-20260929.csv"
+x = "n"
+method = "method"
+dimensions = ["dtype", "family", "order", "domain", "seed", "operation", "include_touching"]
+
+[[tables]]
+id = "interval-geometry-core-table"
+source = "interval_geometry_core"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Complete Rust call (ms)"
+methods = { production = "Package", packed_sorted = "Packed records", indices_sorted = "Indices", materialized = "Union then gaps" }
+cases = [
+  { label = "Strict clusters: sorted disjoint", sizes = [1000000], methods = { production = "Package", packed_sorted = "Packed records", indices_sorted = "Indices" }, filters = { dtype = "i64", family = "disjoint", order = "start", domain = "full", seed = 7, operation = "cluster", include_touching = "false" } },
+  { label = "Strict clusters: shuffled disjoint", sizes = [1000000], methods = { production = "Package", packed_sorted = "Packed records", indices_sorted = "Indices" }, filters = { dtype = "i64", family = "disjoint", order = "shuffled", domain = "full", seed = 7, operation = "cluster", include_touching = "false" } },
+  { label = "Strict clusters: partly ordered spanning rows", sizes = [1000000], methods = { production = "Package", packed_sorted = "Packed records", indices_sorted = "Indices" }, filters = { dtype = "i64", family = "spanning", order = "partial", domain = "full", seed = 7, operation = "cluster", include_touching = "false" } },
+  { label = "Union: sorted nested", sizes = [1000000], methods = { production = "Package", packed_sorted = "Packed records", indices_sorted = "Indices" }, filters = { dtype = "i64", family = "nested", order = "start", domain = "full", seed = 7, operation = "merge", include_touching = "false" } },
+  { label = "Gaps: sorted nested", sizes = [1000000], filters = { dtype = "i64", family = "nested", order = "start", domain = "full", seed = 7, operation = "gaps", include_touching = "false" } },
+  { label = "Gaps: shuffled disjoint", sizes = [1000000], filters = { dtype = "i64", family = "disjoint", order = "shuffled", domain = "full", seed = 7, operation = "gaps", include_touching = "false" } },
+]
+
 [sources.coverage_profile_core]
 path = "benchmarks/results/coverage-profile-core-final-20260929.csv"
 x = "n"

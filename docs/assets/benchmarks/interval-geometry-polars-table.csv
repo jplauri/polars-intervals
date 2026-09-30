@@ -1,0 +1,19 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_domain,workload_payload,workload_source,workload_seed,workload_operation,workload_scope,method,x,median,min,max,samples
+Strict clusters: shuffled overlapping chain,sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,eager,native,8,0.709,0.6819,0.7228,3
+Strict clusters: shuffled overlapping chain,sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,eager,native,1000,0.8643,0.8006,0.942,3
+Strict clusters: shuffled overlapping chain,sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,eager,native,100000,30.7957,30.2166,31.996399999999998,3
+Strict clusters: shuffled overlapping chain,sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,eager,production,8,0.1133,0.09659999999999999,0.1239,3
+Strict clusters: shuffled overlapping chain,sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,eager,production,1000,0.1483,0.1162,0.1594,3
+Strict clusters: shuffled overlapping chain,sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,eager,production,100000,4.114199999999999,3.8297999999999996,4.1956999999999995,3
+Touching clusters: reversed touching chain,touching,reverse,i64,0,1,extended,0,memory,7,cluster_touching,eager,native,100000,6.8866,6.5404,7.1545,3
+Touching clusters: reversed touching chain,touching,reverse,i64,0,1,extended,0,memory,7,cluster_touching,eager,production,100000,1.6363999999999999,1.2184,1.6927999999999999,3
+Union: shuffled separate UInt64 intervals,disjoint,shuffled,u64,0,1,extended,0,memory,7,merge,eager,native,100000,42.0146,41.762899999999995,42.649499999999996,3
+Union: shuffled separate UInt64 intervals,disjoint,shuffled,u64,0,1,extended,0,memory,7,merge,eager,production,100000,4.1604,4.1387,4.757,3
+Gaps: shuffled separate UInt64 intervals,disjoint,shuffled,u64,0,1,extended,0,memory,7,gaps,eager,native,100000,44.1737,43.7071,49.157599999999995,3
+Gaps: shuffled separate UInt64 intervals,disjoint,shuffled,u64,0,1,extended,0,memory,7,gaps,eager,production,100000,4.2766,4.26,5.0652,3
+"Strict clusters: 1,000 timestamp groups",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,cluster_strict,eager,native,1000,4.7322,4.416399999999999,5.1395,3
+"Strict clusters: 1,000 timestamp groups",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,cluster_strict,eager,native,100000,26.3696,25.6355,26.429499999999997,3
+"Strict clusters: 1,000 timestamp groups",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,cluster_strict,eager,production,1000,10.332099999999999,10.1474,10.3798,3
+"Strict clusters: 1,000 timestamp groups",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,cluster_strict,eager,production,100000,14.3117,14.155,15.3431,3
+Gaps: 32 empty-only observed groups,empty,start,i64,32,1,extended,0,memory,7,gaps,eager,native,100000,6.3404,6.2924,7.012,3
+Gaps: 32 empty-only observed groups,empty,start,i64,32,1,extended,0,memory,7,gaps,eager,production,100000,1.9123999999999999,1.6338,2.0528,3

@@ -12,6 +12,9 @@ release plugin. Summary and plotting scripts only read saved results.
 
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
+| [`interval_geometry.py`](interval_geometry.py) | End-to-end benchmark | Complete eager/lazy geometry against native prefix-max plans, separate planning/collection and optional process RSS → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
+| [`interval_geometry_core.py`](interval_geometry_core.py) | Core comparison runner | Packed and indexed frontier scans, fused/materialized gaps and separate requested heap → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
+| [`test_interval_geometry.py`](test_interval_geometry.py) | Baseline checks | Independent graph/cell oracles, deferred validation and typed grouped lazy outputs → native competitor checks | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`coverage_profile.py`](coverage_profile.py) | End-to-end benchmark | Complete release calls against native Polars event sums/count aggregation, with optional lazy/streaming-engine collection, validation, groups and output assembly → raw samples and provenance | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`coverage_profile_core.py`](coverage_profile_core.py) | Core comparison runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples, source archive and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`test_coverage_profile.py`](test_coverage_profile.py) | Baseline checks | Direct membership oracle on small grouped, temporal and wide-load inputs → native Polars baseline validation | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
@@ -32,7 +35,7 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
-Except for the dominating-set and coverage-profile comparisons, they time production
+Except for the geometry, dominating-set and coverage-profile comparisons, they time production
 only. Removed candidates and runners are preserved in the
 [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
 Historical metadata may reference a base revision with uncommitted feature
@@ -90,6 +93,25 @@ because this Polars build does not implement Int128 unary negation. Unit count
 aggregation is measured separately. Core memory measures requested live heap,
 not process RSS or complete Polars allocations. Cases are synthetic; see each
 run's metadata and full raw samples for measured coverage and omissions.
+
+Interval geometry compares complete cluster, union and bounded-gap calls.
+Run the scripts as modules from the repository root:
+
+```sh
+uv run --no-sync python -m benchmarks.interval_geometry_core --output benchmarks/results/geometry-core-new.csv
+uv run --no-sync python -m benchmarks.interval_geometry --output benchmarks/results/geometry-polars-new --scopes eager lazy_complete
+```
+
+Use `--cases`, `--sizes`, `--operations`, `--samples` and `--seeds` for focused
+comparisons. The core runner accepts comma-separated selections. The Polars
+runner accepts space-separated selections and has additional `lazy_plan`,
+`lazy_collect` and `streaming_complete` scopes. Parquet fixtures include query
+I/O only in collection timings. `--memory` starts separate fresh eager workers
+and records whole-process working-set/RSS observations, including retained
+outputs. These are separate from the core requested-live-heap metric.
+The native candidate shares input validation but computes geometry with Polars
+prefix maxima, run markers and native grouping. Its private tests use original
+pairwise connectivity and elementary-cell membership oracles.
 
 The lane-balancing core runner uses `cargo bench -p intervals-core --bench
 balance_lanes --locked`. Set `BALANCE_CSV` and `BALANCE_QUALITY_CSV` to new

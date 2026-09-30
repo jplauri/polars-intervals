@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add [`cluster_intervals`, `merge_intervals`, and `interval_gaps`](interval-geometry.md)
+  for connected records, exact union, and complement inside explicit scalar
+  bounds. All support eager and genuinely lazy execution with exact endpoint
+  dtypes. Empty rows are isolated clusters and contribute no coverage.
+
 - **Breaking Rust API change:** In the unpublished `intervals-core` crate,
   consolidate the six length-mismatch error variants into
   `IntervalError::LengthMismatch([(&'static str, usize); 2])` and remove
