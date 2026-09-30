@@ -1,6 +1,6 @@
 # Lane assignment benchmarks
 
-[All benchmarks](benchmarks.md)
+[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
 
 ## Summary
 
@@ -23,10 +23,18 @@ interval lengths take the longest, while non-overlapping intervals are cheaper.
 <details markdown="1">
 <summary>Benchmark details</summary>
 
+**What was compared**
+
+The run covers 1,000, 100,000 and one million rows. It compares non-overlapping,
+moderately overlapping, nested and variable-length inputs, each sorted by start
+or shuffled.
+
+--8<-- "docs/assets/benchmarks/lanes-polars-summary.md:-2:"
+
+**Settings**
+
 See the [measurement guide](benchmarking.md) and shared
 [hardware](benchmarks.md#hardware).
-
-**Full Polars measurements**
 
 The September 30, 2026 run uses package 0.2.0 and Polars 1.44.2. Polars' thread
 setting was left at its default, producing a 24-thread pool on this machine.
@@ -34,26 +42,57 @@ Each case has two warmups and five timed samples. The table shows seed 7;
 seed 41 remains separate in the raw samples. At one million shuffled rows,
 the second seed took 59–178 ms, with the same input-pattern tradeoffs.
 
+Inputs have Int64 endpoints, one chunk per column and no groups. Collection
+uses the auto engine.
+
 Timing includes public expression and lazy query construction, optimization,
-plugin extraction and validation, sorting, assignment and row-aligned output.
+input extraction and validation, sorting, assignment and row-aligned output.
 Test-data construction, correctness checks and output destruction are excluded.
 Before timing, an independent checker verifies no overlaps within lanes and
 the minimum possible lane count. Every timed output is then checked against
 that validated deterministic result outside timing.
 
-The run covers 1,000, 100,000 and one million rows, four input patterns and both
-orders. Inputs have Int64 endpoints, one chunk per column and no groups.
-Collection uses the auto engine. Date/Datetime endpoints, grouping, streaming,
-memory and a native Polars expression comparison were not measured in this run.
-Release-library and installed-plugin hashes match; the source archive and
-metadata preserve the build and all runner inputs.
+<span id="coverage-and-limitations"></span>
 
---8<-- "docs/assets/benchmarks/lanes-polars-summary.md:-2:"
+**Limitations**
 
-[Run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.metadata.json) ·
-[Measured source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.sources.zip)
+Date/Datetime endpoints, grouping, streaming, memory and a native Polars
+expression comparison were not measured in this run.
 
-**Historical algorithm comparisons**
+<span id="reproduce-and-data"></span>
+
+**Reproduce**
+
+After the [release rebuild](benchmarking.md#setup), leave `POLARS_MAX_THREADS`
+unset and run:
+
+```sh
+uv run --no-sync python benchmarks/scheduling_polars.py --output benchmarks/results/scheduling-polars-new
+uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_polars.py
+```
+
+The shared runner measures both lane assignment and weighted scheduling.
+Use a new output prefix. For the separate Rust measurements:
+
+```sh
+cargo bench -p intervals-core --bench assign_lanes --locked > target/assign-lanes-local.csv
+```
+
+The harness requires an optimized build and writes samples to standard output.
+See the shared guide for setup and publishing generated tables.
+
+[Shared setup and publishing](benchmarking.md) ·
+[First-run samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-windows.csv) ·
+[Repeat samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-repeat-windows.csv) ·
+[Environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-environment.json) ·
+[Algorithm and repeat notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#lane-assignment)
+
+Release-library and installed-plugin hashes match for the September 30 run.
+The [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.metadata.json)
+and [measured source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.sources.zip)
+preserve the build and all runner inputs.
+
+**History**
 
 These separate Rust measurements include small and large non-overlapping inputs,
 plus sorted and shuffled overlapping inputs where private algorithms were faster.
@@ -82,11 +121,7 @@ input, the endpoint-scan alternative takes 96 ms compared with 172 ms.
 An independent repeat showed the same tradeoffs, with some runtime variation.
 The million-row shuffled, non-overlapping case took 59.4 ms on that repeat,
 compared with 79.7 ms here. The roughly 30 ms versus 9 ms sorted-nesting result
-was stable. Both runs are available below.
-
-<span id="coverage-and-limitations"></span>
-
-**Coverage and limitations**
+was stable. Both runs are linked under Reproduce.
 
 Each run covers 72 combinations of size, input pattern and order, from 1,000 to
 one million rows. Patterns include low and high overlap, nested intervals,
@@ -107,33 +142,5 @@ At one million rows, live algorithm-buffer capacity including output is about
 alternative uses 19.1 MiB in both cases. These are buffer capacities, not total
 process memory. See the [measurement guide](benchmarking.md) and
 [algorithm notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#lane-assignment).
-
-<span id="reproduce-and-data"></span>
-
-**Reproduce and data**
-
-After the [release rebuild](benchmarking.md#setup), leave `POLARS_MAX_THREADS`
-unset and run:
-
-```sh
-uv run --no-sync python benchmarks/scheduling_polars.py --output benchmarks/results/scheduling-polars-new
-uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_polars.py
-```
-
-The shared runner measures both lane assignment and weighted scheduling.
-Use a new output prefix. For the separate Rust measurements:
-
-```sh
-cargo bench -p intervals-core --bench assign_lanes --locked > target/assign-lanes-local.csv
-```
-
-The harness requires an optimized build and writes samples to standard output.
-See the shared guide for setup and publishing generated tables.
-
-[Shared setup and publishing](benchmarking.md) ·
-[First-run samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-windows.csv) ·
-[Repeat samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-repeat-windows.csv) ·
-[Environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-environment.json) ·
-[Algorithm and repeat notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#lane-assignment)
 
 </details>

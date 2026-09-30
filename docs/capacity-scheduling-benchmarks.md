@@ -1,6 +1,6 @@
 # Capacity scheduling benchmarks
 
-[All benchmarks](benchmarks.md)
+[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
 
 ## Summary
 
@@ -27,29 +27,14 @@ memory was reduced. The updated full Polars query has not been remeasured.
 <details markdown="1">
 <summary>Benchmark details</summary>
 
-**Measured build**
+<span id="full-polars-measurements"></span>
 
-The saved run record is dated `2026-09-26T12:40:12.1472941+03:00` and names
-base revision `cd3a0181232bda9a2c1f7b0aafdfef1adcd8233f`. The measured package
-version was not recorded. The original core source hash matches `29d75ee`,
-before `cee8e52` removed the per-interval edge-index vector and intermediate
-worker-result buffering. Those changes affect allocations and reconstruction
-inside the timed solver. The separately recorded cleanup run measures core
-calls, not the full Polars queries in the headline table.
-
-See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
+**What was compared**
 
 The headline table uses integer endpoints at one million rows and shows overlap
 limits from selecting one interval per group through selecting all 32.
 
 --8<-- "docs/assets/benchmarks/capacity-summary.md:-2:"
-
-<span id="full-polars-measurements"></span>
-
-**Full Polars measurements**
-
-**Complete Polars queries · solver uses up to 8 workers · median of 3 samples ·
-Polars thread count unrecorded · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-environment.json)**
 
 Each set contains 32 intervals that overlap one another, with no overlap between
 sets. Capacity is the maximum number that may be selected at the same time.
@@ -61,9 +46,69 @@ Runtime does not simply increase with capacity. A capacity of 31 still requires
 choosing which interval to leave out. At 32, every interval in these positive-
 weight examples can be selected, making the task much easier.
 
+**Settings**
+
+See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
+
+**Complete Polars queries · solver uses up to 8 workers · median of 3 samples ·
+Polars thread count unrecorded · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-environment.json)**
+
+Small cases are checked by trying all subsets. Larger results are checked for
+capacity violations and compared with independent optimization implementations.
+The Polars examples also have independently calculable best weights.
+
+Query times include validation and output construction, but exclude generating
+and converting input data.
+
+<span id="coverage-and-limitations"></span>
+
+**Limitations**
+
+Algorithm tests cover empty inputs through one million rows, varied overlap,
+sorted and shuffled order, seven weight distributions and different capacity
+limits. Polars tests cover integer, Date and Datetime endpoints, including
+timezone-aware nanosecond timestamps. No equivalent Polars-only optimizer was
+benchmarked.
+
+The algorithm-only datasets differ from the Polars examples. Some expensive
+alternative-method combinations were omitted, and the largest inputs have
+narrower test coverage.
+
+<span id="reproduce-and-data"></span>
+
+<span id="operation-specific-commands"></span>
+
+**Reproduce**
+
+```sh
+cargo bench -p intervals-core --bench max_weight_with_capacity --locked > benchmarks/results/capacity-local.csv
+python -I /path/to/checkout/benchmarks/capacity_temporal.py > capacity-temporal-local.csv
+```
+
+`CAPACITY_BENCH_MAX_N`, `CAPACITY_BENCH_SAMPLES` and `CAPACITY_BENCH_FAMILY`
+restrict the core run. Run the temporal command with the installed release
+wheel's Python from outside the checkout, following the shared setup.
+
+[Setup, metrics and publishing](benchmarking.md) ·
+[Core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-windows.csv) ·
+[Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-temporal-windows.csv) ·
+[Omission log](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-windows.log) ·
+[Cleanup samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-cleanup-windows.csv) ·
+[Design and historical validation](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#scalar-capacity-selection)
+
 <span id="underlying-algorithm-comparisons"></span>
 
-**Underlying algorithm comparisons**
+<span id="historical-validation"></span>
+
+**History**
+
+The saved run record is dated `2026-09-26T12:40:12.1472941+03:00` and names
+base revision `cd3a0181232bda9a2c1f7b0aafdfef1adcd8233f`. The measured package
+version was not recorded. The original core source hash matches `29d75ee`,
+before `cee8e52` removed the per-interval edge-index vector and intermediate
+worker-result buffering. Those changes affect allocations and reconstruction
+inside the timed solver. The separately recorded cleanup run measures core
+calls, not the full Polars queries in the headline table.
 
 **Rust algorithm only · package uses up to 8 workers · median of 3 samples ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-environment.json)**
@@ -85,51 +130,8 @@ On the million-row independent-set example, peak requested heap storage is
 The extra memory helps reduce runtime. These are algorithm allocations, not
 whole-process memory.
 
-<span id="coverage-and-limitations"></span>
-
-**Coverage and limitations**
-
-Algorithm tests cover empty inputs through one million rows, varied overlap,
-sorted and shuffled order, seven weight distributions and different capacity
-limits. Polars tests cover integer, Date and Datetime endpoints, including
-timezone-aware nanosecond timestamps. No equivalent Polars-only optimizer was
-benchmarked.
-
-Small cases are checked by trying all subsets. Larger results are checked for
-capacity violations and compared with independent optimization implementations.
-The Polars examples also have independently calculable best weights.
-
-Query times include validation and output construction, but exclude generating
-and converting input data. The algorithm-only datasets differ from the Polars
-examples. Some expensive alternative-method combinations were omitted, and the
-largest inputs have narrower test coverage.
-
 The displayed run predates a memory-allocation cleanup. A separate before/after
 run is retained, but does not establish a speedup from that change. Details and
 omissions are in the [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#scalar-capacity-selection).
-
-<span id="historical-validation"></span>
-
-<span id="reproduce-and-data"></span>
-
-**Reproduce and data**
-
-<span id="operation-specific-commands"></span>
-
-```sh
-cargo bench -p intervals-core --bench max_weight_with_capacity --locked > benchmarks/results/capacity-local.csv
-python -I /path/to/checkout/benchmarks/capacity_temporal.py > capacity-temporal-local.csv
-```
-
-`CAPACITY_BENCH_MAX_N`, `CAPACITY_BENCH_SAMPLES` and `CAPACITY_BENCH_FAMILY`
-restrict the core run. Run the temporal command with the installed release
-wheel's Python from outside the checkout, following the shared setup.
-
-[Setup, metrics and publishing](benchmarking.md) ·
-[Core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-windows.csv) ·
-[Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-temporal-windows.csv) ·
-[Omission log](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-windows.log) ·
-[Cleanup samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-cleanup-windows.csv) ·
-[Design and historical validation](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#scalar-capacity-selection)
 
 </details>

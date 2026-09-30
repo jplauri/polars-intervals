@@ -277,8 +277,7 @@ This reads saved measurements. It does not run benchmarks or compile Rust.
 Commit regenerated files in `docs/assets/benchmarks/` with the source/configuration
 change. The documentation CI build regenerates the assets before building the site.
 
-Start a report from [report-template.md](report-template.md): a short Summary,
-one Results table and a collapsed Benchmark details block. Register a compact
-table in [plots.toml](plots.toml), including important losses.
+Copy and follow [report-template.md](report-template.md). Register the report's
+tables in [plots.toml](plots.toml).
 See the [adding an operation checklist](../docs/benchmarking.md#adding-an-operation)
-for scope lines, shared methodology, supporting notes, navigation and checks.
+for the publishing steps and checks.

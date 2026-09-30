@@ -30,18 +30,13 @@ their row counts. It is a cost baseline for a different objective.
 <details markdown="1">
 <summary>Benchmark details</summary>
 
-See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
+**What was compared**
 
 --8<-- "docs/assets/benchmarks/balance-summary.md:-2:"
 
 The compact table selects a small input with empty intervals, an input that
 can balance evenly across eight lanes, and two long/short-interval inputs
 whose overlaps force uneven lane sizes.
-
-**Full Polars measurements**
-
-**Complete Polars queries · one thread · median of 5 samples after warmup ·
-[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-quality-windows-20260928.metadata.json)**
 
 Ordinary assignment uses `assign_lanes`. New balanced assignment uses
 `assign_balanced_lanes` with its default settings. Improving existing lanes uses
@@ -71,30 +66,29 @@ In the last example, balanced assignment takes 24.1 ms compared with 1.39 ms.
 The [saved quality results](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-quality-windows-20260928.quality.csv)
 include the lane counts behind these comparisons.
 
-**Algorithm-only timings and search settings**
+**Settings**
 
-**Rust algorithm only · median of 5 samples after two warmups ·
-[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-core-windows-20260928.metadata.json)**
+See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
 
-“Initial choices only” selects the best starting assignment without further
-search. The other columns correspond to the user-facing operations above.
-These inputs differ from the Polars examples.
+**Complete Polars queries · one thread · median of 5 samples after warmup ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-quality-windows-20260928.metadata.json)**
 
---8<-- "docs/assets/benchmarks/balance-core-table.md"
+Query times include planning, validation, preparation, extraction and output
+materialization. Input generation, correctness checks and final Series
+destruction are outside timing. Temporary collection-container teardown can
+occur inside timing. Construction includes its initial assignment; improving
+existing lanes excludes creating that assignment. Every timed result is checked
+for overlaps within lanes and for the minimum lane count.
 
 The default `max_work=100_000` limits search effort, not elapsed milliseconds.
-Across 60 algorithm test cases, increasing it from 10,000 to 100,000 improved
-balance in four cases. Increasing it to one million improved two more.
-More search can help, but does not guarantee improvement. Input checks and
-preparation still take time outside that search limit.
+Input checks and preparation still take time outside that search limit.
 
 <span id="coverage-and-limitations"></span>
 
-**Coverage and limitations**
+**Limitations**
 
 Balance measures numbers of rows, including empty intervals. It does not measure
-the total duration of intervals in each lane. Every output is checked for
-overlaps within lanes and for the minimum lane count.
+the total duration of intervals in each lane.
 
 Of the 132 datasets in the separate size-scaling suite, 24 were constructed with
 a known best balance. New balanced assignment reached it in all 24. Improving
@@ -107,15 +101,11 @@ example remains at counts 15, 16 and 17 even though 16 in every lane is possible
 This demonstrates a real limit of the search. Million-row performance and other
 machines were not measured here.
 
-The saved runs use older names for the same construction and improvement modes.
-The [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/balance-lanes-notes.md)
-retain their mapping, detailed quality checks and measurement boundaries.
-
 <span id="reproduce-and-data"></span>
 
-**Reproduce and data**
+**Reproduce**
 
-Follow the [release-plugin setup](benchmarking.md#setup). Generate the existing
+Follow the [release setup](benchmarking.md#setup). Generate the existing
 corpora first, then run the complete commands in the
 [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/balance-lanes-notes.md#reproduce-the-recorded-matrix).
 A small offline run is:
@@ -138,5 +128,24 @@ records link raw samples, provenance and source hashes. The
 [verification log](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-verification-windows-20260928.md)
 records executed checks. Generated datasets stay outside version control.
 Table downloads retain sample ranges and exact medians.
+
+**History**
+
+**Rust algorithm only · median of 5 samples after two warmups ·
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-core-windows-20260928.metadata.json)**
+
+“Initial choices only” selects the best starting assignment without further
+search. The other columns correspond to the user-facing operations above.
+These inputs differ from the Polars examples.
+
+--8<-- "docs/assets/benchmarks/balance-core-table.md"
+
+Across 60 algorithm test cases, increasing it from 10,000 to 100,000 improved
+balance in four cases. Increasing it to one million improved two more.
+More search can help, but does not guarantee improvement.
+
+The saved runs use older names for the same construction and improvement modes.
+The [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/balance-lanes-notes.md)
+retain their mapping, detailed quality checks and measurement boundaries.
 
 </details>

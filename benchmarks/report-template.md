@@ -1,6 +1,6 @@
 # <Operation> benchmarks
 
-[All benchmarks](../docs/benchmarks.md)
+[All benchmarks](../docs/benchmarks.md) · [Measurement guide](../docs/benchmarking.md)
 
 ## Summary
 
@@ -15,7 +15,7 @@ fixed thread count as the default unless the run used the default setting.
 State an exception readers can act on, such as input order, group size, weights
 or thread settings. Keep comparisons with private candidate algorithms in
 details. Identify synthetic examples as such. Keep API options in the API
-reference and implementation history in details.
+reference and implementation history in details. Use "function" in visible text.
 
 If complete Polars timings are missing, say "Full Polars query timings have not
 been measured." Prefer measuring the public operation before publishing.
@@ -43,6 +43,10 @@ where measured, plus important cases where the advantage disappears or reverses.
 Use about three significant figures. Missing measurements stay missing.
 Describe inconclusive differences as "about the same" and losses as "× slower".
 
+Use one ratio convention: **speedup = baseline median / package median**.
+A value of 2 means the package is 2× faster; a value of 0.5 means it is 2× slower.
+Do not mix speedup and relative-runtime ratios in new report tables.
+
 When no native comparison exists, show workload, rows and the package runtime.
 Keep useful input variants or public modes in separate, clearly named columns.
 An operation with a different purpose is not a native Polars baseline. Label
@@ -66,20 +70,41 @@ time" and keep them separate from full Polars measurements.
 <details markdown="1">
 <summary>Benchmark details</summary>
 
-Link to the [measurement guide](../docs/benchmarking.md) and shared hardware.
-Preserve timing boundaries, sample counts, warmups, thread settings, seeds,
-versions, source hashes, raw samples, exact table downloads and repeat runs.
-Keep runs and timing scopes separate. Explain case selection and identify the
-native method used for each row. Define speedup as native median / package median.
-For a loss, describe "× slower" using package median / native median.
+Use the following five bold subsection labels in this order. Keep each short.
+Link long derivations and experiment narratives from supporting notes instead
+of filling this block. Keep these labels out of the table of contents.
 
-Keep detailed workload coverage, correctness evidence, memory definitions,
-algorithm comparisons and implementation history here or in supporting notes.
-Distinguish independent checks from agreement between implementations. Preserve
-unfavorable results and measurement gaps. Label proposed explanations as such.
+**What was compared**
 
-Include the operation's reproduction command and link to the shared setup.
-Add only the details needed for this operation.
+Identify the public function, equivalent native queries and selected workloads.
+Name the fastest native method for each headline row. Explain case selection
+and retain useful exceptions. Additional results belong here only when they
+help readers interpret the first table. Keep separate runs and scopes separate.
+
+**Settings**
+
+Give timing boundaries, warmups, samples, threads, seeds and software versions.
+Link the shared hardware and measurement guide instead of repeating them.
+Preserve settings and source/build hashes in linked metadata.
+
+**Limitations**
+
+State missing input types, workloads, baselines and execution modes. Briefly
+explain correctness evidence, distinguishing independent checks from agreement
+between candidates. Name any memory metric and exclusions. Keep meaningful
+variability and unfavorable results. Label proposed explanations as such.
+
+**Reproduce**
+
+Give the operation command and link the shared setup. Include raw samples,
+metadata, measured source archives and exact table downloads here.
+
+**History**
+
+Keep older builds, private algorithm comparisons and repeat-run history here.
+Use supporting notes for lengthy development narratives. Preserve original
+measurement identities and archived table conventions without relabeling data.
+Explain how timed paths changed, without inferring an unmeasured speedup.
 
 </details>
 
@@ -87,4 +112,5 @@ Add only the details needed for this operation.
 measured runtime, how it compares with the fastest tested native Polars method,
 and the main exception. Reproduction and implementation details stay optional.
 Preserve existing page URLs and anchors when updating reports. Keep headings
-inside details out of the table of contents, preserving their IDs explicitly. -->
+inside details out of the table of contents, preserving their IDs explicitly.
+Use the same operation name in the page title, sidebar and overview. -->

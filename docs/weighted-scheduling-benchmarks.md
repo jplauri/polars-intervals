@@ -1,6 +1,6 @@
 # Weighted scheduling benchmarks
 
-[All benchmarks](benchmarks.md)
+[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
 
 ## Summary
 
@@ -23,10 +23,18 @@ one million rows. The other shuffled examples finish in about a tenth of a secon
 <details markdown="1">
 <summary>Benchmark details</summary>
 
+**What was compared**
+
+The run covers 1,000, 100,000 and one million rows. It compares non-overlapping,
+moderately overlapping, nested and variable-length inputs, each sorted by start
+or shuffled.
+
+--8<-- "docs/assets/benchmarks/weighted-polars-summary.md:-2:"
+
+**Settings**
+
 See the [measurement guide](benchmarking.md) and shared
 [hardware](benchmarks.md#hardware).
-
-**Full Polars measurements**
 
 The September 30, 2026 run uses package 0.2.0 and Polars 1.44.2. Polars' thread
 setting was left at its default, producing a 24-thread pool on this machine.
@@ -34,28 +42,61 @@ Each case has two warmups and five timed samples. The table shows seed 7;
 seed 41 remains separate in the raw samples. Its million-row shuffled medians
 were 96–260 ms, with the same input-pattern tradeoffs.
 
+Inputs have Int64 endpoints and positive Int64 weights, one chunk per column
+and no groups. Collection uses the auto engine.
+
 Timing includes public expression and lazy query construction, optimization,
-plugin extraction and validation, sorting, selection and row-aligned output.
+input extraction and validation, sorting, selection and row-aligned output.
 Test-data construction, correctness checks and output destruction are excluded.
 Before timing, each output is checked for feasibility and optimal total weight
 using an independent start-ordered suffix dynamic program. The checker is
 tested against every subset on small problems. Every timed output is then
 compared with that validated deterministic result outside timing.
 
-The run covers 1,000, 100,000 and one million rows, four input patterns and both
-orders. Inputs have Int64 endpoints and positive Int64 weights, one chunk per
-column and no groups. Collection uses the auto engine. Date/Datetime endpoints,
-other weight distributions, grouping, streaming, memory and a native Polars
-expression comparison were not measured in this run. Release-library and
-installed-plugin hashes match; the source archive and metadata preserve the
-build and all runner inputs.
+<span id="coverage-and-limitations"></span>
 
---8<-- "docs/assets/benchmarks/weighted-polars-summary.md:-2:"
+**Limitations**
 
-[Run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.metadata.json) ·
-[Measured source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.sources.zip)
+Date/Datetime endpoints, other weight distributions, grouping, streaming,
+memory and a native Polars expression comparison were not measured in this run.
 
-**Historical algorithm comparisons**
+<span id="reproduce-and-data"></span>
+
+**Reproduce**
+
+After the [release rebuild](benchmarking.md#setup), leave `POLARS_MAX_THREADS`
+unset and run:
+
+```sh
+uv run --no-sync python benchmarks/scheduling_polars.py --output benchmarks/results/scheduling-polars-new
+uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_polars.py
+```
+
+The shared runner measures both scheduling operations. Use a new output prefix.
+For the separate Rust measurements:
+
+```sh
+cargo bench -p intervals-core --bench max_weight_non_overlapping --locked > target/weighted-local.csv
+```
+
+Set `WEIGHTED_BENCH_MAX_N=1000` for a smoke run. The core harness requires release
+mode and does not need Polars. Historical package-check results moved to the
+[validation record](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#repeat-and-historical-validation).
+
+[Shared setup and publishing](benchmarking.md) ·
+[First-run samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-windows.csv) ·
+[Repeat samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-repeat-windows.csv) ·
+[Environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-environment.json) ·
+[Algorithm notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#weighted-scheduling)
+
+<span id="historical-validation"></span>
+
+Release-library and installed-plugin hashes match for the September 30 run.
+The [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.metadata.json)
+and [measured source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.sources.zip)
+preserve the build and all runner inputs.
+
+**History**
 
 These separate Rust measurements show small and large non-overlapping inputs,
 gains on structured inputs, and losses on sorted or shuffled random-length inputs.
@@ -85,10 +126,6 @@ An independent repeat confirmed both the gains on structured inputs and the
 losses on random lengths. Its samples remain separate, so the table describes
 one run rather than an average across machines or runs.
 
-<span id="coverage-and-limitations"></span>
-
-**Coverage and limitations**
-
 The tests cover 1,000 to one million rows, eleven interval patterns, sorted and
 shuffled input, and six weight distributions. They include nesting, duplicates,
 shared endpoints, empty intervals, negative or zero weights, and a single
@@ -108,36 +145,5 @@ alternative both use 39.1 MiB of live buffer capacity. The endpoint-scan
 alternative uses 77.2 MiB. This measures algorithm buffers rather than the
 whole process. See the [measurement guide](benchmarking.md) and
 [supporting comparisons and checks](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#weighted-scheduling).
-
-<span id="reproduce-and-data"></span>
-
-**Reproduce and data**
-
-<span id="historical-validation"></span>
-
-After the [release rebuild](benchmarking.md#setup), leave `POLARS_MAX_THREADS`
-unset and run:
-
-```sh
-uv run --no-sync python benchmarks/scheduling_polars.py --output benchmarks/results/scheduling-polars-new
-uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_polars.py
-```
-
-The shared runner measures both scheduling operations. Use a new output prefix.
-For the separate Rust measurements:
-
-```sh
-cargo bench -p intervals-core --bench max_weight_non_overlapping --locked > target/weighted-local.csv
-```
-
-Set `WEIGHTED_BENCH_MAX_N=1000` for a smoke run. The core harness requires release
-mode and does not need Polars. Historical package-check results moved to the
-[validation record](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#repeat-and-historical-validation).
-
-[Shared setup and publishing](benchmarking.md) ·
-[First-run samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-windows.csv) ·
-[Repeat samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-repeat-windows.csv) ·
-[Environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-environment.json) ·
-[Algorithm notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#weighted-scheduling)
 
 </details>
