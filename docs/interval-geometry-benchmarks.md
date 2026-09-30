@@ -26,11 +26,11 @@ groups**, native Polars clustering took **4.73 ms** eagerly against the package'
 The measurements support a simple common core, with no workload thresholds or
 claim that it is universally fastest.
 
-Saved timings and process-memory measurements use the archived benchmark
-versions before a helper-only cleanup. The native competitor now reuses the
-shared validation barrier, and both memory runners share the existing OS helper.
-Production kernels, adapters and public Python APIs are unchanged. No timing
-or memory improvement is claimed for this cleanup.
+Saved timings and process-memory measurements describe the archived versions.
+Later cleanup shared core/adapter helpers and benchmark bookkeeping, removed
+redundant validation calls, and replaced the competitor's Rust validator with
+Polars checks. Public contracts are unchanged. These tables do not measure the
+refactored code, and no timing or memory improvement is claimed for the cleanup.
 
 ## Results
 

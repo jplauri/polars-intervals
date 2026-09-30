@@ -6,6 +6,7 @@ import os
 import platform
 import subprocess
 import sys
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -23,6 +24,58 @@ def command(*args):
         return subprocess.check_output(args, cwd=ROOT, text=True, stderr=subprocess.STDOUT).strip()
     except (OSError, subprocess.CalledProcessError) as error:
         return f"unavailable: {error}"
+
+
+def verify_release(native, release=None):
+    """Return the matching release library and its source inputs, or fail."""
+    release = release or next(
+        (
+            ROOT / "target/release" / name
+            for name in (
+                "polars_intervals.dll",
+                "libpolars_intervals.so",
+                "libpolars_intervals.dylib",
+            )
+            if (ROOT / "target/release" / name).is_file()
+        ),
+        None,
+    )
+    if release is None or not release.is_file() or sha256(native) != sha256(release):
+        raise ValueError("Installed plugin must match the fresh Cargo release library")
+    inputs = [
+        *ROOT.glob("crates/*/src/**/*.rs"),
+        *ROOT.glob("crates/*/Cargo.toml"),
+        *(ROOT / name for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml")),
+    ]
+    if any(path.stat().st_mtime_ns > release.stat().st_mtime_ns for path in inputs):
+        raise ValueError("Rust inputs are newer than the release library; rebuild release first")
+    return release, inputs
+
+
+def build_environment():
+    return {
+        name: os.environ.get(name)
+        for name in (
+            "RUSTFLAGS",
+            "CARGO_ENCODED_RUSTFLAGS",
+            "CARGO_PROFILE_RELEASE_OPT_LEVEL",
+            "CARGO_PROFILE_RELEASE_LTO",
+            "CARGO_PROFILE_RELEASE_CODEGEN_UNITS",
+        )
+    }
+
+
+def archive_sources(archive, paths):
+    """Create a source archive without overwriting an existing measurement."""
+    with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED) as saved:
+        for path in dict.fromkeys(ROOT / path for path in paths):
+            saved.write(path, path.relative_to(ROOT))
+    return {"source_archive": archive.name, "source_archive_sha256": sha256(archive)}
+
+
+def source_changes(hashes):
+    changed = [path for path, digest in hashes.items() if sha256(ROOT / path) != digest]
+    return {"sources_unchanged_during_run": not changed, "changed_sources_during_run": changed}
 
 
 def environment():

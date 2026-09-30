@@ -18,7 +18,7 @@ from time import perf_counter_ns
 import polars as pl
 import polars_intervals as pi
 from polars_intervals import _internal
-from provenance import ROOT, environment, sha256
+from provenance import ROOT, environment, sha256, verify_release
 
 # Focused workload matrix, not a Cartesian product. Group IDs are interleaved.
 CASES = [
@@ -141,19 +141,10 @@ def main():
     parser.add_argument("--release-library", type=Path)
     args = parser.parse_args()
     native = Path(_internal.__file__)
-    libraries = [
-        ROOT / "target/release" / name
-        for name in ("polars_intervals.dll", "libpolars_intervals.so", "libpolars_intervals.dylib")
-    ]
-    release = args.release_library or next((p for p in libraries if p.exists()), None)
-    if release is None or sha256(native) != sha256(release):
-        parser.error("Installed plugin does not match Cargo release library; rebuild release first")
-    native_inputs = [ROOT / name for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml")]
-    for crate in (ROOT / "crates").iterdir():
-        native_inputs.append(crate / "Cargo.toml")
-        native_inputs.extend((crate / "src").rglob("*.rs"))
-    if any(path.stat().st_mtime_ns > release.stat().st_mtime_ns for path in native_inputs):
-        parser.error("Rust inputs are newer than the release library; rebuild release first")
+    try:
+        release, native_inputs = verify_release(native, args.release_library)
+    except ValueError as error:
+        parser.error(str(error))
     timing_path = args.output.with_suffix(".timings.csv")
     metadata_path = args.output.with_suffix(".metadata.json")
     if timing_path.exists() or metadata_path.exists():

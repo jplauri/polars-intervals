@@ -17,7 +17,7 @@ from time import perf_counter_ns
 import polars as pl
 import polars_intervals as pi
 from polars_intervals import _internal
-from provenance import ROOT, environment, sha256
+from provenance import ROOT, environment, sha256, verify_release
 
 CASES = [
     ("path", "start", "i64", 1, 1, "auto"),
@@ -164,26 +164,10 @@ def main():
     parser.add_argument("--release-library", type=Path)
     args = parser.parse_args()
     native = Path(_internal.__file__)
-    release = args.release_library or next(
-        (
-            ROOT / "target/release" / name
-            for name in (
-                "polars_intervals.dll",
-                "libpolars_intervals.so",
-                "libpolars_intervals.dylib",
-            )
-            if (ROOT / "target/release" / name).exists()
-        ),
-        None,
-    )
-    if release is None or sha256(native) != sha256(release):
-        parser.error("Installed plugin must match the freshly built release library")
-    inputs = [ROOT / name for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml")]
-    for crate in (ROOT / "crates").iterdir():
-        inputs.append(crate / "Cargo.toml")
-        inputs.extend((crate / "src").rglob("*.rs"))
-    if any(p.stat().st_mtime_ns > release.stat().st_mtime_ns for p in inputs):
-        parser.error("Rust inputs changed; rebuild release first")
+    try:
+        release, inputs = verify_release(native, args.release_library)
+    except ValueError as error:
+        parser.error(str(error))
     output, meta = (
         args.output.with_suffix(".timings.csv"),
         args.output.with_suffix(".metadata.json"),

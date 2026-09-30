@@ -1,5 +1,5 @@
 //! Private complete-call comparisons with and without sortedness checks.
-//! Indexed variants avoid endpoint copies, but still allocate indices and output.
+//! Indexed preparation avoids endpoint copies, but still allocates indices and output.
 use intervals_core::{
     IntervalError, cluster_intervals, interval_gaps, merge_intervals, validate_intervals,
 };
@@ -8,7 +8,6 @@ pub const CLUSTER_METHODS: &[&str] = &[
     "production",
     "packed_sort",
     "packed_sorted",
-    "indices",
     "indices_sorted",
 ];
 pub const MERGE_METHODS: &[&str] = CLUSTER_METHODS;
@@ -16,10 +15,8 @@ pub const GAP_METHODS: &[&str] = &[
     "production",
     "packed_sort",
     "packed_sorted",
-    "indices",
     "indices_sorted",
     "materialized",
-    "materialized_sort",
 ];
 
 pub fn cluster<T: Ord + Copy>(
@@ -44,7 +41,7 @@ pub fn cluster<T: Ord + Copy>(
         }
         label(starts, ends, rows.into_iter(), touching)
     } else {
-        let order = indices(starts, ends, None, method == "indices_sorted");
+        let order = indices(starts, ends, None);
         label(
             starts,
             ends,
@@ -109,7 +106,7 @@ pub fn merge<T: Ord + Copy>(
         coalesce(packed(starts, ends, None, method == "packed_sorted").into_iter())
     } else {
         coalesce(
-            indices(starts, ends, None, method == "indices_sorted")
+            indices(starts, ends, None)
                 .into_iter()
                 .map(|i| (starts[i], ends[i])),
         )
@@ -137,13 +134,12 @@ pub fn gaps<T: Ord + Copy>(
     Ok(match method {
         "packed_sort" => complement(packed(starts, ends, domain, false).into_iter(), left, right),
         "packed_sorted" => complement(packed(starts, ends, domain, true).into_iter(), left, right),
-        "materialized" | "materialized_sort" => {
-            let union =
-                coalesce(packed(starts, ends, domain, method == "materialized").into_iter());
+        "materialized" => {
+            let union = coalesce(packed(starts, ends, domain, true).into_iter());
             complement(union.into_iter(), left, right)
         }
         _ => complement(
-            indices(starts, ends, domain, method == "indices_sorted")
+            indices(starts, ends, domain)
                 .into_iter()
                 .map(|i| (starts[i].max(left), ends[i].min(right))),
             left,
@@ -172,18 +168,13 @@ fn packed<T: Ord + Copy>(
     rows
 }
 
-fn indices<T: Ord + Copy>(
-    starts: &[T],
-    ends: &[T],
-    domain: Option<(T, T)>,
-    sorted: bool,
-) -> Vec<usize> {
+fn indices<T: Ord + Copy>(starts: &[T], ends: &[T], domain: Option<(T, T)>) -> Vec<usize> {
     let mut rows: Vec<_> = (0..starts.len())
         .filter(|&i| {
             starts[i] < ends[i] && domain.is_none_or(|(l, r)| starts[i] < r && ends[i] > l)
         })
         .collect();
-    if !sorted || !rows.is_sorted_by_key(|&i| starts[i]) {
+    if !rows.is_sorted_by_key(|&i| starts[i]) {
         rows.sort_unstable_by_key(|&i| starts[i]);
     }
     rows

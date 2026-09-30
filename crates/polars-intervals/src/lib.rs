@@ -12,12 +12,11 @@
 use polars::prelude::*;
 use std::borrow::Cow;
 
-// Keep physical extraction and logical validation identical across row-aligned
-// expressions and frame adapters. The body is monomorphized for each endpoint.
+// Keep physical extraction identical across row-aligned expressions and frame
+// adapters. Callers validate logical dtypes before dispatch.
 macro_rules! dispatch_endpoints {
     ($starts:expr, $ends:expr, $name:expr, |$left:ident, $right:ident| $body:expr) => {{
         let (starts, ends, name) = ($starts, $ends, $name);
-        validate_endpoint_pair(starts, ends, name)?;
         macro_rules! call {
             ($s:expr, $e:expr) => {{
                 let ($left, $right) = ($s, $e);
@@ -62,8 +61,6 @@ mod _internal {
     use super::geometry::interval_gaps_py;
     #[pymodule_export]
     use super::geometry::merge_intervals_py;
-    #[pymodule_export]
-    use super::geometry::validate_intervals_py;
     #[pymodule_export]
     use super::profile::max_weight_with_capacity_profile_py;
 }
@@ -194,12 +191,7 @@ fn minimum_stabbing_points_plugin(inputs: &[Series]) -> PolarsResult<Series> {
 /// original zero-based row index within the supplied collection.
 pub fn minimum_stabbing_points(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     let points = evaluate(starts, ends, Algorithm::Stabbing)?;
-    let points = match starts.dtype() {
-        // Restore metadata directly: integer-to-Datetime casts without the
-        // optional timezone feature discard the zone. No time conversion is needed.
-        DataType::Datetime(unit, zone) => points.into_datetime(*unit, zone.clone()),
-        dtype => points.cast(dtype)?,
-    };
+    let points = logical_series(points, starts.dtype())?;
     Ok(Series::new("minimum_stabbing_points".into(), [points]))
 }
 
@@ -800,6 +792,28 @@ fn endpoint_values<'a, T: PolarsIntegerType>(
     }))
 }
 
+fn native_domain<T: TryFrom<i128>>(domain: Option<(i128, i128)>) -> PolarsResult<Option<(T, T)>> {
+    domain
+        .map(|(left, right)| {
+            let convert = |value| {
+                T::try_from(value).map_err(|_| {
+                    polars_err!(InvalidOperation: "domain bound is outside endpoint dtype range")
+                })
+            };
+            Ok((convert(left)?, convert(right)?))
+        })
+        .transpose()
+}
+
+fn logical_series(physical: Series, dtype: &DataType) -> PolarsResult<Series> {
+    match dtype {
+        // Integer-to-Datetime casts without the optional timezone feature discard
+        // the zone. Restore metadata directly; no time conversion is needed.
+        DataType::Datetime(unit, zone) => Ok(physical.into_datetime(*unit, zone.clone())),
+        dtype => physical.cast(dtype),
+    }
+}
+
 fn validate_group_keys(
     keys: &[Series],
     len: usize,
@@ -825,6 +839,7 @@ fn validate_group_keys(
 }
 
 fn evaluate(starts: &Series, ends: &Series, algorithm: Algorithm<'_>) -> PolarsResult<Series> {
+    validate_endpoint_pair(starts, ends, algorithm.name())?;
     dispatch_endpoints!(
         starts,
         ends,

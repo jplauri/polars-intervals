@@ -8,11 +8,9 @@ checks and returned-output destruction are outside every runtime sample.
 import argparse
 import csv
 import json
-import os
 import subprocess
 import sys
 import tempfile
-import zipfile
 from pathlib import Path
 from time import perf_counter_ns
 
@@ -23,7 +21,16 @@ from polars_intervals import _internal
 
 from benchmarks.coverage_profile import fixture as profile_fixture
 from benchmarks.interval_geometry_native import native_cluster, native_gaps, native_merge
-from benchmarks.provenance import ROOT, environment, resident_memory, sha256
+from benchmarks.provenance import (
+    ROOT,
+    archive_sources,
+    build_environment,
+    environment,
+    resident_memory,
+    sha256,
+    source_changes,
+    verify_release,
+)
 
 # family, order, dtype, requested groups (0=ungrouped), chunks, domain, payload, source
 CASES = [
@@ -180,27 +187,10 @@ def main():
     if args.output is None or min(args.sizes) < 0 or args.samples < 1 or args.warmups < 1:
         parser.error("Need --output, nonnegative sizes and positive samples/warmups")
     native = Path(_internal.__file__)
-    release = next(
-        (
-            ROOT / "target/release" / name
-            for name in (
-                "polars_intervals.dll",
-                "libpolars_intervals.so",
-                "libpolars_intervals.dylib",
-            )
-            if (ROOT / "target/release" / name).exists()
-        ),
-        None,
-    )
-    if release is None or sha256(native) != sha256(release):
-        parser.error("Installed plugin must match the fresh Cargo release library")
-    inputs = [
-        *ROOT.glob("crates/*/src/**/*.rs"),
-        *ROOT.glob("crates/*/Cargo.toml"),
-        ROOT / "Cargo.lock",
-    ]
-    if any(path.stat().st_mtime_ns > release.stat().st_mtime_ns for path in inputs):
-        parser.error("Rust source is newer than the release build")
+    try:
+        release, inputs = verify_release(native)
+    except ValueError as error:
+        parser.error(str(error))
     raw = args.output.with_suffix(".csv")
     meta = args.output.with_suffix(".metadata.json")
     archive = args.output.with_suffix(".sources.zip")
@@ -215,6 +205,8 @@ def main():
                 *ROOT.glob("python/polars_intervals/*.py"),
                 *ROOT.glob("benchmarks/interval_geometry*.py"),
                 ROOT / "benchmarks/test_interval_geometry.py",
+                ROOT / "tests/test_interval_geometry.py",
+                ROOT / "tests/dtypes.py",
                 ROOT / "benchmarks/coverage_profile.py",
                 ROOT / "benchmarks/coverage_profile_native.py",
                 ROOT / "benchmarks/provenance.py",
@@ -231,31 +223,18 @@ def main():
         "scope": "Complete validation/preparation/grouping/clipping/sorting/scan/remapping/output/FFI. Eager and lazy_complete include plan construction. lazy_plan does not execute. lazy_collect collects a prebuilt plan. streaming_complete builds and collects using the streaming engine. Returned output destruction, fixture construction, correctness and RSS calls are excluded.",
         "memory": "Separate fresh-process eager call. Before/after process working set and peak working set on Windows (RSS/high-water mark elsewhere), includes inputs, runtime and retained output. Peak increase after fixture construction is not exact allocations and may be zero if an earlier high-water mark dominates. No timed RSS polling.",
         "validation": "Every sampled result checked against actual production outside timing. Independent small graph and elementary-cell candidate oracles: benchmarks/test_interval_geometry.py. Large cases use cross-implementation equality, not an independent large oracle.",
-        "native_candidate": "Shared Rust all-row validation only, called directly for eager inputs and behind a blocking no-pushdown map_batches barrier for lazy inputs. All geometry uses native lazy expressions. Cum-max includes ALL preceding ends. Empty singletons and first-occurrence remapping included.",
+        "native_candidate": "Native Polars all-row validation, called directly for eager inputs and behind a blocking no-pushdown map_batches barrier for lazy inputs. Geometry also uses native lazy expressions. Cum-max includes ALL preceding ends. Empty singletons and first-occurrence remapping included.",
         "ordering": "Candidate order rotates per sample. Both methods warmed before samples. Plan-only output schema checked outside timing.",
         "omissions": "No profile baseline: optional coverage-profile comparison omitted to keep the focused A/B/C experiment. Scan-backed cases have no eager scope. Input-generation integer arithmetic is fixture-only. No out-of-core claim.",
         "native_sha256": sha256(native),
         "release_sha256": sha256(release),
         "release_path": str(release),
         "native_path": str(native),
-        "build_environment": {
-            name: os.environ.get(name)
-            for name in (
-                "RUSTFLAGS",
-                "CARGO_ENCODED_RUSTFLAGS",
-                "CARGO_PROFILE_RELEASE_OPT_LEVEL",
-                "CARGO_PROFILE_RELEASE_LTO",
-                "CARGO_PROFILE_RELEASE_CODEGEN_UNITS",
-            )
-        },
+        "build_environment": build_environment(),
         "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in sources},
         "status": "running",
     }
-    with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED) as saved:
-        for path in sources:
-            saved.write(path, path.relative_to(ROOT))
-    metadata["source_archive"] = archive.name
-    metadata["source_archive_sha256"] = sha256(archive)
+    metadata.update(archive_sources(archive, sources))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     memories = []
     with (
@@ -361,11 +340,7 @@ def main():
         memory.write_text(json.dumps(memories, indent=2) + "\n", encoding="utf-8")
     metadata["status"] = "complete"
     metadata["raw_sha256"] = sha256(raw)
-    changed = [
-        path for path, digest in metadata["source_sha256"].items() if sha256(ROOT / path) != digest
-    ]
-    metadata["sources_unchanged_during_run"] = not changed
-    metadata["changed_sources_during_run"] = changed
+    metadata.update(source_changes(metadata["source_sha256"]))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
 
 

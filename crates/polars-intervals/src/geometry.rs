@@ -1,5 +1,7 @@
-use super::cover::{TargetValue, scalar_physical};
-use super::{endpoint_values, validate_endpoint_pair, validate_group_keys};
+use super::cover::{TargetValue, physical_domain, scalar_physical};
+use super::{
+    endpoint_values, logical_series, native_domain, validate_endpoint_pair, validate_group_keys,
+};
 use polars::prelude::*;
 use pyo3::prelude::*;
 use pyo3_polars::{PyDataFrame, PySeries};
@@ -70,28 +72,6 @@ fn evaluate(
     ))
 }
 
-fn validate_rows_domain<T: Ord + Copy + TryFrom<i128>>(
-    starts: &[T],
-    ends: &[T],
-    domain: Option<(i128, i128)>,
-) -> PolarsResult<Option<(T, T)>> {
-    // Validate before grouping/clipping so diagnostics always name original rows.
-    intervals_core::validate_intervals(starts, ends)
-        .map_err(|error| polars_err!(ComputeError: "{error}"))?;
-    domain
-        .map(|(left, right)| {
-            let convert = |value| {
-                T::try_from(value).map_err(|_| {
-                    polars_err!(InvalidOperation: "domain bound is outside endpoint dtype range")
-                })
-            };
-            let (left, right) = (convert(left)?, convert(right)?);
-            polars_ensure!(left <= right, ComputeError: "{}", intervals_core::IntervalError::InvalidDomain);
-            Ok((left, right))
-        })
-        .transpose()
-}
-
 fn evaluate_typed<T>(
     starts: &ChunkedArray<T>,
     ends: &ChunkedArray<T>,
@@ -106,7 +86,13 @@ where
     ChunkedArray<T>: IntoSeries,
 {
     let [starts, ends] = endpoint_values(starts, ends, name)?;
-    let domain = validate_rows_domain(&starts, &ends, domain)?;
+    // Validate before grouping/clipping so diagnostics always name original rows.
+    intervals_core::validate_intervals(&starts, &ends)
+        .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+    let domain = native_domain(domain)?;
+    if domain.is_some_and(|(left, right)| left > right) {
+        return Err(polars_err!(ComputeError: "{}", intervals_core::IntervalError::InvalidDomain));
+    }
     let solve = |starts: &[T::Native], ends: &[T::Native]| {
         match domain {
             Some((left, right)) => intervals_core::interval_gaps(starts, ends, left, right),
@@ -153,22 +139,9 @@ where
         ("end", output.iter().map(|&(_, end)| end).collect()),
     ] {
         let physical = ChunkedArray::<T>::from_vec(name.into(), values).into_series();
-        let logical = match dtype {
-            DataType::Datetime(unit, zone) => physical.into_datetime(*unit, zone.clone()),
-            dtype => physical.cast(dtype)?,
-        };
-        columns.push(logical.into_column());
+        columns.push(logical_series(physical, dtype)?.into_column());
     }
     DataFrame::new(output.len(), columns)
-}
-
-fn physical_domain(
-    domain: Option<(TargetValue, TargetValue)>,
-    dtype: &DataType,
-) -> PolarsResult<Option<(i128, i128)>> {
-    domain
-        .map(|(left, right)| Ok((left.physical(dtype)?, right.physical(dtype)?)))
-        .transpose()
 }
 
 #[pyo3::pyfunction(name = "merge_intervals")]
@@ -207,25 +180,5 @@ pub(crate) fn interval_gaps_py(
         )
     })
     .map(PyDataFrame)
-    .map_err(|error| super::profile::python_error(py, error))
-}
-
-// Private benchmark support: native plans use the same validation without
-// computing a production union or materializing rows in Python.
-#[pyo3::pyfunction(name = "validate_intervals", signature = (starts, ends, domain=None))]
-pub(crate) fn validate_intervals_py(
-    py: Python<'_>,
-    starts: PySeries,
-    ends: PySeries,
-    domain: Option<(TargetValue, TargetValue)>,
-) -> PyResult<()> {
-    py.detach(|| {
-        validate_endpoint_pair(&starts.0, &ends.0, "validate_intervals")?;
-        let domain = physical_domain(domain, starts.0.dtype())?;
-        dispatch_endpoints!(&starts.0, &ends.0, "validate_intervals", |left, right| {
-            let [left, right] = endpoint_values(left, right, "validate_intervals")?;
-            validate_rows_domain(&left, &right, domain).map(|_| ())
-        })
-    })
     .map_err(|error| super::profile::python_error(py, error))
 }

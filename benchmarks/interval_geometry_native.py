@@ -1,12 +1,10 @@
 """Private native-Polars frontier competitor, including genuine lazy execution.
 
-Only validation uses the shared native adapter. Sorting, prefix maxima, run
-formation, canonical labels, grouping, clipping and output assembly are Polars
-expressions. No callback collects a lazy query or iterates rows/groups in Python.
-An error-only eager window translates grouped clustering diagnostics.
+Validation, sorting, prefix maxima, run formation, canonical labels, grouping,
+clipping and output assembly use Polars expressions. No callback collects a
+lazy query or iterates rows/groups in Python. An error-only eager window
+provides grouped clustering diagnostics.
 """
-
-import re
 
 import polars as pl
 
@@ -19,9 +17,7 @@ def _prepare(intervals, start, end, by, domain=None, *, row_aligned=False):
         _frame_dtypes,
         _frame_keys,
         _geometry_input,
-        _target,
     )
-    from polars_intervals._internal import validate_intervals
 
     if row_aligned:
         # Row-aligned windows inherit Polars grouping support, including endpoint
@@ -39,31 +35,29 @@ def _prepare(intervals, start, end, by, domain=None, *, row_aligned=False):
         selected, keys, schema = _geometry_input(intervals, start, end, by, "native_geometry")
         dtype = schema["start"]
     bounds = None if domain is None else tuple(_bound(value, dtype) for value in domain)
-    parsed = None if domain is None else tuple(_target(value) for value in domain)
 
     def validate(frame):
-        try:
-            validate_intervals(frame[start], frame[end], parsed)
-        except pl.exceptions.ComputeError as error:
-            # A frame validator reports a global row. Cluster windows instead
-            # diagnose the original position within the affected group. Only
-            # this exceptional path computes the corresponding native window.
-            pattern = r"interval at index \d+ has start greater than end"
-            if not (row_aligned and keys and re.search(pattern, str(error))):
-                raise
-            local = frame.select(
-                pl.int_range(0, pl.len(), dtype=pl.UInt32)
-                .over([pl.selectors.by_name(key) for key in keys])
-                .filter(pl.selectors.by_name(start) > pl.selectors.by_name(end))
-                .first()
-            ).item()
-            message = re.sub(
-                pattern,
-                f"interval at index {local} has start greater than end",
-                str(error),
-                count=1,
+        left, right = pl.selectors.by_name(start), pl.selectors.by_name(end)
+        nulls, invalid = frame.select(
+            (left.is_null() | right.is_null()).any().alias("nulls"),
+            pl.int_range(pl.len()).filter(left > right).first().alias("invalid"),
+        ).row(0)
+        if nulls:
+            raise pl.exceptions.ComputeError("null endpoints are not supported")
+        if invalid is not None:
+            if row_aligned and keys:
+                # Cluster windows diagnose the original position within a group.
+                invalid = frame.select(
+                    pl.int_range(pl.len())
+                    .over([pl.selectors.by_name(key) for key in keys])
+                    .filter(left > right)
+                    .first()
+                ).item()
+            raise pl.exceptions.ComputeError(
+                f"interval at index {invalid} has start greater than end"
             )
-            raise pl.exceptions.ComputeError(message) from error
+        if bounds and bounds[0].to_physical().item() > bounds[1].to_physical().item():
+            raise pl.exceptions.ComputeError("domain start is greater than domain end")
         return frame
 
     # Shared barrier preserves all-row validation before downstream operations.

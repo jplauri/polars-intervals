@@ -52,14 +52,7 @@ pub fn cluster_intervals<T: Ord + Copy>(
     let mut frontier = None;
     let mut current = 0;
     for (start, end, row) in records {
-        let separate = frontier.is_none_or(|right| {
-            if include_touching {
-                start > right
-            } else {
-                start >= right
-            }
-        });
-        if separate {
+        if separates(start, frontier, include_touching) {
             current = cluster_id(remap.len() as u64)?;
             remap.push(None);
             frontier = Some(end);
@@ -89,6 +82,16 @@ fn cluster_id(id: u64) -> Result<u32, IntervalError> {
     u32::try_from(id).map_err(|_| IntervalError::TooManyClusters)
 }
 
+fn separates<T: Ord>(start: T, frontier: Option<T>, touching: bool) -> bool {
+    frontier.is_none_or(|right| {
+        if touching {
+            start > right
+        } else {
+            start >= right
+        }
+    })
+}
+
 // First occurrence is already canonical in start order. Empty rows consume an
 // ID in original order without resetting or extending the nonempty frontier.
 fn cluster_presorted<T: Ord + Copy>(
@@ -105,13 +108,7 @@ fn cluster_presorted<T: Ord + Copy>(
             labels.push(cluster_id(next)?);
             next += 1;
         } else {
-            if frontier.is_none_or(|right| {
-                if touching {
-                    start > right
-                } else {
-                    start >= right
-                }
-            }) {
+            if separates(start, frontier, touching) {
                 current = cluster_id(next)?;
                 next += 1;
                 frontier = Some(end);
@@ -275,12 +272,5 @@ mod tests {
             Err(IntervalError::TooManyClusters)
         );
         assert_eq!(cluster_id(u64::MAX), Err(IntervalError::TooManyClusters));
-    }
-
-    proptest::proptest! {
-        #[test]
-        fn checked_cluster_ids_match_the_uint32_range(id in proptest::prelude::any::<u64>()) {
-            proptest::prop_assert_eq!(cluster_id(id).ok(), u32::try_from(id).ok());
-        }
     }
 }

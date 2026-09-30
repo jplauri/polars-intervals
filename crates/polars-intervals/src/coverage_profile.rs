@@ -1,7 +1,7 @@
-use super::cover::{TargetValue, scalar_physical};
+use super::cover::{TargetValue, physical_domain, scalar_physical};
 use super::{
-    endpoint_values, integer_values, validate_endpoint_pair, validate_group_keys,
-    validate_integer_dtype,
+    endpoint_values, integer_values, logical_series, native_domain, validate_endpoint_pair,
+    validate_group_keys, validate_integer_dtype,
 };
 use intervals_core::{CoverageSegment, IntervalError};
 use polars::prelude::*;
@@ -99,15 +99,7 @@ where
     ChunkedArray<T>: IntoSeries,
 {
     let [starts, ends] = endpoint_values(starts, ends, NAME)?;
-    let domain = domain
-        .map(|(left, right)| -> PolarsResult<_> {
-            let convert = |value| {
-                T::Native::try_from(value)
-                    .map_err(|_| polars_err!(InvalidOperation: "domain bound is outside endpoint dtype range"))
-            };
-            Ok((convert(left)?, convert(right)?))
-        })
-        .transpose()?;
+    let domain = native_domain(domain)?;
     // Validate before partitioning, so row diagnostics retain original indices
     // even for groups with no output. Ungrouped calls use core validation directly.
     if !keys.is_empty() {
@@ -191,11 +183,7 @@ where
         ("end", output.iter().map(|segment| segment.end).collect()),
     ] {
         let physical = ChunkedArray::<T>::from_vec(name.into(), values).into_series();
-        let logical = match dtype {
-            DataType::Datetime(unit, zone) => physical.into_datetime(*unit, zone.clone()),
-            dtype => physical.cast(dtype)?,
-        };
-        columns.push(logical.into_column());
+        columns.push(logical_series(physical, dtype)?.into_column());
     }
     let height = output.len();
     columns.push(
@@ -219,14 +207,7 @@ pub(crate) fn coverage_profile_py(
     include_zero: bool,
 ) -> PyResult<PyDataFrame> {
     let result = py.detach(|| {
-        let domain = domain
-            .map(|(left, right)| -> PolarsResult<_> {
-                Ok((
-                    left.physical(starts.0.dtype())?,
-                    right.physical(starts.0.dtype())?,
-                ))
-            })
-            .transpose()?;
+        let domain = physical_domain(domain, starts.0.dtype())?;
         evaluate(
             &starts.0,
             &ends.0,

@@ -3,47 +3,13 @@
 import importlib
 import random
 import sys
-from itertools import pairwise
 
 import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
 from benchmarks.interval_geometry_native import native_cluster, native_gaps, native_merge
-
-
-def graph_oracle(rows, touching):
-    labels = [None] * len(rows)
-    label = 0
-    for first in range(len(rows)):
-        if labels[first] is not None:
-            continue
-        labels[first] = label
-        pending = [first]
-        while pending:
-            i = pending.pop()
-            s, e = rows[i]
-            for j, (a, b) in enumerate(rows):
-                related = (s <= b and a <= e) if touching else (s < b and a < e)
-                if labels[j] is None and s < e and a < b and related:
-                    labels[j] = label
-                    pending.append(j)
-        label += 1
-    return labels
-
-
-def cell_oracle(rows, domain=None):
-    points = sorted({x for row in rows for x in row} | (set(domain) if domain else set()))
-    result = []
-    for left, right in pairwise(points):
-        covered = any(s <= left < e for s, e in rows)
-        wanted = covered if domain is None else domain[0] <= left < domain[1] and not covered
-        if wanted:
-            if result and result[-1][1] == left:
-                result[-1] = (result[-1][0], right)
-            else:
-                result.append((left, right))
-    return result
+from tests.test_interval_geometry import cells_oracle, cluster_oracle
 
 
 def test_native_random_original_problem_oracles():
@@ -63,7 +29,7 @@ def test_native_random_original_problem_oracles():
             ]
             by = "g" if grouped else None
             for touching in (False, True):
-                per_group = {g: iter(graph_oracle(geometry(g), touching)) for g in groups}
+                per_group = {g: iter(cluster_oracle(geometry(g), touching)) for g in groups}
                 expected = [next(per_group[g if grouped else None]) for _, _, g in rows]
                 for source in (df, df.lazy()):
                     output = native_cluster(source, by=by, include_touching=touching)
@@ -75,7 +41,7 @@ def test_native_random_original_problem_oracles():
                 expected = [
                     (*((g,) if grouped else ()), *segment)
                     for g in groups
-                    for segment in cell_oracle(geometry(g), domain)
+                    for segment in cells_oracle(geometry(g), domain)
                 ]
                 operation = native_merge if domain is None else native_gaps
                 options = (
@@ -138,6 +104,32 @@ def test_native_lazy_validation_and_schema_only_planning(operation):
     assert calls == []
     with pytest.raises(pl.exceptions.ComputeError, match="index 1"):
         query.head(1).collect(engine="streaming")
+
+
+@pytest.mark.parametrize("operation", [native_cluster, native_merge, native_gaps])
+def test_native_null_endpoints_validate_before_pruning(operation):
+    df = pl.DataFrame(
+        {"start": [0, None], "end": [0, 1]}, schema={"start": pl.Int64, "end": pl.Int64}
+    )
+    options = {"domain_start": 0, "domain_end": 0} if operation == native_gaps else {}
+    with pytest.raises(pl.exceptions.ComputeError, match="null endpoints"):
+        operation(df, **options)
+    query = operation(df.lazy(), **options)
+    query.collect_schema()
+    with pytest.raises(pl.exceptions.ComputeError, match="null endpoints"):
+        query.head(1).collect(engine="streaming")
+
+
+def test_native_reversed_domain_validation_is_deferred():
+    for rows in ([], [(0, 1)]):
+        df = pl.DataFrame(rows, schema={"start": pl.Int64, "end": pl.Int64}, orient="row")
+        with pytest.raises(pl.exceptions.ComputeError, match="domain start"):
+            native_gaps(df, domain_start=2, domain_end=1)
+        query = native_gaps(df.lazy(), domain_start=2, domain_end=1)
+        query.collect_schema()
+        query.explain()
+        with pytest.raises(pl.exceptions.ComputeError, match="domain start"):
+            query.collect(engine="streaming")
 
 
 def test_native_rejects_invalid_options():

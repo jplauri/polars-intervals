@@ -3,12 +3,13 @@
 The [report](../docs/interval-geometry-benchmarks.md) contains measured results.
 The [API guide](../docs/interval-geometry.md) defines the public contracts.
 
-Saved timings and RSS measurements predate a helper-only cleanup: the native
-competitor now uses `_blocking_frame`, and the geometry and overlap runners
-share `provenance.resident_memory`. Production kernels, adapters and public
-Python APIs are unchanged. Raw samples, metadata and source archives remain
-unchanged and identify the measured versions. The cleanup was checked for
-behavior, without new performance claims.
+Saved timings and RSS measurements describe the archived implementations.
+Later cleanup shared the clustering boundary predicate, adapter domain/type
+conversions, validation barrier and benchmark provenance helpers. It removed
+redundant adapter checks and replaced the competitor's benchmark-only Rust
+validator with Polars checks. The public Python APIs and geometry algorithms
+retain their contracts. Raw samples, metadata and source archives are unchanged.
+The cleanup was checked for behavior, without new timing or memory claims.
 
 ## Candidates and timing boundaries
 
@@ -22,10 +23,14 @@ implementations covered by the same original-problem oracles.
 | `production` | Scan original endpoints directly after verifying relevant start order, otherwise sort packed records. Clustering restores canonical IDs. Gaps emit directly. |
 | `packed_sort` | Packed records with unconditional sorting. Measures the value and cost of checking start order. |
 | `packed_sorted` | Private packed preparation with verified start order. Compares with the production direct-buffer path and unconditional packed sorting. Its fused gaps also compare directly with `materialized`. |
-| `indices` | Sort row indices and read endpoints indirectly. Includes index storage and complete output construction. |
-| `indices_sorted` | Indexed preparation with a verified start-order fast path. |
+| `indices_sorted` | Sort row indices and read endpoints indirectly, with a verified start-order fast path. Includes index storage and complete output construction. |
 | `materialized` | Build canonical clipped union, then complement it. Checks start order. Gaps only. |
-| `materialized_sort` | Materialized union and complement with unconditional sorting. Gaps only. |
+
+The archived runs also include `indices` and `materialized_sort`, which always
+sort. These private variants were removed after measurement. The retained
+packed pair isolates the sortedness check, and `packed_sorted` versus
+`materialized` isolates gap emission. `indices_sorted` retains the indexed
+comparison and its measured wins and memory savings.
 
 For verified ordered input, the only allocation is output. Ordered clustering
 assigns each new component its canonical ID while visiting original rows,
@@ -55,14 +60,16 @@ component representatives within each group. Gaps derive leading, internal
 and trailing uncovered ranges from clipped union. Observed groups are obtained
 before clipping, with nullable keys mapped to stable first-row positions.
 
-The native competitor shares the package's Rust endpoint/domain validator.
-A direct eager validation call precedes the native scan plan. For lazy inputs,
-a blocking node prevents downstream filters, projections or slices from
-changing the validation instance. All geometry after that barrier uses native
-Polars expressions. Temporary columns occupy a fresh projected namespace.
-No callback collects a lazy query or loops over rows/groups in Python.
-After a grouped clustering validation failure, one native eager window converts
-the diagnostic to its original within-group position. Valid calls do not run
+The measured native competitor used the package's Rust endpoint/domain
+validator. The current competitor checks original rows with Polars expressions
+and validates scalar bounds with the existing native-baseline helper. A direct
+eager validation call precedes the scan plan. For lazy inputs, a blocking node
+prevents downstream filters, projections or slices from changing the validation
+instance. All geometry after that barrier uses native Polars expressions.
+Temporary columns occupy a fresh projected namespace. No callback collects a
+lazy query or loops over rows/groups in Python. After a grouped clustering
+validation failure, one native eager window supplies the original within-group
+position directly, without parsing an exception message. Valid calls do not run
 this error-only calculation.
 
 The clustering competitor takes a frame and column names, equivalent to a
