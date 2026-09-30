@@ -1,6 +1,6 @@
 # Maximum covered length benchmarks { #maximum-k-coverage-benchmarks }
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 

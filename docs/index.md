@@ -45,5 +45,5 @@ Intervals include their start and exclude their end, so touching intervals do no
 
 - [Usage](usage.md): input rules and examples for each operation.
 - [API reference](api.md): parameters, return types, and input requirements.
-- [Benchmarks](benchmarks.md): comparisons and plots.
+- [Benchmarks](benchmarks.md): runtimes and native Polars comparisons.
 - [Contributing](contributing.md): source builds and development.

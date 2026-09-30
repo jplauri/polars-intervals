@@ -1,13 +1,14 @@
 # Nesting depth benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
 [`nesting_depth`](api.md#polars_intervals.nesting_depth) measures how deeply each
 interval sits inside a chain of other intervals. Outermost intervals have depth
-zero. In synthetic benchmarks, full Polars queries took **about 200 ms for three
-million shuffled integer intervals**, with either shallow or deep nesting. The
+zero. In synthetic benchmarks with Polars restricted to four threads, full Polars
+queries took **about 200 ms for three million shuffled integer intervals**, with
+either shallow or deep nesting. The
 sorted, fully nested example took **43 ms**. Input order and grouping can matter
 as much as nesting depth. A native Polars comparison has not been measured.
 

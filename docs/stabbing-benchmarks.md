@@ -1,6 +1,6 @@
 # Minimum stabbing points benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 

@@ -1,6 +1,6 @@
 # Clustering, union, and gaps benchmarks { #interval-clustering-union-and-gap-benchmarks }
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
@@ -9,10 +9,10 @@ connected intervals,
 [`merge_intervals`](api.md#polars_intervals.merge_intervals) combines covered
 ranges, and [`interval_gaps`](api.md#polars_intervals.interval_gaps) finds
 uncovered ranges within a domain. In synthetic benchmarks, clustering **100,000
-shuffled intervals took 4.11 ms**, **7.5× faster** than the native Polars
-implementation tested, with Polars restricted to one thread. Merging and finding
-gaps in 100,000 separate intervals took **4.16–4.28 ms**, **about 10× faster**
-under the same thread restriction. Native clustering won on many tiny groups.
+shuffled intervals took 4.74 ms**, **3.2× faster** than the native Polars
+implementation tested. Merging and finding gaps in 100,000 grouped intervals
+took **4.29–5.66 ms**, **2.9–3.4× faster**. The advantage shrinks at one million
+rows, and native clustering won on many tiny groups.
 
 ## Results
 
@@ -23,14 +23,9 @@ labels, merged ranges or gaps.
 
 --8<-- "docs/assets/benchmarks/geometry-summary.md:3:-3"
 
-Grouping adds overhead when each group contains only one interval. For 1,000
-singleton timestamp groups, package clustering took 10.3 ms, **2.2× slower**
-than native Polars.
-
-More cores narrow some advantages. Measurements used a September 29, 2026
-build labeled 0.2.0.
-Input checks changed afterward in both implementations, and those changes
-have not been timed.
+Grouping adds overhead when groups are tiny. With one interval in each of 1,000
+timestamp groups, clustering took 10.9 ms, **1.5× slower** than native Polars.
+With 100 intervals per group, the function was only 1.2× faster.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
@@ -52,24 +47,31 @@ expression API, the comparator accepts a frame and column names; its
 explain that boundary. Speedup is native median divided by package median for
 the same workload and size.
 
-The headline selects small and large strict-clustering inputs, 100,000-row
-touching/union/gap cases and timestamp groups from one broad eager run.
-A separate million-row lazy run measured ordered-chain clustering at
+--8<-- "docs/assets/benchmarks/geometry-summary.md:-2:"
+
+The headline table uses complete lazy calls from the 24-thread run, including
+planning and collection. It selects clustering, union and gap cases, including
+grouped cases where the advantage narrows or reverses. The second seed showed
+the same pattern: the package kept its large-case advantage, and native
+clustering kept its singleton-group win. Core scans are sequential; Polars query
+work can use the configured pool.
+
+Restricting Polars to one thread widened large-case advantages. In the broad
+one-thread eager run, clustering 100,000 shuffled intervals took **4.11 ms**
+package versus **30.8 ms** native. Merging or finding gaps in 100,000 separate
+intervals took **4.16–4.28 ms**, about 10× faster than native. Million-row
+timestamp union took **58.3 / 259 ms** package/native with one thread, versus
+**50.7 / 83.6 ms** with 24. Shuffled clustering took **44.7 / 311 ms**, versus
+**61.3 / 136 ms**.
+
+A separate one-thread million-row run measured ordered-chain clustering at
 **4.75 ms** package versus **65.2 ms** native, and nested union at **5.22 ms**
-versus **45.2 ms**. Shuffling the chain raised package time to **44.7 ms**.
+versus **45.2 ms**.
 
-A two-seed repeat confirmed the small-group loss: at 1,000 singleton timestamp
-groups, strict clustering took **10.3–10.4 ms** package versus **4.64–4.91 ms**
-native. At 100,000 rows across the same 1,000 groups, package took
-**14.5–14.9 ms** versus **26.0–27.1 ms**. These ranges span seed medians.
-
-The separate 24-thread run narrowed large-case advantages. Million-row
-timestamp union changed from **58.3 / 259 ms** package/native with one thread
-to **50.7 / 83.6 ms** with 24. Shuffled clustering changed from
-**44.7 / 311 ms** to **61.3 / 136 ms**. The package retained its selected
-large-case advantage for both seeds; native clustering retained its
-singleton-group win. Core scans are sequential; Polars query work can use
-the configured pool.
+A two-seed one-thread repeat confirmed the small-group loss: at 1,000 singleton
+timestamp groups, strict clustering took **10.3–10.4 ms** package versus
+**4.64–4.91 ms** native. At 100,000 rows across the same 1,000 groups, package
+took **14.5–14.9 ms** versus **26.0–27.1 ms**. These ranges span seed medians.
 
 A [separate phase run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-lazy-20260929.metadata.json)
 measured ordered 100,000-row union planning at **0.0319 / 0.195 ms**
@@ -80,14 +82,16 @@ reads; complete streaming-engine calls took **7.86 / 29.7 ms**.
 **Settings**
 
 See shared [hardware](benchmarks.md#hardware) and the [measurement guide](benchmarking.md).
-Broad eager runs used one thread, one warmup and three samples. Selected
-million-row, thread, phase and small-group repeats used two warmups and five
-samples. Tables select seed 7; repeated size/thread runs also preserve seed 41.
-Method order rotates between samples. Exact scopes and settings remain separate:
+The headline run set 24 Polars threads, matching this machine's logical
+processors. Broad eager runs used one thread, one warmup and three samples.
+Selected million-row, thread, phase and small-group repeats used two warmups and
+five samples. Tables select seed 7; repeated size/thread runs also preserve seed
+41. Method order rotates between samples. Exact scopes and settings remain
+separate:
 
+- [24-thread headline run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-threads24-20260929.metadata.json)
 - [Broad eager run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-20260929.metadata.json)
 - [Million-row lazy run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-million-20260929.metadata.json)
-- [24-thread lazy run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-threads24-20260929.metadata.json)
 - [Million-row core run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-core-million-20260929.metadata.json)
 
 Complete Python timings include argument checks, validation, extraction,
@@ -97,6 +101,13 @@ these separately. Inputs are already in memory except for the warm Parquet
 cases. Fixture construction, compilation, correctness checks and Python output
 destruction are excluded. Core calls include output destruction and do not
 represent complete Polars times.
+
+Small cases use independent overlap graphs, elementary-cell membership and
+bounded integer bitmaps to check canonical labels and exact gaps. Large cases
+compare complete outputs and structural invariants; they lack an independent
+large-instance oracle. Every row is validated before clipping or fast paths.
+Tests also cover pushdowns, schema-only planning, streaming, multiple keys and
+exact temporal metadata.
 
 <span id="coverage-and-limitations"></span>
 
@@ -109,13 +120,6 @@ coordinates. Complete Polars runs cover UInt64 above 2^53, Date, nanosecond
 Datetime, null keys, few large/many small/skewed groups, differing chunks, wide
 payloads and scans. Core runs cover i64/u64/i16, omitting out-of-range narrow
 coordinates.
-
-Small cases use independent overlap graphs, elementary-cell membership and
-bounded integer bitmaps to check canonical labels and exact gaps. Large cases
-compare complete outputs and structural invariants; they lack an independent
-large-instance oracle. Every row is validated before clipping or fast paths.
-Tests also cover pushdowns, schema-only planning, streaming, multiple keys and
-exact temporal metadata.
 
 Clustering returns one label per input row. Million-row nested union returns
 one range; disjoint gaps return **1,000,001**. The narrow-domain eight-group case
@@ -145,13 +149,15 @@ The runner verifies that the installed extension matches that release binary.
 Use a new output prefix for every run. In PowerShell:
 
 ```powershell
+$env:POLARS_MAX_THREADS = "24"
+uv run --no-sync python -m benchmarks.interval_geometry --output benchmarks/results/geometry-threads24-new --sizes 1000 100000 1000000 --cases 1 7 8 14 --seeds 7 41 --samples 5 --warmups 2 --scopes lazy_complete
 $env:POLARS_MAX_THREADS = "1"
 uv run --no-sync python -m benchmarks.interval_geometry --output benchmarks/results/geometry-new --sizes 0 8 1000 10000 100000 --samples 3 --warmups 1 --scopes eager lazy_complete
 uv run --no-sync python -m benchmarks.interval_geometry --output benchmarks/results/geometry-million-new --sizes 1000000 --cases 0 1 2 3 7 8 14 --seeds 7 41 --samples 5 --warmups 2 --scopes eager lazy_complete
 uv run --no-sync python -m benchmarks.interval_geometry_core --output benchmarks/results/geometry-core-new --sizes 0,8,1000,10000,100000 --samples 3 --warmups 1
 ```
 
-For focused thread, phase and memory repeats, use the exact settings recorded
+For focused phase and memory repeats, use the exact settings recorded
 below. Set `POLARS_MAX_THREADS` before starting the process. Add `--memory` for
 separate fresh-process workers. The core wrapper records Cargo release settings
 and saves its source snapshot. Both runners preserve raw samples and reject
@@ -161,11 +167,7 @@ existing output prefixes. Generate tables with the isolated plots environment:
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
 ```
 
-Exact headline and supplemental table downloads:
-
-Headline cases:
-
---8<-- "docs/assets/benchmarks/geometry-summary.md:-2:"
+Supplemental table downloads:
 
 Broad eager comparisons:
 
@@ -174,10 +176,6 @@ Broad eager comparisons:
 Million-row lazy comparisons:
 
 --8<-- "docs/assets/benchmarks/interval-geometry-million-table.md:-2:"
-
-24-thread lazy comparisons:
-
---8<-- "docs/assets/benchmarks/interval-geometry-threads24-table.md:-2:"
 
 Private Rust algorithm comparisons:
 
@@ -198,9 +196,9 @@ Raw samples, metadata and source archives:
 
 **History**
 
-The headline run was recorded at `2026-09-29T19:36:11.609785+00:00`, based on
-`362aa5b2cf63d826dde98c28d72efac6ff29c9cf` with uncommitted feature sources.
-The [source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-20260929.sources.zip)
+The broad eager run was based on `362aa5b2cf63d826dde98c28d72efac6ff29c9cf`
+with uncommitted feature sources. Its
+[source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-20260929.sources.zip)
 declares version `0.2.0`; core and adapter match `43e9af1`. Later `83e8e44`
 removes duplicate adapter type/length checks and replaces the native competitor's
 Rust validator with Polars expressions. Both affect complete-query timing.

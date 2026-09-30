@@ -1,15 +1,17 @@
 # <Operation> benchmarks
 
-[All benchmarks](../docs/benchmarks.md) · [Measurement guide](../docs/benchmarking.md)
+[All benchmarks](../docs/benchmarks.md) · [Measurement rules](../docs/benchmarking.md#measurement-rules)
 
 ## Summary
 
 Write one short paragraph, usually 50–80 words. Start with the linked method
 name and explain its purpose in one sentence. Give a measured input size,
 runtime, and comparison with the fastest native Polars method tested on the
-same workload. Use Polars' default thread pool for headline comparisons. If only
-restricted-thread measurements exist, put that condition in the comparison
-sentence itself, such as "with Polars restricted to one thread". Never label a
+same workload. Headline runtimes and comparisons use Polars' default thread
+pool or all logical processors. If the headline workload was measured only with
+fewer threads, put that condition in the summary sentence itself, such as "with
+Polars restricted to one thread". If other workloads were measured with all
+logical processors, add one visible sentence with those results. Never label a
 fixed thread count as the default unless the run used the default setting.
 
 State an exception readers can act on, such as input order, group size, weights
@@ -40,7 +42,9 @@ Add one visible line defining the comparison in public Polars terms, such as
 Native Polars means the fastest equivalent query tested for that row in the same run.
 Record which method won in Benchmark details. Include small and large inputs
 where measured, plus important cases where the advantage disappears or reverses.
-Use about three significant figures. Missing measurements stay missing.
+Use about three significant figures for times and two for ratios. Quote ratios
+in the summary and overview as the table shows them. Missing measurements stay
+missing.
 Describe inconclusive differences as "about the same" and losses as "× slower".
 
 Use one ratio convention: **speedup = baseline median / package median**.
@@ -58,12 +62,10 @@ limits. Keep meaningful variability visible when it could change the conclusion.
 Use a plot only when it makes a scaling trend, crossover or tradeoff clearer.
 
 Add brief notes only when they change how readers should interpret the result.
-These can cover missing measurements, restricted comparisons, meaningful memory
-costs or an older measured build. Explain them in plain language. An older-build
-note must name the measured version or date and say which timed path changed,
-or that no relevant path changed. Do not repeat a vague historical disclaimer.
-Keep source hashes and exact revisions in details. Put exact thread settings in
-details, except for the summary's restricted-thread condition.
+These can cover missing measurements, restricted comparisons or meaningful
+memory costs. Explain them in plain language. Do not mention measurement dates
+or older builds. Keep source hashes and exact revisions in details. Put exact
+thread settings in details, except for the summary's thread condition.
 For algorithm-only results, replace the timing label with "Underlying algorithm
 time" and keep them separate from full Polars measurements.
 
@@ -78,33 +80,36 @@ of filling this block. Keep these labels out of the table of contents.
 
 Identify the public function, equivalent native queries and selected workloads.
 Name the fastest native method for each headline row. Explain case selection
-and retain useful exceptions. Additional results belong here only when they
-help readers interpret the first table. Keep separate runs and scopes separate.
+and retain useful exceptions. Include the headline table's exact downloads.
+Additional results belong here only when they help readers interpret the first
+table. Keep separate runs and scopes separate.
 
 **Settings**
 
 Give timing boundaries, warmups, samples, threads, seeds and software versions.
-Link the shared hardware and measurement guide instead of repeating them.
-Preserve settings and source/build hashes in linked metadata.
+Briefly explain correctness evidence, distinguishing independent checks from
+agreement between candidates. Link the shared hardware and measurement guide
+instead of repeating them. Preserve settings and source/build hashes in linked
+metadata.
 
 **Limitations**
 
-State missing input types, workloads, baselines and execution modes. Briefly
-explain correctness evidence, distinguishing independent checks from agreement
-between candidates. Name any memory metric and exclusions. Keep meaningful
-variability and unfavorable results. Label proposed explanations as such.
+State missing input types, workloads, baselines and execution modes. Name any
+memory metric and exclusions. Keep meaningful variability and unfavorable
+results. Label proposed explanations as such.
 
 **Reproduce**
 
 Give the operation command and link the shared setup. Include raw samples,
-metadata, measured source archives and exact table downloads here.
+metadata, measured source archives and supplemental table downloads here.
 
 **History**
 
 Keep older builds, private algorithm comparisons and repeat-run history here.
-Use supporting notes for lengthy development narratives. Preserve original
-measurement identities and archived table conventions without relabeling data.
-Explain how timed paths changed, without inferring an unmeasured speedup.
+Identify measured builds by revision, not date. Use supporting notes for lengthy
+development narratives. Preserve original measurement identities and archived
+table conventions without relabeling data. Explain how timed paths changed,
+without inferring an unmeasured speedup.
 
 </details>
 

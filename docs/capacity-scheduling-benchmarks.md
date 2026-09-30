@@ -1,6 +1,6 @@
 # Capacity scheduling benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
@@ -20,9 +20,6 @@ problem. Large, interconnected groups can take much longer.
 Each overlap group has 32 intervals. A limit of 31 still requires choosing one
 to leave out, while a limit of 32 allows all intervals in these examples and
 makes the task easier.
-
-Measurements were taken on September 26, 2026 before the solver's working
-memory was reduced. The updated full Polars query has not been remeasured.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
@@ -102,8 +99,8 @@ wheel's Python from outside the checkout, following the shared setup.
 
 **History**
 
-The saved run record is dated `2026-09-26T12:40:12.1472941+03:00` and names
-base revision `cd3a0181232bda9a2c1f7b0aafdfef1adcd8233f`. The measured package
+The saved run record names base revision
+`cd3a0181232bda9a2c1f7b0aafdfef1adcd8233f`. The measured package
 version was not recorded. The original core source hash matches `29d75ee`,
 before `cee8e52` removed the per-interval edge-index vector and intermediate
 worker-result buffering. Those changes affect allocations and reconstruction

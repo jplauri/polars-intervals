@@ -1,6 +1,6 @@
 # Coverage depth and resource demand benchmarks { #coverage-and-load-profile-benchmarks }
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
@@ -8,8 +8,8 @@
 segments showing how many intervals are active, or their total resource demand,
 along the coordinate range. With Polars restricted to one thread, complete calls
 processed **100,000 synthetic intervals in 1.24–8.70 ms**, **3.9–33× faster than
-the fastest tested native Polars expressions**. The advantage varies with the
-data and is smaller when native Polars can use more CPU cores.
+the fastest tested native Polars expressions**. A separate million-row run with
+24 Polars threads was **1.3–4.7× faster**. The advantage varies with the data.
 
 ## Results
 
@@ -23,9 +23,6 @@ Native Polars uses grouped endpoint sums or counts to build the same profile.
 Sorted short intervals give the largest advantage in these examples. The
 32-resource workload has a smaller advantage, at about four times faster.
 
-Measurements used a September 29, 2026 build labeled 0.2.0, before sorting and
-input checks changed. The updated full Polars queries have not been timed.
-
 <details markdown="1">
 <summary>Benchmark details</summary>
 
@@ -37,6 +34,8 @@ signed events or arrival/departure counts, sort and cumulatively sum loads.
 Weighted cases sum demand; other cases count active intervals. Event sums won
 the displayed unweighted cases. Speedup is the fastest native median divided
 by the package median for the same workload and size.
+
+--8<-- "docs/assets/benchmarks/coverage-profile-headline.md:-2:"
 
 The headline selects short intervals, weighted durations and grouped cases from
 the eager/lazy follow-up with its simplified native baseline. Eight-row calls
@@ -81,6 +80,13 @@ and output destruction. Fixture construction, compilation, correctness checks,
 allocation probes and Python output destruction are outside timing. Rust times
 do not represent full Polars calls.
 
+Small instances use independent original-row membership and per-integer-tick
+oracles. Larger cases use whole-output candidate agreement and structural
+checks; they do not have an independent quadratic oracle. Properties also
+check transformations, partition addition and idempotence. Area, peak, clique
+and lane comparisons are secondary checks. Every row is validated even for an
+empty domain.
+
 <a id="coverage-and-limitations"></a>
 
 **Limitations**
@@ -91,13 +97,6 @@ boundaries and empty/zero-heavy rows. Domains include inferred, extended,
 partial, outside and empty ranges. Complete Polars cases cover UInt64, Date,
 zoned nanosecond Datetime, null keys, 32/1,000 requested groups and differing
 chunk boundaries.
-
-Small instances use independent original-row membership and per-integer-tick
-oracles. Larger cases use whole-output candidate agreement and structural
-checks; they do not have an independent quadratic oracle. Properties also
-check transformations, partition addition and idempotence. Area, peak, clique
-and lane comparisons are secondary checks. Every row is validated even for an
-empty domain.
 
 Output size matters: the million-row nested fixture returns almost two million
 segments, while short intervals return 15. Raw samples record positive clipped
@@ -146,12 +145,7 @@ uv run --locked --isolated --only-group docs mkdocs build --strict
 
 Set `PROPTEST_CASES=2048` for the higher-case run.
 
-Exact table downloads, including supplemental eager, million-row, thread and
-algorithm comparisons:
-
-Headline cases:
-
---8<-- "docs/assets/benchmarks/coverage-profile-headline.md:-2:"
+Supplemental table downloads:
 
 Eager, lazy and streaming comparisons:
 
@@ -194,8 +188,8 @@ records deferred-execution tests, current wheel checks and the focused timing ru
 
 **History**
 
-The headline run was recorded at `2026-09-29T15:59:30.655100+00:00`, based on
-`2b2a2666386c971f6e8d63cbf47cd7a405d1f41b` with uncommitted feature sources.
+The headline run was based on `2b2a2666386c971f6e8d63cbf47cd7a405d1f41b` with
+uncommitted feature sources.
 Its [source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.sources.zip)
 declares version `0.2.0`; core and adapter match `280e515`. The base revision
 alone does not identify the measured code. Later `8284b66` sorting changes and

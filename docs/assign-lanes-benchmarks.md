@@ -1,6 +1,6 @@
 # Lane assignment benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
@@ -36,7 +36,7 @@ or shuffled.
 See the [measurement guide](benchmarking.md) and shared
 [hardware](benchmarks.md#hardware).
 
-The September 30, 2026 run uses package 0.2.0 and Polars 1.44.2. Polars' thread
+The run uses package 0.2.0 and Polars 1.44.2. Polars' thread
 setting was left at its default, producing a 24-thread pool on this machine.
 Each case has two warmups and five timed samples. The table shows seed 7;
 seed 41 remains separate in the raw samples. At one million shuffled rows,
@@ -87,7 +87,7 @@ See the shared guide for setup and publishing generated tables.
 [Environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-environment.json) ·
 [Algorithm and repeat notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#lane-assignment)
 
-Release-library and installed-plugin hashes match for the September 30 run.
+Release-library and installed-plugin hashes match for this run.
 The [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.metadata.json)
 and [measured source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.sources.zip)
 preserve the build and all runner inputs.
@@ -102,8 +102,6 @@ The algorithm runs used one thread, two warmups and nine samples per case,
 with seed 42 and integer endpoints. The displayed times are medians. Settings,
 software versions and source hashes are recorded in the
 [environment metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/assign-lanes-environment.json).
-
---8<-- "docs/assets/benchmarks/lanes-summary.md:-2:"
 
 “Up to 128 overlapping” describes how many intervals can be active at once.
 Nested inputs place intervals inside one another. The first method implements

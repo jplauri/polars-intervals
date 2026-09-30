@@ -1,7 +1,0 @@
-case,workload_family,workload_order,method,x,median,min,max,samples
-"Non-overlapping, shuffled",disjoint,shuffled,heap,1000,0.021599999999999998,0.019799999999999998,0.0294,9
-"Non-overlapping, shuffled",disjoint,shuffled,heap,1000000,79.7289,78.3329,84.3017,9
-"Up to 128 overlapping, sorted",moderate128,sorted,heap,1000000,23.5181,23.3903,24.0127,9
-"Up to 128 overlapping, shuffled",moderate128,shuffled,heap,1000000,153.1129,148.7727,162.0601,9
-"Nested, sorted",nested,sorted,heap,1000000,29.9334,29.3962,31.3451,9
-"Nested, shuffled",nested,shuffled,heap,1000000,171.9333,167.2123,186.2535,9

@@ -1,6 +1,6 @@
 # Lane balancing benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
@@ -140,8 +140,8 @@ These inputs differ from the Polars examples.
 
 --8<-- "docs/assets/benchmarks/balance-core-table.md"
 
-Across 60 algorithm test cases, increasing it from 10,000 to 100,000 improved
-balance in four cases. Increasing it to one million improved two more.
+Across 60 algorithm test cases, increasing `max_work` from 10,000 to 100,000
+improved balance in four cases. Increasing it to one million improved two more.
 More search can help, but does not guarantee improvement.
 
 The saved runs use older names for the same construction and improvement modes.

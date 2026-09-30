@@ -1,14 +1,14 @@
 # Containment counting benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
 [`containment_count`](api.md#polars_intervals.containment_count) counts how many
 other intervals each row contains. In synthetic benchmarks, full Polars queries
-processed **three million repeated intervals in 65.3 ms**, **2.24× faster** than
+processed **three million repeated intervals in 65.3 ms**, **2.2× faster** than
 the native Polars ranking expressions tested. With few containments, the same
-size took **1.09 seconds**, **1.85× faster**. Many small groups reverse the
+size took **1.09 seconds**, **1.8× faster**. Many small groups reverse the
 advantage.
 
 ## Results
@@ -22,10 +22,6 @@ creating a row for every matching pair.
 
 Repeated intervals are much cheaper to count than irregular inputs. With only
 ten rows per group on average, calling the function costs more than it saves.
-
-Measurements were taken on September 26, 2026 with a build that copied
-endpoint columns. The current function avoids some of these copies and has not
-been remeasured.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
@@ -60,6 +56,9 @@ See the shared [hardware](benchmarks.md#hardware). Settings, software versions
 and source hashes are recorded in the
 [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/containment-polars-rank-runs-windows.json).
 
+Small cases are checked by comparing every pair directly. Larger outputs are
+cross-checked between implementations.
+
 <span id="coverage-and-limitations"></span>
 
 **Limitations**
@@ -67,8 +66,6 @@ and source hashes are recorded in the
 Algorithm tests cover fourteen input patterns with 1,000 to three million rows,
 including nesting, duplicates, shared endpoints, empty intervals and different
 input orders. Polars tests also cover groups, Date and timezone-aware Datetime.
-Small cases are checked by comparing every pair directly. Larger outputs are
-cross-checked between implementations.
 
 The function validates inputs, while the Polars comparison assumes valid
 endpoints. The Polars ranking APIs were marked unstable at that time.
@@ -101,8 +98,7 @@ The Python runner accepts `--sizes` and `--repeats`.
 
 **History**
 
-The headline ranking follow-up was recorded at
-`2026-09-26T19:50:36.278107+00:00`, with dirty base revision
+The headline ranking follow-up used dirty base revision
 `925033f9990b47f473d9debb2779b4533e63f24f`. The measured wheel's package version
 and adapter source hash were not recorded, so the base revision's `0.1.0`
 manifest does not establish the installed wheel's identity. The run retains

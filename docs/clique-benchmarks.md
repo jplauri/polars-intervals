@@ -1,17 +1,17 @@
 # Maximum-weight clique benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
 [`max_weight_clique`](api.md#polars_intervals.max_weight_clique) selects the
 highest-weight set of intervals that overlap one another. Without weights, it
-selects the largest such set. On a benchmark with **one million shuffled integer
-intervals**, complete Polars queries took **43.1 ms without weights** and **140
-ms with positive weights**. These synthetic inputs had at most eight intervals
-overlapping at once. The result is exact in both modes, but overlap patterns and
-weights strongly affect runtime. Polars has no built-in solver for this
-optimization problem.
+selects the largest such set. With Polars restricted to one thread, complete
+queries on **one million shuffled integer intervals** took **43.1 ms without
+weights** and **140 ms with positive weights**. At most eight of these synthetic
+intervals overlapped at once. The result is exact in both modes, but overlap
+patterns and weights strongly affect runtime. Polars has no built-in solver for
+this optimization problem.
 
 ## Results
 

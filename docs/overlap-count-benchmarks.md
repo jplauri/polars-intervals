@@ -1,6 +1,6 @@
 # Overlap counting benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
@@ -65,15 +65,16 @@ query construction are excluded. See the shared [hardware](benchmarks.md#hardwar
 Settings, software versions and source hashes are recorded in the
 [main run](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/sweep-windows.json).
 
+Results were checked against the alternative implementations, with additional
+independent checks on edge cases.
+
 <span id="coverage-and-limitations"></span>
 
 **Limitations**
 
 The main run covers 1,000 to three million rows, low and high overlap, sorted
-and shuffled input, and one or 100 groups. Results were checked against the
-alternative implementations, with additional independent checks on edge cases.
-The function also validates inputs, while the Polars-only alternatives assume
-valid input.
+and shuffled input, and one or 100 groups. The function also validates inputs,
+while the Polars-only alternatives assume valid input.
 
 Inputs consisting entirely of empty intervals or nested intervals can favor
 Polars-only expressions. Older datetime measurements include integer conversion

@@ -1,6 +1,6 @@
 # Scheduling with changing capacity benchmarks { #variable-capacity-selection-benchmarks }
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md) · [Measurement rules](benchmarking.md#measurement-rules)
 
 ## Summary
 
