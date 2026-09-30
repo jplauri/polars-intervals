@@ -1,7 +1,8 @@
 # Usage
 
 Use polars-intervals to compare intervals, assign lanes, and choose intervals
-for scheduling or covering.
+for scheduling or covering. You can also combine intervals, find gaps, and
+measure coverage or resource demand.
 
 ## A first example
 
@@ -40,6 +41,34 @@ have the same dtype, and nothing is cast for you:
 | `Date` | Both columns must be `Date` |
 | `Datetime` | The same time unit and timezone |
 
+Other endpoint types, including `Int128`, floating-point, Boolean, Decimal,
+`Time` and `Duration`, are rejected.
+
+### Weights, costs, and other values
+
+Cost, weight, capacity and initial-lane columns accept `Int8`, `Int16`, `Int32`,
+`Int64`, `UInt8`, `UInt16`, `UInt32` and `UInt64`. Supply one non-null value per
+input row. Values are not cast automatically. All other dtypes are rejected,
+including floating-point, Boolean, Decimal, temporal and 128-bit integers.
+
+| Input | Functions | Allowed values |
+| --- | --- | --- |
+| Selection `weight` | [`max_weight_non_overlapping`](#select-a-globally-maximum-weight-schedule), [`max_weight_with_capacity`](#select-with-a-simultaneous-capacity), [`max_weight_with_capacity_profile`](#select-with-a-capacity-profile), [`max_weight_clique`](#select-a-maximum-weight-clique) | Zero and negative values are valid but never selected. |
+| `cost` | [`minimum_cost_cover`](#cover-at-minimum-cost), [`minimum_cost_dominating_set`](#select-a-minimum-cost-dominating-set) | Nonnegative. Zero is valid. |
+| Quantity `weight` | [`coverage_profile`](coverage-profile.md) | Nonnegative. Zero is valid. |
+| Profile `capacity` | [`max_weight_with_capacity_profile`](#select-with-a-capacity-profile) | Nonnegative. Zero is valid. |
+| `initial_lanes` | [`assign_balanced_lanes`](#balance-lane-row-counts) | IDs must fit `UInt32` and form a valid assignment using the minimum number of lanes, with contiguous IDs from zero. |
+
+Omitted costs in `minimum_cost_dominating_set` and omitted weights in
+`max_weight_clique` or `coverage_profile` mean one per row. These functions do
+not automatically use a column named `cost`, `weight` or `load`.
+`max_weight_with_capacity_profile` reads the `weight` and `capacity` columns by
+default.
+
+Scalar options `capacity`, `k` and `max_work` require nonnegative Python integers.
+Boolean values are rejected. See each function's [API reference](api.md) for its
+range limits.
+
 ### Column names, expressions, and results
 
 Most functions accept column names such as `"start"` or expressions such as
@@ -48,6 +77,31 @@ input does not need to be sorted.
 
 Selections return a Boolean mask. Use it in `filter` to keep the chosen rows,
 or in `with_columns` to flag them.
+
+### Frame results
+
+`coverage_profile`, `merge_intervals` and `interval_gaps` return new segment
+rows. Pass a DataFrame for an immediate result or a LazyFrame for a query that
+runs when collected. The result has the same frame kind as the input. Use these
+functions directly or with `.pipe(...)`.
+
+Their `start` and `end` arguments are column names. Output endpoints are always
+named `start` and `end`. Endpoint and group-key dtypes are preserved, including
+in empty results. Other input columns are not retained.
+
+Use `by="resource"` or an ordered list of distinct column names to solve groups
+independently. `by=None` and `by=[]` use one collection. Keys support String,
+Boolean, the integer types above, Date and Datetime. Null key values group
+together. Group keys cannot use names reserved for output columns.
+
+Groups appear in first-appearance order, with segments sorted by start within
+each group. Only groups present in the input can produce output. A grouped
+empty frame has no output groups.
+
+These functions need their complete input in memory, even with
+`.collect(engine="streaming")`. All chunks participate in the same operation.
+Schema checks happen when the query is built. Row validation happens when it
+runs and covers every input row, including empty or clipped-away intervals.
 
 ### Count within groups
 
@@ -80,14 +134,10 @@ computed from the full input, add it with `with_columns` first, then filter.
 
 ## Choose an algorithm
 
-For connected components, exact union, and uncovered ranges, see
-[Clustering, union, and bounded gaps](interval-geometry.md). Clustering returns
-one ID per row. Union and gaps return segment frames and support eager and lazy
-pipelines.
-
 | Task | Algorithms |
 | --- | --- |
 | [Inspect interval relationships](#inspect-interval-relationships) | Count overlaps, count contained rows, measure nesting depth |
+| [Clustering, union, and gaps](interval-geometry.md) | Label connected rows, combine covered ranges, or find uncovered ranges |
 | [Assign lanes](#assign-lanes) | Use the fewest lanes, then optionally balance their row counts |
 | [Select intervals by weight](#select-intervals-by-weight) | Choose a schedule with one or more slots, or choose a mutually overlapping set |
 | [Covering and coverage](#covering-and-coverage) | Cover a target, maximize covered length with a budget, or hit every interval with points |
