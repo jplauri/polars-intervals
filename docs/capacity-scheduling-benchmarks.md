@@ -8,8 +8,8 @@
 selects intervals with the highest total weight while limiting how many may
 overlap at once. In synthetic examples with small, independent overlap groups,
 full Polars queries took **28–119 ms for one million integer intervals** and
-returned an exact optimum. A native Polars comparison was not measured. Large,
-interconnected groups can take much longer.
+returned an exact optimum. Polars has no built-in solver for this optimization
+problem. Large, interconnected groups can take much longer.
 
 ## Results
 
@@ -21,10 +21,21 @@ Each overlap group has 32 intervals. A limit of 31 still requires choosing one
 to leave out, while a limit of 32 allows all intervals in these examples and
 makes the task easier.
 
-These measurements use an earlier build.
+Measurements were taken on September 26, 2026 before the solver's working
+memory was reduced. The updated full Polars query has not been remeasured.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
+
+**Measured build**
+
+The saved run record is dated `2026-09-26T12:40:12.1472941+03:00` and names
+base revision `cd3a0181232bda9a2c1f7b0aafdfef1adcd8233f`. The measured package
+version was not recorded. The original core source hash matches `29d75ee`,
+before `cee8e52` removed the per-interval edge-index vector and intermediate
+worker-result buffering. Those changes affect allocations and reconstruction
+inside the timed solver. The separately recorded cleanup run measures core
+calls, not the full Polars queries in the headline table.
 
 See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
 

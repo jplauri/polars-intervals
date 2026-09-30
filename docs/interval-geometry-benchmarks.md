@@ -4,18 +4,22 @@
 
 ## Summary
 
-[`cluster_intervals`](api.md#polars_intervals.cluster_intervals) labels connected
-intervals, [`merge_intervals`](api.md#polars_intervals.merge_intervals) combines
-covered ranges, and [`interval_gaps`](api.md#polars_intervals.interval_gaps) finds
+[`cluster_intervals`](api.md#polars_intervals.cluster_intervals) labels
+connected intervals,
+[`merge_intervals`](api.md#polars_intervals.merge_intervals) combines covered
+ranges, and [`interval_gaps`](api.md#polars_intervals.interval_gaps) finds
 uncovered ranges within a domain. In synthetic benchmarks, clustering **100,000
 shuffled intervals took 4.11 ms**, **7.5× faster** than the native Polars
-implementation tested. Merging and finding gaps in 100,000 separate intervals
-took **4.16–4.28 ms**, **about 10× faster**. Native clustering won on many tiny
-groups.
+implementation tested, with Polars restricted to one thread. Merging and finding
+gaps in 100,000 separate intervals took **4.16–4.28 ms**, **about 10× faster**
+under the same thread restriction. Native clustering won on many tiny groups.
 
 ## Results
 
 **Full Polars query time · milliseconds**
+
+Native Polars uses sorted endpoints and cumulative maximums to build the same
+labels, merged ranges or gaps.
 
 --8<-- "docs/assets/benchmarks/geometry-summary.md:3:-3"
 
@@ -23,12 +27,25 @@ Grouping adds overhead when each group contains only one interval. For 1,000
 singleton timestamp groups, package clustering took 10.3 ms, **2.2× slower**
 than native Polars.
 
-These comparisons used one CPU thread. More cores narrow some advantages.
-These measurements use an earlier build. The current version has not been
-remeasured.
+More cores narrow some advantages. Measurements used a September 29, 2026
+build labeled 0.2.0.
+Input checks changed afterward in both implementations, and those changes
+have not been timed.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
+
+**Measured build**
+
+The headline run was recorded at `2026-09-29T19:36:11.609785+00:00`, with
+base revision `362aa5b2cf63d826dde98c28d72efac6ff29c9cf` and uncommitted feature
+sources. The [archived source](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-20260929.sources.zip)
+declares package version `0.2.0`; its production core and adapter match `43e9af1`.
+The later `83e8e44` refactor removes duplicate adapter type/length checks and
+replaces the native competitor's Rust validator with Polars expressions.
+Both affect complete-query timing paths. Sharing predicates and conversion
+helpers is a separate refactor, while runner provenance bookkeeping is outside
+timing. The archived plugin identity and source hashes remain in the metadata.
 
 See the [measurement guide](benchmarking.md) and shared
 [hardware](benchmarks.md#hardware).

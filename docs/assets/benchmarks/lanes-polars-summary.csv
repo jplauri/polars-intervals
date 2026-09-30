@@ -1,0 +1,9 @@
+case,workload_family,workload_order,workload_seed,workload_scope,workload_dtype,workload_weights,workload_operation,method,x,median,min,max,samples
+"Non-overlapping, shuffled",disjoint,shuffled,7,lazy_complete,i64,positive,assign_lanes,production,1000,0.2122,0.2045,0.2738,5
+"Non-overlapping, shuffled",disjoint,shuffled,7,lazy_complete,i64,positive,assign_lanes,production,1000000,59.064699999999995,58.0032,60.5978,5
+"Up to 128 overlapping, sorted by start",moderate128,sorted,7,lazy_complete,i64,positive,assign_lanes,production,1000000,24.4182,24.1496,24.9876,5
+"Up to 128 overlapping, shuffled",moderate128,shuffled,7,lazy_complete,i64,positive,assign_lanes,production,1000000,120.5972,117.23129999999999,129.3059,5
+"Nested, sorted by start",nested,sorted,7,lazy_complete,i64,positive,assign_lanes,production,1000000,30.371599999999997,30.1528,30.705099999999998,5
+"Nested, shuffled",nested,shuffled,7,lazy_complete,i64,positive,assign_lanes,production,1000000,139.5657,136.4948,140.039,5
+"Variable lengths, sorted by start",random_lengths,sorted,7,lazy_complete,i64,positive,assign_lanes,production,1000000,80.3536,79.77709999999999,80.6254,5
+"Variable lengths, shuffled",random_lengths,shuffled,7,lazy_complete,i64,positive,assign_lanes,production,1000000,175.8382,170.5144,183.79299999999998,5

@@ -9,21 +9,38 @@ other intervals each row contains. In synthetic benchmarks, full Polars queries
 processed **three million repeated intervals in 65.3 ms**, **2.24× faster** than
 the native Polars ranking expressions tested. With few containments, the same
 size took **1.09 seconds**, **1.85× faster**. Many small groups reverse the
-advantage. These measurements use an earlier package build.
+advantage.
 
 ## Results
 
 **Full Polars query time · milliseconds**
+
+Native Polars uses ranking expressions to count the same containments without
+creating a row for every matching pair.
 
 --8<-- "docs/assets/benchmarks/containment-summary.md:3:-3"
 
 Repeated intervals are much cheaper to count than irregular inputs. With only
 ten rows per group on average, calling the plugin costs more than it saves.
 
-The current version has not been remeasured.
+Measurements were taken on September 26, 2026 with a plugin that copied
+endpoint columns. The current plugin avoids some of these copies and has not
+been remeasured.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
+
+**Measured build**
+
+The headline ranking follow-up was recorded at
+`2026-09-26T19:50:36.278107+00:00`, with dirty base revision
+`925033f9990b47f473d9debb2779b4533e63f24f`. The measured wheel's package version
+and adapter source hash were not recorded, so the base revision's `0.1.0`
+manifest does not establish the installed wheel's identity. The run retains
+kernel and runner hashes. Its historical adapter copied both endpoint columns;
+the current shared extraction borrows contiguous columns and collects only
+when necessary. That extraction is inside the complete-query timing. Moving
+candidate files and consolidating provenance are outside the timed operation.
 
 See the [measurement guide](benchmarking.md) and shared
 [hardware](benchmarks.md#hardware).

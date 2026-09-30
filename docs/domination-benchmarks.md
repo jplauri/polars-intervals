@@ -7,9 +7,10 @@
 [`minimum_cost_dominating_set`](api.md#polars_intervals.minimum_cost_dominating_set)
 selects the cheapest representatives so every interval is selected or overlaps
 one. On a synthetic chain of **100,000 shuffled integer intervals**, full Polars
-queries took **7.97 ms without a cost column** and **18.0 ms with varying costs**.
-Both modes return an exact optimum. A native Polars comparison was not measured.
-Polars timings stop at 100,000 rows, and overlap patterns affect runtime.
+queries took **7.97 ms without a cost column** and **18.0 ms with varying
+costs**. Both modes return an exact optimum. Polars has no built-in solver for
+this optimization problem. Polars timings stop at 100,000 rows, and overlap
+patterns affect runtime.
 
 ## Results
 
@@ -20,10 +21,23 @@ Polars timings stop at 100,000 rows, and overlap patterns affect runtime.
 Uniform costs are faster than varying costs on these chains. Solving many tiny
 groups adds overhead, which becomes less prominent as the groups grow.
 
-These measurements use an earlier build.
+Measurements used a September 29, 2026 build labeled 0.2.0. Input checks have
+since changed. The updated full Polars query has not been timed.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
+
+**Measured build**
+
+The Polars run was recorded at `2026-09-29T04:57:42.653202+00:00`, with
+base revision `d742de3e57fdc523d1673e81106ca6d5109127bb`. Its recorded crate-manifest
+hash declares package version `0.2.0`; the core and adapter hashes match the
+final feature snapshot at `510cd44`, rather than the base revision alone.
+The `91b4aea` integration replaces the local length validator with the shared
+one. The greedy, reduction and heap recurrences are retained. Python plugin
+registration happens before the prepared query is collected, while fixture
+and provenance helpers are also outside the timed call. No post-refactor
+performance measurement is inferred from these source changes.
 
 See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
 

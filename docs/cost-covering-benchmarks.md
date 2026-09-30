@@ -4,12 +4,12 @@
 
 ## Summary
 
-[`minimum_cost_cover`](api.md#polars_intervals.minimum_cost_cover) covers a target
-range without gaps while minimizing the total cost of selected intervals.
-Full Polars queries took **211–263 ms for one million shuffled integer intervals**
-in the two synthetic examples below. The result is exact. A native Polars
-comparison was not measured. The number and arrangement of useful intervals
-affect runtime and working memory.
+[`minimum_cost_cover`](api.md#polars_intervals.minimum_cost_cover) covers a
+target range without gaps while minimizing the total cost of selected intervals.
+Full Polars queries took **211–263 ms for one million shuffled integer
+intervals** in the two synthetic examples below. The result is exact. Polars has
+no built-in solver for this optimization problem. The number and arrangement of
+useful intervals affect runtime and working memory.
 
 ## Results
 
@@ -20,10 +20,22 @@ affect runtime and working memory.
 These million-row examples take roughly a quarter of a second. Having many
 overlapping alternatives takes longer than covering a continuous chain.
 
-These measurements use an earlier build.
+Measurements used a September 26, 2026 build labeled 0.1.0. Input checks have
+since changed. The updated full Polars query has not been timed.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
+
+**Measured build**
+
+The saved measurement record is dated `2026-09-26T15:21:30.752129+00:00`, with
+base revision `cee8e52e96a9a260af712d84fb86574c6225d309`. Artifact hashes identify
+an explicitly recorded `polars_intervals-0.1.0-cp314-cp314-win_amd64.whl`.
+The measured core source hash matches the covering solver in `1f27171`.
+Metadata records the later adapter cleanup separately, including common plugin
+input validation and fewer scalar copies. The record does not isolate the
+runtime effect of those adapter changes. Harness verification and CSV summary
+cleanup are outside the timed query, and no cleanup speedup is claimed.
 
 See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
 

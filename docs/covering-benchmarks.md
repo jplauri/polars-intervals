@@ -7,8 +7,8 @@
 [`minimum_cover`](api.md#polars_intervals.minimum_cover) selects the fewest
 intervals needed to cover a target range without gaps. Full Polars queries took
 **51–69 ms for one million shuffled integer intervals** in the two synthetic
-examples below. The selection is exact. A native Polars comparison was not
-measured. Overlap patterns and endpoint types affect runtime.
+examples below. The selection is exact. Polars has no built-in solver for this
+optimization problem. Overlap patterns and endpoint types affect runtime.
 
 ## Results
 
@@ -19,10 +19,22 @@ measured. Overlap patterns and endpoint types affect runtime.
 Both million-row examples finish in well under a tenth of a second. The input
 with many overlapping intervals is faster than the chain in this run.
 
-These measurements use an earlier build.
+Measurements used a September 26, 2026 build labeled 0.1.0. Input checks have
+since changed. The updated full Polars query has not been timed.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
+
+**Measured build**
+
+The saved measurement record is dated `2026-09-26T15:21:30.752129+00:00`, with
+base revision `cee8e52e96a9a260af712d84fb86574c6225d309`. Artifact hashes identify
+an explicitly recorded `polars_intervals-0.1.0-cp314-cp314-win_amd64.whl`.
+The measured core source hash matches the covering solver in `1f27171`.
+Metadata records the later adapter cleanup separately, including common plugin
+input validation and fewer scalar copies. The record does not isolate the
+runtime effect of those adapter changes. Harness verification and CSV summary
+cleanup are outside the timed query, and no cleanup speedup is claimed.
 
 See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
 

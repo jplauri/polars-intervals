@@ -6,21 +6,19 @@
 
 [`max_weight_non_overlapping`](api.md#polars_intervals.max_weight_non_overlapping)
 selects non-overlapping intervals with the highest possible total weight. In
-synthetic benchmarks, its underlying algorithm processed **one million intervals
-in 21–240 ms**. Input order and interval lengths make a large difference.
-Alternative algorithms were faster on random-length examples. Full Polars query
-timings and a native Polars comparison have not been measured.
+synthetic benchmarks with positive weights, full Polars queries processed **one
+million shuffled intervals in 96–260 ms**. Input already sorted by start was
+faster. Variable interval lengths cost more than the structured examples. Polars
+has no built-in solver for this optimization problem.
 
 ## Results
 
-**Underlying algorithm time · milliseconds**
+**Full Polars query time · milliseconds**
 
---8<-- "docs/assets/benchmarks/weighted-summary.md:3:-3"
+--8<-- "docs/assets/benchmarks/weighted-polars-summary.md:3:-3"
 
-The package's algorithm works well on non-overlapping and nested inputs.
-Random lengths reverse the advantage: the best tested alternative was
-**1.57× faster** on the shuffled example. A separate repeat confirmed these
-gains and losses.
+Shuffled intervals with variable lengths take about a quarter of a second at
+one million rows. The other shuffled examples finish in about a tenth of a second.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
@@ -28,10 +26,40 @@ gains and losses.
 See the [measurement guide](benchmarking.md) and shared
 [hardware](benchmarks.md#hardware).
 
-**Measurement and algorithm comparisons**
+**Full Polars measurements**
 
-The headline cases show small and large non-overlapping inputs, gains on
-structured inputs, and losses on sorted or shuffled random-length inputs.
+The September 30, 2026 run uses package 0.2.0 and Polars 1.44.2. Polars' thread
+setting was left at its default, producing a 24-thread pool on this machine.
+Each case has two warmups and five timed samples. The table shows seed 7;
+seed 41 remains separate in the raw samples. Its million-row shuffled medians
+were 96–260 ms, with the same input-pattern tradeoffs.
+
+Timing includes public expression and lazy query construction, optimization,
+plugin extraction and validation, sorting, selection and row-aligned output.
+Test-data construction, correctness checks and output destruction are excluded.
+Before timing, each output is checked for feasibility and optimal total weight
+using an independent start-ordered suffix dynamic program. The checker is
+tested against every subset on small problems. Every timed output is then
+compared with that validated deterministic result outside timing.
+
+The run covers 1,000, 100,000 and one million rows, four input patterns and both
+orders. Inputs have Int64 endpoints and positive Int64 weights, one chunk per
+column and no groups. Collection uses the auto engine. Date/Datetime endpoints,
+other weight distributions, grouping, streaming, memory and a native Polars
+expression comparison were not measured in this run. Release-library and
+installed-plugin hashes match; the source archive and metadata preserve the
+build and all runner inputs.
+
+--8<-- "docs/assets/benchmarks/weighted-polars-summary.md:-2:"
+
+[Run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.metadata.json) ·
+[Measured source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.sources.zip)
+
+**Historical algorithm comparisons**
+
+These separate Rust measurements show small and large non-overlapping inputs,
+gains on structured inputs, and losses on sorted or shuffled random-length inputs.
+They are not timings of the full Polars calls shown above.
 
 The algorithm runs used one thread, two warmups and five samples per case,
 with seed 42 and integer endpoints and weights. The displayed times are medians.
@@ -72,8 +100,8 @@ Several different selections can have the same optimal weight.
 
 These are comparisons of the underlying algorithms, including input validation,
 sorting and result construction. They include internal measurement overhead.
-There are no complete Polars-query timings, Date/Datetime measurements or
-Polars-only comparisons in this report.
+These historical runs measured no complete Polars queries, Date/Datetime
+endpoints or Polars-only comparisons.
 
 At one million positive, nonempty intervals, the chosen design and binary-search
 alternative both use 39.1 MiB of live buffer capacity. The endpoint-scan
@@ -86,6 +114,17 @@ whole process. See the [measurement guide](benchmarking.md) and
 **Reproduce and data**
 
 <span id="historical-validation"></span>
+
+After the [release rebuild](benchmarking.md#setup), leave `POLARS_MAX_THREADS`
+unset and run:
+
+```sh
+uv run --no-sync python benchmarks/scheduling_polars.py --output benchmarks/results/scheduling-polars-new
+uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_polars.py
+```
+
+The shared runner measures both scheduling operations. Use a new output prefix.
+For the separate Rust measurements:
 
 ```sh
 cargo bench -p intervals-core --bench max_weight_non_overlapping --locked > target/weighted-local.csv

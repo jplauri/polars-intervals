@@ -5,13 +5,12 @@
 ## Summary
 
 [`max_k_coverage`](api.md#polars_intervals.max_k_coverage) selects at most `k`
-intervals to cover the greatest total length, counting overlaps only once.
-The result is exact. On a synthetic input of **one million shuffled integer
+intervals to cover the greatest total length, counting overlaps only once. The
+result is exact. On a synthetic input of **one million shuffled integer
 intervals**, a complete Polars query took **161 ms when allowed to select 8
 intervals** and **681 ms when allowed to select 64**, using the same overlapping
-input pattern. Allowing
-more selected intervals can increase both runtime and working memory. No
-equivalent native Polars optimizer was measured.
+input pattern. Allowing more selected intervals can increase both runtime and
+working memory. Polars has no built-in solver for this optimization problem.
 
 ## Results
 

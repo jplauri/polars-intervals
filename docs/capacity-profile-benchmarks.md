@@ -8,9 +8,9 @@
 selects the highest-weight set of intervals when the allowed number of overlaps
 changes over time. In synthetic examples with small, independent overlap groups,
 full Polars queries took **14.3 ms for 100,000 integer intervals** and **160 ms
-for one million**, with the overlap limit varying between 2, 4, 6 and 8.
-The result is exact. A native Polars comparison was not measured. Larger,
-interconnected groups can take much longer.
+for one million**, with the overlap limit varying between 2, 4, 6 and 8. The
+result is exact. Polars has no built-in solver for this optimization problem.
+Larger, interconnected groups can take much longer.
 
 ## Results
 

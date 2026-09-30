@@ -1,0 +1,110 @@
+{
+  "timestamp_utc": "2026-09-30T16:49:37.240999+00:00",
+  "command": [
+    "benchmarks/scheduling_polars.py",
+    "--output",
+    "benchmarks/results/scheduling-polars-20260930"
+  ],
+  "platform": "Windows-11-10.0.26300-SP0",
+  "processor": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+  "logical_cpus": 24,
+  "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "D:\\polars-intervals\\.venv\\Scripts\\python.exe",
+  "polars": "1.44.2",
+  "polars_threads": 24,
+  "thread_environment": {
+    "POLARS_MAX_THREADS": null,
+    "RAYON_NUM_THREADS": null,
+    "CARGO_BUILD_JOBS": null
+  },
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+  "revision": "e0dd10cc0de3ef52e77486fb4363eef1b4fefe79",
+  "git_status": "M benchmarks/plots.toml\n M benchmarks/report-template.md\n M docs/balance-lanes-benchmarks.md\n M docs/benchmarking.md\n M docs/capacity-profile-benchmarks.md\n M docs/capacity-scheduling-benchmarks.md\n M docs/clique-benchmarks.md\n M docs/containment-benchmarks.md\n M docs/cost-covering-benchmarks.md\n M docs/coverage-benchmarks.md\n M docs/coverage-profile-benchmarks.md\n M docs/covering-benchmarks.md\n M docs/domination-benchmarks.md\n M docs/interval-geometry-benchmarks.md\n M docs/overlap-count-benchmarks.md\n M docs/stabbing-benchmarks.md\n?? benchmarks/scheduling_polars.py\n?? benchmarks/test_scheduling_polars.py",
+  "settings": {
+    "output": "benchmarks\\results\\scheduling-polars-20260930",
+    "sizes": [
+      1000,
+      100000,
+      1000000
+    ],
+    "seeds": [
+      7,
+      41
+    ],
+    "samples": 5,
+    "warmups": 2
+  },
+  "package_version": "0.2.0",
+  "package_path": "D:\\polars-intervals\\python\\polars_intervals\\__init__.py",
+  "families": [
+    "disjoint",
+    "moderate128",
+    "nested",
+    "random_lengths"
+  ],
+  "operations": [
+    "assign_lanes",
+    "max_weight_non_overlapping"
+  ],
+  "scope": "Complete lazy query: public expression/query construction, optimization, plugin validation/extraction, scheduling and row-aligned output. Fixture/input construction, oracle/checks and output destruction excluded.",
+  "verification": "Initial output independently checked for lane feasibility/minimum palette or weighted feasibility/optimal objective with a start-ordered suffix DP. Every warmup and timed output compared against that validated deterministic result outside timing.",
+  "ordering": "Sorted means by start, then end and weight. Shuffled uses a seeded permutation of the same rows. Operation order rotates between samples.",
+  "threads": "No thread environment is changed by the runner. Default runs leave POLARS_MAX_THREADS unset; actual settings and pool size are recorded above.",
+  "coverage": "Synthetic ungrouped Int64 endpoints, positive Int64 weights, one chunk per column, auto collection engine. No native Polars baseline or memory measurement.",
+  "objective": "Minimum lane count for assign_lanes; maximum selected total weight for max_weight_non_overlapping.",
+  "native_path": "D:\\polars-intervals\\python\\polars_intervals\\_internal.cp314-win_amd64.pyd",
+  "native_sha256": "62037bd1d1891ff4e421fd0696c2fc0830b34b48bfb0f88048b9cb90e8d7af4d",
+  "release_path": "D:\\polars-intervals\\target\\release\\polars_intervals.dll",
+  "release_sha256": "62037bd1d1891ff4e421fd0696c2fc0830b34b48bfb0f88048b9cb90e8d7af4d",
+  "build_environment": {
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null,
+    "CARGO_PROFILE_RELEASE_OPT_LEVEL": null,
+    "CARGO_PROFILE_RELEASE_LTO": null,
+    "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": null
+  },
+  "source_sha256": {
+    "crates\\intervals-core\\src\\balance.rs": "94d03298007f52075b7bf0296e4bd240424409d7f9c420241798ee83728b12e5",
+    "crates\\intervals-core\\src\\capacity.rs": "1a82e6bd128b5c14c17675102f00ce2f4d1ddac9dae1bce6b3836fb2bd42a4fc",
+    "crates\\intervals-core\\src\\capacity_profile.rs": "a0d76da5c8f98df02fa0dd412d5c4ee0de05ed13ae26bdb5e29ce803ef86c739",
+    "crates\\intervals-core\\src\\clique.rs": "2eba32502514635d6ce1b6ab08c78f169d3e7e04df556aff437a186ba0d2c58a",
+    "crates\\intervals-core\\src\\containment.rs": "1be611f26925f32c131534118929c67783d6f3f26eed73db7ded581a73c12ad9",
+    "crates\\intervals-core\\src\\cover.rs": "caba93747929f03b780a05ecddc3a8557c03fb40fb9a4eeadc7e112e37925cab",
+    "crates\\intervals-core\\src\\coverage.rs": "0606183afbeae32663c05096f188c841f847cf01a5be2571b569ce8a8476d57e",
+    "crates\\intervals-core\\src\\coverage_profile.rs": "d6afcc12fd4d3c9df5ce3148eb801186371d3fbdf69fa9393e773a86760fb45f",
+    "crates\\intervals-core\\src\\domination.rs": "c3efd97356d54d5633b2d0250b42219546b4861fc8c303dadf5ff1696a3c9421",
+    "crates\\intervals-core\\src\\geometry.rs": "14d24f7f4dd075ed162e72250413c5d1150116a7a337dfa1f28f60bb30119e55",
+    "crates\\intervals-core\\src\\lanes.rs": "6ec75dec2df12e0a2c30010a28aefd431e299fb47377e2f5634386bdae0a9fba",
+    "crates\\intervals-core\\src\\lib.rs": "2989d6cd117dd86385a4c397ef3d6d4998c7662ba59fa2e6071d21385f315cdb",
+    "crates\\intervals-core\\src\\nesting.rs": "a0452a9b51e79f9a5eb63dd9283b07de450e8bf9abcc1daa4d4f5b0a6ae8383e",
+    "crates\\intervals-core\\src\\stabbing.rs": "c3ceb0262e70c14ecb7690ca37a25e89f5c442424af54acb35a8af7d0acb37d0",
+    "crates\\intervals-core\\src\\weighted.rs": "19c013c229d4e203caf1898cb2b7a62da910f02400c3f2e7954c9b571b4cfbea",
+    "crates\\polars-intervals\\src\\cover.rs": "423cf51f77db717613781aa59acd2a18100ffcc6512dcc654a606dc7000d98b9",
+    "crates\\polars-intervals\\src\\coverage_profile.rs": "280b9013031a9530068a2712314cd52f2861c3d104d3eb95f384969585b51118",
+    "crates\\polars-intervals\\src\\domination.rs": "45d8b068293ddaad5901fad6e1d6b7aa0872b67bab851f0ffb226b1e5918d9c7",
+    "crates\\polars-intervals\\src\\geometry.rs": "373f0eb4a625a652272358dfebdd11f8712244e7efc13524a43f33631d839848",
+    "crates\\polars-intervals\\src\\lib.rs": "a66c86317a2e4d0f51f777a114b38daea5d70dc0c630900e65a0025605264944",
+    "crates\\polars-intervals\\src\\profile.rs": "1799bc25c35142bdbf793368fa29e869cfcc5aaccdd3ae6c4b0edaefb73fe7f7",
+    "crates\\intervals-core\\Cargo.toml": "b3fee69541cde8d2b7bf293be1fff4a96b604c4f2c6d009a9ce1ac957ab01dd0",
+    "crates\\polars-intervals\\Cargo.toml": "fc1f36cc4b80664432fc511bd109d00ba5d327afc8ce66897c54dd88ddc15acc",
+    "Cargo.toml": "f9aa1b57de86ef9b31d9c8a1f556f97880133264239deacad738bd10182964af",
+    "Cargo.lock": "5629288b59113ac4d3d8bdff3afe78d24e3c4c72d8c82a06466edb2edc71073a",
+    "rust-toolchain.toml": "86810d0ace88a635a96ed7a8d7d432afa6950c0c0b99f78f6e905ed9616a9882",
+    "python\\polars_intervals\\__init__.py": "dfd2889065f3d82fa1700ec923be7e8bbb035292477723be85a80709536ca67e",
+    "benchmarks\\scheduling_polars.py": "f687c6ed347c9e4ea73a314c01c8cf8da71455887f56da53bef373712b0a1701",
+    "benchmarks\\test_scheduling_polars.py": "bb384a6bed4ed981d11e9d72f97a9e5b7cd9672c03b5082ae4a5342b3dedc178",
+    "benchmarks\\balance_lanes.py": "82c2baaf11cd2c6822b879b1812e2bbeb1ee6c367b212d71d44c04decdbfbbfd",
+    "benchmarks\\balance_lanes_fixtures.py": "3df03d1f1d9c3fb957d00a355c4364d596fabdba0832f993d8c8838fbbcc8d9b",
+    "benchmarks\\generate_interval_graphs.py": "c1707a92e9916a1768625fb2ad32e0b25bdab4058dc1f5f6cd486b304e43e51f",
+    "benchmarks\\provenance.py": "1b288b135d53e05c1ba37815e9d20b80e64be0f9a29ea4bc3cfb761cb251604e",
+    "pyproject.toml": "cbbb3ab035cd9804837dd0fcb5f8e0de2c0425840d6271ca1e1ce37005c1e2c2",
+    "uv.lock": "ee1c19f5f14e6f761747f660b86767f7558edad5d74b0b0288797e7b94ca8295"
+  },
+  "status": "completed",
+  "source_archive": "scheduling-polars-20260930.sources.zip",
+  "source_archive_sha256": "680004a0f452ec61f6b5de970ebb817726aad8eab20cb52b2a8626c14183dea0",
+  "sources_unchanged_during_run": true,
+  "changed_sources_during_run": [],
+  "samples": 480,
+  "samples_sha256": "dabbeddef6c08a8164db0202f4ccf4ac2478dc0bd30d22cf5337b428b2be9e1c"
+}

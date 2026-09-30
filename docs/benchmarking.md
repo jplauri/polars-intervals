@@ -33,6 +33,10 @@ and vary candidate order where the harness supports it. Warmup/sample counts,
 thread settings, software versions, phase clocks, and allocator instrumentation
 differ between saved runs; the report's measurement details describe what
 actually happened. These guidelines do not retroactively change historical runs.
+Headline comparisons should leave `POLARS_MAX_THREADS` unset and record the
+resulting pool size. When only restricted-thread runs are available, state the
+restriction in the summary's comparison sentence. A forced thread count is not
+a default-setting run, even if it matches the machine's default pool size.
 
 **Correctness.** Validate outside timing against an independent oracle or a
 documented cross-check. State which was used: agreement with another candidate,
@@ -61,10 +65,11 @@ revisions/source hashes, and historical evidence in `benchmarks/results/`.
 In operation reports, put seeds, hashes, build and cleanup history, correctness
 inventories, and raw-data links inside expandable details or supporting notes.
 Keep only qualifications that change how readers should interpret a result
-beside the headline or table. Use plain wording for older measurements, such as
-"These measurements use an earlier build. The current version has not been
-remeasured." Discuss repeat runs separately, including meaningful variation or
-contradictions.
+beside the headline or table. An older-build note should name the measured
+version or date and explain whether a timed path changed. Put exact revisions,
+hashes and change history in details. Discuss repeat runs separately, including
+meaningful variation or contradictions. Private candidate comparisons belong in
+details; visible exceptions should concern settings or inputs readers control.
 
 <details markdown="1">
 <summary>Recovering historical runs</summary>

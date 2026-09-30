@@ -6,23 +6,19 @@
 
 [`assign_lanes`](api.md#polars_intervals.assign_lanes) places intervals in the
 fewest possible lanes so that intervals in the same lane never overlap. In
-synthetic benchmarks, its underlying algorithm handled **one million shuffled
-intervals in 80–172 ms**. Sorted examples took **24–30 ms**. Other algorithms
-were faster on several heavily overlapping inputs. Full Polars query timings
-and a native Polars comparison have not been measured.
+synthetic benchmarks, full Polars queries handled **one million shuffled
+intervals in 59–176 ms**. Sorted overlapping examples took **24–80 ms**. Input
+order and overlap patterns make a large difference. Polars has no built-in
+solver for this optimization problem.
 
 ## Results
 
-**Underlying algorithm time · milliseconds**
+**Full Polars query time · milliseconds**
 
---8<-- "docs/assets/benchmarks/lanes-summary.md:3:-3"
+--8<-- "docs/assets/benchmarks/lanes-polars-summary.md:3:-3"
 
-Sorted input is much faster to process. On heavily overlapping inputs, other
-algorithms can win: the best tested alternative was **3.30× faster** for sorted
-nested intervals and **1.79× faster** for shuffled nested intervals.
-
-The repeat run took 59.4 ms for the million-row shuffled, non-overlapping case,
-compared with 79.7 ms here. The sorted-nesting result was stable.
+Input already sorted by start is faster to process in these examples. Variable
+interval lengths take the longest, while non-overlapping intervals are cheaper.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
@@ -30,10 +26,38 @@ compared with 79.7 ms here. The sorted-nesting result was stable.
 See the [measurement guide](benchmarking.md) and shared
 [hardware](benchmarks.md#hardware).
 
-**Measurement and algorithm comparisons**
+**Full Polars measurements**
 
-The headline cases show small and large non-overlapping inputs, plus sorted and
-shuffled overlapping inputs where other algorithms can be faster.
+The September 30, 2026 run uses package 0.2.0 and Polars 1.44.2. Polars' thread
+setting was left at its default, producing a 24-thread pool on this machine.
+Each case has two warmups and five timed samples. The table shows seed 7;
+seed 41 remains separate in the raw samples. At one million shuffled rows,
+the second seed took 59–178 ms, with the same input-pattern tradeoffs.
+
+Timing includes public expression and lazy query construction, optimization,
+plugin extraction and validation, sorting, assignment and row-aligned output.
+Test-data construction, correctness checks and output destruction are excluded.
+Before timing, an independent checker verifies no overlaps within lanes and
+the minimum possible lane count. Every timed output is then checked against
+that validated deterministic result outside timing.
+
+The run covers 1,000, 100,000 and one million rows, four input patterns and both
+orders. Inputs have Int64 endpoints, one chunk per column and no groups.
+Collection uses the auto engine. Date/Datetime endpoints, grouping, streaming,
+memory and a native Polars expression comparison were not measured in this run.
+Release-library and installed-plugin hashes match; the source archive and
+metadata preserve the build and all runner inputs.
+
+--8<-- "docs/assets/benchmarks/lanes-polars-summary.md:-2:"
+
+[Run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.metadata.json) ·
+[Measured source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.sources.zip)
+
+**Historical algorithm comparisons**
+
+These separate Rust measurements include small and large non-overlapping inputs,
+plus sorted and shuffled overlapping inputs where private algorithms were faster.
+They are not timings of the full Polars calls shown above.
 
 The algorithm runs used one thread, two warmups and nine samples per case,
 with seed 42 and integer endpoints. The displayed times are medians. Settings,
@@ -74,8 +98,9 @@ checks agreement between the measured implementation and the public Rust
 function. Different valid assignments can place rows in different lanes.
 
 Timing includes input checks, sorting, assignment and output construction.
-Creating test data and destroying the returned output are excluded. No complete
-Polars query, Date/Datetime endpoints or Polars-only alternative was measured.
+Creating test data and destroying the returned output are excluded. These
+historical runs measured no complete Polars query, Date/Datetime endpoints
+or Polars-only alternative.
 
 At one million rows, live algorithm-buffer capacity including output is about
 11.4 MiB when few intervals overlap and 27.4 MiB when all overlap. The two-list
@@ -86,6 +111,17 @@ process memory. See the [measurement guide](benchmarking.md) and
 <span id="reproduce-and-data"></span>
 
 **Reproduce and data**
+
+After the [release rebuild](benchmarking.md#setup), leave `POLARS_MAX_THREADS`
+unset and run:
+
+```sh
+uv run --no-sync python benchmarks/scheduling_polars.py --output benchmarks/results/scheduling-polars-new
+uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_polars.py
+```
+
+The shared runner measures both lane assignment and weighted scheduling.
+Use a new output prefix. For the separate Rust measurements:
 
 ```sh
 cargo bench -p intervals-core --bench assign_lanes --locked > target/assign-lanes-local.csv

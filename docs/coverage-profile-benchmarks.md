@@ -4,16 +4,18 @@
 
 ## Summary
 
-[`coverage_profile`](api.md#polars_intervals.coverage_profile) returns new segments
-showing how many intervals are active, or their total resource demand, along
-the coordinate range. In the displayed synthetic examples, complete Polars
-calls processed **100,000 intervals in 1.24–8.70 ms**, **3.9–33× faster than the
-fastest tested native Polars expressions**. The advantage varies with the data
-and is smaller when native Polars can use more CPU cores.
+[`coverage_profile`](api.md#polars_intervals.coverage_profile) returns new
+segments showing how many intervals are active, or their total resource demand,
+along the coordinate range. With Polars restricted to one thread, complete calls
+processed **100,000 synthetic intervals in 1.24–8.70 ms**, **3.9–33× faster than
+the fastest tested native Polars expressions**. The advantage varies with the
+data and is smaller when native Polars can use more CPU cores.
 
 ## Results
 
 **Full Polars query time · milliseconds**
+
+Native Polars uses grouped endpoint sums or counts to build the same profile.
 
 <!-- Keep the generated download links in Measurement records below. -->
 --8<-- "docs/assets/benchmarks/coverage-profile-headline.md:3:-3"
@@ -21,13 +23,26 @@ and is smaller when native Polars can use more CPU cores.
 Sorted short intervals give the largest advantage in these examples. The
 32-resource workload has a smaller advantage, at about four times faster.
 
-These comparisons use one Polars thread and an earlier package build.
-Streaming still constructs the complete profile in memory.
+Measurements used a September 29, 2026 build labeled 0.2.0, before sorting and
+input checks changed. The updated full Polars queries have not been timed.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
 
+**Measured build**
+
+The headline run was recorded at `2026-09-29T15:59:30.655100+00:00`, with
+base revision `2b2a2666386c971f6e8d63cbf47cd7a405d1f41b` and uncommitted feature
+sources. The [archived source](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.sources.zip)
+declares package version `0.2.0`. Its core and adapter match the feature snapshot
+at `280e515`; the base revision alone does not identify the measured build.
+The sorting changes in `8284b66` are inside the timed algorithm. Later shared
+adapter helpers also change the source used for input checks and conversion.
+The source-change bookkeeping in the benchmark runner is outside timing.
+
 **Lazy and streaming calls**
+
+Streaming still constructs the complete profile in memory.
 
 Complete calls including query construction and collection · one Polars thread ·
 median of five samples ·

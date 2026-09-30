@@ -934,3 +934,45 @@ cases = [
   { label = "Overlapping steps, shuffled, select up to 8", sizes = [1000000], filters = { family = "staircase", order = "shuffled", k = 8 } },
   { label = "Overlapping steps, shuffled, select up to 64", sizes = [1000000], filters = { family = "staircase", order = "shuffled", k = 64 } },
 ]
+
+[sources.scheduling_polars]
+path = "benchmarks/results/scheduling-polars-20260930.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "seed", "scope", "dtype", "weights", "operation"]
+
+[[tables]]
+id = "lanes-polars-summary"
+source = "scheduling_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { production = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Non-overlapping, shuffled", sizes = [1000, 1000000], filters = { family = "disjoint", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Up to 128 overlapping, sorted by start", sizes = [1000000], filters = { family = "moderate128", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Up to 128 overlapping, shuffled", sizes = [1000000], filters = { family = "moderate128", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Nested, sorted by start", sizes = [1000000], filters = { family = "nested", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Nested, shuffled", sizes = [1000000], filters = { family = "nested", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Variable lengths, sorted by start", sizes = [1000000], filters = { family = "random_lengths", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Variable lengths, shuffled", sizes = [1000000], filters = { family = "random_lengths", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+]
+
+[[tables]]
+id = "weighted-polars-summary"
+source = "scheduling_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { production = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Non-overlapping, shuffled", sizes = [1000, 1000000], filters = { family = "disjoint", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Up to 128 overlapping, sorted by start", sizes = [1000000], filters = { family = "moderate128", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Up to 128 overlapping, shuffled", sizes = [1000000], filters = { family = "moderate128", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Nested, sorted by start", sizes = [1000000], filters = { family = "nested", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Nested, shuffled", sizes = [1000000], filters = { family = "nested", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Variable lengths, sorted by start", sizes = [1000000], filters = { family = "random_lengths", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Variable lengths, shuffled", sizes = [1000000], filters = { family = "random_lengths", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+]

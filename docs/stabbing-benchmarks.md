@@ -7,10 +7,10 @@
 [`minimum_stabbing_points`](api.md#polars_intervals.minimum_stabbing_points)
 finds the fewest points needed so that every interval contains at least one
 selected point. Complete Polars queries on **three million synthetic
-non-overlapping integer intervals took 26.5 ms when sorted and 139 ms when shuffled**.
-The result is exact. Input order has a large effect because intervals already
-sorted by their ends need less processing. No native Polars alternative was
-measured.
+non-overlapping integer intervals took 26.5 ms when sorted and 139 ms when
+shuffled**. The result is exact. Input order has a large effect because
+intervals already sorted by their ends need less processing. Polars has no
+built-in solver for this optimization problem.
 
 ## Results
 
