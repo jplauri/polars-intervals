@@ -1,0 +1,19 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_domain,workload_payload,workload_source,workload_seed,workload_operation,workload_scope,method,x,median,min,max,samples
+"Label overlapping intervals, shuffled",sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,lazy_complete,native,100000,15.3143,14.9857,15.6479,5
+"Label overlapping intervals, shuffled",sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,lazy_complete,native,1000000,135.9956,127.0713,161.56369999999998,5
+"Label overlapping intervals, shuffled",sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,lazy_complete,production,100000,4.7355,4.5755,4.9887,5
+"Label overlapping intervals, shuffled",sequencing,shuffled,i64,0,1,extended,0,memory,7,cluster_strict,lazy_complete,production,1000000,61.314699999999995,60.430899999999994,72.4247,5
+"Label intervals in 1,000 timestamp groups, shuffled",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,cluster_strict,lazy_complete,native,1000,7.4028,7.0439,7.8084,5
+"Label intervals in 1,000 timestamp groups, shuffled",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,cluster_strict,lazy_complete,native,100000,18.0907,16.9381,18.5995,5
+"Label intervals in 1,000 timestamp groups, shuffled",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,cluster_strict,lazy_complete,production,1000,10.940299999999999,10.748299999999999,11.0801,5
+"Label intervals in 1,000 timestamp groups, shuffled",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,cluster_strict,lazy_complete,production,100000,15.1724,14.7921,21.310499999999998,5
+"Merge intervals in 1,000 timestamp groups, shuffled",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,merge,lazy_complete,native,100000,16.2427,15.276,16.6386,5
+"Merge intervals in 1,000 timestamp groups, shuffled",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,merge,lazy_complete,native,1000000,83.55669999999999,82.7992,94.4067,5
+"Merge intervals in 1,000 timestamp groups, shuffled",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,merge,lazy_complete,production,100000,5.6604,5.4719,5.781,5
+"Merge intervals in 1,000 timestamp groups, shuffled",sequencing,shuffled,datetime_ns,1000,7,extended,0,memory,7,merge,lazy_complete,production,1000000,50.677099999999996,49.0213,55.4492,5
+"Find gaps in 8 groups within a narrow domain, shuffled",booking,shuffled,i64,8,7,partial,0,memory,7,gaps,lazy_complete,native,100000,14.575999999999999,14.238199999999999,15.3323,5
+"Find gaps in 8 groups within a narrow domain, shuffled",booking,shuffled,i64,8,7,partial,0,memory,7,gaps,lazy_complete,native,1000000,83.7281,81.4804,86.05799999999999,5
+"Find gaps in 8 groups within a narrow domain, shuffled",booking,shuffled,i64,8,7,partial,0,memory,7,gaps,lazy_complete,production,100000,4.2856,4.0663,4.5316,5
+"Find gaps in 8 groups within a narrow domain, shuffled",booking,shuffled,i64,8,7,partial,0,memory,7,gaps,lazy_complete,production,1000000,38.7006,38.535599999999995,40.1675,5
+"Merge intervals in 32 uneven groups, shuffled",booking_skew,shuffled,i64,32,7,partial,0,memory,7,merge,lazy_complete,native,1000000,106.1464,102.5069,112.1381,5
+"Merge intervals in 32 uneven groups, shuffled",booking_skew,shuffled,i64,32,7,partial,0,memory,7,merge,lazy_complete,production,1000000,57.119899999999994,53.8654,64.4747,5

@@ -1,0 +1,5 @@
+case,workload_m,workload_pattern,workload_algorithm,method,x,median,min,max,samples
+Constant capacity 4,1,constant,profile,Int64,1000000,77.5649,72.53399999999999,79.5626,3
+Enough capacity for all,1,high,profile,Int64,1000000,46.7179,45.0978,47.869,3
+"Capacity varies: 2, 4, 6, 8",3125,varying,profile,Int64,100000,14.28,14.248,14.313899999999999,3
+"Capacity varies: 2, 4, 6, 8 (larger input)",31250,varying,profile,Int64,1000000,160.231,159.3628,166.533,3

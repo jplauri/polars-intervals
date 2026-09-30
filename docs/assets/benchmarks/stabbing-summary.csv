@@ -1,0 +1,7 @@
+case,workload_family,workload_order,method,x,median,min,max,samples
+"Non-overlapping, sorted",disjoint,sorted,Int64,1000,0.49889999999999995,0.4405,0.6664,3
+"Non-overlapping, sorted",disjoint,sorted,Int64,3000000,26.473599999999998,24.5705,27.9346,3
+"Non-overlapping, shuffled",disjoint,shuffled,Int64,1000,0.2105,0.17659999999999998,0.2291,3
+"Non-overlapping, shuffled",disjoint,shuffled,Int64,3000000,139.07989999999998,135.2773,150.6179,3
+"Regular overlaps, sorted",dense,sorted,Int64,3000000,7.757499999999999,7.611199999999999,9.0255,3
+"Regular overlaps, shuffled",dense,shuffled,Int64,3000000,114.72999999999999,109.5955,116.3805,3

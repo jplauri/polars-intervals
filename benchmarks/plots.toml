@@ -50,21 +50,6 @@ x = "n"
 method = "method"
 dimensions = ["family", "order", "dtype", "groups", "chunks", "domain", "payload", "source", "seed", "operation", "scope"]
 
-[[tables]]
-id = "interval-geometry-threads24-table"
-source = "interval_geometry_threads24"
-value = "ns"
-divisor = 1000000
-ylabel = "Complete lazy call, 24 threads (ms)"
-methods = { production = "Package", native = "Native Polars" }
-cases = [
-  { label = "Strict clusters: 1,000 singleton timestamp groups", sizes = [1000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "lazy_complete" } },
-  { label = "Strict clusters: shuffled overlapping chain", sizes = [100000, 1000000], filters = { family = "sequencing", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "lazy_complete" } },
-  { label = "Union: 1,000 timestamp groups", sizes = [100000, 1000000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "lazy_complete" } },
-  { label = "Gaps: 8 groups, narrow domain", sizes = [100000, 1000000], filters = { family = "booking", order = "shuffled", dtype = "i64", groups = 8, chunks = 7, domain = "partial", payload = 0, source = "memory", seed = 7, operation = "gaps", scope = "lazy_complete" } },
-  { label = "Union: 32 skewed groups", sizes = [1000000], filters = { family = "booking_skew", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, domain = "partial", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "lazy_complete" } },
-]
-
 [sources.interval_geometry_core]
 path = "benchmarks/results/interval-geometry-core-million-20260929.csv"
 x = "n"
@@ -98,6 +83,22 @@ path = "benchmarks/results/coverage-profile-ponytail-20260929.csv"
 x = "n"
 method = "method"
 dimensions = ["family", "order", "dtype", "groups", "chunks", "weights", "domain", "include_zero", "seed"]
+
+[[tables]]
+id = "coverage-profile-headline"
+source = "coverage_profile_lazy"
+value = "ns"
+divisor = 1000000
+ylabel = "Polars call time (ms)"
+methods = { production = "polars-intervals (ms)", native = "Event sums", native_count = "Event counts" }
+xlabel = "Rows"
+native_comparison = { package = "production", baselines = ["native", "native_count"] }
+cases = [
+  { label = "Short intervals, sorted", sizes = [1000, 100000], filters = { family = "sequencing", order = "start", dtype = "i64", groups = 0, chunks = 1, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+  { label = "Variable durations, sorted, weighted", sizes = [100000], filters = { family = "booking", order = "start", dtype = "i64", groups = 0, chunks = 1, weights = "mixed", domain = "inferred", include_zero = false, seed = 7 }, methods = { production = "polars-intervals (ms)", native = "Event sums" } },
+  { label = "32 resources, shuffled, limited time range, weighted", sizes = [100000], filters = { family = "booking", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, weights = "mixed", domain = "partial", include_zero = true, seed = 7 }, methods = { production = "polars-intervals (ms)", native = "Event sums" } },
+  { label = "1,000 timestamp groups, shuffled", sizes = [100000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, weights = "units", domain = "inferred", include_zero = false, seed = 7 } },
+]
 
 [[tables]]
 id = "coverage-profile-lazy-table"
@@ -690,4 +691,240 @@ cases = [
   { label = "Includes empty intervals, shuffled", sizes = [100000], filters = { family = "mixed_empty", order = "shuffled" } },
   { label = "Long intervals spanning short ones, sorted", sizes = [1000], filters = { family = "stars", order = "sorted" } },
   { label = "All overlap, shuffled", sizes = [100000], filters = { family = "clique", order = "shuffled" } },
+]
+
+# Compact reader-facing tables. Detailed tables above retain all comparisons.
+
+[[tables]]
+id = "geometry-summary"
+source = "interval_geometry_threads24"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { production = "polars-intervals (ms)", native = "Native Polars" }
+xlabel = "Rows"
+native_comparison = { package = "production", baselines = ["native"] }
+cases = [
+  { label = "Label overlapping intervals, shuffled", sizes = [100000, 1000000], filters = { family = "sequencing", order = "shuffled", dtype = "i64", groups = 0, chunks = 1, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "lazy_complete" } },
+  { label = "Label intervals in 1,000 timestamp groups, shuffled", sizes = [1000, 100000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "cluster_strict", scope = "lazy_complete" } },
+  { label = "Merge intervals in 1,000 timestamp groups, shuffled", sizes = [100000, 1000000], filters = { family = "sequencing", order = "shuffled", dtype = "datetime_ns", groups = 1000, chunks = 7, domain = "extended", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "lazy_complete" } },
+  { label = "Find gaps in 8 groups within a narrow domain, shuffled", sizes = [100000, 1000000], filters = { family = "booking", order = "shuffled", dtype = "i64", groups = 8, chunks = 7, domain = "partial", payload = 0, source = "memory", seed = 7, operation = "gaps", scope = "lazy_complete" } },
+  { label = "Merge intervals in 32 uneven groups, shuffled", sizes = [1000000], filters = { family = "booking_skew", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, domain = "partial", payload = 0, source = "memory", seed = 7, operation = "merge", scope = "lazy_complete" } },
+]
+
+[[tables]]
+id = "overlap-summary"
+source = "overlap"
+value = "ms"
+divisor = 1
+ylabel = "Times in milliseconds"
+methods = { plugin = "polars-intervals (ms)", native_expr = "Search expressions", native_parallel = "Parallel search expressions", native_asof = "As-of joins", native_sweep = "Endpoint sweep", inequality_join = "Inequality join" }
+xlabel = "Rows"
+native_comparison = { package = "plugin", baselines = ["native_expr", "native_parallel", "native_asof", "native_sweep", "inequality_join"] }
+cases = [
+  { label = "Few overlaps, 1 group", sizes = [100000, 3000000], filters = { scenario = "sparse", groups = 1, order = "shuffled", dtype = "int64" } },
+  { label = "Many overlaps, 1 group", sizes = [3000000], filters = { scenario = "dense", groups = 1, order = "shuffled", dtype = "int64" }, methods = { plugin = "polars-intervals (ms)", native_expr = "Search expressions", native_parallel = "Parallel search expressions", native_asof = "As-of joins", native_sweep = "Endpoint sweep" } },
+  { label = "Few overlaps, 100 groups", sizes = [1000, 3000000], filters = { scenario = "sparse", groups = 100, order = "shuffled", dtype = "int64" }, inconclusive_sizes = [1000] },
+  { label = "Many overlaps, 100 groups", sizes = [1000, 3000000], filters = { scenario = "dense", groups = 100, order = "shuffled", dtype = "int64" }, inconclusive_sizes = [1000] },
+]
+
+[[tables]]
+id = "containment-summary"
+source = "containment_runs"
+value = "ms"
+divisor = 1
+ylabel = "Times in milliseconds"
+methods = { plugin = "polars-intervals (ms)", rank_runs = "Ranking expressions" }
+xlabel = "Rows"
+native_comparison = { package = "plugin", baselines = ["rank_runs"] }
+cases = [
+  { label = "Repeated intervals, no grouping", sizes = [3000000], filters = { scenario = "duplicates", groups = 1, dtype = "Int64", window = "false" } },
+  { label = "Few containments, no grouping", sizes = [3000000], filters = { scenario = "sparse", groups = 1, dtype = "Int64", window = "false" } },
+  { label = "Mixed intervals, no grouping", sizes = [3000000], filters = { scenario = "mixed", groups = 1, dtype = "Int64", window = "false" } },
+  { label = "Few containments, 1,000 groups", sizes = [10000], filters = { scenario = "sparse", groups = 1000, dtype = "Int64", window = "true" } },
+]
+
+[[tables]]
+id = "nesting-summary"
+source = "nesting_polars"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { Int64 = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Depth up to 7, shuffled, 1 group", sizes = [100000, 3000000], filters = { groups = 1, family = "low8", order = "shuffled", candidate = "plugin" } },
+  { label = "Fully nested, shuffled, 1 group", sizes = [3000000], filters = { groups = 1, family = "chain", order = "shuffled", candidate = "plugin" } },
+  { label = "Fully nested, sorted, 1 group", sizes = [3000000], filters = { groups = 1, family = "chain", order = "sorted", candidate = "plugin" } },
+  { label = "Depth up to 7, shuffled, 1,000 groups", sizes = [100000], filters = { groups = 1000, family = "low8", order = "shuffled", candidate = "plugin" } },
+]
+
+[[tables]]
+id = "capacity-summary"
+source = "capacity_temporal"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { Int64 = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "32 overlapping per set, capacity 1", sizes = [1000000], filters = { k = 1 } },
+  { label = "32 overlapping per set, capacity 2", sizes = [1000000], filters = { k = 2 } },
+  { label = "32 overlapping per set, capacity 31", sizes = [1000000], filters = { k = 31 } },
+  { label = "32 overlapping per set, capacity 32", sizes = [1000000], filters = { k = 32 } },
+]
+
+[[tables]]
+id = "profile-summary"
+source = "profile_temporal"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { Int64 = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Constant capacity 4", sizes = [1000000], filters = { m = 1, pattern = "constant", algorithm = "profile" } },
+  { label = "Enough capacity for all", sizes = [1000000], filters = { m = 1, pattern = "high", algorithm = "profile" } },
+  { label = "Capacity varies: 2, 4, 6, 8", sizes = [100000], filters = { m = 3125, pattern = "varying", algorithm = "profile" } },
+  { label = "Capacity varies: 2, 4, 6, 8 (larger input)", sizes = [1000000], filters = { m = 31250, pattern = "varying", algorithm = "profile" } },
+]
+
+[[tables]]
+id = "cover-summary"
+source = "covering_temporal"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { Int64 = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "End-to-end intervals, shuffled", sizes = [1000000], filters = { family = "chain", order = "shuffled", method = "minimum_cover" } },
+  { label = "Many overlaps, shuffled", sizes = [1000000], filters = { family = "dense", order = "shuffled", method = "minimum_cover" } },
+]
+
+[[tables]]
+id = "cost-cover-summary"
+source = "covering_temporal"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { Int64 = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "End-to-end intervals, shuffled", sizes = [1000000], filters = { family = "chain", order = "shuffled", method = "minimum_cost_cover" } },
+  { label = "Many overlaps, shuffled", sizes = [1000000], filters = { family = "dense", order = "shuffled", method = "minimum_cost_cover" } },
+]
+
+[[tables]]
+id = "domination-summary"
+source = "domination_polars"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { units = "No cost column (ms)", mixed = "Varying costs (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Chain, shuffled integers", sizes = [1000, 100000], filters = { family = "path", order = "shuffled", dtype = "i64", groups = 1, chunks = 1, engine = "auto", seed = 7, method = "production" } },
+  { label = "32 chains, shuffled integers, multiple chunks", sizes = [1000, 100000], filters = { family = "path", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, engine = "auto", seed = 7, method = "production" } },
+]
+
+[[tables]]
+id = "balance-summary"
+source = "balance_polars"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { baseline = "Ordinary assignment (ms)", balanced = "Balanced assignment (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "9 empty intervals among 2 overlapping ones", sizes = [11], filters = { corpus = "handcrafted", id = "8f532cfb8eea51ee3ab762f0b5f4030eb642874c67585a8721cb97e6a1042e85", family = "handcrafted", population = "handcrafted", seed = 0, order = "fixture", workload = "integer", engine = "auto", groups = 1 } },
+  { label = "Separate intervals followed by 8 overlapping ones", sizes = [100000], filters = { corpus = "handcrafted", id = "64ea4da24da1f13fbb2c45cd8fc428700d2ceb9eeabbd935d2226a80ada42b40", family = "handcrafted", population = "handcrafted", seed = 0, order = "fixture", workload = "integer", engine = "auto", groups = 1 } },
+  { label = "One long interval overlapping short ones", sizes = [100000], filters = { corpus = "handcrafted", id = "4f2c81e93bef3f123fd64f5813677c287061935e13724607764f4f5f01714779", family = "handcrafted", population = "handcrafted", seed = 0, order = "fixture", workload = "integer", engine = "auto", groups = 1 } },
+  { label = "50,000 long intervals overlapping short ones", sizes = [100000], filters = { corpus = "handcrafted", id = "16640e2e2bd56a2116badc8794ebc13f7c04eb84e3c96098134430b5c9a65f5b", family = "handcrafted", population = "handcrafted", seed = 0, order = "fixture", workload = "integer", engine = "auto", groups = 1 } },
+]
+
+[[tables]]
+id = "clique-summary"
+source = "clique_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { unit = "No weights (ms)", positive = "Positive weights (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Up to 8 overlapping, shuffled integers", sizes = [1000, 100000, 1000000], filters = { family = "low8", order = "shuffled", dtype = "i64", groups = 1, chunks = 1, engine = "auto", seed = 42, algorithm = "production" } },
+  { label = "All overlap, shuffled dates", sizes = [1000000], filters = { family = "clique", order = "shuffled", dtype = "date", groups = 1, chunks = 1, engine = "auto", seed = 42, algorithm = "production" } },
+  { label = "Up to 8 overlapping, shuffled UTC datetimes, streaming", sizes = [1000000], filters = { family = "low8", order = "shuffled", dtype = "datetime_ns_utc", groups = 1, chunks = 7, engine = "streaming", seed = 42, algorithm = "production" } },
+  { label = "32 groups, shuffled integers, multiple chunks", sizes = [1000, 1000000], filters = { family = "low8", order = "shuffled", dtype = "i64", groups = 32, chunks = 7, engine = "auto", seed = 42, algorithm = "production" } },
+]
+
+[[tables]]
+id = "stabbing-summary"
+source = "stabbing_temporal"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { Int64 = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Non-overlapping, sorted", sizes = [1000, 3000000], filters = { family = "disjoint", order = "sorted" } },
+  { label = "Non-overlapping, shuffled", sizes = [1000, 3000000], filters = { family = "disjoint", order = "shuffled" } },
+  { label = "Regular overlaps, sorted", sizes = [3000000], filters = { family = "dense", order = "sorted" } },
+  { label = "Regular overlaps, shuffled", sizes = [3000000], filters = { family = "dense", order = "shuffled" } },
+]
+
+[[tables]]
+id = "coverage-summary"
+source = "coverage_polars"
+value = "total_ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { Int64 = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Overlapping steps, sorted, select up to 8", sizes = [10000, 1000000], filters = { family = "staircase", order = "sorted", k = 8 } },
+  { label = "Overlapping steps, shuffled, select up to 8", sizes = [1000000], filters = { family = "staircase", order = "shuffled", k = 8 } },
+  { label = "Overlapping steps, shuffled, select up to 64", sizes = [1000000], filters = { family = "staircase", order = "shuffled", k = 64 } },
+]
+
+[sources.scheduling_polars]
+path = "benchmarks/results/scheduling-polars-20260930.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "order", "seed", "scope", "dtype", "weights", "operation"]
+
+[[tables]]
+id = "lanes-polars-summary"
+source = "scheduling_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { production = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Non-overlapping, shuffled", sizes = [1000, 1000000], filters = { family = "disjoint", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Up to 128 overlapping, sorted by start", sizes = [1000000], filters = { family = "moderate128", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Up to 128 overlapping, shuffled", sizes = [1000000], filters = { family = "moderate128", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Nested, sorted by start", sizes = [1000000], filters = { family = "nested", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Nested, shuffled", sizes = [1000000], filters = { family = "nested", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Variable lengths, sorted by start", sizes = [1000000], filters = { family = "random_lengths", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+  { label = "Variable lengths, shuffled", sizes = [1000000], filters = { family = "random_lengths", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "assign_lanes" } },
+]
+
+[[tables]]
+id = "weighted-polars-summary"
+source = "scheduling_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+methods = { production = "polars-intervals (ms)" }
+xlabel = "Rows"
+cases = [
+  { label = "Non-overlapping, shuffled", sizes = [1000, 1000000], filters = { family = "disjoint", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Up to 128 overlapping, sorted by start", sizes = [1000000], filters = { family = "moderate128", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Up to 128 overlapping, shuffled", sizes = [1000000], filters = { family = "moderate128", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Nested, sorted by start", sizes = [1000000], filters = { family = "nested", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Nested, shuffled", sizes = [1000000], filters = { family = "nested", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Variable lengths, sorted by start", sizes = [1000000], filters = { family = "random_lengths", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
+  { label = "Variable lengths, shuffled", sizes = [1000000], filters = { family = "random_lengths", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
 ]

@@ -120,35 +120,72 @@ def summarize_table(samples, source, table):
     return pl.concat(points)
 
 
+def format_value(value):
+    if value is None:
+        return "—"
+    return f"{float(f'{value:.3g}'):,g}"
+
+
 def render_table(points, source, table):
     """Render a compact comparison; missing combinations remain empty measurements."""
     values = {
         (row["case"], row["x"], row["method"]): row["median"]
         for row in points.iter_rows(named=True)
     }
+    comparison = table.get("native_comparison")
+    if comparison:
+        package = comparison["package"]
+        baselines = comparison["baselines"]
+        if (
+            not baselines
+            or package in baselines
+            or not {package, *baselines}.issubset(table["methods"])
+        ):
+            raise ValueError("Native comparisons need a package and distinct measured baselines")
+        headings = [table["methods"][package], "Native Polars (ms)", "Compared with native"]
+    else:
+        headings = list(table["methods"].values())
     lines = [
         f"**{table['ylabel']} · medians**",
         "",
-        f"| Workload | {table.get('xlabel', 'Input rows')} | "
-        + " | ".join(table["methods"].values())
-        + " |",
-        "| --- | ---: | " + " | ".join("---:" for _ in table["methods"]) + " |",
+        f"| Workload | {table.get('xlabel', 'Input rows')} | " + " | ".join(headings) + " |",
+        "| --- | ---: | " + " | ".join("---:" for _ in headings) + " |",
     ]
     has_missing = False
     for case in table["cases"]:
         for size in case["sizes"]:
-            cells = []
-            for method in table["methods"]:
-                value = values.get((case["label"], size, method))
-                has_missing |= value is None
-                if value is None:
+            methods = [package] if comparison else table["methods"]
+            row_values = [values.get((case["label"], size, method)) for method in methods]
+            if comparison:
+                native = min(
+                    (
+                        value
+                        for method in baselines
+                        if (value := values.get((case["label"], size, method))) is not None
+                    ),
+                    default=None,
+                )
+                row_values.append(native)
+            cells = [format_value(value) for value in row_values]
+            if comparison:
+                production = row_values[0]
+                if production is None or native is None or min(production, native) <= 0:
                     cells.append("—")
+                elif size in case.get("inconclusive_sizes", []) or production == native:
+                    cells.append("about the same")
+                elif native > production:
+                    cells.append(f"{native / production:.2g}× faster")
                 else:
-                    rounded = float(f"{value:.3g}")
-                    cells.append(f"{rounded:,g}")
+                    cells.append(f"{production / native:.2g}× slower")
+            has_missing |= "—" in cells
             lines.append(f"| {case['label']} | {size:,} | " + " | ".join(cells) + " |")
     if has_missing:
-        lines.extend(["", "— means no recorded measurement for that combination."])
+        note = (
+            "— means no recorded measurement or an unavailable comparison."
+            if comparison
+            else "— means no recorded measurement for that combination."
+        )
+        lines.extend(["", note])
     lines.extend(
         [
             "",

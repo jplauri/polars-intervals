@@ -3,7 +3,7 @@
 See the [benchmark overview](../docs/benchmarks.md) for compact results tables.
 
 [Running and publishing benchmarks](../docs/benchmarking.md) covers setup,
-table generation, and the four-section checklist for adding an operation.
+table generation, report format and checks for adding an operation.
 
 ## Python scripts
 
@@ -24,6 +24,8 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`nesting_depth.py`](nesting_depth.py) | End-to-end benchmark | Exact analytic families, integer/temporal and grouped inputs → verified collection samples and environment metadata | [Nesting depth](../docs/nesting-depth-benchmarks.md) |
 | [`balance_lanes.py`](balance_lanes.py) | End-to-end benchmark | Existing interval corpora → independently checked row-count quality, collection samples and provenance | [Lane balancing](../docs/balance-lanes-benchmarks.md) |
 | [`test_balance_lanes.py`](test_balance_lanes.py) | Runner checks | Tiny offline records → oracle, scoring, baseline alignment and aggregation checks | [Lane balancing notes](balance-lanes-notes.md) |
+| [`scheduling_polars.py`](scheduling_polars.py) | End-to-end benchmark | Public lazy scheduling queries → independently checked samples and source provenance | [Lane assignment](../docs/assign-lanes-benchmarks.md), [weighted scheduling](../docs/weighted-scheduling-benchmarks.md) |
+| [`test_scheduling_polars.py`](test_scheduling_polars.py) | Oracle checks | Exhaustive small scheduling problems and invalid lane assignments → independent checker validation | [Scheduling runner](scheduling_polars.py) |
 | [`coverage_temporal.py`](coverage_temporal.py) | End-to-end benchmark | Integer/temporal fixtures → raw timing CSV | [Maximum k-coverage](../docs/coverage-benchmarks.md) |
 | [`overlap_count.py`](overlap_count.py) | End-to-end benchmark | Generated workloads → timing samples, RSS and environment in JSON | [Overlap counting](../docs/overlap-count-benchmarks.md) |
 | [`containment_count.py`](containment_count.py) | End-to-end benchmark | Generated workloads → samples, native plans and pair-count safety skips in JSON | [Containment counting](../docs/containment-benchmarks.md) |
@@ -68,6 +70,20 @@ The runner checks that the installed native extension matches the local Cargo
 release library, records hashes and environment metadata, preserves existing
 results, and rotates unit/explicit-unit/positive/mixed-weight measurements.
 Use `--sizes`, `--seeds`, `--samples`, and `--warmups` for focused repeat runs.
+
+Lane assignment and weighted scheduling share a complete Polars runner. After
+the release rebuild, leave `POLARS_MAX_THREADS` unset to measure the default
+thread pool:
+
+```sh
+uv run --no-sync python benchmarks/scheduling_polars.py --output benchmarks/results/scheduling-polars-new
+uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_polars.py
+```
+
+The runner includes public query construction and collection. It checks lane
+feasibility and the minimum lane count, or scheduling feasibility and the optimal
+total weight, outside timing. It records each seed separately and preserves the
+release hashes, source archive and thread settings.
 
 Coverage/load profiles compare complete A event, B independent-stream, and C
 active-end heap calls. Weighted index streams are an additional B layout
@@ -253,6 +269,7 @@ uv run --locked --only-group dev python -m unittest discover -s benchmarks -p "t
 
 ```sh
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
+uv run --locked --isolated --only-group plots python -m unittest discover -s benchmarks -p test_plot.py
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
@@ -260,8 +277,7 @@ This reads saved measurements. It does not run benchmarks or compile Rust.
 Commit regenerated files in `docs/assets/benchmarks/` with the source/configuration
 change. The documentation CI build regenerates the assets before building the site.
 
-Start a report from [report-template.md](report-template.md): Summary, Results,
-Coverage and limitations, Reproduce and data. Register a small representative
-table in [plots.toml](plots.toml), including important losses.
+Copy and follow [report-template.md](report-template.md). Register the report's
+tables in [plots.toml](plots.toml).
 See the [adding an operation checklist](../docs/benchmarking.md#adding-an-operation)
-for scope lines, shared methodology, supporting notes, and navigation.
+for the publishing steps and checks.

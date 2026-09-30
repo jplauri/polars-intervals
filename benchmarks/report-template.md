@@ -1,81 +1,121 @@
 # <Operation> benchmarks
 
-[All benchmarks](../docs/benchmarks.md) · [Measurement guide](../docs/benchmarking.md)
+[All benchmarks](../docs/benchmarks.md) · [Measurement rules](../docs/benchmarking.md#measurement-rules)
 
 ## Summary
 
-Start with the exact method name in code formatting, linked to its API reference
-(for example, [`minimum_cover`](../docs/api.md#polars_intervals.minimum_cover)).
-Explain what it does before discussing performance. Write for a reader who knows
-their interval data but has never seen the implementation or benchmark setup.
+Write one short paragraph, usually 50–80 words. Start with the linked method
+name and explain its purpose in one sentence. Give a measured input size,
+runtime, and comparison with the fastest native Polars method tested on the
+same workload. Headline runtimes and comparisons use Polars' default thread
+pool or all logical processors. If the headline workload was measured only with
+fewer threads, put that condition in the summary sentence itself, such as "with
+Polars restricted to one thread". If other workloads were measured with all
+logical processors, add one visible sentence with those results. Never label a
+fixed thread count as the default unless the run used the default setting.
 
-Give a concrete input size and measured runtime early, with the conditions needed
-to interpret them. Identify selected synthetic examples as such. State whether
-the time measures a complete Polars operation or only its underlying algorithm.
-Explain the main benefit and limitation in a few direct sentences. For heuristic
-methods, describe result quality in everyday terms and distinguish observed
-improvements from guarantees. For exact methods, state what is guaranteed.
+State an exception readers can act on, such as input order, group size, weights
+or thread settings. Keep comparisons with private candidate algorithms in
+details. Identify synthetic examples as such. Keep API options in the API
+reference and implementation history in details. Use "function" in visible text.
+
+If complete Polars timings are missing, say "Full Polars query timings have not
+been measured." Prefer measuring the public operation before publishing.
+For an optimizer without a built-in Polars solver, use "Polars has no built-in
+solver for this optimization problem." For an unmeasured native expression
+comparison, use "A native Polars comparison has not been measured."
+For heuristics, pair runtime with the quality of the result. Distinguish
+observed improvements from guarantees.
 
 ## Results
 
-Complete Polars query / Rust algorithm only · <thread count> · median of <N>
-samples · [measurement settings](<link>)
+**Full Polars query time · milliseconds**
 
-Include a generated compact table with clear workload descriptions, input sizes,
-absolute times with units, and recognizable method names. Identify the package's
-method and explain alternatives. Define necessary shorthand beside the table.
-Include representative measured cases and important slow cases. Explain any
-per-case selection of comparison methods. Keep exact data and sample ranges
-accessible through the generated downloads.
+Use one small generated table with this shape:
 
-Explain the main takeaway without reciting every cell. Describe effects readers
-recognize, such as input order, overlap, grouping, capacity or selection limits,
-before internal causes. For heuristics, connect runtime to the quality gained
-on the same inputs.
+| Workload | Rows | polars-intervals (ms) | Native Polars (ms) | Compared with native |
+| --- | ---: | ---: | ---: | --- |
+| <Plain-language input description> | <Size> | <Time> | <Time> | <Ratio>× faster |
 
-Put measured Polars operations before algorithm-only comparisons. Keep detailed
-algorithm comparisons in an expandable block within Results or in supporting
-notes. Give every table a timing scope and measurement-settings link. Identify
-benchmark implementations that represent the package's design rather than direct
-calls to its current public function. Keep qualifications needed to understand
-the numbers next to them.
+Add one visible line defining the comparison in public Polars terms, such as
+"Native Polars: the fastest tested query using joins or `search_sorted`."
+Native Polars means the fastest equivalent query tested for that row in the same run.
+Record which method won in Benchmark details. Include small and large inputs
+where measured, plus important cases where the advantage disappears or reverses.
+Use about three significant figures for times and two for ratios. Quote ratios
+in the summary and overview as the table shows them. Missing measurements stay
+missing.
+Describe inconclusive differences as "about the same" and losses as "× slower".
 
-## Coverage and limitations
+Use one ratio convention: **speedup = baseline median / package median**.
+A value of 2 means the package is 2× faster; a value of 0.5 means it is 2× slower.
+Do not mix speedup and relative-runtime ratios in new report tables.
 
-Explain how varied the test data was, how results were checked, and where a user's
-experience might differ. Distinguish exhaustive small-case checks from agreement
-between implementations on large inputs. For heuristics, distinguish improvement
-from reaching a known best result. Do not imply that best results are known for
-every dataset or that the test mix represents users' workloads.
+When no native comparison exists, show workload, rows and the package runtime.
+Keep useful input variants or public modes in separate, clearly named columns.
+An operation with a different purpose is not a native Polars baseline. Label
+algorithm-only measurements as package algorithm time.
 
-Keep consequential limits visible: missing Polars timings, unmeasured input types,
-restricted comparisons, meaningful slow cases, memory costs and older measured
-builds. Explain memory figures as algorithm storage or whole-process memory and
-link to [precise definitions](../docs/benchmarking.md#memory-metrics). Put internal
-instrumentation, historical experiments and detailed validation in supporting notes.
+Follow the table with one or two sentences explaining the takeaway. Discuss
+effects readers recognize, such as input order, overlap, grouping or selection
+limits. Keep meaningful variability visible when it could change the conclusion.
+Use a plot only when it makes a scaling trend, crossover or tradeoff clearer.
 
-## Reproduce and data
+Add brief notes only when they change how readers should interpret the result.
+These can cover missing measurements, restricted comparisons or meaningful
+memory costs. Explain them in plain language. Do not mention measurement dates
+or older builds. Keep source hashes and exact revisions in details. Put exact
+thread settings in details, except for the summary's thread condition.
+For algorithm-only results, replace the timing label with "Underlying algorithm
+time" and keep them separate from full Polars measurements.
 
 <details markdown="1">
-<summary>Reproduce this operation</summary>
+<summary>Benchmark details</summary>
 
-Follow the [shared setup instructions](../docs/benchmarking.md#setup), then run:
+Use the following five bold subsection labels in this order. Keep each short.
+Link long derivations and experiment narratives from supporting notes instead
+of filling this block. Keep these labels out of the table of contents.
 
-```sh
-<operation-specific command, writing a new result file>
-```
+**What was compared**
+
+Identify the public function, equivalent native queries and selected workloads.
+Name the fastest native method for each headline row. Explain case selection
+and retain useful exceptions. Include the headline table's exact downloads.
+Additional results belong here only when they help readers interpret the first
+table. Keep separate runs and scopes separate.
+
+**Settings**
+
+Give timing boundaries, warmups, samples, threads, seeds and software versions.
+Briefly explain correctness evidence, distinguishing independent checks from
+agreement between candidates. Link the shared hardware and measurement guide
+instead of repeating them. Preserve settings and source/build hashes in linked
+metadata.
+
+**Limitations**
+
+State missing input types, workloads, baselines and execution modes. Name any
+memory metric and exclusions. Keep meaningful variability and unfavorable
+results. Label proposed explanations as such.
+
+**Reproduce**
+
+Give the operation command and link the shared setup. Include raw samples,
+metadata, measured source archives and supplemental table downloads here.
+
+**History**
+
+Keep older builds, private algorithm comparisons and repeat-run history here.
+Identify measured builds by revision, not date. Use supporting notes for lengthy
+development narratives. Preserve original measurement identities and archived
+table conventions without relabeling data. Explain how timed paths changed,
+without inferring an unmeasured speedup.
 
 </details>
 
-Link to raw samples (including repeat runs), run metadata/source hashes, and
-supporting design/correctness notes. Keep derivations, inventories, rejected
-approaches, and chronology in those notes, not in the main report.
-
-<!-- Author guidance: keep these four headings in order and both navigation links
-at the top. Use direct sentences, avoid semicolons, and introduce concepts before
-using them. Avoid unexplained notation, benchmark jargon and promotional claims.
-Keep prose short without padding or dropping material qualifications. After the
-summary and first table, a newcomer should understand the performance and main
-limitation. Hardware has one home in docs/benchmarks.md. Shared methodology, setup
-and publishing live in docs/benchmarking.md. Use about three significant figures.
-Exact generated values remain in CSV. Adjust relative links when copying to docs/. -->
+<!-- Acceptance test: after the summary and first table, a newcomer knows the
+measured runtime, how it compares with the fastest tested native Polars method,
+and the main exception. Reproduction and implementation details stay optional.
+Preserve existing page URLs and anchors when updating reports. Keep headings
+inside details out of the table of contents, preserving their IDs explicitly.
+Use the same operation name in the page title, sidebar and overview. -->

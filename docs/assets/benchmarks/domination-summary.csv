@@ -1,0 +1,9 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_engine,workload_seed,workload_method,method,x,median,min,max,samples
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,mixed,1000,0.1795,0.1787,0.18109999999999998,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,mixed,100000,17.952299999999997,17.673199999999998,18.5368,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,units,1000,0.1146,0.11159999999999999,0.1261,5
+"Chain, shuffled integers",path,shuffled,i64,1,1,auto,7,production,units,100000,7.971699999999999,7.793399999999999,8.1229,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,mixed,1000,0.5018,0.45439999999999997,0.7331,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,mixed,100000,14.3056,14.047899999999998,15.718499999999999,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,units,1000,0.38489999999999996,0.3464,0.5068,5
+"32 chains, shuffled integers, multiple chunks",path,shuffled,i64,32,7,auto,7,production,units,100000,7.943899999999999,7.5028,8.2087,5

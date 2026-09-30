@@ -52,7 +52,7 @@ nav:
   - Benchmarks:
       - Overview: benchmarks.md
       - Overlap counting: overlap-count-benchmarks.md
-      - Coverage and load profiles: coverage-profile-benchmarks.md
+      - Coverage depth and resource demand: coverage-profile-benchmarks.md
       - Clustering, union, and gaps: interval-geometry-benchmarks.md
       - Containment counting: containment-benchmarks.md
       - Nesting depth: nesting-depth-benchmarks.md
@@ -61,12 +61,12 @@ nav:
       - Weighted scheduling: weighted-scheduling-benchmarks.md
       - Maximum-weight clique: clique-benchmarks.md
       - Capacity scheduling: capacity-scheduling-benchmarks.md
-      - Capacity profiles: capacity-profile-benchmarks.md
+      - Scheduling with changing capacity: capacity-profile-benchmarks.md
       - Minimum covering: covering-benchmarks.md
       - Minimum-cost covering: cost-covering-benchmarks.md
       - Minimum-cost dominating set: domination-benchmarks.md
       - Minimum stabbing points: stabbing-benchmarks.md
-      - Maximum k-coverage: coverage-benchmarks.md
+      - Maximum covered length: coverage-benchmarks.md
       - Running and publishing: benchmarking.md
   - Release notes: changelog.md
   - Development:

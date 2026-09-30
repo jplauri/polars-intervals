@@ -1,0 +1,15 @@
+case,workload_family,workload_order,workload_dtype,workload_groups,workload_chunks,workload_engine,workload_seed,workload_algorithm,method,x,median,min,max,samples
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,positive,1000,0.0972,0.0931,0.1076,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,positive,100000,7.4512,7.2897,7.9033999999999995,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,positive,1000000,140.2896,120.5581,165.74779999999998,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,unit,1000,0.0803,0.0773,0.0865,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,unit,100000,3.8718,3.7266999999999997,4.0347,5
+"Up to 8 overlapping, shuffled integers",low8,shuffled,i64,1,1,auto,42,production,unit,1000000,43.0539,42.253099999999996,55.244,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,42,production,positive,1000000,10.5792,10.0565,10.9688,5
+"All overlap, shuffled dates",clique,shuffled,date,1,1,auto,42,production,unit,1000000,2.058,2.0471999999999997,2.7784999999999997,5
+"Up to 8 overlapping, shuffled UTC datetimes, streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,positive,1000000,125.8214,125.1231,137.236,5
+"Up to 8 overlapping, shuffled UTC datetimes, streaming",low8,shuffled,datetime_ns_utc,1,7,streaming,42,production,unit,1000000,48.2332,47.4373,52.7245,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,positive,1000,0.4371,0.378,0.594,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,positive,1000000,83.0834,80.583,85.6952,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,unit,1000,0.41409999999999997,0.3072,0.43439999999999995,5
+"32 groups, shuffled integers, multiple chunks",low8,shuffled,i64,32,7,auto,42,production,unit,1000000,49.616,47.9555,51.1115,5

@@ -1,0 +1,5 @@
+case,workload_family,workload_order,workload_k,method,x,median,min,max,samples
+"Overlapping steps, sorted, select up to 8",staircase,sorted,8,Int64,10000,1.0753,1.001,1.0799999999999998,3
+"Overlapping steps, sorted, select up to 8",staircase,sorted,8,Int64,1000000,125.2586,122.13029999999999,126.68339999999999,3
+"Overlapping steps, shuffled, select up to 8",staircase,shuffled,8,Int64,1000000,160.8724,157.6841,163.483,3
+"Overlapping steps, shuffled, select up to 64",staircase,shuffled,64,Int64,1000000,680.9259,678.9356,683.0688,3

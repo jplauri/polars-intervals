@@ -1,0 +1,5 @@
+case,workload_k,method,x,median,min,max,samples
+"32 overlapping per set, capacity 1",1,Int64,1000000,28.005,27.9041,28.433699999999998,3
+"32 overlapping per set, capacity 2",2,Int64,1000000,62.4955,62.0877,64.2221,3
+"32 overlapping per set, capacity 31",31,Int64,1000000,118.60549999999999,115.2969,134.83169999999998,3
+"32 overlapping per set, capacity 32",32,Int64,1000000,43.2496,40.8917,56.151399999999995,3

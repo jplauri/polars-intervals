@@ -1,0 +1,9 @@
+case,workload_family,workload_order,workload_seed,workload_scope,workload_dtype,workload_weights,workload_operation,method,x,median,min,max,samples
+"Non-overlapping, shuffled",disjoint,shuffled,7,lazy_complete,i64,positive,max_weight_non_overlapping,production,1000,0.2561,0.2123,0.30619999999999997,5
+"Non-overlapping, shuffled",disjoint,shuffled,7,lazy_complete,i64,positive,max_weight_non_overlapping,production,1000000,96.6905,96.04209999999999,99.43379999999999,5
+"Up to 128 overlapping, sorted by start",moderate128,sorted,7,lazy_complete,i64,positive,max_weight_non_overlapping,production,1000000,25.3155,24.7415,25.5402,5
+"Up to 128 overlapping, shuffled",moderate128,shuffled,7,lazy_complete,i64,positive,max_weight_non_overlapping,production,1000000,96.0303,94.2575,104.91279999999999,5
+"Nested, sorted by start",nested,sorted,7,lazy_complete,i64,positive,max_weight_non_overlapping,production,1000000,26.2078,25.837899999999998,26.414199999999997,5
+"Nested, shuffled",nested,shuffled,7,lazy_complete,i64,positive,max_weight_non_overlapping,production,1000000,96.91789999999999,95.4225,98.2207,5
+"Variable lengths, sorted by start",random_lengths,sorted,7,lazy_complete,i64,positive,max_weight_non_overlapping,production,1000000,183.3832,181.178,186.0075,5
+"Variable lengths, shuffled",random_lengths,shuffled,7,lazy_complete,i64,positive,max_weight_non_overlapping,production,1000000,260.2969,251.03019999999998,264.435,5

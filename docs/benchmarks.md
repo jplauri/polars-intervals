@@ -1,51 +1,51 @@
 # Benchmarks
 
-Saved measurements compare the production implementation with native Polars
-expressions or Rust candidates. Start with an operation's results table. Each
-report identifies its timing scope, workload, tradeoffs, and missing coverage.
+Find the runtime and Polars comparison for your operation below. These headlines
+summarize full Polars queries on synthetic inputs. Open a report for the input
+patterns and important exceptions.
 
-| Operation | What was measured |
-| --- | --- |
-| [Overlap counting](overlap-count-benchmarks.md) | Complete Polars collections against native counting expressions |
-| [Coverage and load profiles](coverage-profile-benchmarks.md) | Canonical segments from Rust sweeps and complete eager/lazy grouped Polars calls |
-| [Clustering, union, and gaps](interval-geometry-benchmarks.md) | Packed and indexed Rust scans, native Polars plans, and complete eager/lazy operations |
-| [Containment counting](containment-benchmarks.md) | Polars collections and separate Rust candidate comparisons |
-| [Nesting depth](nesting-depth-benchmarks.md) | Polars collections and separate Rust candidate comparisons |
-| [Lane assignment](assign-lanes-benchmarks.md) | Rust candidates for assigning the fewest nonoverlapping lanes |
-| [Lane balancing](balance-lanes-benchmarks.md) | Row-count quality and runtime of construction and repair, in Polars and the Rust core |
-| [Weighted scheduling](weighted-scheduling-benchmarks.md) | Rust candidates for maximum-weight nonoverlapping selection |
-| [Maximum-weight clique](clique-benchmarks.md) | Exact maximum-weight intersection, unit defaults, Rust candidates and release Polars collections |
-| [Capacity scheduling](capacity-scheduling-benchmarks.md) | Polars collections and Rust selection under an overlap limit |
-| [Capacity profiles](capacity-profile-benchmarks.md) | Polars collections and Rust selection under changing capacity |
-| [Minimum covering](covering-benchmarks.md) | Polars collections and Rust candidates for fewest-interval covering |
-| [Minimum-cost covering](cost-covering-benchmarks.md) | Polars collections and Rust candidates for minimum-cost covering |
-| [Minimum-cost dominating set](domination-benchmarks.md) | Reduction, fused covering, heap DP and greedy comparisons, plus release Polars collections |
-| [Minimum stabbing points](stabbing-benchmarks.md) | Polars collections and Rust candidates for interval hitting sets |
-| [Maximum k-coverage](coverage-benchmarks.md) | Polars collections and Rust candidates for maximum covered measure |
+## Interval queries and native Polars comparisons
+
+Speedups compare the fastest equivalent native Polars query tested on the same
+input. Native Polars can match or beat these functions when data is split into
+many tiny groups, such as ten or fewer rows per group.
+
+| Operation | Purpose | Measured headline |
+| --- | --- | --- |
+| [Overlap counting](overlap-count-benchmarks.md) | Count overlaps for each row | 1.4–2.3× faster than Polars · 167–244 ms at 3M shuffled rows |
+| [Coverage depth and resource demand](coverage-profile-benchmarks.md) | Measure active intervals or their total demand | 3.9–33× faster than Polars · 1.24–8.70 ms at 100k rows (one Polars thread) · 1.3–4.7× at 1M rows (24 threads) |
+| [Clustering, union, and gaps](interval-geometry-benchmarks.md) | Label connected intervals, merge ranges or find gaps | Clustering: 3.2× faster than Polars · 4.74 ms at 100k shuffled rows |
+| [Containment counting](containment-benchmarks.md) | Count containments for each row | 1.3–2.2× faster than Polars · 65.3–1,090 ms at 3M rows |
+| [Nesting depth](nesting-depth-benchmarks.md) | Measure the longest containment chain above each row | About 200 ms at 3M shuffled rows (four Polars threads) · native comparison unmeasured |
+
+## Optimizers without a built-in Polars solver
+
+These reports show optimizer runtimes. Lane balancing is a heuristic for
+balance; the other operations return an exact optimum for their stated
+objective.
+
+| Operation | Purpose | Measured headline |
+| --- | --- | --- |
+| [Lane assignment](assign-lanes-benchmarks.md) | Assign the fewest lanes without overlaps | Exact · 59–176 ms at 1M shuffled rows |
+| [Lane balancing](balance-lanes-benchmarks.md) | Improve row-count balance using the fewest lanes | Improved balance on 108/132 datasets · 3.76–24.1 ms at 100k rows (one Polars thread) |
+| [Weighted scheduling](weighted-scheduling-benchmarks.md) | Select nonoverlapping intervals with maximum total weight | Exact · 96–260 ms at 1M shuffled rows |
+| [Maximum-weight clique](clique-benchmarks.md) | Select mutually overlapping intervals with maximum total weight | Exact · 43.1 ms unweighted or 140 ms weighted at 1M shuffled rows (one Polars thread) |
+| [Capacity scheduling](capacity-scheduling-benchmarks.md) | Maximize weight under an overlap limit | Exact · 28–119 ms at 1M rows in small independent overlap groups |
+| [Scheduling with changing capacity](capacity-profile-benchmarks.md) | Maximize weight under an overlap limit that changes over time | Exact · 160 ms at 1M rows in small independent overlap groups |
+| [Minimum covering](covering-benchmarks.md) | Cover a target with the fewest intervals | Exact · 51–69 ms at 1M shuffled rows |
+| [Minimum-cost covering](cost-covering-benchmarks.md) | Cover a target at minimum total cost | Exact · 211–263 ms at 1M shuffled rows |
+| [Minimum-cost dominating set](domination-benchmarks.md) | Select cheapest representatives so every interval is selected or overlaps one | Exact · 7.97–18.0 ms at 100k shuffled rows (one Polars thread) |
+| [Minimum stabbing points](stabbing-benchmarks.md) | Find the fewest points that hit every interval | Exact · 26.5 ms sorted or 139 ms shuffled at 3M rows |
+| [Maximum covered length](coverage-benchmarks.md) | Maximize covered length with a limited selection | Exact · 161–681 ms at 1M shuffled rows, selecting up to 8 or 64 intervals |
 
 ## Hardware
 
 Published runs use a fixed machine: **AMD Ryzen 9 3900X,
-12 physical cores / 24 logical processors, 32 GiB RAM** (about 31.9 GiB usable),
+12 physical cores / 24 logical processors, 32 GiB RAM**,
 running Windows 11 x86-64. The original hardware records remain in each run's
 metadata for provenance.
 
-Thread counts, sample counts, software versions, builds, and instrumentation vary
-between runs. Read the scope line beside each result set and follow its metadata
-link for the exact settings. Rust core timings and complete Polars collections
-are separate measurements.
+<span id="reading-and-reproducing-results"></span>
 
-## Reading and reproducing results
-
-Tables show selected median runtimes with explicit units, including important
-production losses. Their downloadable data retain exact medians, sample ranges,
-and counts. Detailed candidates and historical runs remain linked from each
-report. See the [shared methodology](benchmarking.md#measurement-rules) for timing,
-validation, memory definitions, and interpretation limits.
-
-- [Running and publishing benchmarks](benchmarking.md): setup, regeneration, and
-  a short checklist for adding an operation.
-- [Script inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md):
-  runners and report generators.
-- [Report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md):
-  the four-section structure used by every operation.
+[Benchmark setup and reporting](benchmarking.md#reading-and-reproducing-results)
+describes how to reproduce or contribute results.
