@@ -3,7 +3,7 @@
 See the [benchmark overview](../docs/benchmarks.md) for compact results tables.
 
 [Running and publishing benchmarks](../docs/benchmarking.md) covers setup,
-table generation, and the four-section checklist for adding an operation.
+table generation, report format and checks for adding an operation.
 
 ## Python scripts
 
@@ -253,6 +253,7 @@ uv run --locked --only-group dev python -m unittest discover -s benchmarks -p "t
 
 ```sh
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
+uv run --locked --isolated --only-group plots python -m unittest discover -s benchmarks -p test_plot.py
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
@@ -260,8 +261,8 @@ This reads saved measurements. It does not run benchmarks or compile Rust.
 Commit regenerated files in `docs/assets/benchmarks/` with the source/configuration
 change. The documentation CI build regenerates the assets before building the site.
 
-Start a report from [report-template.md](report-template.md): Summary, Results,
-Coverage and limitations, Reproduce and data. Register a small representative
+Start a report from [report-template.md](report-template.md): a short Summary,
+one Results table and a collapsed Benchmark details block. Register a compact
 table in [plots.toml](plots.toml), including important losses.
 See the [adding an operation checklist](../docs/benchmarking.md#adding-an-operation)
-for scope lines, shared methodology, supporting notes, and navigation.
+for scope lines, shared methodology, supporting notes, navigation and checks.

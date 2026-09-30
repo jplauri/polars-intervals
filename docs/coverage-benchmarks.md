@@ -6,12 +6,36 @@
 
 [`max_k_coverage`](api.md#polars_intervals.max_k_coverage) selects at most `k`
 intervals to cover the greatest total length, counting overlaps only once.
-The result is exact. On **one million shuffled integer intervals**, a complete
-Polars query took **161 ms when allowed to select 8 intervals** and **681 ms
-when allowed to select 64**, using the same overlapping input pattern. Allowing
-more selected intervals can increase both runtime and working memory.
+The result is exact. On a synthetic input of **one million shuffled integer
+intervals**, a complete Polars query took **161 ms when allowed to select 8
+intervals** and **681 ms when allowed to select 64**, using the same overlapping
+input pattern. Allowing
+more selected intervals can increase both runtime and working memory. No
+equivalent native Polars optimizer was measured.
 
 ## Results
+
+**Full Polars query time · milliseconds**
+
+--8<-- "docs/assets/benchmarks/coverage-summary.md:3:-3"
+
+On these integer inputs, increasing the selection limit from 8 to 64 makes
+the query about four times slower, while sorting helps at the smaller limit.
+These overlapping-step examples show a measured tradeoff, not a fixed scaling
+rule for every input.
+
+<details markdown="1">
+<summary>Benchmark details</summary>
+
+See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
+
+--8<-- "docs/assets/benchmarks/coverage-summary.md:-2:"
+
+The compact table selects integer overlapping-step inputs: sorted cases at
+10,000 and one million rows with a selection limit of 8, and shuffled
+million-row cases with limits of 8 and 64.
+
+**Full Polars measurements**
 
 **Complete Polars queries · 24 Polars threads · median of 3 samples ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-environment.json)**
@@ -27,8 +51,7 @@ example about four times slower. Sorting helps at the smaller limit: the
 sorted example takes 125 ms compared with 161 ms when shuffled. These are
 measured cases, not a fixed scaling rule for every input.
 
-<details markdown="1">
-<summary>Underlying algorithm and memory comparisons</summary>
+**Underlying algorithm and memory comparisons**
 
 **Rust algorithm only · one thread · median of 3 samples · integer endpoints ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-environment.json)**
@@ -50,9 +73,9 @@ storage rises from 162 MiB at a limit of 8 to 216 MiB at 64. These are
 algorithm-only allocations, including output and working storage. They do not
 measure the memory of a complete Polars query.
 
-</details>
+<span id="coverage-and-limitations"></span>
 
-## Coverage and limitations
+**Coverage and limitations**
 
 The algorithm run covers 1,506 combinations of size, interval pattern, input
 order and selection limit. It spans 1,000 to one million rows and limits from
@@ -74,10 +97,9 @@ and converting inputs is excluded. Some slower algorithm comparisons were
 limited to smaller datasets. The [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#maximum-k-coverage)
 retain these limits, memory tradeoffs and correctness checks.
 
-## Reproduce and data
+<span id="reproduce-and-data"></span>
 
-<details markdown="1">
-<summary>Operation-specific commands</summary>
+**Reproduce and data**
 
 ```sh
 cargo bench -p intervals-core --bench max_k_coverage --locked > target/coverage-core.csv
@@ -88,10 +110,10 @@ python -I /path/to/checkout/benchmarks/coverage_temporal.py > coverage-temporal.
 The core harness performs separate correctness and allocation calls before
 three timed invocations. See the shared guide for release setup.
 
-</details>
-
 [Shared setup and publishing](benchmarking.md) ·
 [Core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-core.csv) ·
 [Collection samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-temporal.csv) ·
 [Metadata, source hashes and validation](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-environment.json) ·
 [Recurrence, proofs and experiments](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#maximum-k-coverage)
+
+</details>

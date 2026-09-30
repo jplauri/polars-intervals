@@ -177,6 +177,53 @@ class PlotTests(unittest.TestCase):
         self.assertEqual(points["workload_family"].to_list(), ["dense"] * 3)
         self.assertIn("| Dense | 1,000 | 2 | 4 |", render_table(points, source, table))
 
+    def test_native_comparison_uses_fastest_available_median_per_size(self):
+        samples = pl.concat(
+            [
+                self.samples,
+                pl.LazyFrame(
+                    {
+                        "family": ["dense"] * 3,
+                        "n": [1000, 10000, 100000],
+                        "method": ["C", "C", "A"],
+                        "ns": [8_000_000, 5_000_000, 20_000_000],
+                        "sample": [0, 0, 0],
+                    }
+                ),
+            ]
+        )
+        table = {
+            **self.chart,
+            "methods": {"A": "Package (ms)", "B": "Native B", "C": "Native C"},
+            "native_comparison": {"package": "A", "baselines": ["B", "C"]},
+            "cases": [
+                {"label": "Dense", "sizes": [1000, 10000, 100000], "filters": {"family": "dense"}}
+            ],
+        }
+        points = summarize_table(samples, self.source, table)
+        markdown = render_table(points, self.source, table)
+        self.assertIn("| Package (ms) | Native Polars (ms) | Compared with native |", markdown)
+        self.assertIn("| Dense | 1,000 | 2 | 4 | 2× faster |", markdown)
+        self.assertIn("| Dense | 10,000 | 10 | 5 | 2× slower |", markdown)
+        self.assertIn("| Dense | 100,000 | 20 | — | — |", markdown)
+        self.assertEqual(set(points["method"]), {"A", "B", "C"})
+        inconclusive = {
+            **table,
+            "cases": [{**table["cases"][0], "inconclusive_sizes": [1000]}],
+        }
+        self.assertIn(
+            "| Dense | 1,000 | 2 | 4 | about the same |",
+            render_table(points, self.source, inconclusive),
+        )
+        zeros = render_table(points.with_columns(pl.lit(0.0).alias("median")), self.source, table)
+        self.assertIn("| Dense | 1,000 | 0 | 0 | — |", zeros)
+        with self.assertRaisesRegex(ValueError, "distinct measured baselines"):
+            render_table(
+                points,
+                self.source,
+                {**table, "native_comparison": {"package": "A", "baselines": ["A"]}},
+            )
+
     def test_config_writes_table_outputs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -1,20 +1,43 @@
 # Nesting depth benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md)
 
 ## Summary
 
 [`nesting_depth`](api.md#polars_intervals.nesting_depth) measures how deeply each
 interval sits inside a chain of other intervals. Outermost intervals have depth
-zero. Complete Polars queries took **about 200 ms for three million shuffled
-integer intervals**, both with shallow nesting and with every interval nested
-inside the next. The sorted version of the fully nested example took **43 ms**.
-Input order and grouping can matter as much as nesting depth.
+zero. In synthetic benchmarks, full Polars queries took **about 200 ms for three
+million shuffled integer intervals**, with either shallow or deep nesting. The
+sorted, fully nested example took **43 ms**. Input order and grouping can matter
+as much as nesting depth. A native Polars comparison has not been measured.
 
 ## Results
 
-**Complete Polars queries · 4 Polars threads · median of 5 samples ·
-[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/nesting-polars-windows.json)**
+**Full Polars query time · milliseconds**
+
+--8<-- "docs/assets/benchmarks/nesting-summary.md:3:-3"
+
+Sorting makes a large difference in the fully nested example. Splitting 100,000
+rows into 1,000 groups roughly doubles runtime because each group adds work.
+
+<details markdown="1">
+<summary>Benchmark details</summary>
+
+See the [measurement guide](benchmarking.md) and shared
+[hardware](benchmarks.md#hardware).
+
+**Measurement and endpoint types**
+
+The headline cases contrast shallow and deep nesting, smaller and larger inputs,
+and the effects of sorting or splitting the input into many groups.
+
+The Polars run used four Polars threads, one warmup and five samples per case,
+with seed 731. The displayed times are medians. Settings, software versions and
+source hashes are recorded in the
+[run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/nesting-polars-windows.json).
+No native Polars implementation was measured. The summary uses Int64 endpoints.
+
+--8<-- "docs/assets/benchmarks/nesting-summary.md:-2:"
 
 “Depth up to 7” is shallow nesting. “Fully nested” means each successive
 interval is inside another, producing a long chain. Row counts are totals across
@@ -27,8 +50,7 @@ rows into 1,000 groups increases runtime in the shallow example because each
 group adds processing overhead. Date columns were faster in these measurements,
 but the table does not establish that they will always be faster.
 
-<details markdown="1">
-<summary>Underlying algorithm comparisons</summary>
+**Underlying algorithm comparisons**
 
 **Rust algorithm only · one thread · median of 5 samples ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/nesting-kernels-windows.json)**
@@ -45,9 +67,9 @@ the package's Rust function took 215 ms for three million fully nested rows.
 Its peak requested heap allocation was 91.6 MiB on shallow input and 124 MiB on
 a full chain. Deep nesting requires more working storage.
 
-</details>
+<span id="coverage-and-limitations"></span>
 
-## Coverage and limitations
+**Coverage and limitations**
 
 Algorithm tests cover twenty patterns with 1,000 to three million rows. They
 include shallow and deep nesting, duplicates, shared endpoints, empty intervals
@@ -65,10 +87,9 @@ Polars-only expression was benchmarked, and whole-query memory was not measured.
 See the [validation notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#validation-details)
 and [memory definitions](benchmarking.md#memory-metrics).
 
-## Reproduce and data
+<span id="reproduce-and-data"></span>
 
-<details markdown="1">
-<summary>Operation-specific commands</summary>
+**Reproduce and data**
 
 ```powershell
 $env:NESTING_SAMPLES = "5"
@@ -84,10 +105,10 @@ instrumentation. The original comparison and the repeat selected different
 candidate methods, recorded in their measurement settings. See the
 [provenance guidance](benchmarking.md#measurement-rules) for the archived suite.
 
-</details>
-
 [Shared setup and publishing](benchmarking.md) ·
 [Core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/nesting-kernels-windows.csv) ·
 [Collection samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/nesting-polars-windows.csv) ·
 [Repeat metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/nesting-production-windows.json) ·
 [Recurrences, sorted-input investigation and historical evidence](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#nesting-depth)
+
+</details>

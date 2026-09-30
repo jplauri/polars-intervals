@@ -1,18 +1,39 @@
 # Variable-capacity selection benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md)
 
 ## Summary
 
 [`max_weight_with_capacity_profile`](api.md#polars_intervals.max_weight_with_capacity_profile)
 selects the highest-weight set of intervals when the allowed number of overlaps
-changes over time. The result is exact. In a benchmark with separate sets of up
-to 32 overlapping intervals, the complete Polars operation took **14.3 ms for
-100,000 integer intervals** and **160 ms for one million**, with capacity varying
-between 2, 4, 6 and 8. Larger interconnected overlap sets and different capacity
-patterns can change the cost substantially.
+changes over time. In synthetic examples with small, independent overlap groups,
+full Polars queries took **14.3 ms for 100,000 integer intervals** and **160 ms
+for one million**, with the overlap limit varying between 2, 4, 6 and 8.
+The result is exact. A native Polars comparison was not measured. Larger,
+interconnected groups can take much longer.
 
 ## Results
+
+**Full Polars query time · milliseconds**
+
+--8<-- "docs/assets/benchmarks/profile-summary.md:3:-3"
+
+Changing the overlap limit adds work on these inputs. Allowing every useful
+interval to be selected avoids the harder selection step.
+
+<details markdown="1">
+<summary>Benchmark details</summary>
+
+See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
+
+The headline table uses integer endpoints to compare constant, changing and
+sufficient capacity, including changing-capacity inputs at 100,000 and one million rows.
+
+--8<-- "docs/assets/benchmarks/profile-summary.md:-2:"
+
+<span id="full-polars-measurements"></span>
+
+**Full Polars measurements**
 
 **Complete Polars operation · solver uses up to 8 workers · median of 3 samples ·
 Polars thread count unrecorded · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
@@ -29,8 +50,9 @@ inputs. When capacity is sufficient for every interval, the optimizer can avoid
 the harder selection step. A constant profile uses the simpler constant-capacity
 solver, with some additional time to read and check the profile.
 
-<details markdown="1">
-<summary>Underlying algorithm comparisons</summary>
+<span id="underlying-algorithm-comparisons"></span>
+
+**Underlying algorithm comparisons**
 
 **Rust algorithm only · one thread · median of 3 samples ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
@@ -53,9 +75,9 @@ The package stays single-threaded below 16,384 rows. Forced parallel processing
 loses on the 1,000-row example but wins at 10,000 rows, so that threshold is a
 tradeoff. At one million rows, parallel processing is substantially faster.
 
-</details>
+<span id="coverage-and-limitations"></span>
 
-## Coverage and limitations
+**Coverage and limitations**
 
 The final algorithm run covers 187 combinations of input size, overlap pattern,
 capacity changes, segment count, input order and weights. Large interconnected
@@ -78,10 +100,11 @@ package call. This includes output and working storage, but excludes caller
 inputs and the rest of the process. The [supporting notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#variable-capacity-selection)
 retain memory comparisons, earlier experiments and validation details.
 
-## Reproduce and data
+<span id="reproduce-and-data"></span>
 
-<details markdown="1">
-<summary>Operation-specific commands</summary>
+**Reproduce and data**
+
+<span id="operation-specific-commands"></span>
 
 ```sh
 cargo bench -p intervals-core --bench max_weight_with_capacity_profile --locked > benchmarks/results/capacity-profile-local.csv
@@ -93,10 +116,10 @@ python -I /path/to/checkout/benchmarks/capacity_profile_temporal.py > capacity-p
 temporal command with the installed release wheel's Python from outside the
 checkout, following the shared setup.
 
-</details>
-
 [Setup, metrics and publishing](benchmarking.md) ·
 [Final core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-core.csv) ·
 [Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-temporal.csv) ·
 [Metadata and historical run inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json) ·
 [Design notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#variable-capacity-selection)
+
+</details>

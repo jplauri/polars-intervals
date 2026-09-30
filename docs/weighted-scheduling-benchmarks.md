@@ -1,20 +1,44 @@
 # Weighted scheduling benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md)
 
 ## Summary
 
 [`max_weight_non_overlapping`](api.md#polars_intervals.max_weight_non_overlapping)
 selects non-overlapping intervals with the highest possible total weight. In
-algorithm-only benchmarks, the design used by the package processed **one million
-intervals in 21–240 ms** across the displayed examples. Input order and interval
-lengths make a large difference. These times exclude Polars overhead, and
-alternative algorithms were faster on the random-length examples.
+synthetic benchmarks, its underlying algorithm processed **one million intervals
+in 21–240 ms**. Input order and interval lengths make a large difference.
+Alternative algorithms were faster on random-length examples. Full Polars query
+timings and a native Polars comparison have not been measured.
 
 ## Results
 
-**Rust algorithm only · one thread · median of 5 samples · integer endpoints
-and weights · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-environment.json)**
+**Underlying algorithm time · milliseconds**
+
+--8<-- "docs/assets/benchmarks/weighted-summary.md:3:-3"
+
+The package's algorithm works well on non-overlapping and nested inputs.
+Random lengths reverse the advantage: the best tested alternative was
+**1.57× faster** on the shuffled example. A separate repeat confirmed these
+gains and losses.
+
+<details markdown="1">
+<summary>Benchmark details</summary>
+
+See the [measurement guide](benchmarking.md) and shared
+[hardware](benchmarks.md#hardware).
+
+**Measurement and algorithm comparisons**
+
+The headline cases show small and large non-overlapping inputs, gains on
+structured inputs, and losses on sorted or shuffled random-length inputs.
+
+The algorithm runs used one thread, two warmups and five samples per case,
+with seed 42 and integer endpoints and weights. The displayed times are medians.
+Settings, software versions and source hashes are recorded in the
+[environment metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-environment.json).
+
+--8<-- "docs/assets/benchmarks/weighted-summary.md:-2:"
 
 All weights in this table are positive. “Sorted by end” means the input is
 ordered by interval finish time. The first method implements the algorithm
@@ -33,7 +57,9 @@ An independent repeat confirmed both the gains on structured inputs and the
 losses on random lengths. Its samples remain separate, so the table describes
 one run rather than an average across machines or runs.
 
-## Coverage and limitations
+<span id="coverage-and-limitations"></span>
+
+**Coverage and limitations**
 
 The tests cover 1,000 to one million rows, eleven interval patterns, sorted and
 shuffled input, and six weight distributions. They include nesting, duplicates,
@@ -55,10 +81,11 @@ alternative uses 77.2 MiB. This measures algorithm buffers rather than the
 whole process. See the [measurement guide](benchmarking.md) and
 [supporting comparisons and checks](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#weighted-scheduling).
 
-## Reproduce and data
+<span id="reproduce-and-data"></span>
 
-<details markdown="1" id="historical-validation">
-<summary>Operation-specific command and historical validation</summary>
+**Reproduce and data**
+
+<span id="historical-validation"></span>
 
 ```sh
 cargo bench -p intervals-core --bench max_weight_non_overlapping --locked > target/weighted-local.csv
@@ -68,10 +95,10 @@ Set `WEIGHTED_BENCH_MAX_N=1000` for a smoke run. The core harness requires relea
 mode and does not need Polars. Historical package-check results moved to the
 [validation record](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#repeat-and-historical-validation).
 
-</details>
-
 [Shared setup and publishing](benchmarking.md) ·
 [First-run samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-windows.csv) ·
 [Repeat samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-repeat-windows.csv) ·
 [Environment and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/weighted-environment.json) ·
 [Algorithm notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/algorithm-notes.md#weighted-scheduling)
+
+</details>

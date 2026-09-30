@@ -1,15 +1,57 @@
 # Interval clustering, union and gap benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md)
 
 ## Summary
 
 [`cluster_intervals`](api.md#polars_intervals.cluster_intervals) labels connected
-intervals in original row order. It supports strict overlap or touching
-connectivity, and each empty row remains a separate component.
-[`merge_intervals`](api.md#polars_intervals.merge_intervals) returns the exact
-union as maximal nonempty runs.
-[`interval_gaps`](api.md#polars_intervals.interval_gaps) returns its complement
+intervals, [`merge_intervals`](api.md#polars_intervals.merge_intervals) combines
+covered ranges, and [`interval_gaps`](api.md#polars_intervals.interval_gaps) finds
+uncovered ranges within a domain. In synthetic benchmarks, clustering **100,000
+shuffled intervals took 4.11 ms**, **7.5× faster** than the native Polars
+implementation tested. Merging and finding gaps in 100,000 separate intervals
+took **4.16–4.28 ms**, **about 10× faster**. Native clustering won on many tiny
+groups.
+
+## Results
+
+**Full Polars query time · milliseconds**
+
+--8<-- "docs/assets/benchmarks/geometry-summary.md:3:-3"
+
+Grouping adds overhead when each group contains only one interval. For 1,000
+singleton timestamp groups, package clustering took 10.3 ms, **2.2× slower**
+than native Polars.
+
+These comparisons used one CPU thread. More cores narrow some advantages.
+These measurements use an earlier build. The current version has not been
+remeasured.
+
+<details markdown="1">
+<summary>Benchmark details</summary>
+
+See the [measurement guide](benchmarking.md) and shared
+[hardware](benchmarks.md#hardware).
+
+**Measurement and case selection**
+
+The headline table selects small and large strict-clustering inputs,
+100,000-row cases for touching, union and gaps, and timestamp groups where
+native clustering can win. All headline rows come from the same broad eager run.
+The displayed times are medians from three samples after one warmup, with
+one Polars thread and seed 7.
+
+The benchmark's native implementation is the only native candidate measured in
+this run. Speedup is native median divided by package median. The loss uses
+package median divided by native median.
+
+--8<-- "docs/assets/benchmarks/geometry-summary.md:-2:"
+
+**Operation and earlier measurements**
+
+Clustering returns labels in original row order. It supports strict overlap or
+touching connectivity, and each empty row remains a separate component. Merging
+returns the exact union as maximal nonempty runs. Gaps return its complement
 inside a supplied domain. These operations preserve exact endpoint types and
 solve each observed group independently.
 
@@ -32,7 +74,7 @@ redundant validation calls, and replaced the competitor's Rust validator with
 Polars checks. Public contracts are unchanged. These tables do not measure the
 refactored code, and no timing or memory improvement is claimed for the cleanup.
 
-## Results
+**Broad Polars comparisons**
 
 Complete eager Polars calls · one thread · seed 7 · median of three samples ·
 [settings and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/interval-geometry-polars-20260929.metadata.json)
@@ -96,8 +138,7 @@ including file reads. Complete streaming-engine calls took **7.86 ms** versus
 need the complete collection or group. The streaming label does not establish
 bounded memory or out-of-core execution.
 
-<details markdown="1">
-<summary>Rust algorithm comparison and production decision</summary>
+**Rust algorithm comparison and production decision**
 
 Complete Rust calls including output destruction · Int64 endpoints · sequential · seed 7 ·
 median of five samples ·
@@ -144,11 +185,12 @@ repeated alongside timing rows in the raw CSV, not measured anew per sample.
 
 Initial packed-production and direct-buffer-prototype measurements are retained
 as historical evidence in the [comparison notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/interval-geometry-notes.md).
-The tables here measure the final public implementation after a fresh rebuild.
+Those runs measured the public implementation after a fresh rebuild, before the
+later cleanup described above.
 
-</details>
+<span id="coverage-and-limitations"></span>
 
-## Coverage and limitations
+**Coverage and limitations**
 
 The [single-machine](benchmarks.md#hardware) synthetic matrix includes 0, 8,
 1,000, 10,000 and 100,000 rows, plus selected million-row cases. It varies
@@ -188,10 +230,9 @@ algorithm allocation counts. A prior fixture peak can mask later allocations.
 They were collected separately from timing. See the shared
 [memory definitions](benchmarking.md#memory-metrics).
 
-## Reproduce and data
+<span id="reproduce-and-data"></span>
 
-<details markdown="1">
-<summary>Reproduce this operation</summary>
+**Reproduce and data**
 
 Follow the [shared setup](benchmarking.md#setup) and rebuild the release plugin.
 The complete-call runner verifies that the installed extension matches that
@@ -214,8 +255,6 @@ existing output prefixes. Generate tables with the isolated plots environment:
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
 ```
 
-</details>
-
 Each final run has raw samples, metadata and an archived source snapshot:
 
 | Run | Samples | Metadata | Sources |
@@ -234,3 +273,5 @@ used the verified release extension SHA-256
 `be5e9721282db7d605d1b6dfbf4b0226254f2bd4ae6ed83af70a162b023cc7bc`.
 The dirty-tree snapshots identify the exact measured feature sources. Later
 documentation and packaging work does not relabel those binaries or samples.
+
+</details>

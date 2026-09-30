@@ -1,19 +1,48 @@
 # Minimum-cost dominating-set benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md)
 
 ## Summary
 
 [`minimum_cost_dominating_set`](api.md#polars_intervals.minimum_cost_dominating_set)
 selects the cheapest representatives so every interval is selected or overlaps
-a selected interval. Equal-cost solutions use the fewest rows. On a synthetic
-chain of **100,000 shuffled integer intervals**, complete Polars queries took
-**7.97 ms without a cost column** and **18.0 ms with varying costs**. Each interval
-in this chain overlaps only its immediate neighbors. Uniform costs allow a
-faster greedy algorithm. Both modes return an exact optimum, but overlap
-patterns and input order affect runtime.
+one. On a synthetic chain of **100,000 shuffled integer intervals**, full Polars
+queries took **7.97 ms without a cost column** and **18.0 ms with varying costs**.
+Both modes return an exact optimum. A native Polars comparison was not measured.
+Polars timings stop at 100,000 rows, and overlap patterns affect runtime.
 
 ## Results
+
+**Full Polars query time · milliseconds**
+
+--8<-- "docs/assets/benchmarks/domination-summary.md:3:-3"
+
+Uniform costs are faster than varying costs on these chains. Solving many tiny
+groups adds overhead, which becomes less prominent as the groups grow.
+
+These measurements use an earlier build.
+
+<details markdown="1">
+<summary>Benchmark details</summary>
+
+See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
+
+The headline table compares shuffled integer chains at 1,000 and 100,000 rows,
+with one chain or 32 groups, and with no cost column or varying costs.
+
+--8<-- "docs/assets/benchmarks/domination-summary.md:-2:"
+
+<span id="operation-notes"></span>
+
+**Operation notes**
+
+Equal-cost solutions use the fewest rows. Each interval in the synthetic chain
+overlaps only its immediate neighbors. Uniform costs allow a faster greedy
+algorithm.
+
+<span id="full-polars-measurements"></span>
+
+**Full Polars measurements**
 
 **Complete Polars queries · one Polars thread · median of 5 samples · seed 7 ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-polars-windows-20260929.metadata.json)**
@@ -30,8 +59,9 @@ Boolean output. Building inputs and queries is excluded. Tiny grouped inputs
 show the overhead of solving each group. When all intervals overlap one another,
 only one representative is needed, and this date example is faster than the chain.
 
-<details markdown="1">
-<summary>Underlying algorithm and memory comparisons</summary>
+<span id="underlying-algorithm-and-memory-comparisons"></span>
+
+**Underlying algorithm and memory comparisons**
 
 **Rust algorithm only · one thread · median of 5 samples · seed 7 ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-production-windows-20260929.metadata.json)**
@@ -59,9 +89,9 @@ benefited. Reversed duplicate geometries are a visible unit-greedy loss
 against fused covering. The earlier candidate comparison showed the same pattern.
 Runs and seeds remain separate. Small differences do not establish a reliable winner.
 
-</details>
+<span id="coverage-and-limitations"></span>
 
-## Coverage and limitations
+**Coverage and limitations**
 
 The synthetic inputs cover two seeds, integer and temporal endpoints, five row
 orders, uniform and varying costs, empty rows, extreme coordinates and disconnected
@@ -86,10 +116,11 @@ The saved measurements predate the shared-helper cleanup. The selected algorithm
 are unchanged. [Source and cleanup notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/domination-notes.md#measurement-sources-and-cleanup)
 identify the measured build and later changes.
 
-## Reproduce and data
+<span id="reproduce-and-data"></span>
 
-<details markdown="1">
-<summary>Reproduce this operation</summary>
+**Reproduce and data**
+
+<span id="reproduce-this-operation"></span>
 
 Follow the [shared setup](benchmarking.md#setup). Use fresh output names:
 
@@ -110,10 +141,10 @@ select focused comparisons. Million-row cases are bounded by the runner's
 matrix; quadratic DP is omitted above 64 rows. Restore thread settings after
 the run. Run plot generation/reporting checks using [the shared commands](benchmarking.md#generate-plots).
 
-</details>
-
 Raw data and run-specific metadata: [pilot](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-pilot-windows-20260929.csv),
 [large comparison](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-comparison-windows-20260929.metadata.json),
 [final production](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-production-windows-20260929.csv),
 [final million-row repeat](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-final-large-windows-20260929.csv),
 and [Polars collections](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-polars-windows-20260929.timings.csv).
+
+</details>

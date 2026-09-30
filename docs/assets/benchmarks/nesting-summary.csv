@@ -1,0 +1,6 @@
+case,workload_groups,workload_family,workload_order,workload_candidate,method,x,median,min,max,samples
+"Depth up to 7, shuffled, 1 group",1,low8,shuffled,plugin,Int64,100000,5.124499999999999,5.0351,5.3122,5
+"Depth up to 7, shuffled, 1 group",1,low8,shuffled,plugin,Int64,3000000,202.6882,194.6752,229.76729999999998,5
+"Fully nested, shuffled, 1 group",1,chain,shuffled,plugin,Int64,3000000,205.9645,199.57999999999998,228.4881,5
+"Fully nested, sorted, 1 group",1,chain,sorted,plugin,Int64,3000000,42.636399999999995,42.5015,46.326,5
+"Depth up to 7, shuffled, 1,000 groups",1000,low8,shuffled,plugin,Int64,100000,10.8551,10.5273,14.839699999999999,5

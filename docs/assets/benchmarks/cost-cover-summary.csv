@@ -1,0 +1,3 @@
+case,workload_family,workload_order,workload_method,method,x,median,min,max,samples
+"End-to-end intervals, shuffled",chain,shuffled,minimum_cost_cover,Int64,1000000,210.802,207.56289999999998,212.56029999999998,3
+"Many overlaps, shuffled",dense,shuffled,minimum_cost_cover,Int64,1000000,263.1597,261.85429999999997,270.0458,3

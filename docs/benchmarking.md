@@ -1,8 +1,9 @@
 # Running and publishing benchmarks
 
 The [overview](benchmarks.md) links to results for every operation and describes
-the shared [hardware](benchmarks.md#hardware). Operation reports give commands,
-timing exceptions, and links to run-specific metadata. The
+the shared [hardware](benchmarks.md#hardware). Operation reports lead with measured
+runtimes and native Polars comparisons. Expandable details hold commands,
+measurement settings, and run-specific metadata. The
 [script inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/README.md)
 distinguishes benchmark runners from report generators.
 
@@ -30,7 +31,7 @@ planning, output materialization, and destruction are timed. Workload constructi
 compilation, and correctness checks belong outside timing. Warm up before samples
 and vary candidate order where the harness supports it. Warmup/sample counts,
 thread settings, software versions, phase clocks, and allocator instrumentation
-differ between saved runs; the report's scope line and metadata describe what
+differ between saved runs; the report's measurement details describe what
 actually happened. These guidelines do not retroactively change historical runs.
 
 **Correctness.** Validate outside timing against an independent oracle or a
@@ -47,13 +48,27 @@ is not a significance test, and a small median difference does not establish a
 reliable winner. Do not pool separate runs or unrelated workloads. If reporting
 relative runtime, define it as **candidate median / production median**:
 production is 1.0× and values above 1.0× mean slower. This ratio of medians is
-not a distribution of paired measurements. Identify the method whenever selecting
-the fastest baseline independently per case.
+not a distribution of paired measurements. For reader-facing speedups, use
+**fastest tested native Polars median / package median** on the same case and
+run. Identify the winning native method. This compares the measured methods,
+not every possible Polars implementation. Do not compare different timing scopes
+or select times from different runs.
 
 **Limits and provenance.** Synthetic fixtures on one machine characterize those
 workloads, not every application or platform. Keep losses, skips, bounded
 baselines, and missing types visible. Preserve raw samples, environment, settings,
 revisions/source hashes, and historical evidence in `benchmarks/results/`.
+In operation reports, put seeds, hashes, build and cleanup history, correctness
+inventories, and raw-data links inside expandable details or supporting notes.
+Keep only qualifications that change how readers should interpret a result
+beside the headline or table. Use plain wording for older measurements, such as
+"These measurements use an earlier build. The current version has not been
+remeasured." Discuss repeat runs separately, including meaningful variation or
+contradictions.
+
+<details markdown="1">
+<summary>Recovering historical runs</summary>
+
 Most core runners time production only. The coverage-profile runner retains
 private event, heap and weighted-index comparisons because they are needed to
 reproduce its production decision. Removed older candidates and their runners remain
@@ -62,7 +77,8 @@ Some run metadata records a base revision with uncommitted feature changes, so
 that revision may not contain the benchmark code. Use the snapshot to recover
 the suite and consult each run's source hashes and cleanup notes for differences
 from the measured sources.
-Discuss repeat runs separately, including meaningful variation or contradictions.
+
+</details>
 
 ### Memory metrics
 
@@ -97,6 +113,11 @@ before its strict build. Commit generated `docs/assets/benchmarks/<id>.md` and
 CSV downloads retain exact medians, min/max, sample counts, and table workload
 dimensions. Missing measurements stay missing. Use `--output PATH` for a preview
 or `--config PATH` for another configuration.
+
+Compact report tables can include only their table rows with `:3:-3` after the
+snippet filename. Include the generated download links with `:-2:` inside
+**Benchmark details**. This keeps exact data accessible without duplicating
+the timing label or showing source links in the main report.
 
 ### Configure a table
 
@@ -137,22 +158,39 @@ rows. It cannot discover a dimension omitted from the source declaration, so
 review that list. A requested size with no samples is an error; missing individual
 method/size combinations remain missing.
 
+For a native comparison, set `native_comparison = { package = "production",
+baselines = ["native"] }` on the table. Include every equivalent native method
+measured in that run. The table chooses the lowest native median separately
+for each workload and size. Exact downloads retain all method summaries.
+Case `inconclusive_sizes = [1000]` displays "about the same" where the evidence
+does not support a dependable winner. Make that decision from the samples and
+repeat runs, not an arbitrary percentage threshold.
+
 ### Adding an operation
 
 1. Reuse an appropriate runner and correctness checks; record samples, omissions,
    and run metadata without overwriting historical evidence.
 2. Copy the [report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md)
-   into `docs/`. Keep **Summary → Results → Coverage and limitations → Reproduce
-   and data**. Start with the method name, explain its purpose, then give a
-   measured input size and runtime. Write for readers who have not seen the
-   implementation or benchmark setup. Follow the template's editorial guidance
-   for clear table labels, result quality and meaningful limitations.
+   into `docs/`. Use a short **Summary**, one **Results** table and a collapsed
+   **Benchmark details** block. Add brief visible notes only when they change
+   the takeaway. Write the summary with the operation's purpose,
+   measured input size and runtime, speedup against the fastest native Polars
+   method tested on the same case when available, and the main exception.
+   Make a missing native comparison explicit. Write for readers who have not
+   seen the implementation or benchmark setup.
 3. Add source mappings and a small representative table to `plots.toml`, including
    important production losses. Put end-to-end Polars results before separately
-   labelled Rust comparisons. Give each set a scope line and metadata link.
+   labelled Rust comparisons. Use a short, consistent scope label beside each
+   table, such as **Full Polars query time** or **Underlying algorithm time**.
+   Put thread settings, sample counts, metadata links and exact downloads inside
+   expandable details. Explain a thread condition visibly when it affects the
+   takeaway, such as a native comparison restricted to one thread.
+   Explain the takeaway without reciting the table's cells.
 4. Link shared methodology and hardware instead of repeating them. Put derivations
    and experiment history in existing supporting notes where possible. Include
-   the operation command in a collapsed reproduction block.
+   the operation command and raw-data links in the collapsed details block.
+   Optional technical details do not each need a visible subsection. Keep
+   material limits visible, including meaningful losses and older measured builds.
 5. Add the page to both the overview and `mkdocs.yml`; update the script inventory
    if needed. Preserve existing page URLs and repair affected links/anchors.
 6. Run generation, reporting tests, and the strict build above. Check source

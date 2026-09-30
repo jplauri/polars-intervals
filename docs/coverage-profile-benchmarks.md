@@ -5,31 +5,44 @@
 ## Summary
 
 [`coverage_profile`](api.md#polars_intervals.coverage_profile) returns new segments
-describing how many intervals are active, or their total resource demand, at
-each coordinate. It coalesces touching equal loads, optionally includes zero
-gaps, clips to a supplied observation horizon, and solves observed groups
-independently. These are exact profiles, not selected subsets of input rows.
-
-For **100,000 synthetic ordered short intervals**, the updated API took
-**1.24 ms** eagerly, **1.58 ms** including lazy plan construction and collection,
-and **1.71 ms** with streaming-engine collection (one thread, seed 7). Native
-Polars events took **41.0 ms** in the same run. The retained Rust implementation
-uses two independently sorted endpoint streams. It preserves exact Int128 loads
-and canonical segments, with linear processing when both streams are ordered.
-The choice trades higher weighted-record memory for faster large shuffled calls;
-an active-end heap wins on some ordered weighted core workloads.
-
-The timing tables below predate removal of the Rust core's explicit sortedness
-guards. A [focused before/after follow-up](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-sort-review-20260929.md)
-retains the simpler standard-library calls without claiming a speedup. Outputs
-and allocations matched, while timing differences varied across repeat runs.
-No new end-to-end Polars timings were taken for that cleanup.
+showing how many intervals are active, or their total resource demand, along
+the coordinate range. In the displayed synthetic examples, complete Polars
+calls processed **100,000 intervals in 1.24–8.70 ms**, **3.9–33× faster than the
+fastest tested native Polars expressions**. The advantage varies with the data
+and is smaller when native Polars can use more CPU cores.
 
 ## Results
 
+**Full Polars query time · milliseconds**
+
+<!-- Keep the generated download links in Measurement records below. -->
+--8<-- "docs/assets/benchmarks/coverage-profile-headline.md:3:-3"
+
+Sorted short intervals give the largest advantage in these examples. The
+32-resource workload has a smaller advantage, at about four times faster.
+
+These comparisons use one Polars thread and an earlier package build.
+Streaming still constructs the complete profile in memory.
+
+<details markdown="1">
+<summary>Benchmark details</summary>
+
+**Lazy and streaming calls**
+
 Complete calls including query construction and collection · one Polars thread ·
 median of five samples ·
-[current comparison settings and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.metadata.json)
+[measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.metadata.json)
+
+The headline table selects small and large short-interval inputs, a weighted
+case and two grouped cases from this run. It compares eager package calls with
+the fastest native method tested for each row. Weighted cases sum resource
+demand. The other cases count active intervals. Event sums were faster than the
+native count alternative for the displayed unweighted cases. The raw samples
+retain both native implementations.
+
+Speedup is the fastest native median divided by the package median on the same
+workload and size. These synthetic inputs were already in memory on the shared
+[Windows machine](benchmarks.md#hardware).
 
 --8<-- "docs/assets/benchmarks/coverage-profile-lazy-table.md"
 
@@ -55,8 +68,8 @@ baseline's join simplification. Their Python
 source snapshots are preserved and their timings are not relabeled as the
 updated wrapper. The Rust engine was unchanged in that follow-up, which measures
 the eager and lazy routes against the simplified baseline. Those measurements
-predate the sort-guard cleanup described above. The original lazy follow-up
-also retains its earlier baseline source
+predate the sort-guard cleanup described in Measurement records below. The
+original lazy follow-up also retains its earlier baseline source
 snapshot; none of those saved timings are attributed to the changed baseline.
 Native count comparisons remain available in the current raw samples.
 
@@ -118,8 +131,7 @@ Complete eager Polars calls · 24 Polars threads · median of five samples ·
 
 --8<-- "docs/assets/benchmarks/coverage-profile-threads24-table.md"
 
-<details markdown="1">
-<summary>Rust algorithm comparison and production decision</summary>
+**Rust algorithm comparison and production decision**
 
 Complete Rust calls · sequential, one algorithm thread · median of five samples ·
 [final production settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-core-final-20260929.metadata.json)
@@ -175,9 +187,9 @@ A separate i128 follow-up evaluated the adapter's actual quantity width before
 the storage decision. The table above predates the later sort-guard cleanup.
 See the [proof and layout notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/coverage-profile-notes.md).
 
-</details>
+<a id="coverage-and-limitations"></a>
 
-## Coverage and limitations
+**Coverage and limitations**
 
 These are synthetic fixtures on [one Windows machine](benchmarks.md#hardware),
 with two seeds, two warmups and five samples per reported workload. Raw data
@@ -216,10 +228,9 @@ native competitor covers the valid public contract on the measured fixtures;
 its invalid-input error text/classes can differ. No optional map/compression
 candidate, parallel sweep or new production dependency was added.
 
-## Reproduce and data
+<a id="reproduce-and-data"></a>
 
-<details markdown="1">
-<summary>Reproduce this operation</summary>
+**Reproduce and data**
 
 Follow the [release-build setup](benchmarking.md#setup), then preserve that build
 with `uv run --no-sync`. The end-to-end runner rejects stale or different native
@@ -255,7 +266,27 @@ uv run --locked --isolated --only-group docs mkdocs build --strict
 Set `PROPTEST_CASES=2048` for the higher-case run. New minimized failures use the
 existing Proptest regression convention; none were discovered in this run.
 
-</details>
+**Measurement records and implementation history**
+
+Headline table downloads:
+
+--8<-- "docs/assets/benchmarks/coverage-profile-headline.md:-2:"
+
+The timing tables predate removal of the Rust core's explicit sortedness guards.
+A [focused before/after follow-up](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-sort-review-20260929.md)
+retains the simpler standard-library calls without claiming a speedup. Outputs
+and allocations matched, while timing differences varied across repeat runs.
+No new end-to-end Polars timings were taken for that cleanup.
+
+The retained Rust implementation uses two independently sorted endpoint streams.
+It preserves exact Int128 loads and canonical segments, with linear processing
+when both streams are ordered. The choice trades higher weighted-record memory
+for faster large shuffled calls. An active-end heap wins on some ordered
+weighted core workloads.
+
+Profiles coalesce touching equal loads, optionally include zero gaps, clip to a
+supplied observation horizon, and solve observed groups independently. They
+return exact profiles rather than selected subsets of input rows.
 
 Raw comparisons:
 [initial core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-core-20260929.csv),
@@ -275,3 +306,5 @@ records the checks, release-binary identity, property case counts and packaging
 results of the initial eager implementation. The
 [lazy follow-up inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-lazy-verification-20260929.md)
 records deferred-execution tests, current wheel checks and the focused timing run.
+
+</details>

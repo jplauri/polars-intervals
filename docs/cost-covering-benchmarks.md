@@ -1,17 +1,46 @@
 # Minimum-cost covering benchmarks
 
-[All benchmarks](benchmarks.md) · [Measurement guide](benchmarking.md)
+[All benchmarks](benchmarks.md)
 
 ## Summary
 
 [`minimum_cost_cover`](api.md#polars_intervals.minimum_cost_cover) covers a target
 range without gaps while minimizing the total cost of selected intervals.
-If costs tie, it selects fewer intervals. Complete Polars queries took
-**211–263 ms for one million shuffled integer intervals** in the two displayed
-examples. The result is exact. The number and arrangement of useful intervals
-affect both runtime and working memory.
+Full Polars queries took **211–263 ms for one million shuffled integer intervals**
+in the two synthetic examples below. The result is exact. A native Polars
+comparison was not measured. The number and arrangement of useful intervals
+affect runtime and working memory.
 
 ## Results
+
+**Full Polars query time · milliseconds**
+
+--8<-- "docs/assets/benchmarks/cost-cover-summary.md:3:-3"
+
+These million-row examples take roughly a quarter of a second. Having many
+overlapping alternatives takes longer than covering a continuous chain.
+
+These measurements use an earlier build.
+
+<details markdown="1">
+<summary>Benchmark details</summary>
+
+See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
+
+The headline table compares the two measured shuffled integer workloads at one
+million rows: a continuous chain and many overlapping alternatives.
+
+--8<-- "docs/assets/benchmarks/cost-cover-summary.md:-2:"
+
+<span id="operation-notes"></span>
+
+**Operation notes**
+
+If costs tie, the operation selects fewer intervals.
+
+<span id="full-polars-measurements"></span>
+
+**Full Polars measurements**
 
 **Complete Polars queries · one solver thread · median of 3 samples ·
 Polars thread count unrecorded · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
@@ -27,8 +56,9 @@ case takes longer than the chain for each endpoint type. Date values are
 somewhat faster in this run, but the measurements do not separate type-handling
 costs from the rest of the computation.
 
-<details markdown="1">
-<summary>Underlying algorithm and memory comparisons</summary>
+<span id="underlying-algorithm-and-memory-comparisons"></span>
+
+**Underlying algorithm and memory comparisons**
 
 **Rust algorithm only · one thread · median of 3 samples ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)**
@@ -47,9 +77,9 @@ million-row integer chain, peak requested heap storage is 158 MB compared with
 105 MB for the package. These figures include output and working buffers,
 not total process memory.
 
-</details>
+<span id="coverage-and-limitations"></span>
 
-## Coverage and limitations
+**Coverage and limitations**
 
 The shared covering tests span 1,000 to one million rows and seventeen input
 patterns. They include different input orders, duplicate intervals, gaps,
@@ -73,10 +103,11 @@ for the full checks and timing scope.
 
 <span id="historical-validation"></span>
 
-## Reproduce and data
+<span id="reproduce-and-data"></span>
 
-<details markdown="1">
-<summary>Operation-specific commands</summary>
+**Reproduce and data**
+
+<span id="operation-specific-commands"></span>
 
 ```sh
 cargo bench -p intervals-core --bench covering --locked > benchmarks/results/covering-local.csv
@@ -87,11 +118,11 @@ The target measures both covering operations. `COVER_BENCH_MAX` and
 `COVER_BENCH_SAMPLES` restrict it. Run the final command with the installed release
 wheel's Python from outside the checkout, following the shared setup guide.
 
-</details>
-
 [Setup, metrics and publishing](benchmarking.md) ·
 [Core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-windows.csv) ·
 [Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-temporal-windows.csv) ·
 [Completion log](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-windows.log) ·
 [Design notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#covering) ·
 [Validation and source hashes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/covering-environment.json)
+
+</details>

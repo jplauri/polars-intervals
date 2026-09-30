@@ -1,0 +1,7 @@
+case,workload_family,workload_order,workload_weights,method,x,median,min,max,samples
+"Non-overlapping, shuffled",disjoint,shuffled,positive,B_two_orders,1000,0.0358,0.0355,0.0393,5
+"Non-overlapping, shuffled",disjoint,shuffled,positive,B_two_orders,1000000,81.9387,81.3785,120.06909999999999,5
+"Moderate overlap, sorted by end",moderate128,finish_sorted,positive,B_two_orders,1000000,20.8788,20.442,21.1546,5
+"Nested, shuffled",nested,shuffled,positive,B_two_orders,1000000,78.12519999999999,77.68549999999999,100.6152,5
+"Random lengths, sorted by end",random_lengths,finish_sorted,positive,B_two_orders,1000000,120.2222,120.0723,123.961,5
+"Random lengths, shuffled",random_lengths,shuffled,positive,B_two_orders,1000000,240.0557,228.5882,251.2806,5
