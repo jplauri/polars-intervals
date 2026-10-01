@@ -8,11 +8,9 @@
 connected intervals,
 [`merge_intervals`](api.md#polars_intervals.merge_intervals) combines covered
 ranges, and [`interval_gaps`](api.md#polars_intervals.interval_gaps) finds
-uncovered ranges within a domain. In synthetic benchmarks, clustering **100,000
-shuffled intervals took 4.74 ms**, **3.2× faster** than the native Polars
-implementation tested. Merging and finding gaps in 100,000 grouped intervals
-took **4.29–5.66 ms**, **2.9–3.4× faster**. The advantage shrinks at one million
-rows, and native clustering won on many tiny groups.
+uncovered ranges within a domain. In synthetic benchmarks, complete calls were
+**at least 1.1× faster than Polars and took under 16 ms for 100,000 rows**.
+Native clustering won on many tiny groups.
 
 ## Results
 

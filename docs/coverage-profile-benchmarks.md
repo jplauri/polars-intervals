@@ -6,10 +6,9 @@
 
 [`coverage_profile`](api.md#polars_intervals.coverage_profile) returns new
 segments showing how many intervals are active, or their total resource demand,
-along the coordinate range. With Polars restricted to one thread, complete calls
-processed **100,000 synthetic intervals in 1.24–8.70 ms**, **3.9–33× faster than
-the fastest tested native Polars expressions**. A separate million-row run with
-24 Polars threads was **1.3–4.7× faster**. The advantage varies with the data.
+along the coordinate range. In synthetic benchmarks, complete calls were
+**at least 1.2× faster than Polars and took under 96 ms for one million rows**.
+The advantage varies with the data.
 
 ## Results
 
@@ -37,7 +36,7 @@ by the package median for the same workload and size.
 
 --8<-- "docs/assets/benchmarks/coverage-profile-headline.md:-2:"
 
-The headline selects short intervals, weighted durations and grouped cases from
+The main table selects short intervals, weighted durations and grouped cases from
 the eager/lazy follow-up with its simplified native baseline. Eight-row calls
 took **0.05–0.10 ms** eager, **0.14–0.26 ms** lazy and **0.23–0.46 ms** with the
 streaming engine. Small apparent lazy wins are timing noise. Its
@@ -63,11 +62,11 @@ Polars work can use the thread pool.
 
 Inputs were already in memory on the shared [Windows machine](benchmarks.md#hardware).
 Runs used two seeds, two warmups and five samples per workload. Displayed
-medians use seed 7. Headline and other eager/lazy comparisons restricted Polars
-to one thread; the thread repeat forced 24. Each run's exact scopes and commands
-are recorded separately:
+medians use seed 7. The main table and other eager/lazy comparisons restricted
+Polars to one thread. The summary uses the repeat with 24 threads. Each run's
+exact scopes and commands are recorded separately:
 
-- [Headline eager/lazy settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.metadata.json)
+- [Main table eager/lazy settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.metadata.json)
 - [Earlier eager settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-polars-20260929.metadata.json)
 - [Earlier million-row settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-polars-million-20260929.metadata.json)
 - [24-thread settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-polars-threads24-20260929.metadata.json)
@@ -188,7 +187,7 @@ records deferred-execution tests, current wheel checks and the focused timing ru
 
 **History**
 
-The headline run was based on `2b2a2666386c971f6e8d63cbf47cd7a405d1f41b` with
+The main table's run was based on `2b2a2666386c971f6e8d63cbf47cd7a405d1f41b` with
 uncommitted feature sources.
 Its [source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.sources.zip)
 declares version `0.2.0`; core and adapter match `280e515`. The base revision

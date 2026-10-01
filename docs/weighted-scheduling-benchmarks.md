@@ -7,7 +7,7 @@
 [`max_weight_non_overlapping`](api.md#polars_intervals.max_weight_non_overlapping)
 selects non-overlapping intervals with the highest possible total weight. In
 synthetic benchmarks with positive weights, full Polars queries processed **one
-million shuffled intervals in 96–260 ms**. Input already sorted by start was
+million intervals in under 270 ms**. Input already sorted by start was
 faster. Variable interval lengths cost more than the structured examples. Polars
 has no built-in solver for this optimization problem.
 

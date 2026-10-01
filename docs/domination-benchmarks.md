@@ -6,11 +6,10 @@
 
 [`minimum_cost_dominating_set`](api.md#polars_intervals.minimum_cost_dominating_set)
 selects the cheapest representatives so every interval is selected or overlaps
-one. With Polars restricted to one thread, full Polars queries on a synthetic
-chain of **100,000 shuffled integer intervals** took **7.97 ms without a cost
-column** and **18.0 ms with varying costs**. Both modes return an exact optimum. Polars has no built-in solver for
-this optimization problem. Polars timings stop at 100,000 rows, and overlap
-patterns affect runtime.
+one. With Polars restricted to one thread, full Polars queries took
+**under 18 ms for 100,000 intervals**. The result is exact. Polars has no built-in
+solver for this optimization problem. Polars timings stop at 100,000 rows, and
+overlap patterns affect runtime.
 
 ## Results
 

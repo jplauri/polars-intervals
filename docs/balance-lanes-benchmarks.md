@@ -7,9 +7,9 @@
 [`assign_balanced_lanes`](api.md#polars_intervals.assign_balanced_lanes) places
 intervals in the fewest possible lanes without overlaps within a lane, then
 tries to distribute their row counts evenly. With Polars restricted to one
-thread, complete queries on three synthetic **100,000-row inputs took 3.76–24.1
-ms**, versus 0.91–1.39 ms for ordinary assignment. In a separate suite, it
-improved balance in **108 of 132 datasets**. It never worsens its starting
+thread, complete queries on three synthetic **100,000-row inputs took under
+25 ms**. In a [separate suite](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/balance-polars-scaling-windows-20260928.quality.csv),
+it improved balance in **108 of 132 datasets**. It never worsens its starting
 balance but does not guarantee the best balance. Polars has no built-in solver
 for this optimization problem.
 

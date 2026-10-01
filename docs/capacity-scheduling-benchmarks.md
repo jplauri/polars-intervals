@@ -7,7 +7,7 @@
 [`max_weight_with_capacity`](api.md#polars_intervals.max_weight_with_capacity)
 selects intervals with the highest total weight while limiting how many may
 overlap at once. In synthetic examples with small, independent overlap groups,
-full Polars queries took **28–119 ms for one million integer intervals** and
+full Polars queries took **under 120 ms for one million intervals** and
 returned an exact optimum. Polars has no built-in solver for this optimization
 problem. Large, interconnected groups can take much longer.
 

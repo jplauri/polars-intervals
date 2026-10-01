@@ -5,9 +5,8 @@
 ## Summary
 
 [`overlap_count`](api.md#polars_intervals.overlap_count) counts how many other
-intervals overlap each row. In synthetic benchmarks, full Polars queries
-processed **three million shuffled integer intervals in 167–244 ms**, **about
-1.4–2.3× faster** than the fastest native Polars method tested on each example.
+intervals overlap each row. In synthetic benchmarks, full Polars queries were
+**at least 1.3× faster than Polars and took under 250 ms for three million rows**.
 The advantage shrinks on small inputs split into many groups, where calling the
 function adds overhead.
 

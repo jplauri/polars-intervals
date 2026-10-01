@@ -6,10 +6,9 @@
 
 [`assign_lanes`](api.md#polars_intervals.assign_lanes) places intervals in the
 fewest possible lanes so that intervals in the same lane never overlap. In
-synthetic benchmarks, full Polars queries handled **one million shuffled
-intervals in 59–176 ms**. Sorted overlapping examples took **24–80 ms**. Input
-order and overlap patterns make a large difference. Polars has no built-in
-solver for this optimization problem.
+synthetic benchmarks, full Polars queries handled **one million intervals in
+under 180 ms**. Input order and overlap patterns make a large difference.
+Polars has no built-in solver for this optimization problem.
 
 ## Results
 
