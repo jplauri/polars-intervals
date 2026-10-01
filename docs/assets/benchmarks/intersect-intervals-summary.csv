@@ -1,11 +1,11 @@
 case,workload_family,workload_left_order,workload_right_order,workload_dtype,workload_groups,workload_matching,workload_chunks,workload_payload,workload_source,workload_seed,workload_operation,workload_scope,method,x,median,min,max,samples
-Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,native,1000,8.8011,7.628299999999999,12.3165,5
-Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,native,100000,37.7982,37.214,40.4931,5
-Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,native,1000000,393.6529,357.99789999999996,497.86809999999997,5
-Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,production,1000,1.1493,1.0414999999999999,1.5917999999999999,5
-Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,production,100000,8.078899999999999,7.4799,8.5657,5
-Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,production,1000000,81.02279999999999,71.188,92.73729999999999,5
-Many tiny timestamp groups,availability,shuffled,reverse,datetime_ns,1000,all,7,0,memory,7,intersect,lazy_complete,native,1000,19.9067,17.353199999999998,23.9773,5
-Many tiny timestamp groups,availability,shuffled,reverse,datetime_ns,1000,all,7,0,memory,7,intersect,lazy_complete,production,1000,1.9387999999999999,1.4669999999999999,2.2777,5
-Nested intervals,nested,start,shuffled,i64,0,all,1,0,memory,7,intersect,lazy_complete,native,1000000,295.2851,228.05929999999998,320.781,5
-Nested intervals,nested,start,shuffled,i64,0,all,1,0,memory,7,intersect,lazy_complete,production,1000000,62.4432,54.681599999999996,66.65859999999999,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,native,1000,5.646999999999999,5.4401,7.8145999999999995,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,native,100000,35.0419,33.821,43.104299999999995,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,native,1000000,324.0986,304.6207,352.6321,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,production,1000,0.5216999999999999,0.355,0.6333,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,production,100000,4.7329,4.3827,6.4566,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,intersect,lazy_complete,production,1000000,37.4743,36.9381,38.9377,5
+Many tiny timestamp groups,availability,shuffled,reverse,datetime_ns,1000,all,7,0,memory,7,intersect,lazy_complete,native,1000,11.3201,10.1296,12.2227,5
+Many tiny timestamp groups,availability,shuffled,reverse,datetime_ns,1000,all,7,0,memory,7,intersect,lazy_complete,production,1000,1.1007,0.8704,1.1363999999999999,5
+Nested intervals,nested,start,shuffled,i64,0,all,1,0,memory,7,intersect,lazy_complete,native,1000000,197.8794,190.9645,233.6386,5
+Nested intervals,nested,start,shuffled,i64,0,all,1,0,memory,7,intersect,lazy_complete,production,1000000,21.304299999999998,20.9504,21.955,5

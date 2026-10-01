@@ -9,9 +9,9 @@ right-side coverage from the left collection.
 [`intersect_intervals`](api.md#polars_intervals.intersect_intervals) returns
 coverage shared by both collections. Both return maximal nonempty ranges.
 On synthetic shuffled availability with **one million total input rows**,
-complete lazy calls took **83.8 ms** for subtraction and **81.0 ms** for
-intersection, **6.1× and 4.9× faster** than the native Polars plan tested.
-With only empty intervals in nullable groups, the package was **4.5–4.7× slower**.
+complete lazy calls took **40.6 ms** for subtraction and **37.5 ms** for
+intersection, **10× and 8.6× faster** than the native Polars plan tested.
+With one million empty intervals in nullable groups, the package was **2.1× slower**.
 
 ## Results
 
@@ -30,13 +30,15 @@ Input sizes count both collections together.
 --8<-- "docs/assets/benchmarks/intersect-intervals-summary.md:3:-3"
 
 The advantage depends on geometry. The native event plan avoids most geometry
-work when all intervals are empty. The package still pays for grouping and the
-two-input blocking adapter. This separate repeat preserves that loss:
+work when all intervals are empty. The package still validates and groups every
+row. In this separate repeat, it leads at 100,000 empty rows and trails at one
+million:
 
 --8<-- "docs/assets/benchmarks/set-geometry-empty-summary.md:3:-3"
 
-At one million repeated Date intervals, the package advantage narrowed to
-**1.4–1.7×**. Sorted availability was faster than shuffled input for the package.
+Across the million-row matrix, repeated Date intervals had the smallest
+advantage, **4.0×**. Sorted availability was faster than shuffled input for the
+package.
 
 <details markdown="1">
 <summary>Benchmark details</summary>
@@ -57,16 +59,16 @@ separate repeat and are not pooled with the main run.
 --8<-- "docs/assets/benchmarks/intersect-intervals-summary.md:-2:"
 --8<-- "docs/assets/benchmarks/set-geometry-empty-summary.md:-2:"
 
-Eager million-row shuffled availability took **50.2 / 460 ms** for
-subtraction and **45.1 / 394 ms** for intersection, package/native. The eager
-route avoids the tagged lazy concatenation. At 100,000 sorted rows, package
-planning took **0.116–0.127 ms**, versus **0.480–0.562 ms** native. Collecting
-prebuilt plans took **5.33–6.40 ms**, versus **37.0–44.2 ms**.
+Eager million-row shuffled availability took **48.6 / 481 ms** for
+subtraction and **37.9 / 320 ms** for intersection, package/native. At 100,000
+sorted rows, package planning took **0.102–0.108 ms**, versus
+**0.449–0.468 ms** native. Collecting prebuilt plans took **2.00–2.80 ms**,
+versus **32.1–38.1 ms**.
 
 Warm Parquet queries on 100,000 synthetic genomic-style rows took
-**14.5–15.3 ms** package versus **45.7–46.4 ms** native, including reads but
+**8.89–9.24 ms** package versus **38.1–38.8 ms** native, including reads but
 excluding prebuilt-plan construction. Complete streaming-engine calls took
-**20.3–20.6 ms**, versus **54.8–56.1 ms**. The raw phase run also retains mixed
+**10.0–10.3 ms**, versus **43.7–45.5 ms**. The raw phase run also retains mixed
 eager/lazy calls and grouped timestamp cases.
 
 The private Rust comparison measures canonical unions followed by scans (A),
@@ -124,8 +126,8 @@ The public implementation is retained for its broad results and shared merge
 code. Its empty-only grouped-input loss remains a limitation.
 
 Separate fresh-process eager measurements recorded peak RSS increases after
-fixture creation. Million-row shuffled availability added **42.0 / 549 MB**
-for subtraction and **33.7 / 535 MB** for intersection, package/native.
+fixture creation. Million-row shuffled availability added **42.1 / 565 MB**
+for subtraction and **33.6 / 511 MB** for intersection, package/native.
 This is an operating-system high-water mark, including runtime and retained
 output. It is not requested heap or allocation count. Earlier peaks can mask
 query memory. Each observation is one cold process, not a distribution.
@@ -154,17 +156,18 @@ process RSS observations.
 
 Complete Polars evidence:
 
-- Broad: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20260930.sources.zip).
-- Headline repeat: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20260930.sources.zip).
-- Million-row matrix: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20260930.sources.zip).
-- Empty-row repeat: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20260930.sources.zip).
-- Planning, collection and scans: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20260930.sources.zip).
-- Eager and memory: [timings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20260930.csv), [RSS observations](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20260930.memory.json), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20260930.sources.zip).
+- Broad: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20261001.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20261001.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20261001.sources.zip).
+- Headline repeat: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20261001.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20261001.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20261001.sources.zip).
+- Million-row matrix: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20261001.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20261001.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20261001.sources.zip).
+- Empty-row repeat: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20261001.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20261001.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20261001.sources.zip).
+- Planning, collection and scans: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20261001.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20261001.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20261001.sources.zip).
+- Eager and memory: [timings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20261001.csv), [RSS observations](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20261001.memory.json), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20261001.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20261001.sources.zip).
 
 **History**
 
-The measured source snapshots are based on `5fd05e0` plus the saved feature
-changes. The three core runs used unchanged sources throughout each run:
+The Polars runs above measured revision `5d63538`. The core runs measured
+`5fd05e0` plus the saved feature changes, with unchanged sources throughout
+each run:
 
 - Broad core: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-core-20260930.csv),
   [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-core-20260930.metadata.json),
@@ -176,8 +179,24 @@ changes. The three core runs used unchanged sources throughout each run:
   [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-core-million-20260930.metadata.json),
   [source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-core-million-20260930.sources.zip).
 
-A later benchmark-only seed-overflow fix leaves measured seeds 7 and 41
-unchanged. Original sources remain in the archives. No historical timings
-have been relabeled as measurements of changed production code.
+A later cleanup removed a redundant empty-left check from `intersect_intervals`.
+The core timings measure the archived source. A benchmark-only seed-overflow
+fix leaves measured seeds 7 and 41 unchanged.
+
+The first lazy adapter tagged every row with its source and position, then
+reordered both operands in Rust. On `5fd05e0` plus the saved feature changes,
+million-row shuffled availability took 83.8 / 81.0 ms for subtraction /
+intersection in lazy calls. Million-row empty-only groups took 84.7 / 85.6 ms.
+Those runs remain available:
+
+- Broad: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-20260930.sources.zip).
+- Headline repeat: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-repeat-20260930.sources.zip).
+- Million-row matrix: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-million-20260930.sources.zip).
+- Empty-row repeat: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-empty-repeat-20260930.sources.zip).
+- Planning, collection and scans: [samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20260930.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-phases-20260930.sources.zip).
+- Eager and memory: [timings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20260930.csv), [RSS observations](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20260930.memory.json), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20260930.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/set-geometry-polars-memory-20260930.sources.zip).
+
+Original sources remain in the archives. No historical timings have been
+relabeled as measurements of changed production code.
 
 </details>

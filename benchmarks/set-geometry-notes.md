@@ -53,11 +53,18 @@ dispatcher. B and C remain private because the task requires reproducible
 comparisons. No all-pairs join, interval index or new dependency is needed.
 
 Complete Polars runs also favor A on nonempty geometry. The headline repeat
-at one million shuffled availability rows took 83.8/81.0 ms for subtraction/
-intersection, versus D's 509/394 ms. A retains one clear limitation: a million
-empty intervals split among nullable groups took 84.7/85.6 ms in lazy calls,
-versus D's 18.7/18.4 ms. Repeating with seed 41 preserves the loss. The report
-and overview keep it visible. No workload-specific dispatcher was added.
+at one million shuffled availability rows took 40.6/37.5 ms for subtraction/
+intersection, versus D's 406/324 ms. A retains one clear limitation: a million
+empty intervals split among nullable groups took 32.6/33.9 ms in lazy calls,
+versus D's 15.4/16.2 ms. Repeating with seed 41 preserves the loss. At 100,000
+such rows, A was faster. The report and overview keep the loss visible. No
+workload-specific dispatcher was added.
+
+The first lazy adapter tagged every row with its source and position. Rust
+then reordered and gathered both operands. That adapter took 83.8/81.0 ms on
+the headline workload and 84.7/85.6 ms on the empty-only one. The production
+adapter slices the ordered concatenation at the tag boundary instead. It then
+calls the same native function as eager inputs.
 
 ## Workloads and correctness
 
@@ -90,4 +97,10 @@ same at one million. Each has raw CSV, metadata and a measured source ZIP.
 All recorded sources remained unchanged during each run. A later harness-only
 fix wraps the right-side seed increment and bounds the seed contribution before
 converting to Int64. It leaves measured seeds 7 and 41 unchanged. The original
-measured harness remains in each archive.
+measured harness remains in each archive. A later cleanup removed a redundant
+empty-left check from `intersect_intervals`. The core timings measure the
+archived source.
+
+The `set-geometry-polars-*-20261001` runs measure the sliced lazy adapter at
+`5d63538`. The `-20260930` Polars runs measure the first tagged adapter. They
+keep their original settings, seeds and raw samples.

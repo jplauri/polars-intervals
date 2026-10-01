@@ -900,13 +900,13 @@ method = "method"
 dimensions = ["dtype", "family", "left_order", "right_order", "left_share", "seed", "operation"]
 
 [sources.set_geometry_polars]
-path = "benchmarks/results/set-geometry-polars-repeat-20260930.csv"
+path = "benchmarks/results/set-geometry-polars-repeat-20261001.csv"
 x = "n"
 method = "method"
 dimensions = ["family", "left_order", "right_order", "dtype", "groups", "matching", "chunks", "payload", "source", "seed", "operation", "scope"]
 
 [sources.set_geometry_empty]
-path = "benchmarks/results/set-geometry-polars-empty-repeat-20260930.csv"
+path = "benchmarks/results/set-geometry-polars-empty-repeat-20261001.csv"
 x = "n"
 method = "method"
 dimensions = ["family", "left_order", "right_order", "dtype", "groups", "matching", "chunks", "payload", "source", "seed", "operation", "scope"]
