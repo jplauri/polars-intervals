@@ -232,9 +232,14 @@ def test_bad_original_rows_survive_empty_and_unmatched_shortcuts(operation, side
     bad = frame([(0, 10), (5, 5), (4, 2 if kind == "reversed" else None)]).with_columns(
         pl.Series("key", ["valid", "valid", "unmatched"])
     )
+    message = (
+        rf"{side}: interval at index 2"
+        if kind == "reversed"
+        else rf"{side} does not support null endpoints"
+    )
     for good in (valid, valid.clear()):
         left, right = (bad, good) if side == "left" else (good, bad)
-        with pytest.raises(pl.exceptions.ComputeError, match=rf"{side}.*index 2"):
+        with pytest.raises(pl.exceptions.ComputeError, match=message):
             if lazy:
                 operation(left.lazy(), right.lazy(), by="key").head(1).collect()
             else:

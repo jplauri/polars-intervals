@@ -136,48 +136,49 @@ def _set_geometry(left, right, left_start, left_end, right_start, right_end, by,
             raise pl.exceptions.InvalidOperationError(
                 f"{name} requires matching left/right group key dtypes for {key!r}"
             )
-    if isinstance(left, pl.DataFrame) and isinstance(right, pl.DataFrame):
-        return getattr(_internal, name)(
-            left[left_start],
-            left[left_end],
-            [left[key] for key in keys],
-            right[right_start],
-            right[right_end],
-            [right[key] for key in keys],
-        )
 
-    # Only keys survive normalization, so these two names need avoid only keys.
-    tag, ordinal = "__pi_left", "__pi_row"
-    while tag in keys:
-        tag += "_"
-    while ordinal in keys:
-        ordinal += "_"
-
-    def branch(frame, start, end, is_left):
-        return frame.lazy().select(
+    def normalize(frame, start, end):
+        return frame.select(
             pl.selectors.by_name(start).alias("start"),
             pl.selectors.by_name(end).alias("end"),
             pl.selectors.by_name(keys),
-            pl.lit(is_left).alias(tag),
-            pl.int_range(0, pl.len(), dtype=pl.UInt64).alias(ordinal),
         )
 
+    def solve(lhs, rhs):
+        return getattr(_internal, name)(
+            lhs["start"],
+            lhs["end"],
+            [lhs[key] for key in keys],
+            rhs["start"],
+            rhs["end"],
+            [rhs[key] for key in keys],
+        )
+
+    left = normalize(left, left_start, left_end)
+    right = normalize(right, right_start, right_end)
+    if isinstance(left, pl.DataFrame) and isinstance(right, pl.DataFrame):
+        return solve(left, right)
+
+    # Only keys survive normalization, so the tag name need avoid only keys.
+    tag = "__pi_left"
+    while tag in keys:
+        tag += "_"
+
+    def split(frame):
+        # Vertical LazyFrame concatenation keeps all left rows before all right rows.
+        n = frame[tag].sum()
+        if not frame[tag].head(n).all():
+            raise pl.exceptions.ComputeError(f"{name} received reordered operands")
+        return solve(frame.head(n), frame.slice(n))
+
     combined = pl.concat(
-        [branch(left, left_start, left_end, True), branch(right, right_start, right_end, False)],
+        [
+            left.lazy().with_columns(pl.lit(True).alias(tag)),
+            right.lazy().with_columns(pl.lit(False).alias(tag)),
+        ],
         how="vertical",
     )
-    return _blocking_frame(
-        combined,
-        lambda frame: _internal.set_intervals_tagged(
-            frame["start"],
-            frame["end"],
-            [frame[key] for key in keys],
-            frame[tag],
-            frame[ordinal],
-            intersection,
-        ),
-        schema,
-    )
+    return _blocking_frame(combined, split, schema)
 
 
 def cluster_intervals(
@@ -409,8 +410,8 @@ def subtract_intervals(
         Date or Datetime dtype, including unit and timezone. Corresponding key
         dtypes must match exactly. Keys support those types plus String and
         Boolean. Logical types survive empty results. Every evaluated input row
-        validates before pruning. Row errors identify its side and original
-        index within that side, with left errors checked first.
+        validates before pruning. Errors name the side, with left errors checked
+        first. Reversed intervals also report their index within that side.
 
         Both lazy sources stay deferred through construction, explain and schema
         resolution. One blocking native call evaluates the complete collections

@@ -235,7 +235,10 @@ def main():
     if any(seed < 0 or seed > 2**64 - 1 for seed in args.seeds):
         parser.error("Seeds must fit UInt64")
     native = Path(_internal.__file__)
-    release, inputs = verify_release(native)
+    try:
+        release, inputs = verify_release(native)
+    except ValueError as error:
+        parser.error(str(error))
     raw, meta, archive, memory = [
         args.output.with_suffix(ext)
         for ext in (".csv", ".metadata.json", ".sources.zip", ".memory.json")

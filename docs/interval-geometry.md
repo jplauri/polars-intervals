@@ -158,7 +158,8 @@ Empty rows contribute nothing, and duplicates do not change coverage. Empty
 left input returns a typed empty result. Empty right input leaves the left
 union for subtraction and returns no intersection. Every row on both sides
 still validates, including right-only groups and calls with an empty operand.
-Errors identify the side and original row within the evaluated operand.
+Errors name the side. Reversed intervals also report their original row within
+the evaluated operand.
 
 ### Lazy and mixed inputs
 

@@ -31,11 +31,11 @@ Or with uv: `uv add polars-intervals`.
 
 | Function | Description |
 | --- | --- |
-| [`subtract_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/#subtract-and-intersect-two-collections) | Remove one collection's coverage from another. |
-| [`intersect_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/#subtract-and-intersect-two-collections) | Return coordinates covered by both collections. |
 | [`cluster_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Label connected records in original row order, optionally joining touching intervals. |
 | [`merge_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Return the exact union as maximal ranges, always joining touching ranges. |
 | [`interval_gaps`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Return uncovered ranges inside required scalar bounds. |
+| [`subtract_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/#subtract-and-intersect-two-collections) | Remove one collection's coverage from another. |
+| [`intersect_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/#subtract-and-intersect-two-collections) | Return coordinates covered by both collections. |
 
 ### Lane assignment
 

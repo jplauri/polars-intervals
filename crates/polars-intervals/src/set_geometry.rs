@@ -16,7 +16,8 @@ use std::borrow::Cow;
 /// Rejects unequal endpoint/key lengths within either side, null endpoints,
 /// unsupported or mismatched logical dtypes, reversed intervals, and invalid
 /// keys. Every row validates before grouping or skipping either operand.
-/// Row errors identify the side and original index, with left-first precedence.
+/// Errors name the side, and the left side validates first. Reversed-row
+/// errors also give the original index within that side.
 pub fn subtract_intervals(
     left_starts: &Series,
     left_ends: &Series,
@@ -85,6 +86,7 @@ fn evaluate(
         left_keys,
         (right_starts, right_ends, right_keys),
         left_starts.dtype(),
+        name,
         intersection,
     ))
 }
@@ -92,25 +94,13 @@ fn evaluate(
 fn validated_values<'a, T: PolarsIntegerType>(
     starts: &'a ChunkedArray<T>,
     ends: &'a ChunkedArray<T>,
+    name: &str,
     side: &str,
 ) -> PolarsResult<[Cow<'a, [T::Native]>; 2]>
 where
     T::Native: Ord,
 {
-    // Preserve row precedence between nulls and reversed ranges. The common
-    // null-free route borrows contiguous arrays and reuses the core validator.
-    if starts.null_count() != 0 || ends.null_count() != 0 {
-        for (index, (start, end)) in starts.iter().zip(ends.iter()).enumerate() {
-            let (Some(start), Some(end)) = (start, end) else {
-                polars_bail!(ComputeError: "{}: null endpoints at index {}", side, index);
-            };
-            if start > end {
-                polars_bail!(ComputeError: "{}: {}", side,
-                    intervals_core::IntervalError::InvalidInterval { index });
-            }
-        }
-    }
-    let values = endpoint_values(starts, ends, side)?;
+    let values = endpoint_values(starts, ends, &format!("{name} {side}"))?;
     intervals_core::validate_intervals(&values[0], &values[1])
         .map_err(|error| polars_err!(ComputeError: "{side}: {error}"))?;
     Ok(values)
@@ -122,6 +112,7 @@ fn evaluate_typed<T>(
     left_keys: &[Series],
     (right_starts, right_ends, right_keys): (&Series, &Series, &[Series]),
     dtype: &DataType,
+    name: &str,
     intersection: bool,
 ) -> PolarsResult<DataFrame>
 where
@@ -129,12 +120,13 @@ where
     T::Native: Ord,
     ChunkedArray<T>: IntoSeries,
 {
-    let [left_starts, left_ends] = validated_values(left_starts, left_ends, "left")?;
+    let [left_starts, left_ends] = validated_values(left_starts, left_ends, name, "left")?;
     let right_starts = right_starts.to_physical_repr();
     let right_ends = right_ends.to_physical_repr();
     let [right_starts, right_ends] = validated_values(
         right_starts.unpack::<T>()?,
         right_ends.unpack::<T>()?,
+        name,
         "right",
     )?;
     let solve = |ls: &[T::Native], le: &[T::Native], rs: &[T::Native], re: &[T::Native]| {
@@ -211,60 +203,6 @@ where
     DataFrame::new(output.len(), columns)
 }
 
-fn evaluate_tagged(
-    starts: &Series,
-    ends: &Series,
-    keys: &[Series],
-    is_left: &Series,
-    ordinal: &Series,
-    intersection: bool,
-) -> PolarsResult<DataFrame> {
-    polars_ensure!(is_left.len() == starts.len() && ordinal.len() == starts.len(), ShapeMismatch:
-        "set intervals requires equal endpoint, source tag and ordinal lengths");
-    validate_endpoint_pair(starts, ends, "set intervals")?;
-    validate_group_keys(keys, starts.len(), "set intervals", &["start", "end"])?;
-    let is_left = is_left.bool()?;
-    let ordinal = ordinal.u64()?;
-    polars_ensure!(is_left.null_count() == 0 && ordinal.null_count() == 0, ComputeError:
-        "set intervals source tags and ordinals must be non-null");
-    let (mut left, mut right) = (Vec::new(), Vec::new());
-    for (index, (is_left, ordinal)) in is_left
-        .no_null_iter()
-        .zip(ordinal.into_no_null_iter())
-        .enumerate()
-    {
-        let index = IdxSize::try_from(index).map_err(
-            |_| polars_err!(ComputeError: "combined interval count exceeds the Polars index range"),
-        )?;
-        if is_left {
-            left.push((ordinal, index));
-        } else {
-            right.push((ordinal, index));
-        }
-    }
-    let take = |mut rows: Vec<(u64, IdxSize)>| -> PolarsResult<_> {
-        if !rows.is_sorted_by_key(|&(ordinal, _)| ordinal) {
-            rows.sort_unstable_by_key(|&(ordinal, _)| ordinal);
-        }
-        polars_ensure!(rows.iter().enumerate().all(|(index, &(ordinal, _))| ordinal == index as u64), ComputeError:
-            "set intervals requires contiguous original side ordinals");
-        let indices = IdxCa::from_vec(
-            "".into(),
-            rows.into_iter().map(|(_, index)| index).collect(),
-        );
-        Ok((
-            starts.take(&indices)?,
-            ends.take(&indices)?,
-            keys.iter()
-                .map(|key| key.take(&indices))
-                .collect::<PolarsResult<Vec<_>>>()?,
-        ))
-    };
-    let (ls, le, lk) = take(left)?;
-    let (rs, re, rk) = take(right)?;
-    evaluate((&ls, &le, &lk), (&rs, &re, &rk), intersection)
-}
-
 #[pyo3::pyfunction(name = "subtract_intervals")]
 pub(crate) fn subtract_intervals_py(
     py: Python<'_>,
@@ -311,70 +249,4 @@ pub(crate) fn intersect_intervals_py(
     })
     .map(PyDataFrame)
     .map_err(|error| super::profile::python_error(py, error))
-}
-
-#[pyo3::pyfunction(name = "set_intervals_tagged")]
-pub(crate) fn set_intervals_tagged_py(
-    py: Python<'_>,
-    starts: PySeries,
-    ends: PySeries,
-    keys: Vec<PySeries>,
-    is_left: PySeries,
-    ordinal: PySeries,
-    intersection: bool,
-) -> PyResult<PyDataFrame> {
-    py.detach(|| {
-        evaluate_tagged(
-            &starts.0,
-            &ends.0,
-            &keys.into_iter().map(|key| key.0).collect::<Vec<_>>(),
-            &is_left.0,
-            &ordinal.0,
-            intersection,
-        )
-    })
-    .map(PyDataFrame)
-    .map_err(|error| super::profile::python_error(py, error))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn tagged_rows_restore_each_sources_order() {
-        let starts = Series::new("start".into(), [4i64, 20, 0, 2, 10]);
-        let ends = Series::new("end".into(), [6i64, 22, 8, 4, 12]);
-        let keys = [Series::new("key".into(), ["a", "b", "a", "a", "b"])];
-        let side = Series::new("side".into(), [false, true, true, false, true]);
-        let ordinals = Series::new("ordinal".into(), [1u64, 0, 1, 0, 2]);
-        let result = evaluate_tagged(&starts, &ends, &keys, &side, &ordinals, false).unwrap();
-        assert_eq!(
-            result["key"].str().unwrap().iter().collect::<Vec<_>>(),
-            [Some("b"), Some("b"), Some("a"), Some("a")]
-        );
-        assert_eq!(
-            result["start"]
-                .i64()
-                .unwrap()
-                .into_no_null_iter()
-                .collect::<Vec<_>>(),
-            [10, 20, 0, 6]
-        );
-        assert_eq!(
-            result["end"]
-                .i64()
-                .unwrap()
-                .into_no_null_iter()
-                .collect::<Vec<_>>(),
-            [12, 22, 2, 8]
-        );
-        let reversed = Series::new("end".into(), [3i64, 22, 8, 4, 12]);
-        let error =
-            evaluate_tagged(&starts, &reversed, &keys, &side, &ordinals, false).unwrap_err();
-        assert!(
-            error.to_string().contains("right: interval at index 1"),
-            "{error}"
-        );
-    }
 }

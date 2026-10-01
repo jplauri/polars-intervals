@@ -126,7 +126,7 @@ pub fn intersect_intervals<T: Ord + Copy>(
 ) -> Result<Vec<(T, T)>, IntervalSetError> {
     validate_intervals(left_starts, left_ends).map_err(IntervalSetError::Left)?;
     validate_intervals(right_starts, right_ends).map_err(IntervalSetError::Right)?;
-    if left_starts.is_empty() || right_starts.is_empty() {
+    if right_starts.is_empty() {
         return Ok(Vec::new());
     }
     let left = merge_validated(left_starts, left_ends);

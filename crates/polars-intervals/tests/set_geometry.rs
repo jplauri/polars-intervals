@@ -210,10 +210,13 @@ fn side_and_original_row_errors_precede_empty_and_unmatched_shortcuts() {
                 "{error}"
             );
         }
+        // As in every adapter, a side's nulls are rejected before its reversed rows.
         let null_ends = Series::new("e".into(), [Some(0i64), Some(0), None, Some(30)]);
         let error = operation(&starts, &null_ends, &[], &starts, &ends, &[]).unwrap_err();
         assert!(
-            error.to_string().contains("left: interval at index 1"),
+            error
+                .to_string()
+                .contains("left does not support null endpoints"),
             "{error}"
         );
         let null_ends = Series::new("e".into(), [Some(0i64), None, Some(19), Some(30)]);
@@ -221,7 +224,7 @@ fn side_and_original_row_errors_precede_empty_and_unmatched_shortcuts() {
         assert!(
             error
                 .to_string()
-                .contains("right: null endpoints at index 1"),
+                .contains("right does not support null endpoints"),
             "{error}"
         );
     }

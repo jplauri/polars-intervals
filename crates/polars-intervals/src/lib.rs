@@ -68,8 +68,6 @@ mod _internal {
     #[pymodule_export]
     use super::set_geometry::intersect_intervals_py;
     #[pymodule_export]
-    use super::set_geometry::set_intervals_tagged_py;
-    #[pymodule_export]
     use super::set_geometry::subtract_intervals_py;
 }
 
