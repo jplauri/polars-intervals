@@ -13,6 +13,7 @@
 //! [`minimum_stabbing_points`] hits every discrete interval with the fewest points.
 //! [`coverage_profile`] and [`weighted_coverage_profile`] return exact load segments.
 //! [`cluster_intervals`], [`merge_intervals`] and [`interval_gaps`] describe interval geometry.
+//! [`subtract_intervals`] and [`intersect_intervals`] combine two covered sets.
 
 #![forbid(unsafe_code)]
 
@@ -49,6 +50,8 @@ mod coverage_profile;
 pub use coverage_profile::{CoverageSegment, coverage_profile, weighted_coverage_profile};
 mod geometry;
 pub use geometry::{cluster_intervals, interval_gaps, merge_intervals};
+mod set_geometry;
+pub use set_geometry::{IntervalSetError, intersect_intervals, subtract_intervals};
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

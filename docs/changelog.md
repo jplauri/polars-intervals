@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add [`subtract_intervals` and `intersect_intervals`](interval-geometry.md#subtract-and-intersect-two-collections)
+  for exact set difference and geometric intersection of two collections.
+  Both support grouped eager, lazy and mixed inputs, exact logical dtypes,
+  and validation of every row on both sides.
+
 - Add [`cluster_intervals`, `merge_intervals`, and `interval_gaps`](interval-geometry.md)
   for connected records, exact union, and complement inside explicit scalar
   bounds. All support eager and genuinely lazy execution with exact endpoint

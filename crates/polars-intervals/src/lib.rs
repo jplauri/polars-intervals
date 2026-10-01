@@ -52,6 +52,8 @@ mod coverage_profile;
 pub use coverage_profile::coverage_profile;
 mod geometry;
 pub use geometry::{interval_gaps, merge_intervals};
+mod set_geometry;
+pub use set_geometry::{intersect_intervals, subtract_intervals};
 
 #[pyo3::pymodule]
 mod _internal {
@@ -63,6 +65,10 @@ mod _internal {
     use super::geometry::merge_intervals_py;
     #[pymodule_export]
     use super::profile::max_weight_with_capacity_profile_py;
+    #[pymodule_export]
+    use super::set_geometry::intersect_intervals_py;
+    #[pymodule_export]
+    use super::set_geometry::subtract_intervals_py;
 }
 
 // The output_type_func form also catches failures while importing field dtypes.

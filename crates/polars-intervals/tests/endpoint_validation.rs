@@ -17,11 +17,27 @@ fn zeros(starts: &Series) -> Series {
 }
 
 // Fast-path settings (k=0, capacity=0, max_work=0) must validate like the rest.
-const ADAPTERS: [(&str, Adapter); 21] = [
+const ADAPTERS: [(&str, Adapter); 25] = [
     ("cluster_strict", |s, e| cluster_intervals(s, e, false)),
     ("cluster_touching", |s, e| cluster_intervals(s, e, true)),
     ("merge_intervals", |s, e| {
         merge_intervals(s, e, &[]).map(|frame| frame["start"].as_materialized_series().clone())
+    }),
+    ("subtract_intervals_left", |s, e| {
+        subtract_intervals(s, e, &[], &s.clear(), &s.clear(), &[])
+            .map(|frame| frame["start"].as_materialized_series().clone())
+    }),
+    ("subtract_intervals_right", |s, e| {
+        subtract_intervals(&s.clear(), &s.clear(), &[], s, e, &[])
+            .map(|frame| frame["start"].as_materialized_series().clone())
+    }),
+    ("intersect_intervals_left", |s, e| {
+        intersect_intervals(s, e, &[], &s.clear(), &s.clear(), &[])
+            .map(|frame| frame["start"].as_materialized_series().clone())
+    }),
+    ("intersect_intervals_right", |s, e| {
+        intersect_intervals(&s.clear(), &s.clear(), &[], s, e, &[])
+            .map(|frame| frame["start"].as_materialized_series().clone())
     }),
     ("interval_gaps_empty_domain", |s, e| {
         let bound = if endpoint_dtypes().contains(s.dtype()) {

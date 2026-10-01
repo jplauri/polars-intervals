@@ -1,0 +1,11 @@
+case,workload_family,workload_left_order,workload_right_order,workload_dtype,workload_groups,workload_matching,workload_chunks,workload_payload,workload_source,workload_seed,workload_operation,workload_scope,method,x,median,min,max,samples
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,subtract,lazy_complete,native,1000,6.0492,5.4093,6.5664,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,subtract,lazy_complete,native,100000,38.202999999999996,37.5532,41.4148,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,subtract,lazy_complete,native,1000000,405.8275,355.8531,416.3194,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,subtract,lazy_complete,production,1000,0.49479999999999996,0.4321,0.6048,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,subtract,lazy_complete,production,100000,5.1559,4.7399,5.9669,5
+Shuffled availability and busy windows,availability,shuffled,reverse,i64,0,all,1,0,memory,7,subtract,lazy_complete,production,1000000,40.626799999999996,40.0854,40.7928,5
+Many tiny timestamp groups,availability,shuffled,reverse,datetime_ns,1000,all,7,0,memory,7,subtract,lazy_complete,native,1000,10.713899999999999,10.2865,11.2599,5
+Many tiny timestamp groups,availability,shuffled,reverse,datetime_ns,1000,all,7,0,memory,7,subtract,lazy_complete,production,1000,1.1468,0.7845,1.2448,5
+Nested intervals,nested,start,shuffled,i64,0,all,1,0,memory,7,subtract,lazy_complete,native,1000000,169.2859,164.06699999999998,193.9642,5
+Nested intervals,nested,start,shuffled,i64,0,all,1,0,memory,7,subtract,lazy_complete,production,1000000,21.589,21.2635,22.1128,5

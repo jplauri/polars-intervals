@@ -1,0 +1,9 @@
+case,workload_family,workload_left_order,workload_right_order,workload_dtype,workload_groups,workload_matching,workload_chunks,workload_payload,workload_source,workload_seed,workload_operation,workload_scope,method,x,median,min,max,samples
+Subtract empty-only grouped rows,empty_rows,start,shuffled,i64,32,all,7,0,memory,7,subtract,lazy_complete,native,100000,6.603899999999999,6.1769,6.8881,5
+Subtract empty-only grouped rows,empty_rows,start,shuffled,i64,32,all,7,0,memory,7,subtract,lazy_complete,native,1000000,15.354199999999999,13.975399999999999,30.2869,5
+Subtract empty-only grouped rows,empty_rows,start,shuffled,i64,32,all,7,0,memory,7,subtract,lazy_complete,production,100000,4.6703,4.2639,5.0384,5
+Subtract empty-only grouped rows,empty_rows,start,shuffled,i64,32,all,7,0,memory,7,subtract,lazy_complete,production,1000000,32.633199999999995,31.032899999999998,51.8853,5
+Intersect empty-only grouped rows,empty_rows,start,shuffled,i64,32,all,7,0,memory,7,intersect,lazy_complete,native,100000,6.9894,6.6587,8.2033,5
+Intersect empty-only grouped rows,empty_rows,start,shuffled,i64,32,all,7,0,memory,7,intersect,lazy_complete,native,1000000,16.1941,14.6305,21.1603,5
+Intersect empty-only grouped rows,empty_rows,start,shuffled,i64,32,all,7,0,memory,7,intersect,lazy_complete,production,100000,4.5153,3.8962,4.9883999999999995,5
+Intersect empty-only grouped rows,empty_rows,start,shuffled,i64,32,all,7,0,memory,7,intersect,lazy_complete,production,1000000,33.8769,30.438299999999998,36.1063,5

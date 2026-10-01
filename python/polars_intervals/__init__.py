@@ -14,6 +14,7 @@ __all__ = [
     "cluster_intervals",
     "containment_count",
     "coverage_profile",
+    "intersect_intervals",
     "interval_gaps",
     "max_k_coverage",
     "max_weight_clique",
@@ -27,6 +28,7 @@ __all__ = [
     "minimum_stabbing_points",
     "nesting_depth",
     "overlap_count",
+    "subtract_intervals",
 ]
 
 _INTEGERS = (pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.UInt8, pl.UInt16, pl.UInt32, pl.UInt64)
@@ -117,6 +119,66 @@ def _blocking_frame(intervals, solve, schema):
         slice_pushdown=False,
         streamable=False,
     )
+
+
+def _set_geometry(left, right, left_start, left_end, right_start, right_end, by, intersection):
+    from polars_intervals import _internal
+
+    name = "intersect_intervals" if intersection else "subtract_intervals"
+    for side, frame in (("left", left), ("right", right)):
+        if not isinstance(frame, (pl.DataFrame, pl.LazyFrame)):
+            raise TypeError(f"{side} must be a Polars DataFrame or LazyFrame")
+    left, keys, schema = _geometry_input(left, left_start, left_end, by, name)
+    right, _, right_schema = _geometry_input(right, right_start, right_end, list(keys), name)
+    _frame_dtypes((schema["start"], right_schema["start"]), (), name)
+    for key in keys:
+        if schema[key] != right_schema[key]:
+            raise pl.exceptions.InvalidOperationError(
+                f"{name} requires matching left/right group key dtypes for {key!r}"
+            )
+
+    def normalize(frame, start, end):
+        return frame.select(
+            pl.selectors.by_name(start).alias("start"),
+            pl.selectors.by_name(end).alias("end"),
+            pl.selectors.by_name(keys),
+        )
+
+    def solve(lhs, rhs):
+        return getattr(_internal, name)(
+            lhs["start"],
+            lhs["end"],
+            [lhs[key] for key in keys],
+            rhs["start"],
+            rhs["end"],
+            [rhs[key] for key in keys],
+        )
+
+    left = normalize(left, left_start, left_end)
+    right = normalize(right, right_start, right_end)
+    if isinstance(left, pl.DataFrame) and isinstance(right, pl.DataFrame):
+        return solve(left, right)
+
+    # Only keys survive normalization, so the tag name need avoid only keys.
+    tag = "__pi_left"
+    while tag in keys:
+        tag += "_"
+
+    def split(frame):
+        # Vertical LazyFrame concatenation keeps all left rows before all right rows.
+        n = frame[tag].sum()
+        if not frame[tag].head(n).all():
+            raise pl.exceptions.ComputeError(f"{name} received reordered operands")
+        return solve(frame.head(n), frame.slice(n))
+
+    combined = pl.concat(
+        [
+            left.lazy().with_columns(pl.lit(True).alias(tag)),
+            right.lazy().with_columns(pl.lit(False).alias(tag)),
+        ],
+        how="vertical",
+    )
+    return _blocking_frame(combined, split, schema)
 
 
 def cluster_intervals(
@@ -260,6 +322,217 @@ def merge_intervals(
     return _blocking_frame(
         intervals, lambda frame: solve(frame[start], frame[end], [frame[key] for key in by]), schema
     )
+
+
+@overload
+def subtract_intervals(
+    left: pl.DataFrame,
+    right: pl.DataFrame,
+    *,
+    left_start: str = "start",
+    left_end: str = "end",
+    right_start: str = "start",
+    right_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame: ...
+
+
+@overload
+def subtract_intervals(
+    left: pl.LazyFrame,
+    right: pl.DataFrame | pl.LazyFrame,
+    *,
+    left_start: str = "start",
+    left_end: str = "end",
+    right_start: str = "start",
+    right_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.LazyFrame: ...
+
+
+@overload
+def subtract_intervals(
+    left: pl.DataFrame,
+    right: pl.LazyFrame,
+    *,
+    left_start: str = "start",
+    left_end: str = "end",
+    right_start: str = "start",
+    right_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.LazyFrame: ...
+
+
+def subtract_intervals(
+    left: pl.DataFrame | pl.LazyFrame,
+    right: pl.DataFrame | pl.LazyFrame,
+    *,
+    left_start: str = "start",
+    left_end: str = "end",
+    right_start: str = "start",
+    right_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame | pl.LazyFrame:
+    """Remove right coverage from the union of left half-open intervals.
+
+    Args:
+        left: DataFrame or LazyFrame describing coverage to keep.
+        right: DataFrame or LazyFrame describing coverage to remove.
+        left_start: Literal left start column name.
+        left_end: Literal left end column name.
+        right_start: Literal right start column name.
+        right_end: Literal right end column name.
+        by: Shared key name or ordered list of distinct names. None and [] solve
+            one ungrouped pair of collections. Null key values match nulls.
+
+    Returns:
+        Columns ``[group keys..., start, end]`` with maximal nonempty ranges.
+        Overlapping and touching fragments coalesce. Groups follow first
+        appearance in the original left input, including empty rows. Ranges
+        within each group are sorted and strictly separated. Only groups with
+        results emit rows. Both DataFrames return a DataFrame. Either LazyFrame
+        makes the result lazy. Inputs are preserved and payloads are omitted.
+
+    Raises:
+        TypeError: For invalid frame, column name or grouping argument types.
+        ValueError: For duplicate keys or keys named start/end.
+        polars.exceptions.PolarsError: For missing columns, unsupported or
+            mismatched dtypes, null endpoints, or reversed intervals.
+
+    Notes:
+        This computes exact set difference, not whole-row removal or fragments
+        attached to source records. Duplicates add no multiplicity. Empty rows
+        contribute nothing. A left-only group returns its union. Right-only
+        groups emit nothing, but all their rows still validate. An empty left
+        input returns a typed empty result. An empty right returns the left union.
+
+        All four endpoints must have the same Int8/16/32/64, UInt8/16/32/64,
+        Date or Datetime dtype, including unit and timezone. Corresponding key
+        dtypes must match exactly. Keys support those types plus String and
+        Boolean. Logical types survive empty results. Every evaluated input row
+        validates before pruning. Errors name the side, with left errors checked
+        first. Reversed intervals also report their index within that side.
+
+        Both lazy sources stay deferred through construction, explain and schema
+        resolution. One blocking native call evaluates the complete collections
+        with the GIL released, including under the streaming engine. This needs
+        both inputs in memory. Downstream filters, projections and slices remain
+        after the operation. Upstream transformations define the input rows.
+        Entirely eliminated nodes need not execute validation.
+
+        Geometry uses only exact endpoint comparisons. For n left rows, m right
+        rows and z output ranges, time is O(n log n + m log m + z) and auxiliary
+        space is O(n + m + z). Verified start order permits linear core work.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> left = pl.DataFrame({"start": [0, 4, 12], "end": [5, 10, 15]})
+        >>> right = pl.DataFrame({"start": [2, 6, 10], "end": [3, 8, 13]})
+        >>> pi.subtract_intervals(left, right).rows()
+        [(0, 2), (3, 6), (8, 10), (13, 15)]
+        >>> query = left.lazy().pipe(pi.subtract_intervals, right)
+        >>> query.filter(pl.col("start") >= 8).collect().rows()
+        [(8, 10), (13, 15)]
+    """
+    return _set_geometry(left, right, left_start, left_end, right_start, right_end, by, False)
+
+
+@overload
+def intersect_intervals(
+    left: pl.DataFrame,
+    right: pl.DataFrame,
+    *,
+    left_start: str = "start",
+    left_end: str = "end",
+    right_start: str = "start",
+    right_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame: ...
+
+
+@overload
+def intersect_intervals(
+    left: pl.LazyFrame,
+    right: pl.DataFrame | pl.LazyFrame,
+    *,
+    left_start: str = "start",
+    left_end: str = "end",
+    right_start: str = "start",
+    right_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.LazyFrame: ...
+
+
+@overload
+def intersect_intervals(
+    left: pl.DataFrame,
+    right: pl.LazyFrame,
+    *,
+    left_start: str = "start",
+    left_end: str = "end",
+    right_start: str = "start",
+    right_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.LazyFrame: ...
+
+
+def intersect_intervals(
+    left: pl.DataFrame | pl.LazyFrame,
+    right: pl.DataFrame | pl.LazyFrame,
+    *,
+    left_start: str = "start",
+    left_end: str = "end",
+    right_start: str = "start",
+    right_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame | pl.LazyFrame:
+    """Return coordinates covered by both collections of half-open intervals.
+
+    Args:
+        left: DataFrame or LazyFrame describing the first collection.
+        right: DataFrame or LazyFrame describing the second collection.
+        left_start: Literal left start column name.
+        left_end: Literal left end column name.
+        right_start: Literal right start column name.
+        right_end: Literal right end column name.
+        by: Shared key name or ordered list of distinct names. Null keys match.
+
+    Returns:
+        Canonical ``[group keys..., start, end]`` ranges with the schema and
+        left-first order rules of subtract_intervals. Both DataFrames return a
+        DataFrame. Either LazyFrame returns a genuinely deferred LazyFrame.
+
+    Raises:
+        TypeError: For invalid frame, column name or grouping argument types.
+        ValueError: For duplicate keys or keys named start/end.
+        polars.exceptions.PolarsError: For missing columns, unsupported or
+            mismatched dtypes, null endpoints, or reversed intervals.
+
+    Notes:
+        This intersects the unions of both inputs. It does not enumerate
+        overlapping row pairs or preserve provenance. Touching alone contributes
+        nothing. Duplicates and empty rows do not change coverage. Overlapping
+        and touching output fragments coalesce. Either empty operand, or a key
+        present on only one side, produces no ranges. Every row on both sides
+        still validates before geometry, including unmatched groups.
+
+        Exact endpoint/key types, side-relative errors, blocking lazy execution,
+        optimizer safeguards and complexity follow subtract_intervals. Geometry
+        is commutative. Swapping grouped inputs can change group presentation
+        order because each call follows its own left input's first appearances.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> left = pl.DataFrame({"start": [0, 4, 12], "end": [5, 10, 15]})
+        >>> right = pl.DataFrame({"start": [2, 6, 10], "end": [3, 8, 13]})
+        >>> pi.intersect_intervals(left, right).rows()
+        [(2, 3), (6, 8), (12, 13)]
+        >>> pi.intersect_intervals(left, right.lazy()).collect().rows()
+        [(2, 3), (6, 8), (12, 13)]
+    """
+    return _set_geometry(left, right, left_start, left_end, right_start, right_end, by, True)
 
 
 @overload

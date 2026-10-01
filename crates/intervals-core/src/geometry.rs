@@ -151,14 +151,19 @@ pub fn merge_intervals<T: Ord + Copy>(
     ends: &[T],
 ) -> Result<Vec<(T, T)>, IntervalError> {
     validate_intervals(starts, ends)?;
+    Ok(merge_validated(starts, ends))
+}
+
+// Both operands of a set operation must validate before either is normalized.
+pub(crate) fn merge_validated<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Vec<(T, T)> {
     let rows = nonempty_rows(starts, ends, None);
     if rows.clone().is_sorted_by_key(|r| r.0) {
-        return Ok(merge_sorted(rows));
+        return merge_sorted(rows);
     }
     let mut records = Vec::with_capacity(rows.clone().count());
     records.extend(rows);
     records.sort_unstable_by_key(|r| r.0);
-    Ok(merge_sorted(records.into_iter()))
+    merge_sorted(records.into_iter())
 }
 
 fn merge_sorted<T: Ord + Copy>(rows: impl Iterator<Item = (T, T)>) -> Vec<(T, T)> {

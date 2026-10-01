@@ -12,6 +12,9 @@ release plugin. Summary and plotting scripts only read saved results.
 
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
+| [`set_geometry.py`](set_geometry.py) | End-to-end benchmark | Two-input eager/lazy set operations against native Polars events, separate planning/collection and cold process RSS → raw samples and source provenance | [Subtraction and intersection](../docs/set-geometry-benchmarks.md) |
+| [`set_geometry_core.py`](set_geometry_core.py) | Core comparison runner | Canonical union scans, fused runs and tagged events with separate requested heap → raw samples and source provenance | [Subtraction and intersection](../docs/set-geometry-benchmarks.md) |
+| [`test_set_geometry.py`](test_set_geometry.py) | Baseline checks | Original-row cell oracle, null groups, deferred validation and exact temporal/UInt64 boundaries → native competitor checks | [Experiment notes](set-geometry-notes.md) |
 | [`interval_geometry.py`](interval_geometry.py) | End-to-end benchmark | Complete eager/lazy geometry against native prefix-max plans, separate planning/collection and optional process RSS → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`interval_geometry_core.py`](interval_geometry_core.py) | Core comparison runner | Packed and indexed frontier scans, fused/materialized gaps and separate requested heap → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`test_interval_geometry.py`](test_interval_geometry.py) | Baseline checks | Independent graph/cell oracles, deferred validation and typed grouped lazy outputs → native competitor checks | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
@@ -37,7 +40,7 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
-Except for the geometry, dominating-set and coverage-profile comparisons, they time production
+Except for the geometry, set-geometry, dominating-set and coverage-profile comparisons, they time production
 only. Removed candidates and runners are preserved in the
 [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
 Historical metadata may reference a base revision with uncommitted feature

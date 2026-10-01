@@ -1,0 +1,206 @@
+[
+  {
+    "case": 1,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "subtract",
+    "method": "production",
+    "before": {
+      "rss_bytes": 107741184,
+      "peak_rss_bytes": 107741184
+    },
+    "after": {
+      "rss_bytes": 125382656,
+      "peak_rss_bytes": 149815296
+    },
+    "peak_increase_bytes": 42074112,
+    "z": 1000000
+  },
+  {
+    "case": 1,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "subtract",
+    "method": "native",
+    "before": {
+      "rss_bytes": 108965888,
+      "peak_rss_bytes": 108965888
+    },
+    "after": {
+      "rss_bytes": 673964032,
+      "peak_rss_bytes": 673964032
+    },
+    "peak_increase_bytes": 564998144,
+    "z": 1000000
+  },
+  {
+    "case": 1,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "intersect",
+    "method": "production",
+    "before": {
+      "rss_bytes": 115867648,
+      "peak_rss_bytes": 115867648
+    },
+    "after": {
+      "rss_bytes": 125403136,
+      "peak_rss_bytes": 149471232
+    },
+    "peak_increase_bytes": 33603584,
+    "z": 500000
+  },
+  {
+    "case": 1,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "intersect",
+    "method": "native",
+    "before": {
+      "rss_bytes": 120025088,
+      "peak_rss_bytes": 120025088
+    },
+    "after": {
+      "rss_bytes": 631476224,
+      "peak_rss_bytes": 631476224
+    },
+    "peak_increase_bytes": 511451136,
+    "z": 500000
+  },
+  {
+    "case": 3,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "subtract",
+    "method": "production",
+    "before": {
+      "rss_bytes": 86016000,
+      "peak_rss_bytes": 86016000
+    },
+    "after": {
+      "rss_bytes": 87048192,
+      "peak_rss_bytes": 102633472
+    },
+    "peak_increase_bytes": 16617472,
+    "z": 0
+  },
+  {
+    "case": 3,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "subtract",
+    "method": "native",
+    "before": {
+      "rss_bytes": 85917696,
+      "peak_rss_bytes": 85917696
+    },
+    "after": {
+      "rss_bytes": 463351808,
+      "peak_rss_bytes": 463351808
+    },
+    "peak_increase_bytes": 377434112,
+    "z": 0
+  },
+  {
+    "case": 3,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "intersect",
+    "method": "production",
+    "before": {
+      "rss_bytes": 85925888,
+      "peak_rss_bytes": 85925888
+    },
+    "after": {
+      "rss_bytes": 86970368,
+      "peak_rss_bytes": 102531072
+    },
+    "peak_increase_bytes": 16605184,
+    "z": 1
+  },
+  {
+    "case": 3,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "intersect",
+    "method": "native",
+    "before": {
+      "rss_bytes": 86011904,
+      "peak_rss_bytes": 86011904
+    },
+    "after": {
+      "rss_bytes": 441167872,
+      "peak_rss_bytes": 441167872
+    },
+    "peak_increase_bytes": 355155968,
+    "z": 1
+  },
+  {
+    "case": 8,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "subtract",
+    "method": "production",
+    "before": {
+      "rss_bytes": 120741888,
+      "peak_rss_bytes": 120741888
+    },
+    "after": {
+      "rss_bytes": 138358784,
+      "peak_rss_bytes": 170778624
+    },
+    "peak_increase_bytes": 50036736,
+    "z": 1000000
+  },
+  {
+    "case": 8,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "subtract",
+    "method": "native",
+    "before": {
+      "rss_bytes": 118120448,
+      "peak_rss_bytes": 118120448
+    },
+    "after": {
+      "rss_bytes": 660283392,
+      "peak_rss_bytes": 660283392
+    },
+    "peak_increase_bytes": 542162944,
+    "z": 1000000
+  },
+  {
+    "case": 8,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "intersect",
+    "method": "production",
+    "before": {
+      "rss_bytes": 123715584,
+      "peak_rss_bytes": 123715584
+    },
+    "after": {
+      "rss_bytes": 141299712,
+      "peak_rss_bytes": 173772800
+    },
+    "peak_increase_bytes": 50057216,
+    "z": 999999
+  },
+  {
+    "case": 8,
+    "n": 1000000,
+    "seed": 7,
+    "operation": "intersect",
+    "method": "native",
+    "before": {
+      "rss_bytes": 119496704,
+      "peak_rss_bytes": 119496704
+    },
+    "after": {
+      "rss_bytes": 668200960,
+      "peak_rss_bytes": 668200960
+    },
+    "peak_increase_bytes": 548704256,
+    "z": 999999
+  }
+]

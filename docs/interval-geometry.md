@@ -1,15 +1,17 @@
-# Clustering, union, and bounded gaps
+# Interval geometry
 
-Use these operations to group connected intervals, merge covered ranges, or
-find gaps in a bounded domain:
+Use these operations to group connected intervals, merge ranges, find gaps,
+subtract exclusions, or intersect two collections:
 
 | Question | Function | Output |
 | --- | --- | --- |
 | Which records are connected by overlap? | [`cluster_intervals`](api.md#polars_intervals.cluster_intervals) | One UInt32 component ID per original row |
 | Which coordinates are covered? | [`merge_intervals`](api.md#polars_intervals.merge_intervals) | Maximal covered ranges |
 | Which coordinates in a domain are uncovered? | [`interval_gaps`](api.md#polars_intervals.interval_gaps) | Maximal uncovered ranges |
+| Which left coordinates remain after exclusions? | [`subtract_intervals`](api.md#polars_intervals.subtract_intervals) | Maximal remaining ranges |
+| Which coordinates do both collections cover? | [`intersect_intervals`](api.md#polars_intervals.intersect_intervals) | Maximal shared ranges |
 
-All three follow the shared [input rules](usage.md#inputs).
+All operations follow the shared [input rules](usage.md#inputs).
 
 ## A worked example
 
@@ -105,3 +107,84 @@ for lazy and streaming behavior.
 The [API reference](api.md) has full signatures and edge cases. The
 [benchmark report](interval-geometry-benchmarks.md) covers runtime, memory use,
 and algorithm details.
+
+## Subtract and intersect two collections
+
+Subtract busy windows from availability, or find times when two resources are
+both available. Both functions act on the union represented by each collection:
+
+```python
+left = pl.DataFrame({"start": [0, 4, 12], "end": [5, 10, 15]})
+right = pl.DataFrame({"start": [2, 6, 10], "end": [3, 8, 13]})
+
+print(pi.subtract_intervals(left, right).rows())
+# [(0, 2), (3, 6), (8, 10), (13, 15)]
+print(pi.intersect_intervals(left, right).rows())
+# [(2, 3), (6, 8), (12, 13)]
+```
+
+The original left boundary at 5 disappears. Each output contains maximal,
+nonempty, disjoint ranges. Overlapping and touching fragments coalesce, and
+each end is strictly below the next start. Touching inputs alone have no
+intersection: `[0,2)` and `[2,4)` share no covered coordinates.
+
+Subtraction cuts away coverage, so one left row may produce several ranges.
+It is not a whole-row anti-join or subtraction that preserves each source
+record's fragments. Intersection does not enumerate overlapping record pairs.
+Neither operation returns source IDs, payload columns, or metadata aggregation.
+These are geometric set operations, not a BEDTools compatibility API.
+
+### Availability by resource
+
+```python
+availability = pl.DataFrame(
+    {"resource": ["desk", "room", "desk"], "start": [0, 0, 8], "end": [6, 10, 12]}
+)
+busy = pl.DataFrame({"resource": ["desk"], "start": [2], "end": [4]})
+print(pi.subtract_intervals(availability, busy, by="resource").rows())
+# [('desk', 0, 2), ('desk', 4, 6), ('desk', 8, 12), ('room', 0, 10)]
+```
+
+The room has no busy rows, so subtraction keeps its union. A left-only group
+has no intersection. A right-only group emits nothing. Null key values match
+nulls, including in multi-column keys. There is no global right-side broadcast.
+Both sides use the same key names. Rename keys upstream if needed.
+
+Groups follow their first appearance in the original left input, before empty
+rows are dropped. Ranges are sorted within each group. Swapping intersection's
+operands preserves geometry per key but can change group-block order.
+
+Empty rows contribute nothing, and duplicates do not change coverage. Empty
+left input returns a typed empty result. Empty right input leaves the left
+union for subtraction and returns no intersection. Every row on both sides
+still validates, including right-only groups and calls with an empty operand.
+Errors name the side. Reversed intervals also report their original row within
+the evaluated operand.
+
+### Lazy and mixed inputs
+
+```python
+query = availability.lazy().pipe(pi.subtract_intervals, busy.lazy(), by="resource")
+result = query.filter(pl.col("start") >= 4).collect(engine="streaming")
+
+# An eager operand becomes an in-memory source in the same deferred plan.
+shared = pi.intersect_intervals(availability, busy.lazy(), by="resource")
+result = shared.collect()
+```
+
+Two DataFrames return a DataFrame. If either argument is a LazyFrame, the
+result stays lazy. Construction, `explain()` and `collect_schema()` read no
+input rows. Both sources enter one blocking native operation. Collection with
+the streaming engine also materializes both inputs. This is not bounded-memory
+streaming. Downstream filters, slices and projections apply to the completed
+geometry. Upstream operations change the intervals that the function sees.
+
+Use `left_start`, `left_end`, `right_start` and `right_end` for custom literal
+column names. Output names remain `start` and `end`. All four endpoints must
+have the same supported dtype, including Datetime units and timezone metadata.
+Corresponding key dtypes must match. These checks also apply to typed empty
+frames. No casts or inferred Null endpoints are accepted. Exact logical types
+survive empty results. Keys cannot be named `start` or `end`.
+
+See the [subtraction and intersection benchmarks](set-geometry-benchmarks.md)
+for complete eager/lazy timings and the production algorithm comparison.
