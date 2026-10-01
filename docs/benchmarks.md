@@ -15,6 +15,7 @@ many tiny groups, such as ten or fewer rows per group.
 | [Overlap counting](overlap-count-benchmarks.md) | Count overlaps for each row | 1.4–2.3× faster than Polars · 167–244 ms at 3M shuffled rows |
 | [Coverage depth and resource demand](coverage-profile-benchmarks.md) | Measure active intervals or their total demand | 3.9–33× faster than Polars · 1.24–8.70 ms at 100k rows (one Polars thread) · 1.3–4.7× at 1M rows (24 threads) |
 | [Clustering, union, and gaps](interval-geometry-benchmarks.md) | Label connected intervals, merge ranges or find gaps | Clustering: 3.2× faster than Polars · 4.74 ms at 100k shuffled rows |
+| [Subtraction and intersection](set-geometry-benchmarks.md) | Remove or intersect covered ranges across two collections | 4.9–6.1× faster than Polars · 81.0–83.8 ms at 1M shuffled rows · 4.5–4.7× slower on empty-only grouped rows |
 | [Containment counting](containment-benchmarks.md) | Count containments for each row | 1.3–2.2× faster than Polars · 65.3–1,090 ms at 3M rows |
 | [Nesting depth](nesting-depth-benchmarks.md) | Measure the longest containment chain above each row | About 200 ms at 3M shuffled rows (four Polars threads) · native comparison unmeasured |
 

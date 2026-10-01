@@ -1,0 +1,19 @@
+case,workload_dtype,workload_family,workload_left_order,workload_right_order,workload_left_share,workload_seed,workload_operation,method,x,median,min,max,samples
+Subtract sorted availability,i64,availability,start,start,50,7,subtract,events,1000000,120.0225,117.10199999999999,130.44,5
+Subtract sorted availability,i64,availability,start,start,50,7,subtract,fused,1000000,20.4847,19.1735,22.882199999999997,5
+Subtract sorted availability,i64,availability,start,start,50,7,subtract,union_scan,1000000,17.941399999999998,17.4615,18.5677,5
+Subtract shuffled availability,i64,availability,shuffled,reverse,50,7,subtract,events,1000000,113.56899999999999,111.71029999999999,114.4216,5
+Subtract shuffled availability,i64,availability,shuffled,reverse,50,7,subtract,fused,1000000,31.3675,30.7048,31.8017,5
+Subtract shuffled availability,i64,availability,shuffled,reverse,50,7,subtract,union_scan,1000000,33.3064,32.777,33.7878,5
+Intersect shuffled availability,i64,availability,shuffled,reverse,50,7,intersect,events,1000000,109.09259999999999,108.78009999999999,109.3361,5
+Intersect shuffled availability,i64,availability,shuffled,reverse,50,7,intersect,fused,1000000,26.2963,25.7637,26.3696,5
+Intersect shuffled availability,i64,availability,shuffled,reverse,50,7,intersect,union_scan,1000000,31.6194,31.4223,32.669399999999996,5
+Intersect dense intervals,i64,dense,shuffled,shuffled,50,7,intersect,events,1000000,119.84209999999999,114.4525,121.65159999999999,5
+Intersect dense intervals,i64,dense,shuffled,shuffled,50,7,intersect,fused,1000000,33.439,32.4249,34.9946,5
+Intersect dense intervals,i64,dense,shuffled,shuffled,50,7,intersect,union_scan,1000000,32.241099999999996,31.299699999999998,32.7497,5
+Intersect nested intervals,i64,nested,start,shuffled,50,7,intersect,events,1000000,111.4319,110.3218,112.2481,5
+Intersect nested intervals,i64,nested,start,shuffled,50,7,intersect,fused,1000000,21.1313,20.726699999999997,21.8433,5
+Intersect nested intervals,i64,nested,start,shuffled,50,7,intersect,union_scan,1000000,17.4972,17.1394,18.0378,5
+Subtract many holes from one domain,i64,holes,start,shuffled,1,7,subtract,events,1000000,111.0722,110.9178,112.3231,5
+Subtract many holes from one domain,i64,holes,start,shuffled,1,7,subtract,fused,1000000,41.4503,41.1883,43.8593,5
+Subtract many holes from one domain,i64,holes,start,shuffled,1,7,subtract,union_scan,1000000,45.7481,45.1808,47.088899999999995,5

@@ -85,7 +85,13 @@ rows. Pass a DataFrame for an immediate result or a LazyFrame for a query that
 runs when collected. The result has the same frame kind as the input. Use these
 functions directly or with `.pipe(...)`.
 
-Their `start` and `end` arguments are column names. Output endpoints are always
+[`subtract_intervals` and `intersect_intervals`](interval-geometry.md#subtract-and-intersect-two-collections)
+take two frames and return new covered ranges. Two DataFrames return a DataFrame.
+If either input is lazy, both inputs participate in one deferred query. All four
+endpoint columns must have exactly the same logical dtype. Shared group keys
+must also match in dtype. Result groups follow the left input's first appearances.
+
+Endpoint arguments take literal column names. Output endpoints are always
 named `start` and `end`. Endpoint and group-key dtypes are preserved, including
 in empty results. Other input columns are not retained.
 
@@ -137,7 +143,7 @@ computed from the full input, add it with `with_columns` first, then filter.
 | Task | Algorithms |
 | --- | --- |
 | [Inspect interval relationships](#inspect-interval-relationships) | Count overlaps, count contained rows, measure nesting depth |
-| [Clustering, union, and gaps](interval-geometry.md) | Label connected rows, combine covered ranges, or find uncovered ranges |
+| [Interval geometry](interval-geometry.md) | Label connected rows, combine ranges, find gaps, subtract coverage, or intersect collections |
 | [Assign lanes](#assign-lanes) | Use the fewest lanes, then optionally balance their row counts |
 | [Select intervals by weight](#select-intervals-by-weight) | Choose a schedule with one or more slots, or choose a mutually overlapping set |
 | [Covering and coverage](#covering-and-coverage) | Cover a target, maximize covered length with a budget, or hit every interval with points |

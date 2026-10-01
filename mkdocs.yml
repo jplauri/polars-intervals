@@ -47,13 +47,14 @@ nav:
   - Usage:
       - Overview: usage.md
       - Coverage and load profiles: coverage-profile.md
-      - Clustering, union, and gaps: interval-geometry.md
+      - Interval geometry: interval-geometry.md
   - API reference: api.md
   - Benchmarks:
       - Overview: benchmarks.md
       - Overlap counting: overlap-count-benchmarks.md
       - Coverage depth and resource demand: coverage-profile-benchmarks.md
       - Clustering, union, and gaps: interval-geometry-benchmarks.md
+      - Subtraction and intersection: set-geometry-benchmarks.md
       - Containment counting: containment-benchmarks.md
       - Nesting depth: nesting-depth-benchmarks.md
       - Lane assignment: assign-lanes-benchmarks.md

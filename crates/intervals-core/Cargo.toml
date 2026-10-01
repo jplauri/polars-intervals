@@ -62,3 +62,7 @@ harness = false
 [[bench]]
 name = "geometry"
 harness = false
+
+[[bench]]
+name = "set_geometry"
+harness = false

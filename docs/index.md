@@ -3,6 +3,8 @@
 Interval algorithms for Polars, implemented in Rust with support for eager and
 lazy queries. Count overlaps and containment, measure nesting, assign lanes,
 and select intervals for scheduling, covering, and coverage problems.
+Merge covered ranges, subtract exclusions, or intersect two collections with
+the [interval geometry operations](interval-geometry.md).
 
 ## Install
 

@@ -29,11 +29,17 @@ ALGORITHMS = {
     "coverage_profile": pi.coverage_profile,
     "merge_intervals": pi.merge_intervals,
     "interval_gaps": pi.interval_gaps,
+    "subtract_intervals": pi.subtract_intervals,
+    "intersect_intervals": pi.intersect_intervals,
 }
 pytestmark = pytest.mark.parametrize("algorithm", ALGORITHMS.values(), ids=ALGORITHMS.keys())
 
 
 def evaluate(frame, algorithm, start="start", end="end"):
+    if algorithm in (pi.subtract_intervals, pi.intersect_intervals):
+        return algorithm(
+            frame, frame, left_start=start, left_end=end, right_start=start, right_end=end
+        )
     if algorithm is pi.interval_gaps:
         dtype = frame[start].dtype if isinstance(start, str) else pl.Int64
         bound = pl.Series([0], dtype=dtype) if dtype in ENDPOINT_DTYPES else 0
@@ -105,7 +111,13 @@ def test_lengths_must_match_without_broadcasting(algorithm, argument, scalar):
     frame = pl.DataFrame({"start": [0, 1], "end": [3, 4]})
     args = {"start": pl.col("start"), "end": pl.col("end")}
     args[argument] = pl.lit(1, dtype=pl.Int64) if scalar else args[argument].head(1)
-    if algorithm in (pi.coverage_profile, pi.merge_intervals, pi.interval_gaps):
+    if algorithm in (
+        pi.coverage_profile,
+        pi.merge_intervals,
+        pi.interval_gaps,
+        pi.subtract_intervals,
+        pi.intersect_intervals,
+    ):
         # DataFrames enforce column lengths; direct Series mismatch coverage is
         # in the Rust integration suite. Expressions are rejected explicitly.
         with pytest.raises(TypeError, match="strings"):

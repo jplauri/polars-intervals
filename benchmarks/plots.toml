@@ -893,6 +893,85 @@ x = "n"
 method = "method"
 dimensions = ["family", "order", "seed", "scope", "dtype", "weights", "operation"]
 
+[sources.set_geometry_core]
+path = "benchmarks/results/set-geometry-core-million-20260930.csv"
+x = "n"
+method = "method"
+dimensions = ["dtype", "family", "left_order", "right_order", "left_share", "seed", "operation"]
+
+[sources.set_geometry_polars]
+path = "benchmarks/results/set-geometry-polars-repeat-20260930.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "left_order", "right_order", "dtype", "groups", "matching", "chunks", "payload", "source", "seed", "operation", "scope"]
+
+[sources.set_geometry_empty]
+path = "benchmarks/results/set-geometry-polars-empty-repeat-20260930.csv"
+x = "n"
+method = "method"
+dimensions = ["family", "left_order", "right_order", "dtype", "groups", "matching", "chunks", "payload", "source", "seed", "operation", "scope"]
+
+[[tables]]
+id = "set-geometry-empty-summary"
+source = "set_geometry_empty"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+xlabel = "Total input rows"
+methods = { production = "polars-intervals (ms)", native = "Native Polars (ms)" }
+native_comparison = { package = "production", baselines = ["native"] }
+cases = [
+  { label = "Subtract empty-only grouped rows", sizes = [100000, 1000000], filters = { family = "empty_rows", left_order = "start", right_order = "shuffled", dtype = "i64", groups = 32, matching = "all", chunks = 7, payload = 0, source = "memory", seed = 7, operation = "subtract", scope = "lazy_complete" } },
+  { label = "Intersect empty-only grouped rows", sizes = [100000, 1000000], filters = { family = "empty_rows", left_order = "start", right_order = "shuffled", dtype = "i64", groups = 32, matching = "all", chunks = 7, payload = 0, source = "memory", seed = 7, operation = "intersect", scope = "lazy_complete" } },
+]
+
+[[tables]]
+id = "subtract-intervals-summary"
+source = "set_geometry_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+xlabel = "Total input rows"
+methods = { production = "polars-intervals (ms)", native = "Native Polars (ms)" }
+native_comparison = { package = "production", baselines = ["native"] }
+cases = [
+  { label = "Shuffled availability and busy windows", sizes = [1000, 100000, 1000000], filters = { family = "availability", left_order = "shuffled", right_order = "reverse", dtype = "i64", groups = 0, matching = "all", chunks = 1, payload = 0, source = "memory", seed = 7, operation = "subtract", scope = "lazy_complete" } },
+  { label = "Many tiny timestamp groups", sizes = [1000], filters = { family = "availability", left_order = "shuffled", right_order = "reverse", dtype = "datetime_ns", groups = 1000, matching = "all", chunks = 7, payload = 0, source = "memory", seed = 7, operation = "subtract", scope = "lazy_complete" } },
+  { label = "Nested intervals", sizes = [1000000], filters = { family = "nested", left_order = "start", right_order = "shuffled", dtype = "i64", groups = 0, matching = "all", chunks = 1, payload = 0, source = "memory", seed = 7, operation = "subtract", scope = "lazy_complete" } },
+]
+
+[[tables]]
+id = "intersect-intervals-summary"
+source = "set_geometry_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+xlabel = "Total input rows"
+methods = { production = "polars-intervals (ms)", native = "Native Polars (ms)" }
+native_comparison = { package = "production", baselines = ["native"] }
+cases = [
+  { label = "Shuffled availability and busy windows", sizes = [1000, 100000, 1000000], filters = { family = "availability", left_order = "shuffled", right_order = "reverse", dtype = "i64", groups = 0, matching = "all", chunks = 1, payload = 0, source = "memory", seed = 7, operation = "intersect", scope = "lazy_complete" } },
+  { label = "Many tiny timestamp groups", sizes = [1000], filters = { family = "availability", left_order = "shuffled", right_order = "reverse", dtype = "datetime_ns", groups = 1000, matching = "all", chunks = 7, payload = 0, source = "memory", seed = 7, operation = "intersect", scope = "lazy_complete" } },
+  { label = "Nested intervals", sizes = [1000000], filters = { family = "nested", left_order = "start", right_order = "shuffled", dtype = "i64", groups = 0, matching = "all", chunks = 1, payload = 0, source = "memory", seed = 7, operation = "intersect", scope = "lazy_complete" } },
+]
+
+[[tables]]
+id = "set-geometry-core"
+source = "set_geometry_core"
+value = "ns"
+divisor = 1000000
+ylabel = "Underlying algorithm time in milliseconds"
+xlabel = "Total input rows"
+methods = { union_scan = "Union + scan (ms)", fused = "Fused runs (ms)", events = "Events (ms)" }
+cases = [
+  { label = "Subtract sorted availability", sizes = [1000000], filters = { dtype = "i64", family = "availability", left_order = "start", right_order = "start", left_share = 50, seed = 7, operation = "subtract" } },
+  { label = "Subtract shuffled availability", sizes = [1000000], filters = { dtype = "i64", family = "availability", left_order = "shuffled", right_order = "reverse", left_share = 50, seed = 7, operation = "subtract" } },
+  { label = "Intersect shuffled availability", sizes = [1000000], filters = { dtype = "i64", family = "availability", left_order = "shuffled", right_order = "reverse", left_share = 50, seed = 7, operation = "intersect" } },
+  { label = "Intersect dense intervals", sizes = [1000000], filters = { dtype = "i64", family = "dense", left_order = "shuffled", right_order = "shuffled", left_share = 50, seed = 7, operation = "intersect" } },
+  { label = "Intersect nested intervals", sizes = [1000000], filters = { dtype = "i64", family = "nested", left_order = "start", right_order = "shuffled", left_share = 50, seed = 7, operation = "intersect" } },
+  { label = "Subtract many holes from one domain", sizes = [1000000], filters = { dtype = "i64", family = "holes", left_order = "start", right_order = "shuffled", left_share = 1, seed = 7, operation = "subtract" } },
+]
+
 [[tables]]
 id = "lanes-polars-summary"
 source = "scheduling_polars"
