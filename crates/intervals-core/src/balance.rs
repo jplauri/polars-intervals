@@ -1,5 +1,5 @@
 //! Cardinality balancing on a fixed minimum palette.
-use crate::{IntervalError, assign_lanes};
+use crate::{IntervalError, assign_lanes, check_len};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
@@ -159,12 +159,7 @@ fn validate_coloring<T: Ord + Copy>(
     lanes: &[u32],
     minimum: usize,
 ) -> Result<(), IntervalError> {
-    if starts.len() != lanes.len() {
-        return Err(IntervalError::LengthMismatch([
-            ("intervals", starts.len()),
-            ("lanes", lanes.len()),
-        ]));
-    }
+    check_len(("intervals", starts.len()), ("lanes", lanes.len()))?;
     // Check before any maximum-label-indexed allocation: scratch is at most n.
     for (index, &lane) in lanes.iter().enumerate() {
         if u64::from(lane) >= starts.len() as u64 {
@@ -414,9 +409,6 @@ struct Component {
 }
 
 fn scratch<T>(len: usize) -> Result<Vec<T>, BalanceStopReason> {
-    len.checked_mul(std::mem::size_of::<T>())
-        .filter(|&bytes| bytes <= isize::MAX as usize)
-        .ok_or(BalanceStopReason::ScratchLimit)?;
     let mut values = Vec::new();
     values
         .try_reserve_exact(len)

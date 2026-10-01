@@ -2,6 +2,7 @@
 
 import ctypes
 import hashlib
+import json
 import os
 import platform
 import subprocess
@@ -76,6 +77,51 @@ def archive_sources(archive, paths):
 def source_changes(hashes):
     changed = [path for path, digest in hashes.items() if sha256(ROOT / path) != digest]
     return {"sources_unchanged_during_run": not changed, "changed_sources_during_run": changed}
+
+
+def run_cargo_bench(output, paths, settings, invocation, metadata):
+    """Run a core benchmark and save its samples and source evidence under a new prefix."""
+    metadata_path = output.with_suffix(".metadata.json")
+    archive_path = output.with_suffix(".sources.zip")
+    for path in (output, metadata_path, archive_path):
+        if path.exists():
+            raise FileExistsError(f"refusing to overwrite historical evidence: {path}")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    metadata = (
+        environment()
+        | {
+            "settings": settings,
+            "cargo_command": invocation,
+            "cargo_version": command("cargo", "--version"),
+            "build_environment": build_environment(),
+            "status": "running",
+        }
+        | metadata
+    )
+    metadata.update(archive_sources(archive_path, paths))
+    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    try:
+        result = subprocess.run(invocation, cwd=ROOT, env={**os.environ, **settings}, check=False)
+        metadata["returncode"] = result.returncode
+    except OSError as error:
+        metadata.update(returncode=1, error=str(error))
+    if metadata["returncode"] == 0:
+        if output.exists():
+            with output.open(encoding="utf-8") as raw:
+                next(raw, None)
+                has_samples = any(line.strip() for line in raw)
+        else:
+            has_samples = False
+        if not has_samples:
+            metadata.update(
+                returncode=1, error="No samples emitted; check selected cases and sizes"
+            )
+    metadata.update(source_changes(metadata["source_sha256"]))
+    metadata["status"] = "complete" if metadata["returncode"] == 0 else "failed"
+    if output.exists():
+        metadata["raw_sha256"] = sha256(output)
+    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    return metadata["returncode"]
 
 
 def environment():

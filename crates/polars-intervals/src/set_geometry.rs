@@ -80,9 +80,9 @@ fn evaluate(
         polars_ensure!(left.name() == right.name() && left.dtype() == right.dtype(), InvalidOperation:
             "{} requires matching left and right group key names and logical dtypes", name);
     }
-    dispatch_endpoints!(left_starts, left_ends, name, |starts, ends| evaluate_typed(
-        starts,
-        ends,
+    dispatch_endpoints!(left_starts.dtype(), name, |cast| evaluate_typed(
+        cast(left_starts)?,
+        cast(left_ends)?,
         left_keys,
         (right_starts, right_ends, right_keys),
         left_starts.dtype(),

@@ -6,20 +6,14 @@ uncommitted candidate experiments.
 """
 
 import argparse
-import json
-import os
 import platform
-import subprocess
 from pathlib import Path
 
 from provenance import (
     ROOT,
-    archive_sources,
-    build_environment,
     command,
-    environment,
+    run_cargo_bench,
     sha256,
-    source_changes,
 )
 
 
@@ -48,12 +42,6 @@ def main():
     if not set(args.weight_dtypes.split(",")) <= {"i64", "i128"}:
         parser.error("Weight dtypes must be i64 or i128")
     output = args.output.resolve()
-    metadata_path = output.with_suffix(".metadata.json")
-    archive_path = output.with_suffix(".sources.zip")
-    for path in (output, metadata_path, archive_path):
-        if path.exists():
-            parser.error(f"refusing to overwrite historical evidence: {path}")
-    output.parent.mkdir(parents=True, exist_ok=True)
     paths = [
         "Cargo.toml",
         "Cargo.lock",
@@ -89,11 +77,6 @@ def main():
         "--locked",
     ]
     metadata = {
-        **environment(),
-        "cargo_version": command("cargo", "--version"),
-        "build_environment": build_environment(),
-        "cargo_command": invocation,
-        "settings": settings,
         "scope": (
             "Complete core call: validation, domain inference/clipping, sortedness checks, "
             "preparation, sweep, coalescing, output allocation, output destruction. "
@@ -132,7 +115,6 @@ def main():
             "The public native adapter widens input weights to i128 before core dispatch."
         ),
         "source_sha256": {path: sha256(ROOT / path) for path in paths},
-        "source_archive": archive_path.name,
         "limitations": (
             "Single-machine synthetic core experiment. No grouped, chunked, temporal Polars or "
             "native-Polars timing here; those belong to a separate end-to-end run. "
@@ -143,21 +125,11 @@ def main():
         metadata["cpu_name"] = command(
             "powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_Processor).Name"
         )
-    metadata.update(archive_sources(archive_path, paths))
-    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    result = subprocess.run(invocation, cwd=ROOT, env={**os.environ, **settings}, check=False)
-    metadata["returncode"] = result.returncode
-    if result.returncode == 0:
-        with output.open(encoding="utf-8") as raw:
-            next(raw, None)
-            if next(raw, None) is None:
-                metadata["returncode"] = 1
-                metadata["error"] = "No samples emitted; check the selected cases and sizes"
-    metadata.update(source_changes(metadata["source_sha256"]))
-    if output.exists():
-        metadata["raw_sha256"] = sha256(output)
-    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    raise SystemExit(metadata["returncode"])
+    try:
+        returncode = run_cargo_bench(output, paths, settings, invocation, metadata)
+    except FileExistsError as error:
+        parser.error(str(error))
+    raise SystemExit(returncode)
 
 
 if __name__ == "__main__":

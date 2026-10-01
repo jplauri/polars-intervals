@@ -1,4 +1,4 @@
-use crate::{IntervalError, validate_lengths};
+use crate::{IntervalError, check_len, validate_lengths};
 
 /// Select one maximum-cardinality clique of half-open intervals.
 ///
@@ -146,12 +146,7 @@ where
     i128: From<W>,
 {
     validate_lengths(starts, ends)?;
-    if starts.len() != weights.len() {
-        return Err(IntervalError::LengthMismatch([
-            ("intervals", starts.len()),
-            ("weights", weights.len()),
-        ]));
-    }
+    check_len(("intervals", starts.len()), ("weights", weights.len()))?;
     let (mut count, mut singleton) = (0, None);
     let mut singleton_weight = 0i128;
     let mut common = None;

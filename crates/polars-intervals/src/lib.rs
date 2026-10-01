@@ -15,26 +15,26 @@ use std::borrow::Cow;
 // Keep physical extraction identical across row-aligned expressions and frame
 // adapters. Callers validate logical dtypes before dispatch.
 macro_rules! dispatch_endpoints {
-    ($starts:expr, $ends:expr, $name:expr, |$left:ident, $right:ident| $body:expr) => {{
-        let (starts, ends, name) = ($starts, $ends, $name);
+    ($dtype:expr, $name:expr, |$cast:ident| $body:expr) => {{
+        let (dtype, name) = ($dtype, $name);
         macro_rules! call {
-            ($s:expr, $e:expr) => {{
-                let ($left, $right) = ($s, $e);
+            ($physical:ty, $extract:expr) => {{
+                let $cast: fn(&Series) -> PolarsResult<&$physical> = $extract;
                 $body
             }};
         }
-        match starts.dtype() {
-            DataType::Int8 => call!(starts.i8()?, ends.i8()?),
-            DataType::Int16 => call!(starts.i16()?, ends.i16()?),
-            DataType::Int32 => call!(starts.i32()?, ends.i32()?),
-            DataType::Int64 => call!(starts.i64()?, ends.i64()?),
-            DataType::UInt8 => call!(starts.u8()?, ends.u8()?),
-            DataType::UInt16 => call!(starts.u16()?, ends.u16()?),
-            DataType::UInt32 => call!(starts.u32()?, ends.u32()?),
-            DataType::UInt64 => call!(starts.u64()?, ends.u64()?),
-            DataType::Date => call!(starts.date()?.physical(), ends.date()?.physical()),
+        match dtype {
+            DataType::Int8 => call!(Int8Chunked, Series::i8),
+            DataType::Int16 => call!(Int16Chunked, Series::i16),
+            DataType::Int32 => call!(Int32Chunked, Series::i32),
+            DataType::Int64 => call!(Int64Chunked, Series::i64),
+            DataType::UInt8 => call!(UInt8Chunked, Series::u8),
+            DataType::UInt16 => call!(UInt16Chunked, Series::u16),
+            DataType::UInt32 => call!(UInt32Chunked, Series::u32),
+            DataType::UInt64 => call!(UInt64Chunked, Series::u64),
+            DataType::Date => call!(Int32Chunked, |series| Ok(series.date()?.physical())),
             DataType::Datetime(_, _) => {
-                call!(starts.datetime()?.physical(), ends.datetime()?.physical())
+                call!(Int64Chunked, |series| Ok(series.datetime()?.physical()))
             }
             dtype => polars_bail!(InvalidOperation:
                 "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}", name, dtype),
@@ -246,52 +246,55 @@ fn capacity_output(inputs: &[Field]) -> PolarsResult<Field> {
     weighted_field(inputs, "max_weight_with_capacity")
 }
 
-fn clique_inputs<T>(inputs: &[T]) -> PolarsResult<(&T, &T, Option<&T>)> {
+fn optional_third<'a, T>(
+    inputs: &'a [T],
+    name: &str,
+) -> PolarsResult<(&'a T, &'a T, Option<&'a T>)> {
     match inputs {
         [starts, ends] => Ok((starts, ends, None)),
         [starts, ends, weights] => Ok((starts, ends, Some(weights))),
         _ => polars_bail!(InvalidOperation:
-            "max_weight_clique requires two or three inputs, got {}", inputs.len()),
+            "{} requires two or three inputs, got {}", name, inputs.len()),
     }
 }
 
 fn clique_output(inputs: &[Field]) -> PolarsResult<Field> {
-    let (start, end, weight) = clique_inputs(inputs)?;
-    polars_ensure!(start.dtype() == end.dtype(), InvalidOperation:
-        "max_weight_clique requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
-        start.dtype(), end.dtype());
-    polars_ensure!(matches!(start.dtype(),
-        DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
-        DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
-        DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
-        "max_weight_clique requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
-        start.dtype());
+    let (start, end, weight) = optional_third(inputs, "max_weight_clique")?;
+    validate_endpoint_dtypes(start.dtype(), end.dtype(), "max_weight_clique")?;
     if let Some(weight) = weight {
-        validate_weight_dtype(weight.dtype(), "max_weight_clique")?;
+        validate_integer_dtype(weight.dtype(), "max_weight_clique", "weight")?;
     }
     Ok(Field::new(start.name().clone(), DataType::Boolean))
 }
 
 #[pyo3_polars::derive::polars_expr(output_type_func = clique_output)]
 fn max_weight_clique_plugin(inputs: &[Series]) -> PolarsResult<Series> {
-    let (starts, ends, weights) = clique_inputs(inputs)?;
+    let (starts, ends, weights) = optional_third(inputs, "max_weight_clique")?;
     max_weight_clique(starts, ends, weights)
 }
 
 fn weighted_field(inputs: &[Field], name: &str) -> PolarsResult<Field> {
     let [start, _, weight] = weighted_inputs(inputs, name)?;
-    validate_weight_dtype(weight.dtype(), name)?;
+    validate_integer_dtype(weight.dtype(), name, "weight")?;
     Ok(Field::new(start.name().clone(), DataType::Boolean))
 }
 
-fn validate_weight_dtype(dtype: &DataType, name: &str) -> PolarsResult<()> {
-    validate_integer_dtype(dtype, name, "weight")
+fn is_supported_integer(dtype: &DataType) -> bool {
+    matches!(
+        dtype,
+        DataType::Int8
+            | DataType::Int16
+            | DataType::Int32
+            | DataType::Int64
+            | DataType::UInt8
+            | DataType::UInt16
+            | DataType::UInt32
+            | DataType::UInt64
+    )
 }
 
 fn validate_integer_dtype(dtype: &DataType, name: &str, role: &str) -> PolarsResult<()> {
-    polars_ensure!(matches!(dtype,
-        DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
-        DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64),
+    polars_ensure!(is_supported_integer(dtype),
         InvalidOperation:
         "{} requires an 8-, 16-, 32-, or 64-bit integer {} dtype, got {}", name, role, dtype);
     Ok(())
@@ -466,17 +469,8 @@ pub fn assign_lanes(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     evaluate(starts, ends, Algorithm::AssignLanes)
 }
 
-fn balanced_lanes_inputs<T>(inputs: &[T]) -> PolarsResult<(&T, &T, Option<&T>)> {
-    match inputs {
-        [starts, ends] => Ok((starts, ends, None)),
-        [starts, ends, lanes] => Ok((starts, ends, Some(lanes))),
-        _ => polars_bail!(InvalidOperation:
-            "assign_balanced_lanes requires two or three inputs, got {}", inputs.len()),
-    }
-}
-
 fn balanced_lanes_output(inputs: &[Field]) -> PolarsResult<Field> {
-    let (start, _, initial_lanes) = balanced_lanes_inputs(inputs)?;
+    let (start, _, initial_lanes) = optional_third(inputs, "assign_balanced_lanes")?;
     if let Some(lanes) = initial_lanes {
         validate_integer_dtype(lanes.dtype(), "assign_balanced_lanes", "lane")?;
     }
@@ -499,7 +493,7 @@ impl BalanceOptions {
 
 #[pyo3_polars::derive::polars_expr(output_type_func = balanced_lanes_output)]
 fn assign_balanced_lanes_plugin(inputs: &[Series], kwargs: BalanceOptions) -> PolarsResult<Series> {
-    let (starts, ends, initial_lanes) = balanced_lanes_inputs(inputs)?;
+    let (starts, ends, initial_lanes) = optional_third(inputs, "assign_balanced_lanes")?;
     assign_balanced_lanes(starts, ends, initial_lanes, kwargs.max_work()?)
 }
 
@@ -639,7 +633,7 @@ pub fn max_weight_clique(
     let Some(weights) = weights else {
         return evaluate(starts, ends, Algorithm::Clique(None));
     };
-    validate_weight_dtype(weights.dtype(), "max_weight_clique")?;
+    validate_integer_dtype(weights.dtype(), "max_weight_clique", "weight")?;
     polars_ensure!(starts.len() == weights.len(), ShapeMismatch:
         "max_weight_clique requires equal lengths, got {} intervals and {} weights",
         starts.len(), weights.len());
@@ -689,7 +683,7 @@ fn evaluate_weighted(
     } else {
         "max_weight_non_overlapping"
     };
-    validate_weight_dtype(weights.dtype(), name)?;
+    validate_integer_dtype(weights.dtype(), name, "weight")?;
     polars_ensure!(starts.len() == weights.len(), ShapeMismatch:
         "{} requires equal lengths, got {} intervals and {} weights",
         name, starts.len(), weights.len());
@@ -770,15 +764,17 @@ impl Algorithm<'_> {
 fn validate_endpoint_pair(starts: &Series, ends: &Series, name: &str) -> PolarsResult<()> {
     polars_ensure!(starts.len() == ends.len(), ShapeMismatch:
         "{} requires equal lengths, got {} starts and {} ends", name, starts.len(), ends.len());
-    polars_ensure!(starts.dtype() == ends.dtype(), InvalidOperation:
+    validate_endpoint_dtypes(starts.dtype(), ends.dtype(), name)
+}
+
+fn validate_endpoint_dtypes(starts: &DataType, ends: &DataType, name: &str) -> PolarsResult<()> {
+    polars_ensure!(starts == ends, InvalidOperation:
         "{} requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
-        name, starts.dtype(), ends.dtype());
-    polars_ensure!(matches!(starts.dtype(),
-        DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
-        DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
+        name, starts, ends);
+    polars_ensure!(is_supported_integer(starts) || matches!(starts,
         DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
         "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
-        name, starts.dtype());
+        name, starts);
     Ok(())
 }
 
@@ -789,13 +785,19 @@ fn endpoint_values<'a, T: PolarsIntegerType>(
 ) -> PolarsResult<[Cow<'a, [T::Native]>; 2]> {
     polars_ensure!(starts.null_count() == 0 && ends.null_count() == 0, ComputeError:
         "{} does not support null endpoints", name);
+    Ok(endpoint_slices([starts, ends]))
+}
+
+fn endpoint_slices<'a, T: PolarsIntegerType, const N: usize>(
+    columns: [&'a ChunkedArray<T>; N],
+) -> [Cow<'a, [T::Native]>; N] {
     // Borrow contiguous inputs; collect only columns spanning multiple chunks.
-    Ok([starts, ends].map(|column| {
+    columns.map(|column| {
         column
             .cont_slice()
             .map(Cow::Borrowed)
             .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
-    }))
+    })
 }
 
 fn native_domain<T: TryFrom<i128>>(domain: Option<(i128, i128)>) -> PolarsResult<Option<(T, T)>> {
@@ -833,10 +835,8 @@ fn validate_group_keys(
             "{} group keys cannot use reserved output names {}", name, reserved.join("/"));
         polars_ensure!(!keys[..index].iter().any(|other| other.name() == key.name()), InvalidOperation:
             "{} requires distinct group keys", name);
-        polars_ensure!(matches!(key.dtype(),
+        polars_ensure!(is_supported_integer(key.dtype()) || matches!(key.dtype(),
             DataType::String | DataType::Boolean |
-            DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
-            DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
             DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
             "{} requires String, Boolean, 8/16/32/64-bit integer, Date, or Datetime group keys, got {}",
             name, key.dtype());
@@ -846,12 +846,11 @@ fn validate_group_keys(
 
 fn evaluate(starts: &Series, ends: &Series, algorithm: Algorithm<'_>) -> PolarsResult<Series> {
     validate_endpoint_pair(starts, ends, algorithm.name())?;
-    dispatch_endpoints!(
-        starts,
-        ends,
-        algorithm.name(),
-        |left, right| evaluate_typed(left, right, algorithm)
-    )
+    dispatch_endpoints!(starts.dtype(), algorithm.name(), |cast| evaluate_typed(
+        cast(starts)?,
+        cast(ends)?,
+        algorithm
+    ))
 }
 
 fn evaluate_typed<T>(

@@ -116,11 +116,6 @@ where
 {
     validate_lengths(starts, ends)?;
     cover::validate_costs(costs, starts.len())?;
-    for (index, (&start, &end)) in starts.iter().zip(ends).enumerate() {
-        if start > end {
-            return Err(IntervalError::InvalidInterval { index });
-        }
-    }
     if costs.first().is_none_or(|&first| {
         costs
             .iter()

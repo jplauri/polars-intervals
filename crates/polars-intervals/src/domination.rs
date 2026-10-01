@@ -1,28 +1,14 @@
-use super::{Algorithm, evaluate, integer_values, validate_integer_dtype};
+use super::{
+    Algorithm, evaluate, integer_values, optional_third, validate_endpoint_dtypes,
+    validate_integer_dtype,
+};
 use polars::prelude::*;
-
-fn domination_inputs<T>(values: &[T]) -> PolarsResult<(&T, &T, Option<&T>)> {
-    match values {
-        [starts, ends] => Ok((starts, ends, None)),
-        [starts, ends, costs] => Ok((starts, ends, Some(costs))),
-        _ => polars_bail!(InvalidOperation:
-            "minimum_cost_dominating_set requires two or three inputs, got {}", values.len()),
-    }
-}
 
 // Validate fields through output_type_func: unsupported imported dtypes must
 // return a Polars error rather than panic across the expression FFI boundary.
 fn output(fields: &[Field]) -> PolarsResult<Field> {
-    let (start, end, cost) = domination_inputs(fields)?;
-    polars_ensure!(start.dtype() == end.dtype(), InvalidOperation:
-        "minimum_cost_dominating_set requires matching integer, Date, or Datetime dtypes (including Datetime time unit and timezone), got {} and {}",
-        start.dtype(), end.dtype());
-    polars_ensure!(matches!(start.dtype(),
-        DataType::Int8 | DataType::Int16 | DataType::Int32 | DataType::Int64 |
-        DataType::UInt8 | DataType::UInt16 | DataType::UInt32 | DataType::UInt64 |
-        DataType::Date | DataType::Datetime(_, _)), InvalidOperation:
-        "minimum_cost_dominating_set requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}",
-        start.dtype());
+    let (start, end, cost) = optional_third(fields, "minimum_cost_dominating_set")?;
+    validate_endpoint_dtypes(start.dtype(), end.dtype(), "minimum_cost_dominating_set")?;
     if let Some(cost) = cost {
         validate_integer_dtype(cost.dtype(), "minimum_cost_dominating_set", "cost")?;
     }
@@ -31,7 +17,7 @@ fn output(fields: &[Field]) -> PolarsResult<Field> {
 
 #[pyo3_polars::derive::polars_expr(output_type_func = output)]
 fn minimum_cost_dominating_set_plugin(values: &[Series]) -> PolarsResult<Series> {
-    let (starts, ends, costs) = domination_inputs(values)?;
+    let (starts, ends, costs) = optional_third(values, "minimum_cost_dominating_set")?;
     minimum_cost_dominating_set(starts, ends, costs)
 }
 

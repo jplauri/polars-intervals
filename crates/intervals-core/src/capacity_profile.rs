@@ -1,5 +1,5 @@
 use crate::capacity::{Prepared, Row, check_objective, components, prepare};
-use crate::{IntervalError, max_weight_with_capacity};
+use crate::{IntervalError, check_len, max_weight_with_capacity};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
@@ -187,18 +187,14 @@ fn normalize<T: Ord + Copy, C: Copy>(
 where
     i128: From<C>,
 {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch([
-            ("profile starts", starts.len()),
-            ("profile ends", ends.len()),
-        ]));
-    }
-    if starts.len() != capacities.len() {
-        return Err(IntervalError::LengthMismatch([
-            ("profile segments", starts.len()),
-            ("capacities", capacities.len()),
-        ]));
-    }
+    check_len(
+        ("profile starts", starts.len()),
+        ("profile ends", ends.len()),
+    )?;
+    check_len(
+        ("profile segments", starts.len()),
+        ("capacities", capacities.len()),
+    )?;
     let mut packed = Vec::with_capacity(starts.len());
     for (index, ((&start, &end), &capacity)) in starts.iter().zip(ends).zip(capacities).enumerate()
     {
@@ -510,7 +506,6 @@ impl Network {
             network.adjacent[cursor[from]] = e;
             cursor[from] += 1;
         }
-        debug_assert_eq!(network.adjacent.len(), 2 * network.edge_count());
         network
     }
 
@@ -527,14 +522,6 @@ impl Network {
 
     fn vertices(&self) -> usize {
         self.offsets.len() - 1
-    }
-
-    fn edge_count(&self) -> usize {
-        self.edges.len() / 2
-    }
-
-    fn is_circulation(&self) -> bool {
-        self.circulation
     }
 
     fn solve(&mut self) -> Result<usize, IntervalError> {
@@ -625,7 +612,7 @@ impl Network {
 
     fn selected(&self, row: usize) -> bool {
         let e = self.interval_start + 2 * row;
-        if self.is_circulation() {
+        if self.circulation {
             self.edges[e].capacity == 1
         } else {
             self.edges[e ^ 1].capacity == 1
@@ -743,7 +730,7 @@ mod tests {
                 .zip(&prepared.rows)
                 .filter(|((start, end), row)| *start <= j && j < *end && adaptive_mask[row.index])
                 .count();
-            let unused = if adaptive.is_circulation() {
+            let unused = if adaptive.circulation {
                 effective_capacity - adaptive.edges[2 * j + 1].capacity
             } else {
                 adaptive.edges[2 * j + 1].capacity
@@ -786,7 +773,7 @@ mod tests {
             .filter(|r| mask[r.index])
             .map(|r| r.weight)
             .sum();
-        if network.is_circulation() {
+        if network.circulation {
             let initial_cost: i128 = -prepared.rows.iter().map(|r| r.weight).sum::<i128>();
             assert_eq!(initial_cost + cost, -selected_nonempty);
         } else {
@@ -795,10 +782,7 @@ mod tests {
         for (i, row) in prepared.rows.iter().enumerate() {
             let flow = network.edges[network.interval_start + 2 * i + 1].capacity;
             assert!(flow <= 1);
-            assert_eq!(
-                mask[row.index],
-                flow == usize::from(!network.is_circulation())
-            );
+            assert_eq!(mask[row.index], flow == usize::from(!network.circulation));
         }
         let k = *timeline.capacities.iter().max().unwrap();
         for (j, &capacity) in timeline.capacities.iter().enumerate() {
@@ -809,7 +793,7 @@ mod tests {
                 .zip(&prepared.rows)
                 .filter(|((start, end), row)| *start <= j && j < *end && mask[row.index])
                 .count();
-            let unused = if network.is_circulation() {
+            let unused = if network.circulation {
                 assert_eq!(timeline_flow, active, "backward circulation cut {j}");
                 assert!(timeline_flow <= capacity);
                 capacity - timeline_flow
@@ -947,7 +931,7 @@ mod tests {
             .collect();
         let timeline = Timeline::new(&prepared.rows, &profile);
         let mut network = Network::new(&timeline, &prepared.rows);
-        assert!(network.is_circulation());
+        assert!(network.circulation);
         assert!(network.solve().unwrap() <= prepared.rows.len());
     }
 
