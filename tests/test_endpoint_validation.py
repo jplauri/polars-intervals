@@ -27,6 +27,7 @@ ALGORITHMS = {
     "capacity_0": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=0),
     "capacity_2": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=2),
     "coverage_profile": pi.coverage_profile,
+    "coverage_stats": pi.coverage_stats,
     "merge_intervals": pi.merge_intervals,
     "interval_gaps": pi.interval_gaps,
     "subtract_intervals": pi.subtract_intervals,
@@ -36,6 +37,10 @@ pytestmark = pytest.mark.parametrize("algorithm", ALGORITHMS.values(), ids=ALGOR
 
 
 def evaluate(frame, algorithm, start="start", end="end"):
+    if algorithm is pi.coverage_stats:
+        return algorithm(
+            frame, frame, query_start=start, query_end=end, interval_start=start, interval_end=end
+        )
     if algorithm in (pi.subtract_intervals, pi.intersect_intervals):
         return algorithm(
             frame, frame, left_start=start, left_end=end, right_start=start, right_end=end
@@ -113,6 +118,7 @@ def test_lengths_must_match_without_broadcasting(algorithm, argument, scalar):
     args[argument] = pl.lit(1, dtype=pl.Int64) if scalar else args[argument].head(1)
     if algorithm in (
         pi.coverage_profile,
+        pi.coverage_stats,
         pi.merge_intervals,
         pi.interval_gaps,
         pi.subtract_intervals,

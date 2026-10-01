@@ -50,6 +50,8 @@ mod profile;
 pub use profile::max_weight_with_capacity_profile;
 mod coverage_profile;
 pub use coverage_profile::coverage_profile;
+mod coverage_stats;
+pub use coverage_stats::coverage_stats;
 mod geometry;
 pub use geometry::{interval_gaps, merge_intervals};
 mod set_geometry;
@@ -59,6 +61,10 @@ pub use set_geometry::{intersect_intervals, subtract_intervals};
 mod _internal {
     #[pymodule_export]
     use super::coverage_profile::coverage_profile_py;
+    #[pymodule_export]
+    use super::coverage_stats::coverage_stats_py;
+    #[pymodule_export]
+    use super::coverage_stats::validate_coverage_stats_py;
     #[pymodule_export]
     use super::geometry::interval_gaps_py;
     #[pymodule_export]
@@ -783,8 +789,14 @@ fn endpoint_values<'a, T: PolarsIntegerType>(
     ends: &'a ChunkedArray<T>,
     name: &str,
 ) -> PolarsResult<[Cow<'a, [T::Native]>; 2]> {
-    polars_ensure!(starts.null_count() == 0 && ends.null_count() == 0, ComputeError:
-        "{} does not support null endpoints", name);
+    if starts.null_count() != 0 || ends.null_count() != 0 {
+        let index = starts
+            .iter()
+            .zip(ends.iter())
+            .position(|(start, end)| start.is_none() || end.is_none())
+            .expect("a null endpoint exists");
+        polars_bail!(ComputeError: "{} does not support null endpoints at index {}", name, index);
+    }
     Ok(endpoint_slices([starts, ends]))
 }
 

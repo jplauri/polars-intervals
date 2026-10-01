@@ -14,6 +14,7 @@ __all__ = [
     "cluster_intervals",
     "containment_count",
     "coverage_profile",
+    "coverage_stats",
     "intersect_intervals",
     "interval_gaps",
     "max_k_coverage",
@@ -135,6 +136,226 @@ def _blocking_frame(intervals, solve, schema):
         slice_pushdown=False,
         streamable=False,
     )
+
+
+_COVERAGE_STATS_SCHEMA = {
+    "overlap_count": pl.UInt64,
+    "covered_length": pl.Int128,
+    "query_length": pl.Int128,
+    "covered_fraction": pl.Float64,
+}
+
+
+def _coverage_stats_input(
+    queries, intervals, query_start, query_end, interval_start, interval_end, by
+):
+    name = "coverage_stats"
+    for side, frame in (("queries", queries), ("intervals", intervals)):
+        if not isinstance(frame, (pl.DataFrame, pl.LazyFrame)):
+            raise TypeError(f"{side} must be a Polars DataFrame or LazyFrame")
+    for option, value in (
+        ("query_start", query_start),
+        ("query_end", query_end),
+        ("interval_start", interval_start),
+        ("interval_end", interval_end),
+    ):
+        if not isinstance(value, str):
+            raise TypeError(f"{option} column names must be strings")
+    keys = _frame_keys(by, ())
+    schema = queries.collect_schema()
+    collisions = [column for column in _COVERAGE_STATS_SCHEMA if column in schema]
+    if collisions:
+        raise ValueError(f"coverage_stats queries already contain output columns: {collisions}")
+    _, query_schema = _frame_schema(queries, query_start, query_end, keys, f"{name} queries")
+    intervals, source_schema = _frame_schema(
+        intervals, interval_start, interval_end, keys, f"{name} intervals"
+    )
+    _frame_dtypes(
+        (query_schema[query_start], source_schema[interval_start]),
+        (),
+        f"{name} queries/intervals",
+    )
+    for key in keys:
+        if query_schema[key] != source_schema[key]:
+            raise pl.exceptions.InvalidOperationError(
+                f"{name} requires matching queries/intervals group key dtypes for {key!r}"
+            )
+    return intervals, keys, schema
+
+
+@overload
+def coverage_stats(
+    queries: pl.DataFrame,
+    intervals: pl.DataFrame,
+    *,
+    query_start: str = "start",
+    query_end: str = "end",
+    interval_start: str = "start",
+    interval_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame: ...
+
+
+@overload
+def coverage_stats(
+    queries: pl.LazyFrame,
+    intervals: pl.DataFrame | pl.LazyFrame,
+    *,
+    query_start: str = "start",
+    query_end: str = "end",
+    interval_start: str = "start",
+    interval_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.LazyFrame: ...
+
+
+@overload
+def coverage_stats(
+    queries: pl.DataFrame | pl.LazyFrame,
+    intervals: pl.LazyFrame,
+    *,
+    query_start: str = "start",
+    query_end: str = "end",
+    interval_start: str = "start",
+    interval_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.LazyFrame: ...
+
+
+def coverage_stats(
+    queries: pl.DataFrame | pl.LazyFrame,
+    intervals: pl.DataFrame | pl.LazyFrame,
+    *,
+    query_start: str = "start",
+    query_end: str = "end",
+    interval_start: str = "start",
+    interval_end: str = "end",
+    by: str | list[str] | None = None,
+) -> pl.DataFrame | pl.LazyFrame:
+    """Append exact source coverage statistics to every half-open query interval.
+
+    Args:
+        queries: Reporting windows. All columns and their order are preserved.
+        intervals: Source intervals. Only endpoints and group keys are read.
+        query_start: Literal query start column name.
+        query_end: Literal query end column name.
+        interval_start: Literal source start column name.
+        interval_end: Literal source end column name.
+        by: Shared group key name or distinct names. Null key values match nulls.
+            None or an empty list treats each operand as one collection.
+
+    Returns:
+        Every query row in original order, followed by ``overlap_count`` (UInt64),
+        ``covered_length`` (Int128), ``query_length`` (Int128), and
+        ``covered_fraction`` (Float64). The fraction is null only for empty queries.
+        Two DataFrames return a DataFrame. Either lazy input returns a LazyFrame
+        with both operands deferred until collection.
+
+    Raises:
+        TypeError: For invalid frame or column-name options.
+        ValueError: For repeated group keys or existing query columns named like
+            any output statistic, including on empty inputs.
+        polars.exceptions.PolarsError: For missing columns, null or reversed
+            endpoints, unsupported types, or mismatched endpoint/key dtypes.
+            All rows validate before grouping or shortcuts. Row errors identify
+            queries or intervals and the original index within that operand.
+
+    Notes:
+        Count includes each nonempty overlapping source row, including duplicates.
+        Covered length measures the source union inside each query, counting each
+        coordinate once. Touching alone does not overlap. Empty sources have no
+        effect. Empty queries return zero count and lengths, with a null fraction.
+        Missing source groups give zero coverage. Queries are never coalesced.
+        Passing the same frame twice includes each nonempty row's own source copy.
+
+        All four endpoints must have identical logical types: 8/16/32/64-bit
+        integers, Date, or Datetime (including unit and timezone). Keys support
+        these types plus String and Boolean. Lengths use integer coordinate units,
+        days for Date, and elapsed physical ticks for Datetime. Subtraction and
+        union prefixes use exact Int128. Each group's union measure is bounded by
+        its coordinate span, at most 2**64 - 1. Fractions convert each exact length
+        separately to Float64, then divide. A nearly full fraction can round to 1.0.
+        Exact integer columns are authoritative.
+
+        Sources are prepared once per group. Sorted raw endpoints preserve count
+        multiplicity, and merged union prefixes give covered length. Verified
+        ordered query boundaries can use monotone scans. Other queries use binary
+        searches or sorted boundary requests, chosen from measured crossovers.
+        Per-group worst-case time is O(m log(m+1) + n log(m+1) + n), with
+        O(m+n) extra storage. See the coverage statistics guide for the rule.
+        Lazy execution uses one non-streamable blocking calculation over both
+        complete operands, including with the streaming engine. It is not an
+        out-of-core coverage algorithm. Query payloads stay outside native import.
+
+    Examples:
+        >>> import polars as pl
+        >>> import polars_intervals as pi
+        >>> windows = pl.DataFrame({"start": [0, 5, 12, 7], "end": [10, 10, 15, 7]})
+        >>> reads = pl.DataFrame({"start": [1, 4], "end": [7, 9]})
+        >>> pi.coverage_stats(windows, reads)["covered_length"].to_list()
+        [8, 4, 0, 0]
+        >>> result = windows.lazy().pipe(pi.coverage_stats, reads.lazy())
+        >>> result.filter(pl.col("covered_fraction") < 0.9).collect().height
+        3
+    """
+    from polars_intervals import _internal
+
+    intervals, keys, query_schema = _coverage_stats_input(
+        queries, intervals, query_start, query_end, interval_start, interval_end, by
+    )
+
+    def solve(q, s, qs, qe, ss, se):
+        return _internal.coverage_stats(
+            q[qs],
+            q[qe],
+            [q[key] for key in keys],
+            s[ss],
+            s[se],
+            [s[key] for key in keys],
+        )
+
+    if isinstance(queries, pl.DataFrame) and isinstance(intervals, pl.DataFrame):
+        return queries.hstack(
+            solve(queries, intervals, query_start, query_end, interval_start, interval_end)
+        )
+
+    # Carry query metadata once, in the same branch as its geometry. Independent
+    # internal endpoint columns also allow keys to share endpoint column names.
+    prefix = "__pi_coverage_"
+    while any(prefix + suffix in query_schema for suffix in ("start", "end", "query")):
+        prefix += "_"
+    start, end, tag = (prefix + suffix for suffix in ("start", "end", "query"))
+    literal = pl.selectors.by_name
+    combined = pl.concat(
+        [
+            queries.lazy().with_columns(
+                literal(query_start).alias(start),
+                literal(query_end).alias(end),
+                pl.lit(True).alias(tag),
+            ),
+            intervals.lazy().select(
+                *[
+                    literal(key) if key in keys else pl.lit(None, dtype=dtype).alias(key)
+                    for key, dtype in query_schema.items()
+                ],
+                literal(interval_start).alias(start),
+                literal(interval_end).alias(end),
+                pl.lit(False).alias(tag),
+            ),
+        ],
+        how="vertical",
+    )
+
+    def split(frame):
+        # Vertical concatenation retains the query block and its original order.
+        n = frame[tag].sum()
+        if not frame[tag].head(n).all():
+            raise pl.exceptions.ComputeError("coverage_stats received reordered operands")
+        q, s = frame.head(n), frame.slice(n)
+        stats = solve(q, s, start, end, start, end)
+        return q.select(literal(query_schema.names())).hstack(stats)
+
+    return _blocking_frame(combined, split, {**query_schema, **_COVERAGE_STATS_SCHEMA})
 
 
 def _set_geometry(left, right, left_start, left_end, right_start, right_end, by, intersection):

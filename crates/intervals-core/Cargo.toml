@@ -66,3 +66,7 @@ harness = false
 [[bench]]
 name = "set_geometry"
 harness = false
+
+[[bench]]
+name = "coverage_stats"
+harness = false

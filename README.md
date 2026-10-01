@@ -24,6 +24,7 @@ Or with uv: `uv add polars-intervals`.
 | --- | --- |
 | [`overlap_count`](https://jplauri.github.io/polars-intervals/usage/#count-overlaps) | Count the other intervals overlapping each interval. |
 | [`coverage_profile`](https://jplauri.github.io/polars-intervals/coverage-profile/) | Return segments showing coverage depth or resource load. |
+| [`coverage_stats`](https://jplauri.github.io/polars-intervals/coverage-stats/) | Append source overlap counts and exact covered lengths to every query window. |
 | [`containment_count`](https://jplauri.github.io/polars-intervals/usage/#count-containment) | Count the other intervals contained by each interval. |
 | [`nesting_depth`](https://jplauri.github.io/polars-intervals/usage/#nesting-depth) | Length of the longest strict containment chain above each interval. |
 
@@ -91,6 +92,19 @@ print(result["overlaps"].to_list())  # [1, 2, 1]
 ```
 
 Intervals include their start and exclude their end, so touching intervals do not overlap.
+
+### Measure coverage inside reporting windows
+
+```python
+windows = pl.DataFrame({"start": [0, 5, 12, 7], "end": [10, 10, 15, 7]})
+reads = pl.DataFrame({"start": [1, 4], "end": [7, 9]})
+out = windows.lazy().pipe(pi.coverage_stats, reads.lazy()).collect()
+# covered_length: [8, 4, 0, 0]. Duplicate sources count separately,
+# but their shared covered coordinates count once.
+```
+
+Every window and its payload stays in original order. Use `by="chromosome"`
+for independent groups. See [coverage semantics and exact units](https://jplauri.github.io/polars-intervals/coverage-stats/).
 
 ### Count contained intervals
 

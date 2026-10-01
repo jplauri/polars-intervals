@@ -1,0 +1,22 @@
+case,workload_family,workload_query_order,workload_source_order,workload_ratio,workload_dtype,workload_seed,workload_m,method,x,median,min,max,samples
+"Sorted disjoint, m = 1M",disjoint,start,start,balanced,i64,7,1000000,binary,1000000,194.74169999999998,192.6362,195.34369999999998,5
+"Sorted disjoint, m = 1M",disjoint,start,start,balanced,i64,7,1000000,production,1000000,58.437,57.6464,60.7664,5
+"Sorted disjoint, m = 1M",disjoint,start,start,balanced,i64,7,1000000,sweep,1000000,81.0397,79.9413,84.271,5
+"Sorted genomic, m = 1M",genomic,start,shuffled,balanced,i64,7,1000000,binary,1000000,145.1559,143.9307,155.9355,5
+"Sorted genomic, m = 1M",genomic,start,shuffled,balanced,i64,7,1000000,production,1000000,93.7505,92.2671,95.4683,5
+"Sorted genomic, m = 1M",genomic,start,shuffled,balanced,i64,7,1000000,sweep,1000000,111.4118,110.8518,113.3202,5
+"Shuffled genomic, retained loss, m = 1M",genomic,shuffled,shuffled,balanced,i64,7,1000000,binary,1000000,420.0089,361.9341,507.39639999999997,5
+"Shuffled genomic, retained loss, m = 1M",genomic,shuffled,shuffled,balanced,i64,7,1000000,production,1000000,400.48609999999996,351.28069999999997,627.7144,5
+"Shuffled genomic, retained loss, m = 1M",genomic,shuffled,shuffled,balanced,i64,7,1000000,sweep,1000000,270.6734,269.4482,272.6248,5
+"Duplicated sources, m = 1M",duplicates,shuffled,shuffled,balanced,i64,7,1000000,binary,1000000,477.44169999999997,465.97069999999997,494.7102,5
+"Duplicated sources, m = 1M",duplicates,shuffled,shuffled,balanced,i64,7,1000000,production,1000000,227.3652,226.41889999999998,235.91799999999998,5
+"Duplicated sources, m = 1M",duplicates,shuffled,shuffled,balanced,i64,7,1000000,sweep,1000000,228.8579,225.86149999999998,236.123,5
+"Sparse coordinates, m = 1M",sparse,shuffled,shuffled,balanced,i64,7,1000000,binary,1000000,1043.8476,1033.3156,1090.6255999999998,5
+"Sparse coordinates, m = 1M",sparse,shuffled,shuffled,balanced,i64,7,1000000,production,1000000,262.9617,262.0485,266.8214,5
+"Sparse coordinates, m = 1M",sparse,shuffled,shuffled,balanced,i64,7,1000000,sweep,1000000,263.3709,263.1017,274.6526,5
+"One union run, m = 1M",one_run,shuffled,shuffled,balanced,i64,7,1000000,binary,1000000,146.1147,145.644,146.9594,5
+"One union run, m = 1M",one_run,shuffled,shuffled,balanced,i64,7,1000000,production,1000000,145.1027,144.08339999999998,147.78209999999999,5
+"One union run, m = 1M",one_run,shuffled,shuffled,balanced,i64,7,1000000,sweep,1000000,251.9264,251.4366,253.08239999999998,5
+"Query-heavy genomic, m = 10k",genomic,shuffled,shuffled,many_queries,i64,7,10000,binary,1000000,75.2107,75.13929999999999,77.1707,5
+"Query-heavy genomic, m = 10k",genomic,shuffled,shuffled,many_queries,i64,7,10000,production,1000000,76.0534,75.3394,87.5022,5
+"Query-heavy genomic, m = 10k",genomic,shuffled,shuffled,many_queries,i64,7,10000,sweep,1000000,200.7313,197.12859999999998,201.6736,5

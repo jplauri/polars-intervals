@@ -1,0 +1,13 @@
+case,workload_family,workload_query_order,workload_interval_order,workload_ratio,workload_dtype,workload_groups,workload_matching,workload_chunks,workload_query_payload,workload_source_payload,workload_source,workload_seed,workload_scope,method,x,median,min,max,samples
+Plan construction only,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_plan,native,100000,0.9086,0.8985,0.9327,3
+Plan construction only,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_plan,production,100000,0.2099,0.2045,0.34049999999999997,3
+Collect a prebuilt plan,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_collect,native,100000,280.9547,263.88919999999996,394.80859999999996,3
+Collect a prebuilt plan,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_collect,production,100000,25.64,25.2352,33.1258,3
+Eager queries and lazy sources,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,mixed_complete,native,100000,267.7527,265.76509999999996,369.2097,3
+Eager queries and lazy sources,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,mixed_complete,production,100000,24.3019,20.271,29.3005,3
+Streaming-engine complete call,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,streaming_complete,native,100000,325.25919999999996,302.4296,333.28639999999996,3
+Streaming-engine complete call,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,streaming_complete,production,100000,27.665399999999998,20.2059,27.746499999999997,3
+Warm Parquet prebuilt-plan collection,genomic,shuffled,shuffled,equal,i64,8,all,7,0,0,parquet,7,lazy_collect,native,100000,312.5886,304.7912,338.92539999999997,3
+Warm Parquet prebuilt-plan collection,genomic,shuffled,shuffled,equal,i64,8,all,7,0,0,parquet,7,lazy_collect,production,100000,33.3745,32.6958,36.6384,3
+Warm Parquet streaming complete call,genomic,shuffled,shuffled,equal,i64,8,all,7,0,0,parquet,7,streaming_complete,native,100000,355.9443,320.3875,414.19219999999996,3
+Warm Parquet streaming complete call,genomic,shuffled,shuffled,equal,i64,8,all,7,0,0,parquet,7,streaming_complete,production,100000,35.03,29.729699999999998,36.6691,3

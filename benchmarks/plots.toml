@@ -1007,3 +1007,111 @@ cases = [
   { label = "Variable lengths, sorted by start", sizes = [1000000], filters = { family = "random_lengths", order = "sorted", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
   { label = "Variable lengths, shuffled", sizes = [1000000], filters = { family = "random_lengths", order = "shuffled", seed = 7, scope = "lazy_complete", dtype = "i64", weights = "positive", operation = "max_weight_non_overlapping" } },
 ]
+
+
+[sources.coverage_stats_polars]
+path = "benchmarks/results/coverage-stats-polars-local.csv"
+x = "size"
+method = "method"
+dimensions = ["family", "query_order", "interval_order", "ratio", "dtype", "groups", "matching", "chunks", "query_payload", "source_payload", "source", "seed", "scope"]
+
+[sources.coverage_stats_million]
+path = "benchmarks/results/coverage-stats-polars-million.csv"
+x = "size"
+method = "method"
+dimensions = ["family", "query_order", "interval_order", "ratio", "dtype", "groups", "matching", "chunks", "query_payload", "source_payload", "source", "seed", "scope"]
+
+[sources.coverage_stats_modes]
+path = "benchmarks/results/coverage-stats-polars-modes.csv"
+x = "size"
+method = "method"
+dimensions = ["family", "query_order", "interval_order", "ratio", "dtype", "groups", "matching", "chunks", "query_payload", "source_payload", "source", "seed", "scope"]
+
+[sources.coverage_stats_core]
+path = "benchmarks/results/coverage-stats-core-production.csv"
+x = "n"
+method = "algorithm"
+dimensions = ["family", "query_order", "source_order", "ratio", "dtype", "seed", "m"]
+
+[[tables]]
+id = "coverage-stats-summary"
+source = "coverage_stats_million"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+xlabel = "Queries n = sources m"
+methods = { production = "polars-intervals (ms)", native = "Native Polars (ms)" }
+native_comparison = { package = "production", baselines = ["native"] }
+cases = [
+  { label = "Genomic reads and overlapping windows", sizes = [1000, 1000000], filters = { family = "genomic", query_order = "shuffled", interval_order = "reverse", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_complete" } },
+  { label = "Genomic reads, seed 41 repeat", sizes = [1000000], filters = { family = "genomic", query_order = "shuffled", interval_order = "reverse", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 41, scope = "lazy_complete" } },
+  { label = "Disjoint sources", sizes = [1000, 1000000], filters = { family = "disjoint", query_order = "shuffled", interval_order = "shuffled", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_complete" } },
+  { label = "Nested windows", sizes = [1000000], filters = { family = "nested", query_order = "start", interval_order = "shuffled", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_complete" } },
+  { label = "One source-union run with many matches", sizes = [1000000], filters = { family = "all_covered", query_order = "start", interval_order = "reverse", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_complete" } },
+  { label = "Many tiny timestamp groups", sizes = [1000], filters = { family = "genomic", query_order = "shuffled", interval_order = "reverse", ratio = "equal", dtype = "datetime_ns", groups = 1000, matching = "all", chunks = 7, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_complete" } },
+]
+
+[[tables]]
+id = "coverage-stats-ratios"
+source = "coverage_stats_million"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+xlabel = "Varying input rows"
+methods = { production = "polars-intervals (ms)", native = "Native Polars (ms)" }
+native_comparison = { package = "production", baselines = ["native"] }
+cases = [
+  { label = "8 queries, source rows shown", sizes = [1000000], filters = { family = "all_covered", query_order = "shuffled", interval_order = "reverse", ratio = "few_queries", dtype = "i64", groups = 0, matching = "all", chunks = 7, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_complete" } },
+  { label = "8 sources, query rows shown", sizes = [1000000], filters = { family = "all_covered", query_order = "start", interval_order = "shuffled", ratio = "few_sources", dtype = "i64", groups = 0, matching = "all", chunks = 7, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_complete" } },
+]
+
+[[tables]]
+id = "coverage-stats-payloads"
+source = "coverage_stats_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+xlabel = "Queries n = sources m"
+methods = { production = "polars-intervals (ms)", native = "Native Polars (ms)" }
+native_comparison = { package = "production", baselines = ["native"] }
+cases = [
+  { label = "Narrow queries and sources", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "shuffled", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 7, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_complete" } },
+  { label = "16 string columns and nested query payloads, wide sources", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "shuffled", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 7, query_payload = 16, source_payload = 16, source = "memory", seed = 7, scope = "lazy_complete" } },
+  { label = "Narrow queries, 16 irrelevant source columns", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "shuffled", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 7, query_payload = 0, source_payload = 16, source = "memory", seed = 7, scope = "lazy_complete" } },
+]
+
+[[tables]]
+id = "coverage-stats-modes"
+source = "coverage_stats_modes"
+value = "ns"
+divisor = 1000000
+ylabel = "Times in milliseconds"
+xlabel = "Queries n = sources m"
+methods = { production = "polars-intervals (ms)", native = "Native Polars (ms)" }
+native_comparison = { package = "production", baselines = ["native"] }
+cases = [
+  { label = "Plan construction only", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "reverse", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_plan" } },
+  { label = "Collect a prebuilt plan", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "reverse", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "lazy_collect" } },
+  { label = "Eager queries and lazy sources", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "reverse", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "mixed_complete" } },
+  { label = "Streaming-engine complete call", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "reverse", ratio = "equal", dtype = "i64", groups = 0, matching = "all", chunks = 1, query_payload = 0, source_payload = 0, source = "memory", seed = 7, scope = "streaming_complete" } },
+  { label = "Warm Parquet prebuilt-plan collection", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "shuffled", ratio = "equal", dtype = "i64", groups = 8, matching = "all", chunks = 7, query_payload = 0, source_payload = 0, source = "parquet", seed = 7, scope = "lazy_collect" } },
+  { label = "Warm Parquet streaming complete call", sizes = [100000], filters = { family = "genomic", query_order = "shuffled", interval_order = "shuffled", ratio = "equal", dtype = "i64", groups = 8, matching = "all", chunks = 7, query_payload = 0, source_payload = 0, source = "parquet", seed = 7, scope = "streaming_complete" } },
+]
+
+[[tables]]
+id = "coverage-stats-core"
+source = "coverage_stats_core"
+value = "ns"
+divisor = 1000000
+ylabel = "Underlying algorithm time in milliseconds"
+xlabel = "Queries n"
+methods = { production = "Production (ms)", binary = "Binary searches (ms)", sweep = "Packed sweep (ms)" }
+cases = [
+  { label = "Sorted disjoint, m = 1M", sizes = [1000000], filters = { family = "disjoint", query_order = "start", source_order = "start", ratio = "balanced", dtype = "i64", seed = 7, m = 1000000 } },
+  { label = "Sorted genomic, m = 1M", sizes = [1000000], filters = { family = "genomic", query_order = "start", source_order = "shuffled", ratio = "balanced", dtype = "i64", seed = 7, m = 1000000 } },
+  { label = "Shuffled genomic, retained loss, m = 1M", sizes = [1000000], filters = { family = "genomic", query_order = "shuffled", source_order = "shuffled", ratio = "balanced", dtype = "i64", seed = 7, m = 1000000 } },
+  { label = "Duplicated sources, m = 1M", sizes = [1000000], filters = { family = "duplicates", query_order = "shuffled", source_order = "shuffled", ratio = "balanced", dtype = "i64", seed = 7, m = 1000000 } },
+  { label = "Sparse coordinates, m = 1M", sizes = [1000000], filters = { family = "sparse", query_order = "shuffled", source_order = "shuffled", ratio = "balanced", dtype = "i64", seed = 7, m = 1000000 } },
+  { label = "One union run, m = 1M", sizes = [1000000], filters = { family = "one_run", query_order = "shuffled", source_order = "shuffled", ratio = "balanced", dtype = "i64", seed = 7, m = 1000000 } },
+  { label = "Query-heavy genomic, m = 10k", sizes = [1000000], filters = { family = "genomic", query_order = "shuffled", source_order = "shuffled", ratio = "many_queries", dtype = "i64", seed = 7, m = 10000 } },
+]

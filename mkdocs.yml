@@ -47,12 +47,14 @@ nav:
   - Usage:
       - Overview: usage.md
       - Coverage and load profiles: coverage-profile.md
+      - Per-query coverage statistics: coverage-stats.md
       - Interval geometry: interval-geometry.md
   - API reference: api.md
   - Benchmarks:
       - Overview: benchmarks.md
       - Overlap counting: overlap-count-benchmarks.md
       - Coverage depth and resource demand: coverage-profile-benchmarks.md
+      - Per-query coverage statistics: coverage-stats-benchmarks.md
       - Clustering, union, and gaps: interval-geometry-benchmarks.md
       - Subtraction and intersection: set-geometry-benchmarks.md
       - Containment counting: containment-benchmarks.md

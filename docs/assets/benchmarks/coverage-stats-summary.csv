@@ -1,0 +1,17 @@
+case,workload_family,workload_query_order,workload_interval_order,workload_ratio,workload_dtype,workload_groups,workload_matching,workload_chunks,workload_query_payload,workload_source_payload,workload_source,workload_seed,workload_scope,method,x,median,min,max,samples
+Genomic reads and overlapping windows,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_complete,native,1000,9.0483,9.0102,9.272499999999999,3
+Genomic reads and overlapping windows,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_complete,native,1000000,3813.7787,3774.9999,4037.1933999999997,3
+Genomic reads and overlapping windows,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_complete,production,1000,1.0206,1.0206,1.2136,3
+Genomic reads and overlapping windows,genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_complete,production,1000000,467.12359999999995,461.292,477.11289999999997,3
+"Genomic reads, seed 41 repeat",genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,41,lazy_complete,native,1000000,3986.3549,3875.9959,3995.6351,3
+"Genomic reads, seed 41 repeat",genomic,shuffled,reverse,equal,i64,0,all,1,0,0,memory,41,lazy_complete,production,1000000,474.3997,411.3945,475.98249999999996,3
+Disjoint sources,disjoint,shuffled,shuffled,equal,i64,0,all,1,0,0,memory,7,lazy_complete,native,1000,11.110199999999999,9.988999999999999,11.3647,3
+Disjoint sources,disjoint,shuffled,shuffled,equal,i64,0,all,1,0,0,memory,7,lazy_complete,native,1000000,3924.2799,3861.6634,4031.982,3
+Disjoint sources,disjoint,shuffled,shuffled,equal,i64,0,all,1,0,0,memory,7,lazy_complete,production,1000,1.405,1.3246,1.6636,3
+Disjoint sources,disjoint,shuffled,shuffled,equal,i64,0,all,1,0,0,memory,7,lazy_complete,production,1000000,353.2416,325.4387,372.8282,3
+Nested windows,nested,start,shuffled,equal,i64,0,all,1,0,0,memory,7,lazy_complete,native,1000000,4109.6747,4039.3907999999997,4182.1862,3
+Nested windows,nested,start,shuffled,equal,i64,0,all,1,0,0,memory,7,lazy_complete,production,1000000,189.0561,185.1636,214.80239999999998,3
+One source-union run with many matches,all_covered,start,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_complete,native,1000000,1980.2675,1953.9822,2063.8013,3
+One source-union run with many matches,all_covered,start,reverse,equal,i64,0,all,1,0,0,memory,7,lazy_complete,production,1000000,99.5309,94.6092,102.2231,3
+Many tiny timestamp groups,genomic,shuffled,reverse,equal,datetime_ns,1000,all,7,0,0,memory,7,lazy_complete,native,1000,17.9269,17.2947,18.1507,3
+Many tiny timestamp groups,genomic,shuffled,reverse,equal,datetime_ns,1000,all,7,0,0,memory,7,lazy_complete,production,1000,3.205,2.8882,3.2996999999999996,3

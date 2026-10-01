@@ -91,7 +91,7 @@ fn evaluate(
     ))
 }
 
-fn validated_values<'a, T: PolarsIntegerType>(
+pub(super) fn validated_values<'a, T: PolarsIntegerType>(
     starts: &'a ChunkedArray<T>,
     ends: &'a ChunkedArray<T>,
     name: &str,
@@ -104,6 +104,30 @@ where
     intervals_core::validate_intervals(&values[0], &values[1])
         .map_err(|error| polars_err!(ComputeError: "{side}: {error}"))?;
     Ok(values)
+}
+
+pub(super) fn combined_key_frame(
+    left_keys: &[Series],
+    right_keys: &[Series],
+    left_len: usize,
+    right_len: usize,
+) -> PolarsResult<DataFrame> {
+    let len = left_len
+        .checked_add(right_len)
+        .filter(|&len| IdxSize::try_from(len).is_ok())
+        .ok_or_else(
+            || polars_err!(ComputeError: "combined interval count exceeds the Polars index range"),
+        )?;
+    let columns = left_keys
+        .iter()
+        .zip(right_keys)
+        .map(|(left, right)| {
+            let mut key = left.clone();
+            key.append(right)?;
+            Ok(key.into_column())
+        })
+        .collect::<PolarsResult<Vec<_>>>()?;
+    DataFrame::new(len, columns)
 }
 
 fn evaluate_typed<T>(
@@ -142,19 +166,8 @@ where
     if left_keys.is_empty() {
         output = solve(&left_starts, &left_ends, &right_starts, &right_ends)?;
     } else {
-        let len = left_starts.len().checked_add(right_starts.len())
-            .filter(|&len| IdxSize::try_from(len).is_ok())
-            .ok_or_else(|| polars_err!(ComputeError: "combined interval count exceeds the Polars index range"))?;
-        let columns = left_keys
-            .iter()
-            .zip(right_keys)
-            .map(|(left, right)| {
-                let mut key = left.clone();
-                key.append(right)?;
-                Ok(key.into_column())
-            })
-            .collect::<PolarsResult<Vec<_>>>()?;
-        let frame = DataFrame::new(len, columns)?;
+        let frame =
+            combined_key_frame(left_keys, right_keys, left_starts.len(), right_starts.len())?;
         let groups = frame.group_by_stable(left_keys.iter().map(|key| key.name().as_str()))?;
         let (mut ls, mut le, mut rs, mut re) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
         for group in groups.get_groups().iter() {

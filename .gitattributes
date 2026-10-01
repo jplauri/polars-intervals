@@ -1,6 +1,7 @@
 docs/assets/benchmarks/* linguist-generated=true
 
 # Preserve measured bytes and their hashes across checkout platforms.
+benchmarks/results/coverage-stats-* -text whitespace=cr-at-eol linguist-generated=true
 benchmarks/results/interval-geometry-* -text whitespace=cr-at-eol linguist-generated=true
 benchmarks/results/scheduling-polars-* -text whitespace=cr-at-eol linguist-generated=true
 benchmarks/results/set-geometry-* -text whitespace=cr-at-eol linguist-generated=true
