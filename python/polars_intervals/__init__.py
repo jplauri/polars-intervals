@@ -69,14 +69,25 @@ def _frame_keys(by: str | list[str] | None, reserved: tuple[str, ...]) -> tuple[
     return tuple(by)
 
 
-def _frame_dtypes(endpoint_dtypes, key_dtypes, name: str) -> None:
+def _endpoint_dtype(dtype, name: str) -> None:
     # Guard optional Arrow types before importing Series at the FFI boundary.
+    if dtype not in _INTEGERS and dtype != pl.Date and not isinstance(dtype, pl.Datetime):
+        raise pl.exceptions.InvalidOperationError(
+            f"{name} requires an 8-, 16-, 32-, or 64-bit "
+            f"integer dtype, Date, or Datetime, got {dtype}"
+        )
+
+
+def _integer_dtype(dtype, name: str, role: str) -> None:
+    if dtype not in _INTEGERS:
+        raise pl.exceptions.InvalidOperationError(
+            f"{name} requires an 8-, 16-, 32-, or 64-bit integer {role} dtype, got {dtype}"
+        )
+
+
+def _frame_dtypes(endpoint_dtypes, key_dtypes, name: str) -> None:
     for dtype in endpoint_dtypes:
-        if dtype not in _INTEGERS and dtype != pl.Date and not isinstance(dtype, pl.Datetime):
-            raise pl.exceptions.InvalidOperationError(
-                f"{name} requires an 8-, 16-, 32-, or 64-bit "
-                f"integer dtype, Date, or Datetime, got {dtype}"
-            )
+        _endpoint_dtype(dtype, name)
     for dtype in key_dtypes:
         if dtype not in (*_INTEGERS, pl.String, pl.Boolean, pl.Date) and not isinstance(
             dtype, pl.Datetime
@@ -92,17 +103,22 @@ def _frame_dtypes(endpoint_dtypes, key_dtypes, name: str) -> None:
         )
 
 
+def _frame_schema(intervals, start, end, by, name, extra=()):
+    required = list(dict.fromkeys([start, end, *by, *extra]))
+    # Names such as '*' and regex-looking names are literal column references.
+    intervals = intervals.select(pl.selectors.by_name(required))
+    schema = intervals.collect_schema()
+    _frame_dtypes((schema[start], schema[end]), [schema[key] for key in by], name)
+    return intervals, schema
+
+
 def _geometry_input(intervals, start, end, by, name):
     if not isinstance(intervals, (pl.DataFrame, pl.LazyFrame)):
         raise TypeError("intervals must be a Polars DataFrame or LazyFrame")
     if not isinstance(start, str) or not isinstance(end, str):
         raise TypeError("start and end column names must be strings")
     by = _frame_keys(by, ("start", "end"))
-    required = list(dict.fromkeys([start, end, *by]))
-    # Names such as '*' and regex-looking names are literal column references.
-    intervals = intervals.select(pl.selectors.by_name(required))
-    schema = intervals.collect_schema()
-    _frame_dtypes((schema[start], schema[end]), [schema[key] for key in by], name)
+    intervals, schema = _frame_schema(intervals, start, end, by, name)
     output_schema = {**{key: schema[key] for key in by}, "start": schema[start], "end": schema[end]}
     return intervals, by, output_schema
 
@@ -758,47 +774,29 @@ def coverage_profile(
     if (domain_start is None) != (domain_end is None):
         raise ValueError("domain_start and domain_end must both be supplied or both omitted")
     domain = None if domain_start is None else (_target(domain_start), _target(domain_end))
-    if isinstance(intervals, pl.LazyFrame):
-        required = list(dict.fromkeys([start, end, *by, *([] if weight is None else [weight])]))
-        # by_name treats '*' and regex-looking source names literally.
-        intervals = intervals.select(pl.selectors.by_name(required))
-        schema = intervals.collect_schema()
-        endpoint_dtypes = (schema[start], schema[end])
-        weight_dtype = None if weight is None else schema[weight]
-        key_dtypes = [schema[key] for key in by]
-    else:
-        starts, ends = intervals[start], intervals[end]
-        weights = None if weight is None else intervals[weight]
-        keys = [intervals[key] for key in by]
-        endpoint_dtypes = (starts.dtype, ends.dtype)
-        weight_dtype = None if weights is None else weights.dtype
-        key_dtypes = [key.dtype for key in keys]
-    _frame_dtypes(endpoint_dtypes, key_dtypes, "coverage_profile")
-    if weight_dtype is not None and weight_dtype not in _INTEGERS:
-        raise pl.exceptions.InvalidOperationError(
-            "coverage_profile requires an 8-, 16-, 32-, or 64-bit "
-            f"integer weight dtype, got {weight_dtype}"
-        )
-    if isinstance(intervals, pl.LazyFrame):
-        output_schema = {
-            **{key: schema[key] for key in by},
-            "start": endpoint_dtypes[0],
-            "end": endpoint_dtypes[1],
-            "load": pl.Int128,
-        }
-        return _blocking_frame(
-            intervals,
-            lambda frame: solve(
-                frame[start],
-                frame[end],
-                None if weight is None else frame[weight],
-                [frame[key] for key in by],
-                domain,
-                include_zero,
-            ),
-            output_schema,
-        )
-    return solve(starts, ends, weights, keys, domain, include_zero)
+    intervals, schema = _frame_schema(
+        intervals, start, end, by, "coverage_profile", () if weight is None else (weight,)
+    )
+    if weight is not None:
+        _integer_dtype(schema[weight], "coverage_profile", "weight")
+    output_schema = {
+        **{key: schema[key] for key in by},
+        "start": schema[start],
+        "end": schema[end],
+        "load": pl.Int128,
+    }
+    return _blocking_frame(
+        intervals,
+        lambda frame: solve(
+            frame[start],
+            frame[end],
+            None if weight is None else frame[weight],
+            [frame[key] for key in by],
+            domain,
+            include_zero,
+        ),
+        output_schema,
+    )
 
 
 def minimum_cost_dominating_set(
@@ -1002,21 +1000,9 @@ def max_weight_with_capacity_profile(
     # Polars features (e.g. categorical/object) may panic at the FFI boundary.
     # Rust independently validates supported Series and performs all optimization.
     for column, role in ((columns[2], "weight"), (columns[5], "capacity")):
-        if column.dtype not in _INTEGERS:
-            raise pl.exceptions.InvalidOperationError(
-                "max_weight_with_capacity_profile requires an 8-, 16-, 32-, or 64-bit "
-                f"integer {role} dtype, got {column.dtype}"
-            )
+        _integer_dtype(column.dtype, "max_weight_with_capacity_profile", role)
     for column in (columns[0], columns[1], columns[3], columns[4]):
-        if (
-            column.dtype not in _INTEGERS
-            and column.dtype != pl.Date
-            and not isinstance(column.dtype, pl.Datetime)
-        ):
-            raise pl.exceptions.InvalidOperationError(
-                "max_weight_with_capacity_profile requires an 8-, 16-, 32-, or 64-bit "
-                f"integer dtype, Date, or Datetime, got {column.dtype}"
-            )
+        _endpoint_dtype(column.dtype, "max_weight_with_capacity_profile")
     return solve(*columns)
 
 

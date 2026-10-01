@@ -73,9 +73,9 @@ fn evaluate(
         })
         .transpose()?;
     validate_group_keys(keys, starts.len(), NAME, &["start", "end", "load"])?;
-    dispatch_endpoints!(starts, ends, NAME, |left, right| evaluate_typed(
-        left,
-        right,
+    dispatch_endpoints!(starts.dtype(), NAME, |cast| evaluate_typed(
+        cast(starts)?,
+        cast(ends)?,
         weights.as_deref(),
         keys,
         domain,

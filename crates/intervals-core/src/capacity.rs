@@ -1,4 +1,4 @@
-use crate::{IntervalError, max_weight_non_overlapping, validate_lengths};
+use crate::{IntervalError, check_len, max_weight_non_overlapping, validate_lengths};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 
@@ -167,12 +167,7 @@ where
     i128: From<W>,
 {
     validate_lengths(starts, ends)?;
-    if starts.len() != weights.len() {
-        return Err(IntervalError::LengthMismatch([
-            ("intervals", starts.len()),
-            ("weights", weights.len()),
-        ]));
-    }
+    check_len(("intervals", starts.len()), ("weights", weights.len()))?;
     let mut mask = vec![false; starts.len()];
     let mut rows = Vec::new();
     for (index, (&start, &end)) in starts.iter().zip(ends).enumerate() {

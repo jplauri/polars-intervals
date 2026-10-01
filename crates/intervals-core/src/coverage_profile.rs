@@ -1,4 +1,4 @@
-use crate::{IntervalError, validate_lengths};
+use crate::{IntervalError, check_len, validate_lengths};
 
 /// One maximal constant-load half-open segment of a coverage profile.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -105,12 +105,7 @@ where
     i128: From<W>,
 {
     validate_lengths(starts, ends)?;
-    if starts.len() != weights.len() {
-        return Err(IntervalError::LengthMismatch([
-            ("intervals", starts.len()),
-            ("weights", weights.len()),
-        ]));
-    }
+    check_len(("intervals", starts.len()), ("weights", weights.len()))?;
     let (domain, count) = validate(starts, ends, domain, |i| i128::from(weights[i]))?;
     let Some((left, right)) = domain.filter(|(left, right)| left < right) else {
         return Ok(Vec::new());

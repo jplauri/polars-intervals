@@ -62,9 +62,9 @@ fn evaluate(
     };
     validate_endpoint_pair(starts, ends, name)?;
     validate_group_keys(keys, starts.len(), name, &["start", "end"])?;
-    dispatch_endpoints!(starts, ends, name, |left, right| evaluate_typed(
-        left,
-        right,
+    dispatch_endpoints!(starts.dtype(), name, |cast| evaluate_typed(
+        cast(starts)?,
+        cast(ends)?,
         keys,
         domain,
         starts.dtype(),

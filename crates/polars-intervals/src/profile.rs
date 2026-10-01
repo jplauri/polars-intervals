@@ -1,8 +1,7 @@
-use super::{integer_values, validate_integer_dtype};
+use super::{endpoint_slices, integer_values, validate_integer_dtype};
 use polars::prelude::*;
 use pyo3::prelude::*;
 use pyo3_polars::PySeries;
-use std::borrow::Cow;
 
 const NAME: &str = "max_weight_with_capacity_profile";
 
@@ -61,52 +60,16 @@ pub fn max_weight_with_capacity_profile(
         "{} does not support null capacity", NAME);
     let weights = integer_values(weights)?;
     let capacities = integer_values(capacities)?;
-    macro_rules! dispatch {
-        ($accessor:ident) => {
-            evaluate_typed(
-                [
-                    starts.$accessor()?,
-                    ends.$accessor()?,
-                    profile_starts.$accessor()?,
-                    profile_ends.$accessor()?,
-                ],
-                &weights,
-                &capacities,
-            )
-        };
-    }
-    match starts.dtype() {
-        DataType::Int8 => dispatch!(i8),
-        DataType::Int16 => dispatch!(i16),
-        DataType::Int32 => dispatch!(i32),
-        DataType::Int64 => dispatch!(i64),
-        DataType::UInt8 => dispatch!(u8),
-        DataType::UInt16 => dispatch!(u16),
-        DataType::UInt32 => dispatch!(u32),
-        DataType::UInt64 => dispatch!(u64),
-        DataType::Date => evaluate_typed(
-            [
-                starts.date()?.physical(),
-                ends.date()?.physical(),
-                profile_starts.date()?.physical(),
-                profile_ends.date()?.physical(),
-            ],
-            &weights,
-            &capacities,
-        ),
-        DataType::Datetime(_, _) => evaluate_typed(
-            [
-                starts.datetime()?.physical(),
-                ends.datetime()?.physical(),
-                profile_starts.datetime()?.physical(),
-                profile_ends.datetime()?.physical(),
-            ],
-            &weights,
-            &capacities,
-        ),
-        dtype => polars_bail!(InvalidOperation:
-            "{} requires an 8-, 16-, 32-, or 64-bit integer dtype, Date, or Datetime, got {}", NAME, dtype),
-    }
+    dispatch_endpoints!(starts.dtype(), NAME, |cast| evaluate_typed(
+        [
+            cast(starts)?,
+            cast(ends)?,
+            cast(profile_starts)?,
+            cast(profile_ends)?
+        ],
+        &weights,
+        &capacities,
+    ))
 }
 
 fn evaluate_typed<T>(
@@ -118,12 +81,7 @@ where
     T: PolarsIntegerType,
     T::Native: Ord,
 {
-    let [starts, ends, profile_starts, profile_ends] = endpoints.map(|column| {
-        column
-            .cont_slice()
-            .map(Cow::Borrowed)
-            .unwrap_or_else(|_| Cow::Owned(column.into_no_null_iter().collect()))
-    });
+    let [starts, ends, profile_starts, profile_ends] = endpoint_slices(endpoints);
     let selected = intervals_core::max_weight_with_capacity_profile(
         &starts,
         &ends,

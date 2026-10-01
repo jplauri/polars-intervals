@@ -161,11 +161,15 @@ impl fmt::Display for IntervalError {
 impl std::error::Error for IntervalError {}
 
 fn validate_lengths<T>(starts: &[T], ends: &[T]) -> Result<(), IntervalError> {
-    if starts.len() != ends.len() {
-        return Err(IntervalError::LengthMismatch([
-            ("starts", starts.len()),
-            ("ends", ends.len()),
-        ]));
+    check_len(("starts", starts.len()), ("ends", ends.len()))
+}
+
+fn check_len(
+    left: (&'static str, usize),
+    right: (&'static str, usize),
+) -> Result<(), IntervalError> {
+    if left.1 != right.1 {
+        return Err(IntervalError::LengthMismatch([left, right]));
     }
     Ok(())
 }

@@ -1,4 +1,4 @@
-use crate::{IntervalError, validate_lengths};
+use crate::{IntervalError, check_len, validate_lengths};
 
 /// Select a globally maximum-weight subset of mutually non-overlapping intervals.
 ///
@@ -44,12 +44,7 @@ where
     i128: From<W>,
 {
     validate_lengths(starts, ends)?;
-    if starts.len() != weights.len() {
-        return Err(IntervalError::LengthMismatch([
-            ("intervals", starts.len()),
-            ("weights", weights.len()),
-        ]));
-    }
+    check_len(("intervals", starts.len()), ("weights", weights.len()))?;
     let mut order = Vec::with_capacity(starts.len());
     let mut selected = vec![false; starts.len()];
     let mut empty_weight = 0i128;

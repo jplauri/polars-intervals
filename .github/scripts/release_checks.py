@@ -206,7 +206,6 @@ def artifacts(directory):
 
 
 def installed(checkout):
-    import polars as pl
     import polars_intervals as pi
     import pytest
 
@@ -216,41 +215,6 @@ def installed(checkout):
     require(
         installed_version("polars-intervals") == versions(checkout)["version"],
         "Installed package version differs from the release version.",
-    )
-    result = (
-        pl.DataFrame({"start": [1, 3, 2, 2], "end": [3, 5, 4, 2]})
-        .select(pi.overlap_count("start", "end"))
-        .to_series()
-    )
-    require(result.dtype == pl.UInt64 and result.to_list() == [1, 1, 2, 0], "Smoke test failed.")
-    depth = (
-        pl.DataFrame({"start": [0, 2, 2, 5], "end": [10, 5, 5, 5]})
-        .select(pi.nesting_depth("start", "end"))
-        .to_series()
-    )
-    require(
-        depth.dtype == pl.UInt64 and depth.null_count() == 0 and depth.to_list() == [0, 1, 1, 2],
-        "Nesting depth native plugin smoke test failed.",
-    )
-    profile_input = pl.DataFrame(
-        {
-            "start": [0, 0],
-            "end": [2, 2],
-            "quantity": pl.Series([2**64 - 1, 1], dtype=pl.UInt64),
-        }
-    )
-    profile = pi.coverage_profile(profile_input, weight="quantity")
-    require(
-        profile.schema == {"start": pl.Int64, "end": pl.Int64, "load": pl.Int128}
-        and profile.rows() == [(0, 2, 2**64)],
-        "Coverage profile direct binding / Int128 output smoke test failed.",
-    )
-    lazy_profile = pi.coverage_profile(profile_input.lazy(), weight="quantity")
-    require(
-        isinstance(lazy_profile, pl.LazyFrame)
-        and lazy_profile.collect_schema() == profile.schema
-        and lazy_profile.collect(engine="streaming").equals(profile),
-        "Lazy coverage profile / whole-collection execution smoke test failed.",
     )
     print(f"Testing installed artifact from {package}")
     with tempfile.TemporaryDirectory() as temporary, chdir(temporary):
