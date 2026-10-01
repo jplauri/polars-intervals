@@ -6,10 +6,10 @@
 
 [`minimum_cost_cover`](api.md#polars_intervals.minimum_cost_cover) covers a
 target range without gaps while minimizing the total cost of selected intervals.
-Full Polars queries took **211–263 ms for one million shuffled integer
-intervals** in the two synthetic examples below. The result is exact. Polars has
-no built-in solver for this optimization problem. The number and arrangement of
-useful intervals affect runtime and working memory.
+Full Polars queries took **under 270 ms for one million intervals** in the two
+synthetic examples below. The result is exact. Polars has no built-in solver for
+this optimization problem. The number and arrangement of useful intervals affect
+runtime and working memory.
 
 ## Results
 

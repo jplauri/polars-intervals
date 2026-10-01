@@ -8,10 +8,9 @@
 right-side coverage from the left collection.
 [`intersect_intervals`](api.md#polars_intervals.intersect_intervals) returns
 coverage shared by both collections. Both return maximal nonempty ranges.
-On synthetic shuffled availability with **one million total input rows**,
-complete lazy calls took **40.6 ms** for subtraction and **37.5 ms** for
-intersection, **10× and 8.6× faster** than the native Polars plan tested.
-With one million empty intervals in nullable groups, the package was **2.1× slower**.
+In synthetic benchmarks, complete lazy calls took **under 41 ms for one million
+total input rows**. The package was slower than Polars on empty-only grouped
+inputs at that size.
 
 ## Results
 

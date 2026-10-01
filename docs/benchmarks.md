@@ -12,12 +12,12 @@ many tiny groups, such as ten or fewer rows per group.
 
 | Operation | Purpose | Measured headline |
 | --- | --- | --- |
-| [Overlap counting](overlap-count-benchmarks.md) | Count overlaps for each row | 1.4–2.3× faster than Polars · 167–244 ms at 3M shuffled rows |
-| [Coverage depth and resource demand](coverage-profile-benchmarks.md) | Measure active intervals or their total demand | 3.9–33× faster than Polars · 1.24–8.70 ms at 100k rows (one Polars thread) · 1.3–4.7× at 1M rows (24 threads) |
-| [Clustering, union, and gaps](interval-geometry-benchmarks.md) | Label connected intervals, merge ranges or find gaps | Clustering: 3.2× faster than Polars · 4.74 ms at 100k shuffled rows |
-| [Subtraction and intersection](set-geometry-benchmarks.md) | Remove or intersect covered ranges across two collections | 8.6–10× faster than Polars · 37.5–40.6 ms at 1M shuffled rows · 2.1× slower on 1M empty-only grouped rows |
-| [Containment counting](containment-benchmarks.md) | Count containments for each row | 1.3–2.2× faster than Polars · 65.3–1,090 ms at 3M rows |
-| [Nesting depth](nesting-depth-benchmarks.md) | Measure the longest containment chain above each row | About 200 ms at 3M shuffled rows (four Polars threads) · native comparison unmeasured |
+| [Overlap counting](overlap-count-benchmarks.md) | Count overlaps for each row | At least 1.3× faster than Polars · under 250 ms for 3M rows |
+| [Coverage depth and resource demand](coverage-profile-benchmarks.md) | Measure active intervals or their total demand | At least 1.2× faster than Polars · under 96 ms for 1M rows |
+| [Clustering, union, and gaps](interval-geometry-benchmarks.md) | Label connected intervals, merge ranges or find gaps | At least 1.1× faster than Polars · under 16 ms for 100k rows |
+| [Subtraction and intersection](set-geometry-benchmarks.md) | Remove or intersect covered ranges across two collections | Under 41 ms for 1M total input rows · slower than Polars on empty-only grouped inputs |
+| [Containment counting](containment-benchmarks.md) | Count containments for each row | At least 1.2× faster than Polars · under 1.1 s for 3M rows |
+| [Nesting depth](nesting-depth-benchmarks.md) | Measure the longest containment chain above each row | Under 210 ms for 3M rows (four Polars threads) · native comparison unmeasured |
 
 ## Optimizers without a built-in Polars solver
 
@@ -27,17 +27,17 @@ objective.
 
 | Operation | Purpose | Measured headline |
 | --- | --- | --- |
-| [Lane assignment](assign-lanes-benchmarks.md) | Assign the fewest lanes without overlaps | Exact · 59–176 ms at 1M shuffled rows |
-| [Lane balancing](balance-lanes-benchmarks.md) | Improve row-count balance using the fewest lanes | Improved balance on 108/132 datasets · 3.76–24.1 ms at 100k rows (one Polars thread) |
-| [Weighted scheduling](weighted-scheduling-benchmarks.md) | Select nonoverlapping intervals with maximum total weight | Exact · 96–260 ms at 1M shuffled rows |
-| [Maximum-weight clique](clique-benchmarks.md) | Select mutually overlapping intervals with maximum total weight | Exact · 43.1 ms unweighted or 140 ms weighted at 1M shuffled rows (one Polars thread) |
-| [Capacity scheduling](capacity-scheduling-benchmarks.md) | Maximize weight under an overlap limit | Exact · 28–119 ms at 1M rows in small independent overlap groups |
-| [Scheduling with changing capacity](capacity-profile-benchmarks.md) | Maximize weight under an overlap limit that changes over time | Exact · 160 ms at 1M rows in small independent overlap groups |
-| [Minimum covering](covering-benchmarks.md) | Cover a target with the fewest intervals | Exact · 51–69 ms at 1M shuffled rows |
-| [Minimum-cost covering](cost-covering-benchmarks.md) | Cover a target at minimum total cost | Exact · 211–263 ms at 1M shuffled rows |
-| [Minimum-cost dominating set](domination-benchmarks.md) | Select cheapest representatives so every interval is selected or overlaps one | Exact · 7.97–18.0 ms at 100k shuffled rows (one Polars thread) |
-| [Minimum stabbing points](stabbing-benchmarks.md) | Find the fewest points that hit every interval | Exact · 26.5 ms sorted or 139 ms shuffled at 3M rows |
-| [Maximum covered length](coverage-benchmarks.md) | Maximize covered length with a limited selection | Exact · 161–681 ms at 1M shuffled rows, selecting up to 8 or 64 intervals |
+| [Lane assignment](assign-lanes-benchmarks.md) | Assign the fewest lanes without overlaps | Exact · under 180 ms for 1M rows |
+| [Lane balancing](balance-lanes-benchmarks.md) | Improve row-count balance using the fewest lanes | Improved balance on 108/132 datasets · under 25 ms for 100k rows (one Polars thread) |
+| [Weighted scheduling](weighted-scheduling-benchmarks.md) | Select nonoverlapping intervals with maximum total weight | Exact · under 270 ms for 1M rows |
+| [Maximum-weight clique](clique-benchmarks.md) | Select mutually overlapping intervals with maximum total weight | Exact · under 150 ms for 1M rows (one Polars thread) |
+| [Capacity scheduling](capacity-scheduling-benchmarks.md) | Maximize weight under an overlap limit | Exact · under 120 ms for 1M rows in small independent overlap groups |
+| [Scheduling with changing capacity](capacity-profile-benchmarks.md) | Maximize weight under an overlap limit that changes over time | Exact · under 170 ms for 1M rows in small independent overlap groups |
+| [Minimum covering](covering-benchmarks.md) | Cover a target with the fewest intervals | Exact · under 70 ms for 1M rows |
+| [Minimum-cost covering](cost-covering-benchmarks.md) | Cover a target at minimum total cost | Exact · under 270 ms for 1M rows |
+| [Minimum-cost dominating set](domination-benchmarks.md) | Select cheapest representatives so every interval is selected or overlaps one | Exact · under 18 ms for 100k rows (one Polars thread) |
+| [Minimum stabbing points](stabbing-benchmarks.md) | Find the fewest points that hit every interval | Exact · under 140 ms for 3M rows |
+| [Maximum covered length](coverage-benchmarks.md) | Maximize covered length with a limited selection | Exact · under 690 ms for 1M rows, selecting up to 64 intervals |
 
 ## Hardware
 

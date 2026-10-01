@@ -7,10 +7,9 @@
 [`nesting_depth`](api.md#polars_intervals.nesting_depth) measures how deeply each
 interval sits inside a chain of other intervals. Outermost intervals have depth
 zero. In synthetic benchmarks with Polars restricted to four threads, full Polars
-queries took **about 200 ms for three million shuffled integer intervals**, with
-either shallow or deep nesting. The
-sorted, fully nested example took **43 ms**. Input order and grouping can matter
-as much as nesting depth. A native Polars comparison has not been measured.
+queries took **under 210 ms for three million rows**. Input order and grouping
+can matter as much as nesting depth. A native Polars comparison has not been
+measured.
 
 ## Results
 

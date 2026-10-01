@@ -6,9 +6,9 @@
 
 [`minimum_cover`](api.md#polars_intervals.minimum_cover) selects the fewest
 intervals needed to cover a target range without gaps. Full Polars queries took
-**51–69 ms for one million shuffled integer intervals** in the two synthetic
-examples below. The selection is exact. Polars has no built-in solver for this
-optimization problem. Overlap patterns and endpoint types affect runtime.
+**under 70 ms for one million intervals** in the two synthetic examples below.
+The selection is exact. Polars has no built-in solver for this optimization
+problem. Overlap patterns and endpoint types affect runtime.
 
 ## Results
 

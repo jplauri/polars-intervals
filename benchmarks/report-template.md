@@ -5,14 +5,24 @@
 ## Summary
 
 Write one short paragraph, usually 50–80 words. Start with the linked method
-name and explain its purpose in one sentence. Give a measured input size,
-runtime, and comparison with the fastest native Polars method tested on the
-same workload. Headline runtimes and comparisons use Polars' default thread
-pool or all logical processors. If the headline workload was measured only with
-fewer threads, put that condition in the summary sentence itself, such as "with
-Polars restricted to one thread". If other workloads were measured with all
-logical processors, add one visible sentence with those results. Never label a
-fixed thread count as the default unless the run used the default setting.
+name and explain its purpose in one sentence. Use one bold measured headline
+with an input size, runtime and native Polars comparison where available.
+Keep an existing headline's input size. If it cites two sizes or thread
+settings, keep the all-threads measurement. Headline runtimes and comparisons
+use Polars' default thread pool or all logical processors. If the workload was
+measured only with fewer threads, state that restriction in the headline.
+Never label a fixed thread count as the default unless the run used the default
+setting.
+
+Calculate headline figures from the linked table's CSV medians at that size.
+Use the lowest speedup against the fastest native Polars method for each row,
+rounded down to two significant figures: "At least 1.3× faster than Polars".
+If any row at that size is not faster, make no speedup claim and name the
+exception instead. Use the slowest package median, rounded up to two significant
+figures: "under 250 ms" or "under 1.1 s". Apply these rules to the overview too.
+Keep non-speed results, such as how many datasets showed improved balance.
+Keep a qualifier only when it changes the number, such as a thread restriction,
+`k`, or "small independent overlap groups". Drop order words such as "shuffled".
 
 State an exception readers can act on, such as input order, group size, weights
 or thread settings. Keep comparisons with private candidate algorithms in
@@ -42,9 +52,10 @@ Add one visible line defining the comparison in public Polars terms, such as
 Native Polars means the fastest equivalent query tested for that row in the same run.
 Record which method won in Benchmark details. Include small and large inputs
 where measured, plus important cases where the advantage disappears or reverses.
-Use about three significant figures for times and two for ratios. Quote ratios
-in the summary and overview as the table shows them. Missing measurements stay
-missing.
+Use about three significant figures for table times and two for table ratios.
+Derive summary and overview bounds from the linked CSV medians, not rounded
+table values, following the Summary rules above. Keep exact values in the CSV
+downloads. Missing measurements stay missing.
 Describe inconclusive differences as "about the same" and losses as "× slower".
 
 Use one ratio convention: **speedup = baseline median / package median**.

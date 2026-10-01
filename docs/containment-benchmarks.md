@@ -6,10 +6,8 @@
 
 [`containment_count`](api.md#polars_intervals.containment_count) counts how many
 other intervals each row contains. In synthetic benchmarks, full Polars queries
-processed **three million repeated intervals in 65.3 ms**, **2.2× faster** than
-the native Polars ranking expressions tested. With few containments, the same
-size took **1.09 seconds**, **1.8× faster**. Many small groups reverse the
-advantage.
+were **at least 1.2× faster than Polars and took under 1.1 s for three million
+rows**. Many small groups reverse the advantage.
 
 ## Results
 

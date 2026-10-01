@@ -168,6 +168,16 @@ repeat runs, not an arbitrary percentage threshold.
    into `docs/` and follow it.
 3. Register the report's generated tables in `plots.toml`.
 4. Add the page and its measured headline to the overview and `mkdocs.yml`.
+   Use one conservative figure per headline in the overview and bold Summary
+   sentence. Keep the input size, choosing the all-threads measurement if the
+   headline cites two sizes or thread settings. From the linked table's CSV
+   medians at that size, round the lowest speedup down and the slowest package
+   runtime up to two significant figures: "At least 1.3× faster than Polars"
+   and "under 250 ms". If any row at that size is not faster, omit the speedup
+   claim and name the exception. Keep only qualifiers that change the number,
+   such as a thread restriction, `k`, or small independent overlap groups.
+   Drop order words such as "shuffled". Preserve non-speed results, exact table
+   values and the overview's caveat about tiny groups.
    Update the script inventory if needed. Preserve page URLs and repair
    affected links/anchors.
 5. Run generation, reporting tests, and the strict build above. Check source
