@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 0.3.0 — October 2, 2026
+
+Measure coverage for each query window, build interval unions and gaps, and
+compare two interval collections. Add coverage profiles, exact interval
+selection, and balanced lane assignment.
+
+```sh
+pip install polars-intervals==0.3.0
+```
+
+Requires Python 3.12+ and Polars `>=1.44.1,<1.45`.
+Existing Python signatures and result semantics are preserved. Endpoint dtypes
+must match exactly and endpoints must be non-null. See [Usage](usage.md) for
+each operation's empty-interval rules. The API remains early-stage and may change.
+
 - Add [`coverage_stats`](coverage-stats.md) for source-record counts and exact
   union coverage inside every query window. Preserve all query rows and payloads
   with eager, lazy, and mixed inputs. Lengths use Int128, and fractions are null
@@ -17,11 +32,31 @@
   bounds. All support eager and genuinely lazy execution with exact endpoint
   dtypes. Empty rows are isolated clusters and contribute no coverage.
 
+- Add [`coverage_profile`](coverage-profile.md) for coverage-depth and resource-load
+  segments with exact Int128 loads. Support grouped eager and lazy inputs,
+  explicit observation bounds, and optional zero-load gaps.
+
+- Add [`assign_balanced_lanes`](usage.md#balance-lane-row-counts) to improve lane
+  row-count balance within a configurable work budget. The minimum lane count
+  is guaranteed. Balance improvements are heuristic.
+
+- Add [`max_weight_clique`](usage.md#select-a-maximum-weight-clique) to select an
+  exact maximum-weight clique, using unit weights by default.
+
+- Add [`minimum_cost_dominating_set`](usage.md#select-a-minimum-cost-dominating-set)
+  to select representative intervals at minimum total cost, then minimum row
+  count. Omitted costs minimize row count.
+
+- Publish the documentation site and clarify task guides, execution behavior,
+  validation, and benchmark reports.
+
 - **Breaking Rust API change:** In the unpublished `intervals-core` crate,
-  consolidate the six length-mismatch error variants into
-  `IntervalError::LengthMismatch([(&'static str, usize); 2])` and remove
-  `DEFAULT_BALANCE_WORK`, `BalanceSeed`, and `balanced_lane_seed`.
-  Python APIs and behavior are unchanged.
+  consolidate length-mismatch error variants into
+  `IntervalError::LengthMismatch([(&'static str, usize); 2])`.
+  New error variants also require updates to exhaustive matches.
+
+- Operations using shared endpoint validation now report the first row containing
+  a null endpoint.
 
 ## 0.2.0 — September 27, 2026
 
