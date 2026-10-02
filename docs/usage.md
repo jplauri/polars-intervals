@@ -80,29 +80,28 @@ or in `with_columns` to flag them.
 
 ### Frame results
 
+These functions return a DataFrame when all inputs are DataFrames. If any input
+is a LazyFrame, they return a LazyFrame and evaluate all inputs together when
+collected. Call them directly or with `.pipe(...)`.
+
 [`coverage_stats`](coverage-stats.md) appends source counts, exact covered and
 query lengths, and covered fractions to every query row. It preserves query
-columns and their original row order. Pass two DataFrames for an immediate
-result. If either input is a LazyFrame, the result is a LazyFrame that runs when
-collected. Use `by` to match groups across the two inputs, including null keys.
+columns and their original row order. Use `by` to match groups across the two
+inputs, including null keys.
 
 #### New segment rows
 
 `coverage_profile`, `merge_intervals` and `interval_gaps` return new segment
-rows. Pass a DataFrame for an immediate result or a LazyFrame for a query that
-runs when collected. The result has the same frame kind as the input. Use these
-functions directly or with `.pipe(...)`.
+rows.
 
 [`subtract_intervals` and `intersect_intervals`](interval-geometry.md#subtract-and-intersect-two-collections)
-take two frames and return new covered ranges. Two DataFrames return a DataFrame.
-If either input is lazy, both inputs participate in one deferred query. All four
-endpoint columns must have exactly the same logical dtype. Shared group keys
-must also match in dtype. Result groups follow the left input's first appearances.
+take two frames and return new covered ranges. All four endpoint columns must
+have exactly the same logical dtype. Shared group keys must also match in dtype.
+Result groups follow their first appearance in the left input.
 
-For these segment-producing functions, endpoint arguments take literal column
-names. Output endpoints are always named `start` and `end`. Endpoint and
-group-key dtypes are preserved, including in empty results. Other input columns
-are not retained.
+Endpoint arguments take literal column names. Output endpoints are always named
+`start` and `end`. Endpoint and group-key dtypes are preserved, including in
+empty results. Other input columns are not retained.
 
 Use `by="resource"` or an ordered list of distinct column names to solve groups
 independently. `by=None` and `by=[]` use one collection. Keys support String,

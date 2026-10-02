@@ -29,11 +29,14 @@ uv sync --locked --reinstall-package polars-intervals --config-setting "build-ar
 
 Verify that the installed plugin matches the fresh release build before measuring.
 Use `uv run --no-sync python ...` to preserve it. Rebuild after code or
-dependency changes. To measure an external wheel, install it in a separate
-environment and run its Python outside the checkout. Run benchmarks sequentially
-on an idle machine. Leave `POLARS_MAX_THREADS` unset to measure the default thread
-pool. For a fixed thread count, set it before starting Python and restore it
-afterwards. Save new runs under new filenames.
+dependency changes.
+
+To measure an external wheel, install it in a separate environment and run its
+Python outside the checkout.
+
+Run benchmarks sequentially on an idle machine. Leave `POLARS_MAX_THREADS` unset
+to measure the default thread pool. For a fixed thread count, set it before
+starting Python and restore it afterwards. Save new runs under new filenames.
 
 ## Measurement rules
 

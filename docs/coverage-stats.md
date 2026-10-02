@@ -126,9 +126,9 @@ query = (
 out = query.collect()
 ```
 
-Two DataFrames return a DataFrame. Any LazyFrame input returns a LazyFrame,
-including either mixed eager/lazy combination. Construction, `explain()`, and
-`collect_schema()` do not execute either input. Both inputs are evaluated together
+Two DataFrames return a DataFrame. If either input is a LazyFrame, the result
+is a LazyFrame. Construction, `explain()`, and `collect_schema()` do not execute
+either input. Both inputs are evaluated together
 when you collect the result. Query rows keep their original columns and positions
 without a join on coordinates, group keys, or user IDs.
 

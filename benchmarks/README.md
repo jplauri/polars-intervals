@@ -8,8 +8,8 @@ table generation, report format and checks for adding an operation.
 ## Python scripts
 
 Run commands from the repository root. End-to-end runners need the
-[release plugin build](../docs/benchmarking.md#setup). Core runners measure Rust
-without the plugin. The table generator only reads saved results.
+[release plugin build](../docs/benchmarking.md#setup). Rust core benchmarks run
+without Python or the plugin. The table generator only reads saved results.
 
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
@@ -148,8 +148,8 @@ repairs with it. Saved measurements also include seed and multiseed ablations
 that are no longer run. Quality and untimed requested-heap measurements are separate from
 raw timings. See [the balancing notes](balance-lanes-notes.md) for scopes and
 the [report](../docs/balance-lanes-benchmarks.md) for measured settings.
-Rust core runners do not require Python or the Polars plugin. Each report names
-its Cargo target. Covering and cost covering share the `covering` target.
+Each report names its Cargo target. Covering and cost covering share the
+`covering` target.
 
 ## Interval-graph corpora
 
