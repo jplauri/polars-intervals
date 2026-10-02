@@ -32,9 +32,9 @@ Or with uv: `uv add polars-intervals`.
 
 | Function | Description |
 | --- | --- |
-| [`cluster_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Label connected records in original row order, optionally joining touching intervals. |
+| [`cluster_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Label connected intervals in original row order, optionally joining touching intervals. |
 | [`merge_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Return the exact union as maximal ranges, always joining touching ranges. |
-| [`interval_gaps`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Return uncovered ranges inside required scalar bounds. |
+| [`interval_gaps`](https://jplauri.github.io/polars-intervals/interval-geometry/) | Find uncovered ranges within specified bounds. |
 | [`subtract_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/#subtract-and-intersect-two-collections) | Remove one collection's coverage from another. |
 | [`intersect_intervals`](https://jplauri.github.io/polars-intervals/interval-geometry/#subtract-and-intersect-two-collections) | Return coordinates covered by both collections. |
 
@@ -50,7 +50,7 @@ Or with uv: `uv add polars-intervals`.
 | Function | Description |
 | --- | --- |
 | [`max_weight_non_overlapping`](https://jplauri.github.io/polars-intervals/usage/#select-a-globally-maximum-weight-schedule) | Select a non-overlapping subset with maximum total weight. |
-| [`max_weight_clique`](https://jplauri.github.io/polars-intervals/usage/#select-a-maximum-weight-clique) | Select one maximum-weight set of pairwise intersecting intervals. Omitted weights mean units. |
+| [`max_weight_clique`](https://jplauri.github.io/polars-intervals/usage/#select-a-maximum-weight-clique) | Select mutually overlapping intervals with maximum total weight. Omitted weights mean one per row. |
 | [`max_weight_with_capacity`](https://jplauri.github.io/polars-intervals/usage/#select-with-a-simultaneous-capacity) | Maximize total weight under a simultaneous overlap limit. |
 | [`max_weight_with_capacity_profile`](https://jplauri.github.io/polars-intervals/usage/#select-with-a-capacity-profile) | Maximize total weight under a piecewise-constant capacity profile. |
 
@@ -58,10 +58,10 @@ Or with uv: `uv add polars-intervals`.
 
 | Function | Description |
 | --- | --- |
-| [`max_k_coverage`](https://jplauri.github.io/polars-intervals/usage/#select-maximum-coverage-with-a-budget) | Maximize the total measure covered by at most `k` intervals. |
+| [`max_k_coverage`](https://jplauri.github.io/polars-intervals/usage/#select-maximum-coverage-with-a-budget) | Maximize the total length covered by at most `k` intervals. |
 | [`minimum_cover`](https://jplauri.github.io/polars-intervals/usage/#cover-one-continuous-target) | Cover a target with the fewest intervals. |
 | [`minimum_cost_cover`](https://jplauri.github.io/polars-intervals/usage/#cover-at-minimum-cost) | Cover a target at minimum total cost. |
-| [`minimum_cost_dominating_set`](https://jplauri.github.io/polars-intervals/usage/#select-a-minimum-cost-dominating-set) | Select minimum-cost representatives that dominate every interval vertex. |
+| [`minimum_cost_dominating_set`](https://jplauri.github.io/polars-intervals/usage/#select-a-minimum-cost-dominating-set) | Select representatives at minimum cost so every row is selected or overlaps a selected row. |
 | [`minimum_stabbing_points`](https://jplauri.github.io/polars-intervals/usage/#minimum-stabbing-points) | Find the fewest points that hit every interval. |
 
 ## Examples
@@ -103,7 +103,7 @@ out = windows.lazy().pipe(pi.coverage_stats, reads.lazy()).collect()
 # but their shared covered coordinates count once.
 ```
 
-Every window and its payload stays in original order. Use `by="chromosome"`
+Every window keeps its original columns and row order. Use `by="chromosome"`
 for independent groups. See [coverage semantics and exact units](https://jplauri.github.io/polars-intervals/coverage-stats/).
 
 ### Count contained intervals
@@ -127,7 +127,7 @@ df.with_columns(pi.nesting_depth("start", "end").alias("depth"))
 ```
 
 Return the length of the longest strict containment chain above each interval.
-Outermost intervals have depth zero; identical intervals never add a level.
+Outermost intervals have depth zero. Identical intervals never add a level.
 See [strict endpoint semantics and grouped examples](https://jplauri.github.io/polars-intervals/usage/#nesting-depth).
 
 ### Maximize coverage with a budget
@@ -135,12 +135,12 @@ See [strict endpoint semantics and grouped examples](https://jplauri.github.io/p
 ```python
 df = pl.DataFrame({"start": [0, -5, 6], "end": [10, 4, 15]})
 selected = df.filter(pi.max_k_coverage("start", "end", k=2))
-# Selects [-5, 4) and [6, 15): union measure 18.
+# Selects [-5, 4) and [6, 15): covered length 18.
 ```
 
-Select at most `k` intervals whose union has maximum total measure. Among
+Select at most `k` intervals whose union has maximum total length. Among
 maximum-coverage solutions, use the fewest intervals. The result is an exact,
-deterministic Boolean mask in original row order; empty intervals are never
+deterministic Boolean mask in original row order. Empty intervals are never
 selected. See the [benchmarks and linked design notes](https://jplauri.github.io/polars-intervals/coverage-benchmarks/).
 
 ### Select a minimum-cost dominating set
@@ -153,8 +153,8 @@ df.filter(pi.minimum_cost_dominating_set("start", "end", cost="price"))  # Outer
 
 Every row must be selected or overlap a selected row. Minimize total cost,
 then selected count. Empty intervals are isolated and **all** must be selected,
-even at zero cost. Omitted costs are units; an existing `cost` column has no
-effect. See [semantics and grouped examples](https://jplauri.github.io/polars-intervals/usage/#select-a-minimum-cost-dominating-set).
+even at zero cost. Omitted costs mean one per row. An existing `cost` column
+has no effect. See [semantics and grouped examples](https://jplauri.github.io/polars-intervals/usage/#select-a-minimum-cost-dominating-set).
 
 ### Select a maximum-weight clique
 
@@ -164,9 +164,9 @@ df.filter(pi.max_weight_clique("start", "end"))  # First three rows: maximum car
 df.filter(pi.max_weight_clique("start", "end", weight="value"))  # Last row: weight 9.
 ```
 
-Select one globally maximum-weight set of pairwise intersecting intervals.
+Select mutually overlapping intervals with maximum total weight.
 Omitted or `None` weights mean one per row, even if a column named `weight`
-exists. Touching intervals do not intersect; empty intervals are isolated
+exists. Touching intervals do not overlap. Empty intervals are isolated
 singletons. Nonpositive explicit weights are omitted. See the
 [contract and grouped examples](https://jplauri.github.io/polars-intervals/usage/#select-a-maximum-weight-clique)
 and [benchmark comparison](https://jplauri.github.io/polars-intervals/clique-benchmarks/).

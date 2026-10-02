@@ -1,10 +1,11 @@
 # API reference
 
-See the [usage guides](usage.md) for worked examples.
+See the [usage overview](usage.md) for worked examples and help choosing a function.
 
 For two-collection set operations, see
 [subtraction and intersection](interval-geometry.md#subtract-and-intersect-two-collections).
 
-For row-preserving coverage reports, see [per-query coverage statistics](coverage-stats.md).
+To measure coverage while keeping each query row and its original columns, see
+[per-query coverage statistics](coverage-stats.md).
 
 ::: polars_intervals

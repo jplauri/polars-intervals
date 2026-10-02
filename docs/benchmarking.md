@@ -18,6 +18,7 @@ Each report links its raw measurements and historical records.
 
 ## Setup
 
+Run commands from the repository root.
 Follow the [source build prerequisites](contributing.md#build-from-source).
 Rust core benchmarks use `cargo bench` without Python or the plugin.
 Python end-to-end benchmarks need a release build:
@@ -26,10 +27,12 @@ Python end-to-end benchmarks need a release build:
 uv sync --locked --reinstall-package polars-intervals --config-setting "build-args=--profile release"
 ```
 
-Use `uv run --no-sync python ...` to preserve that build; rebuild after code or
+Verify that the installed plugin matches the fresh release build before measuring.
+Use `uv run --no-sync python ...` to preserve it. Rebuild after code or
 dependency changes. To measure an external wheel, install it in a separate
 environment and run its Python outside the checkout. Run benchmarks sequentially
-on an idle machine. Set `POLARS_MAX_THREADS` before starting Python, restoring it
+on an idle machine. Leave `POLARS_MAX_THREADS` unset to measure the default thread
+pool. For a fixed thread count, set it before starting Python and restore it
 afterwards. Save new runs under new filenames.
 
 ## Measurement rules
@@ -46,7 +49,8 @@ do not retroactively change historical runs.
 **Correctness.** Validate outside timing against an independent oracle or a
 documented cross-check. Record the verification method. Check feasibility,
 objective, dtype and row order where applicable. Tied optimal selections need
-not have identical masks. Preserve detailed checks in notes or metadata.
+not have identical masks unless the API specifies one. Preserve detailed checks
+in notes or metadata.
 
 **Runtime summaries.** Calculate medians within one run, workload, size, method
 and timing scope. Preserve exact samples and min/max ranges. Sample-range
@@ -78,7 +82,7 @@ from the measured sources.
 
 | Metric | What it means |
 | --- | --- |
-| Buffer capacity | Capacity of live algorithm buffers, often including output; excludes caller inputs, allocator bookkeeping, and RSS. Capacity accounting may exclude transient reallocations. |
+| Buffer capacity | Capacity of live algorithm buffers, often including output. Excludes caller inputs, allocator bookkeeping, and RSS. Capacity accounting may exclude transient reallocations. |
 | Requested live heap | Peak bytes requested from an instrumented allocator during a separate untimed call. Includes the objects named by the harness, excluding allocator overhead, stack, and RSS. |
 | Process RSS | Resident memory for the whole process, including inputs and runtime. A query's high-water-mark increase is not an exact allocation count. Cold memory runs can differ from warmed timing runs. |
 
@@ -87,8 +91,8 @@ buffer capacity, requested heap and RSS cannot be substituted for one another.
 
 ## Generate tables { #generate-plots }
 
-The same command generates compact tables from saved data;
-it never runs benchmark suites or builds Rust.
+Generate compact tables from saved data, run the reporting checks, and build the
+site with these commands. They do not run benchmark suites or build Rust.
 
 ```sh
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
@@ -162,22 +166,16 @@ repeat runs, not an arbitrary percentage threshold.
 
 ### Adding an operation
 
-1. Reuse an appropriate runner and correctness checks; record samples, omissions,
+1. Reuse an appropriate runner and correctness checks. Record samples, omissions,
    and run metadata without overwriting historical evidence.
 2. Copy the [report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md)
    into `docs/` and follow it.
 3. Register the report's generated tables in `plots.toml`.
 4. Add the page and its measured headline to the overview and `mkdocs.yml`.
-   Use one conservative figure per headline in the overview and bold Summary
-   sentence. Keep the input size, choosing the all-threads measurement if the
-   headline cites two sizes or thread settings. From the linked table's CSV
-   medians at that size, round the lowest speedup down and the slowest package
-   runtime up to two significant figures: "At least 1.3× faster than Polars"
-   and "under 250 ms". If any row at that size is not faster, omit the speedup
-   claim and name the exception. Keep only qualifiers that change the number,
-   such as a thread restriction, `k`, or small independent overlap groups.
-   Drop order words such as "shuffled". Preserve non-speed results, exact table
-   values and the overview's caveat about tiny groups.
+   Follow the template's [Summary rules](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md#summary)
+   for input sizes, thread settings, conservative rounding and exceptions.
+   Use the same figures in the overview. Preserve non-speed results, exact
+   table values and the overview's caveat about tiny groups.
    Update the script inventory if needed. Preserve page URLs and repair
    affected links/anchors.
 5. Run generation, reporting tests, and the strict build above. Check source

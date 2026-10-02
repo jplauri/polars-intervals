@@ -1,8 +1,8 @@
 # Per-query coverage statistics
 
 [`coverage_stats`](api.md#polars_intervals.coverage_stats) measures source coverage
-inside each reporting window. It preserves every query row, its payload columns,
-and its position. Overlapping windows and duplicate query IDs are valid.
+inside each reporting window. It preserves every query row, its original columns,
+and its original order. Overlapping windows and duplicate query IDs are valid.
 
 ```python
 import polars as pl
@@ -22,16 +22,17 @@ result = pi.coverage_stats(windows, reads)
 
 All intervals include their start and exclude their end. Touching alone does
 not overlap. The four appended columns always appear in the order shown.
-Counts use UInt64. Both lengths use Int128. Fractions use Float64.
+Counts use `UInt64`. Both lengths use `Int128`. Fractions use `Float64`.
 Existing query columns with any of these four names are rejected, even on empty
-inputs. Rename those columns before calling the function. Source payload columns
+inputs. Rename those columns before calling the function. Other source columns
 are ignored.
 
 ## Count, breadth, and depth
 
 `overlap_count` counts original nonempty source rows that overlap the query.
 `covered_length` measures the union of those sources inside the query.
-For the first window above, the union covers eight coordinates, not eleven.
+For the first window above, the union has length eight. The overlapping part
+counts once toward covered length.
 
 Two identical source rows `[1, 7)` give a count of two and a covered length of
 six inside `[0, 10)`. Source duplication increases counts but never duplicates
@@ -76,16 +77,17 @@ result = pi.coverage_stats(
 ```
 
 Use a list for composite keys. Nulls match nulls in each key position.
-Missing source groups retain each query with zero coverage and its true length.
-Source-only groups produce no rows, but still validate. `by=None` and `by=[]`
-both mean ungrouped collections. Key dtypes must match exactly on both operands.
+Queries with no matching source group have zero coverage and keep their full
+length. Source-only groups produce no rows, but still validate. `by=None` and
+`by=[]` both mean ungrouped collections. Key dtypes must match exactly on both
+inputs.
 Supported keys are String, Boolean, 8/16/32/64-bit integers, Date, and Datetime.
 Keys named `start` or `end` are allowed with custom endpoint columns.
 
 Column options are literal names. Names such as `*` and `^end$` do not expand as
-selectors. Query payloads may include nullable, nested, and categorical columns
-supported by the selected Polars execution mode. They bypass native endpoint
-import and retain their original dtypes and column order.
+selectors. Other query columns may include nullable, nested, and categorical
+columns supported by the selected Polars execution mode. They keep their
+original dtypes and column order.
 
 ## Exact lengths and approximate fractions
 
@@ -98,11 +100,11 @@ Lengths use the input coordinate units. Date lengths are days. Datetime lengths
 are elapsed physical milliseconds, microseconds, or nanoseconds. Across a clock
 change, elapsed ticks determine the answer, rather than wall-clock subtraction.
 
-Endpoints widen before subtraction. A full Int64 span has length `2**64 - 1`.
+Endpoints widen before subtraction. A full `Int64` span has length `2**64 - 1`.
 Each group's source-union length is bounded by its coordinate span, also at most
-`2**64 - 1`. Union prefixes and their differences remain exact in Int128.
+`2**64 - 1`. Union prefixes and their differences remain exact in `Int128`.
 
-The fraction converts covered length and query length separately to Float64,
+The fraction converts covered length and query length separately to `Float64`,
 then divides. Empty queries have null fractions. Uncovered and fully covered
 nonempty queries report 0.0 and 1.0. Very large, nearly covered queries can round
 to 1.0 despite a small gap. Use the exact integer columns to distinguish them.
@@ -125,10 +127,10 @@ out = query.collect()
 ```
 
 Two DataFrames return a DataFrame. Any LazyFrame input returns a LazyFrame,
-including either mixed eager/lazy combination. Construction, `explain`, and
-`collect_schema` do not execute either input. Both plans feed one deferred
-blocking calculation. The query payload and geometry travel in the same branch.
-There is no join on coordinates, group keys, or user IDs.
+including either mixed eager/lazy combination. Construction, `explain()`, and
+`collect_schema()` do not execute either input. Both inputs are evaluated together
+when you collect the result. Query rows keep their original columns and positions
+without a join on coordinates, group keys, or user IDs.
 
 All chunks in each operand contribute to the calculation. Collection with
 `engine="streaming"` gives the same result, but the coverage calculation needs
@@ -136,9 +138,9 @@ both complete inputs in memory. It is not an out-of-core streaming algorithm.
 
 Downstream filters and slices cannot truncate the sources. Filtering query rows
 upstream, while keeping the sources fixed, preserves surviving rows' statistics.
-Explicit upstream filters define the evaluated data. Every endpoint row in both
-evaluated operands validates before empty-input or unmatched-group shortcuts.
-Errors name `queries` or `intervals` and the original row within that operand.
+Every endpoint row remaining after upstream filters is validated, including rows
+in unmatched groups and calls with an empty input. Errors name `queries` or
+`intervals` and the row's position in that input after upstream operations.
 
 ## Algorithm and evidence
 

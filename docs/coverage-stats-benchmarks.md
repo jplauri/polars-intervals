@@ -6,18 +6,20 @@
 
 The [`coverage_stats`](api.md#polars_intervals.coverage_stats) function counts
 source records and measures covered length separately for every query. It
-preserves query rows and payloads. In these synthetic workloads, complete lazy
-medians were **at least 8.1× faster than Polars and under 480 ms for one million
-queries against one million source rows**. Many tiny timestamp groups narrow
-the advantage. Wide payloads also increase the native plan's time and memory.
+preserves query rows and their original columns. In these synthetic workloads,
+median runtimes for complete lazy queries were **at least 8.1× faster than Polars
+and under 480 ms for one million queries against one million source rows**.
+Many tiny timestamp groups narrow the advantage. More data in each query row
+also increases the native plan's time and memory.
 
 ## Results
 
 **Full Polars query time · milliseconds**
 
 Native Polars: the tested query using grouped endpoint events and cumulative
-counts. Both functions return all four statistics and preserve query payloads.
-The table includes planning and complete lazy collection. Here **n** is query
+counts. Both implementations return all four statistics and preserve the
+original query columns. The table includes planning and complete lazy collection.
+Here **n** is query
 rows and **m** is source rows. The two sizes are equal in this table.
 
 --8<-- "docs/assets/benchmarks/coverage-stats-summary.md:3:-3"

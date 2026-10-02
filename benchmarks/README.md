@@ -7,8 +7,9 @@ table generation, report format and checks for adding an operation.
 
 ## Python scripts
 
-Run commands from the repository root. Benchmark runners need an installed
-release plugin. Summary and plotting scripts only read saved results.
+Run commands from the repository root. End-to-end runners need the
+[release plugin build](../docs/benchmarking.md#setup). Core runners measure Rust
+without the plugin. The table generator only reads saved results.
 
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
@@ -28,6 +29,7 @@ release plugin. Summary and plotting scripts only read saved results.
 | [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated, sharded interval instances | [Interval-graph corpora](#interval-graph-corpora) |
 | [`test_generate_interval_graphs.py`](test_generate_interval_graphs.py) | Corpus checks | Tiny deterministic instances and local fixtures → structural and reproducibility checks | [Interval-graph corpora](#interval-graph-corpora) |
 | [`nesting_depth.py`](nesting_depth.py) | End-to-end benchmark | Exact analytic families, integer/temporal and grouped inputs → verified collection samples and environment metadata | [Nesting depth](../docs/nesting-depth-benchmarks.md) |
+| [`max_weight_clique.py`](max_weight_clique.py) | End-to-end benchmark | Numeric/temporal, grouped and multichunk inputs → verified collection samples and provenance | [Maximum-weight clique](../docs/clique-benchmarks.md) |
 | [`balance_lanes.py`](balance_lanes.py) | End-to-end benchmark | Existing interval corpora → independently checked row-count quality, collection samples and provenance | [Lane balancing](../docs/balance-lanes-benchmarks.md) |
 | [`test_balance_lanes.py`](test_balance_lanes.py) | Runner checks | Tiny offline records → oracle, scoring, baseline alignment and aggregation checks | [Lane balancing notes](balance-lanes-notes.md) |
 | [`scheduling_polars.py`](scheduling_polars.py) | End-to-end benchmark | Public lazy scheduling queries → independently checked samples and source provenance | [Lane assignment](../docs/assign-lanes-benchmarks.md), [weighted scheduling](../docs/weighted-scheduling-benchmarks.md) |
@@ -54,7 +56,7 @@ between the snapshot and the measured sources; see the
 The dominating-set runner is `cargo bench -p intervals-core --bench
 minimum_cost_dominating_set --locked`. `DOMINATION_CSV` must name a new absolute
 output path. `DOMINATION_SIZES`, `DOMINATION_SEEDS`, `DOMINATION_DTYPES`,
-`DOMINATION_METHODS`, and `DOMINATION_CASES` accept comma-separated selections;
+`DOMINATION_METHODS`, and `DOMINATION_CASES` accept comma-separated selections.
 `DOMINATION_SAMPLES` and `DOMINATION_WARMUPS` default to five and two. It compares
 complete production, covering, fused covering, heap DP and direct greedy calls,
 plus a bounded quadratic reference, with separate allocator instrumentation.
@@ -96,9 +98,9 @@ active-end heap calls. Weighted index streams are an additional B layout
 comparison against production's contiguous records. Earlier flat-record
 experiments remain in the archived source snapshots. The implementations in `benches/support/coverage_profile_candidates.rs`
 are private to benchmarks and tests; only one engine is exposed by the package.
-See [correctness and design notes](coverage-profile-notes.md). Run core
-comparisons with `uv run --no-sync python benchmarks/coverage_profile_core.py --help`
-and complete Polars comparisons with:
+See [correctness and design notes](coverage-profile-notes.md). List core
+comparison options with `uv run --no-sync python benchmarks/coverage_profile_core.py --help`.
+Run complete Polars comparisons with:
 
 ```sh
 uv run --no-sync python benchmarks/coverage_profile.py --output benchmarks/results/coverage-profile-polars-new
@@ -146,8 +148,8 @@ repairs with it. Saved measurements also include seed and multiseed ablations
 that are no longer run. Quality and untimed requested-heap measurements are separate from
 raw timings. See [the balancing notes](balance-lanes-notes.md) for scopes and
 the [report](../docs/balance-lanes-benchmarks.md) for measured settings.
-They do not require Python or the Polars plugin. Each report names its Cargo
-target. Covering and cost covering share the `covering` target.
+Rust core runners do not require Python or the Polars plugin. Each report names
+its Cargo target. Covering and cost covering share the `covering` target.
 
 ## Interval-graph corpora
 
@@ -272,6 +274,8 @@ uv run --locked --only-group dev python -m unittest discover -s benchmarks -p "t
 ```
 
 ## Regenerate tables
+
+Generate tables from saved measurements, check the generator, and build the site:
 
 ```sh
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
