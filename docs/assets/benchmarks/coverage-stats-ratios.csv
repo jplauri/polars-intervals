@@ -1,0 +1,5 @@
+case,workload_family,workload_query_order,workload_interval_order,workload_ratio,workload_dtype,workload_groups,workload_matching,workload_chunks,workload_query_payload,workload_source_payload,workload_source,workload_seed,workload_scope,method,x,median,min,max,samples
+"8 queries, source rows shown",all_covered,shuffled,reverse,few_queries,i64,0,all,7,0,0,memory,7,lazy_complete,native,1000000,81.5754,76.7272,96.43459999999999,3
+"8 queries, source rows shown",all_covered,shuffled,reverse,few_queries,i64,0,all,7,0,0,memory,7,lazy_complete,production,1000000,23.7667,23.4457,24.252299999999998,3
+"8 sources, query rows shown",all_covered,start,shuffled,few_sources,i64,0,all,7,0,0,memory,7,lazy_complete,native,1000000,2011.8457999999998,1877.1109999999999,2188.9616,3
+"8 sources, query rows shown",all_covered,start,shuffled,few_sources,i64,0,all,7,0,0,memory,7,lazy_complete,production,1000000,74.332,72.0565,75.9662,3

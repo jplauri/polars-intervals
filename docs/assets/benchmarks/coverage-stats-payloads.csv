@@ -1,0 +1,7 @@
+case,workload_family,workload_query_order,workload_interval_order,workload_ratio,workload_dtype,workload_groups,workload_matching,workload_chunks,workload_query_payload,workload_source_payload,workload_source,workload_seed,workload_scope,method,x,median,min,max,samples
+Narrow queries and sources,genomic,shuffled,shuffled,equal,i64,0,all,7,0,0,memory,7,lazy_complete,native,100000,275.34979999999996,270.0793,298.9129,5
+Narrow queries and sources,genomic,shuffled,shuffled,equal,i64,0,all,7,0,0,memory,7,lazy_complete,production,100000,20.6256,20.307399999999998,26.524099999999997,5
+"16 string columns and nested query payloads, wide sources",genomic,shuffled,shuffled,equal,i64,0,all,7,16,16,memory,7,lazy_complete,native,100000,1554.1498,1365.5653,1860.9352,5
+"16 string columns and nested query payloads, wide sources",genomic,shuffled,shuffled,equal,i64,0,all,7,16,16,memory,7,lazy_complete,production,100000,24.635099999999998,22.7914,26.8375,5
+"Narrow queries, 16 irrelevant source columns",genomic,shuffled,shuffled,equal,i64,0,all,7,0,16,memory,7,lazy_complete,native,100000,267.1811,261.0019,297.9579,5
+"Narrow queries, 16 irrelevant source columns",genomic,shuffled,shuffled,equal,i64,0,all,7,0,16,memory,7,lazy_complete,production,100000,31.479,20.044,41.3445,5

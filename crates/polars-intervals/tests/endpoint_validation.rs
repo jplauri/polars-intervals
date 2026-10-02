@@ -17,7 +17,7 @@ fn zeros(starts: &Series) -> Series {
 }
 
 // Fast-path settings (k=0, capacity=0, max_work=0) must validate like the rest.
-const ADAPTERS: [(&str, Adapter); 25] = [
+const ADAPTERS: [(&str, Adapter); 27] = [
     ("cluster_strict", |s, e| cluster_intervals(s, e, false)),
     ("cluster_touching", |s, e| cluster_intervals(s, e, true)),
     ("merge_intervals", |s, e| {
@@ -38,6 +38,14 @@ const ADAPTERS: [(&str, Adapter); 25] = [
     ("intersect_intervals_right", |s, e| {
         intersect_intervals(&s.clear(), &s.clear(), &[], s, e, &[])
             .map(|frame| frame["start"].as_materialized_series().clone())
+    }),
+    ("coverage_stats_queries", |s, e| {
+        coverage_stats(s, e, &[], &s.clear(), &s.clear(), &[])
+            .map(|frame| frame["covered_length"].as_materialized_series().clone())
+    }),
+    ("coverage_stats_intervals", |s, e| {
+        coverage_stats(&s.clear(), &s.clear(), &[], s, e, &[])
+            .map(|frame| frame["covered_length"].as_materialized_series().clone())
     }),
     ("interval_gaps_empty_domain", |s, e| {
         let bound = if endpoint_dtypes().contains(s.dtype()) {

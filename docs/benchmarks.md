@@ -14,6 +14,7 @@ many tiny groups, such as ten or fewer rows per group.
 | --- | --- | --- |
 | [Overlap counting](overlap-count-benchmarks.md) | Count overlaps for each row | At least 1.3× faster than Polars · under 250 ms for 3M rows |
 | [Coverage depth and resource demand](coverage-profile-benchmarks.md) | Measure active intervals or their total demand | At least 1.2× faster than Polars · under 96 ms for 1M rows |
+| [Per-query coverage statistics](coverage-stats-benchmarks.md) | Count source records and measure covered length for every query | At least 8.1× faster than Polars · under 480 ms for 1M queries against 1M sources |
 | [Clustering, union, and gaps](interval-geometry-benchmarks.md) | Label connected intervals, merge ranges or find gaps | At least 1.1× faster than Polars · under 16 ms for 100k rows |
 | [Subtraction and intersection](set-geometry-benchmarks.md) | Remove or intersect covered ranges across two collections | Under 41 ms for 1M total input rows · slower than Polars on empty-only grouped inputs |
 | [Containment counting](containment-benchmarks.md) | Count containments for each row | At least 1.2× faster than Polars · under 1.1 s for 3M rows |

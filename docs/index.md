@@ -5,6 +5,8 @@ lazy queries. Count overlaps and containment, measure nesting, assign lanes,
 and select intervals for scheduling, covering, and coverage problems.
 Merge covered ranges, subtract exclusions, or intersect two collections with
 the [interval geometry operations](interval-geometry.md).
+Measure source coverage inside every reporting window with
+[per-query coverage statistics](coverage-stats.md), retaining all query payloads.
 
 ## Install
 

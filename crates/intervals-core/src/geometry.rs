@@ -166,7 +166,7 @@ pub(crate) fn merge_validated<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Vec<(T
     merge_sorted(records.into_iter())
 }
 
-fn merge_sorted<T: Ord + Copy>(rows: impl Iterator<Item = (T, T)>) -> Vec<(T, T)> {
+pub(crate) fn merge_sorted<T: Ord + Copy>(rows: impl Iterator<Item = (T, T)>) -> Vec<(T, T)> {
     let mut output: Vec<(T, T)> = Vec::new();
     for (start, end) in rows {
         if let Some(last) = output.last_mut()

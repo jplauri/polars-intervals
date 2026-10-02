@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add [`coverage_stats`](coverage-stats.md) for source-record counts and exact
+  union coverage inside every query window. Preserve all query rows and payloads
+  with eager, lazy, and mixed inputs. Lengths use Int128, and fractions are null
+  only for empty queries. Shared nullable keys support independent groups.
+
 - Add [`subtract_intervals` and `intersect_intervals`](interval-geometry.md#subtract-and-intersect-two-collections)
   for exact set difference and geometric intersection of two collections.
   Both support grouped eager, lazy and mixed inputs, exact logical dtypes,

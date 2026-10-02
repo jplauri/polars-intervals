@@ -80,6 +80,12 @@ or in `with_columns` to flag them.
 
 ### Frame results
 
+[`coverage_stats`](coverage-stats.md) appends source counts, exact covered and
+query lengths, and covered fractions to every query row. It preserves query
+payloads and global row order. Pass two DataFrames for an immediate result.
+If either input is lazy, both inputs participate in one deferred calculation.
+Use `by` for shared keys, including null-key matches.
+
 `coverage_profile`, `merge_intervals` and `interval_gaps` return new segment
 rows. Pass a DataFrame for an immediate result or a LazyFrame for a query that
 runs when collected. The result has the same frame kind as the input. Use these

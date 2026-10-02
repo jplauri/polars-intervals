@@ -48,10 +48,51 @@ mod coverage;
 pub use coverage::{CoverageEndpoint, max_k_coverage};
 mod coverage_profile;
 pub use coverage_profile::{CoverageSegment, coverage_profile, weighted_coverage_profile};
+mod coverage_stats;
+pub use coverage_stats::coverage_stats;
 mod geometry;
 pub use geometry::{cluster_intervals, interval_gaps, merge_intervals};
 mod set_geometry;
 pub use set_geometry::{IntervalSetError, intersect_intervals, subtract_intervals};
+
+/// Exact source-row count and union coverage for one query interval.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CoverageStats {
+    pub overlap_count: u64,
+    pub covered_length: i128,
+    pub query_length: i128,
+    /// Integer lengths are converted separately to `f64`, then divided.
+    /// Empty queries have `None`. Exact integer columns remain authoritative.
+    pub covered_fraction: Option<f64>,
+}
+
+/// Invalid input to per-query coverage statistics.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CoverageStatsError {
+    Queries(IntervalError),
+    Intervals(IntervalError),
+    /// A source count cannot be represented as `u64`, or count subtraction failed.
+    CountOverflow,
+}
+
+impl fmt::Display for CoverageStatsError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Queries(error) => write!(f, "queries: {error}"),
+            Self::Intervals(error) => write!(f, "intervals: {error}"),
+            Self::CountOverflow => write!(f, "intervals: source count exceeds the UInt64 range"),
+        }
+    }
+}
+
+impl std::error::Error for CoverageStatsError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Queries(error) | Self::Intervals(error) => Some(error),
+            Self::CountOverflow => None,
+        }
+    }
+}
 
 /// Invalid input to an interval algorithm.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

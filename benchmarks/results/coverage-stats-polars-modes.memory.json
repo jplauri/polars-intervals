@@ -1,0 +1,362 @@
+[
+  {
+    "case": 1,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 53370880,
+      "peak_rss_bytes": 53370880
+    },
+    "after": {
+      "rss_bytes": 54489088,
+      "peak_rss_bytes": 54489088
+    },
+    "peak_increase_bytes": 1118208,
+    "output_rows": 1000
+  },
+  {
+    "case": 1,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 53465088,
+      "peak_rss_bytes": 53465088
+    },
+    "after": {
+      "rss_bytes": 70729728,
+      "peak_rss_bytes": 70729728
+    },
+    "peak_increase_bytes": 17264640,
+    "output_rows": 1000
+  },
+  {
+    "case": 1,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 67158016,
+      "peak_rss_bytes": 67158016
+    },
+    "after": {
+      "rss_bytes": 73064448,
+      "peak_rss_bytes": 80699392
+    },
+    "peak_increase_bytes": 13541376,
+    "output_rows": 100000
+  },
+  {
+    "case": 1,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 68034560,
+      "peak_rss_bytes": 68034560
+    },
+    "after": {
+      "rss_bytes": 763027456,
+      "peak_rss_bytes": 763027456
+    },
+    "peak_increase_bytes": 694992896,
+    "output_rows": 100000
+  },
+  {
+    "case": 11,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 60796928,
+      "peak_rss_bytes": 60796928
+    },
+    "after": {
+      "rss_bytes": 63225856,
+      "peak_rss_bytes": 63225856
+    },
+    "peak_increase_bytes": 2428928,
+    "output_rows": 1000
+  },
+  {
+    "case": 11,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 60633088,
+      "peak_rss_bytes": 60633088
+    },
+    "after": {
+      "rss_bytes": 95387648,
+      "peak_rss_bytes": 95387648
+    },
+    "peak_increase_bytes": 34754560,
+    "output_rows": 1000
+  },
+  {
+    "case": 11,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 459735040,
+      "peak_rss_bytes": 459735040
+    },
+    "after": {
+      "rss_bytes": 466927616,
+      "peak_rss_bytes": 477081600
+    },
+    "peak_increase_bytes": 17346560,
+    "output_rows": 100000
+  },
+  {
+    "case": 11,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 461082624,
+      "peak_rss_bytes": 461082624
+    },
+    "after": {
+      "rss_bytes": 2858098688,
+      "peak_rss_bytes": 2957172736
+    },
+    "peak_increase_bytes": 2496090112,
+    "output_rows": 100000
+  },
+  {
+    "case": 19,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 64724992,
+      "peak_rss_bytes": 64724992
+    },
+    "after": {
+      "rss_bytes": 65900544,
+      "peak_rss_bytes": 65900544
+    },
+    "peak_increase_bytes": 1175552,
+    "output_rows": 1000
+  },
+  {
+    "case": 19,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 64475136,
+      "peak_rss_bytes": 64475136
+    },
+    "after": {
+      "rss_bytes": 108969984,
+      "peak_rss_bytes": 108969984
+    },
+    "peak_increase_bytes": 44494848,
+    "output_rows": 1000
+  },
+  {
+    "case": 19,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 853491712,
+      "peak_rss_bytes": 853491712
+    },
+    "after": {
+      "rss_bytes": 858951680,
+      "peak_rss_bytes": 869294080
+    },
+    "peak_increase_bytes": 15802368,
+    "output_rows": 100000
+  },
+  {
+    "case": 19,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 853962752,
+      "peak_rss_bytes": 853962752
+    },
+    "after": {
+      "rss_bytes": 4163870720,
+      "peak_rss_bytes": 4163870720
+    },
+    "peak_increase_bytes": 3309907968,
+    "output_rows": 100000
+  },
+  {
+    "case": 20,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 53792768,
+      "peak_rss_bytes": 53792768
+    },
+    "after": {
+      "rss_bytes": 55144448,
+      "peak_rss_bytes": 55144448
+    },
+    "peak_increase_bytes": 1351680,
+    "output_rows": 1000
+  },
+  {
+    "case": 20,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 53661696,
+      "peak_rss_bytes": 53661696
+    },
+    "after": {
+      "rss_bytes": 71004160,
+      "peak_rss_bytes": 71004160
+    },
+    "peak_increase_bytes": 17342464,
+    "output_rows": 1000
+  },
+  {
+    "case": 20,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 67940352,
+      "peak_rss_bytes": 67940352
+    },
+    "after": {
+      "rss_bytes": 73428992,
+      "peak_rss_bytes": 83648512
+    },
+    "peak_increase_bytes": 15708160,
+    "output_rows": 100000
+  },
+  {
+    "case": 20,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 68489216,
+      "peak_rss_bytes": 68489216
+    },
+    "after": {
+      "rss_bytes": 763928576,
+      "peak_rss_bytes": 763928576
+    },
+    "peak_increase_bytes": 695439360,
+    "output_rows": 100000
+  },
+  {
+    "case": 21,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 60137472,
+      "peak_rss_bytes": 60137472
+    },
+    "after": {
+      "rss_bytes": 61276160,
+      "peak_rss_bytes": 61276160
+    },
+    "peak_increase_bytes": 1138688,
+    "output_rows": 1000
+  },
+  {
+    "case": 21,
+    "size": 1000,
+    "n": 1000,
+    "m": 1000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 60497920,
+      "peak_rss_bytes": 60497920
+    },
+    "after": {
+      "rss_bytes": 75563008,
+      "peak_rss_bytes": 75563008
+    },
+    "peak_increase_bytes": 15065088,
+    "output_rows": 1000
+  },
+  {
+    "case": 21,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "production",
+    "before": {
+      "rss_bytes": 461213696,
+      "peak_rss_bytes": 461213696
+    },
+    "after": {
+      "rss_bytes": 466673664,
+      "peak_rss_bytes": 476852224
+    },
+    "peak_increase_bytes": 15638528,
+    "output_rows": 100000
+  },
+  {
+    "case": 21,
+    "size": 100000,
+    "n": 100000,
+    "m": 100000,
+    "seed": 7,
+    "method": "native",
+    "before": {
+      "rss_bytes": 460382208,
+      "peak_rss_bytes": 460382208
+    },
+    "after": {
+      "rss_bytes": 1159557120,
+      "peak_rss_bytes": 1159557120
+    },
+    "peak_increase_bytes": 699174912,
+    "output_rows": 100000
+  }
+]
