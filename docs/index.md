@@ -1,12 +1,13 @@
 # polars-intervals
 
-Interval algorithms for Polars, implemented in Rust with support for eager and
-lazy queries. Count overlaps and containment, measure nesting, assign lanes,
-and select intervals for scheduling, covering, and coverage problems.
-Merge covered ranges, subtract exclusions, or intersect two collections with
-the [interval geometry operations](interval-geometry.md).
-Measure source coverage inside every reporting window with
-[per-query coverage statistics](coverage-stats.md), retaining all query payloads.
+Use polars-intervals to count overlaps and containment, measure nesting, assign
+lanes, and select intervals for scheduling or covering. It supports eager and
+lazy Polars queries.
+
+Use [interval geometry](interval-geometry.md) to merge covered ranges, subtract
+exclusions, or intersect two collections. Use
+[per-query coverage statistics](coverage-stats.md) to measure coverage inside
+each reporting window while keeping its original columns and row order.
 
 ## Install
 

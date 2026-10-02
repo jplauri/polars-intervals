@@ -50,7 +50,7 @@ Use one small generated table with this shape:
 Add one visible line defining the comparison in public Polars terms, such as
 "Native Polars: the fastest tested query using joins or `search_sorted`."
 Native Polars means the fastest equivalent query tested for that row in the same run.
-Record which method won in Benchmark details. Include small and large inputs
+Record which method won in **What was compared** below. Include small and large inputs
 where measured, plus important cases where the advantage disappears or reverses.
 Use about three significant figures for table times and two for table ratios.
 Derive summary and overview bounds from the linked CSV medians, not rounded
@@ -111,8 +111,9 @@ results. Label proposed explanations as such.
 
 **Reproduce**
 
-Give the operation command and link the shared setup. Include raw samples,
-metadata, measured source archives and supplemental table downloads here.
+Give the operation command and link the [shared setup](../docs/benchmarking.md#setup).
+Include raw samples, metadata, measured source archives and supplemental table
+downloads here.
 
 **History**
 

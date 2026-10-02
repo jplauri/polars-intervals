@@ -1,13 +1,13 @@
 # Benchmarks
 
-Find the runtime and Polars comparison for your operation below. These headlines
-summarize full Polars queries on synthetic inputs. Open a report for the input
-patterns and important exceptions.
+Find measured runtimes for your operation below. The tables summarize full
+Polars queries on synthetic inputs. Open a report for input patterns,
+comparisons, and limitations.
 
 ## Interval queries and native Polars comparisons
 
 Speedups compare the fastest equivalent native Polars query tested on the same
-input. Native Polars can match or beat these functions when data is split into
+input. Several reports show native Polars matching or beating the package on
 many tiny groups, such as ten or fewer rows per group.
 
 | Operation | Purpose | Measured headline |

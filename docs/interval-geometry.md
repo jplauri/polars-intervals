@@ -5,7 +5,7 @@ subtract exclusions, or intersect two collections:
 
 | Question | Function | Output |
 | --- | --- | --- |
-| Which records are connected by overlap? | [`cluster_intervals`](api.md#polars_intervals.cluster_intervals) | One UInt32 component ID per original row |
+| Which records are connected by overlap? | [`cluster_intervals`](api.md#polars_intervals.cluster_intervals) | One `UInt32` cluster ID per original row |
 | Which coordinates are covered? | [`merge_intervals`](api.md#polars_intervals.merge_intervals) | Maximal covered ranges |
 | Which coordinates in a domain are uncovered? | [`interval_gaps`](api.md#polars_intervals.interval_gaps) | Maximal uncovered ranges |
 | Which left coordinates remain after exclusions? | [`subtract_intervals`](api.md#polars_intervals.subtract_intervals) | Maximal remaining ranges |
@@ -34,24 +34,24 @@ print(pi.interval_gaps(df, domain_start=0, domain_end=16).rows())
 
 The first three rows are connected through overlaps. They need not all share
 one point. The fourth row only touches that component at 8, so it joins only
-with `include_touching=True`. Union always joins touching ranges because there
-is no uncovered coordinate between them.
+with `include_touching=True`. `merge_intervals` always joins touching ranges
+because there is no uncovered coordinate between them.
 
 Cluster IDs follow each component's first appearance in the original input.
-For `[10,12), [0,2), [1,3)`, they are `[0,1,1]`. Permuting input rows may
+For `[10, 12), [0, 2), [1, 3)`, they are `[0, 1, 1]`. Permuting input rows may
 renumber components while preserving their membership. IDs restart at zero
 inside each group.
 
 ## Empty rows and domains
 
-Every `[x,x)` row is an isolated cluster, including duplicate empty rows and
-touching-inclusive clustering. It never connects two nonempty rows. Empty rows
-contribute nothing to union and never split a gap.
+Every `[x, x)` row is an isolated cluster, including duplicate empty rows and
+clustering with `include_touching=True`. It never connects two nonempty rows.
+Empty rows contribute nothing to merged ranges and never split a gap.
 
-| Input | Clusters | Union | Gaps in a nonempty domain D |
+| Input | Clusters | Merged ranges | Gaps in a nonempty domain D |
 | --- | --- | --- | --- |
-| No rows, ungrouped | Empty UInt32 column | No rows | D |
-| Three empty rows, ungrouped | `[0,1,2]` | No rows | D |
+| No rows, ungrouped | Empty `UInt32` column | No rows | D |
+| Three empty rows, ungrouped | `[0, 1, 2]` | No rows | D |
 | No rows, grouped | No observed groups | No rows | No rows |
 
 Both gap bounds are required. The same scalar domain applies to every observed
@@ -77,13 +77,14 @@ merged = pi.merge_intervals(grouped, by="resource")
 gaps = pi.interval_gaps(grouped, by="resource", domain_start=0, domain_end=16)
 ```
 
-Union and gaps return `[requested keys..., "start", "end"]`, even with custom
-input endpoint names. Endpoints keep their exact dtypes, including when no
-segments remain. Segments inside each group are sorted by start, nonempty, and
-strictly separated. Other input columns are omitted.
+Merged ranges and gaps return `[requested keys..., "start", "end"]`, even with
+custom input endpoint names. Endpoints keep their exact dtypes, including when
+no segments remain. Segments inside each group are sorted by start, nonempty,
+and strictly separated. Other input columns are omitted.
 
-See the shared [frame and grouping rules](usage.md#frame-results). Union and
-gaps reserve the output names `start` and `end`, so group keys cannot use them.
+See the shared [frame and grouping rules](usage.md#frame-results).
+`merge_intervals` and `interval_gaps` reserve the output names `start` and `end`,
+so group keys cannot use them.
 
 ## Eager and lazy execution
 
@@ -126,7 +127,7 @@ print(pi.intersect_intervals(left, right).rows())
 The original left boundary at 5 disappears. Each output contains maximal,
 nonempty, disjoint ranges. Overlapping and touching fragments coalesce, and
 each end is strictly below the next start. Touching inputs alone have no
-intersection: `[0,2)` and `[2,4)` share no covered coordinates.
+intersection: `[0, 2)` and `[2, 4)` share no covered coordinates.
 
 Subtraction cuts away coverage, so one left row may produce several ranges.
 It is not a whole-row anti-join or subtraction that preserves each source
@@ -145,10 +146,10 @@ print(pi.subtract_intervals(availability, busy, by="resource").rows())
 # [('desk', 0, 2), ('desk', 4, 6), ('desk', 8, 12), ('room', 0, 10)]
 ```
 
-The room has no busy rows, so subtraction keeps its union. A left-only group
-has no intersection. A right-only group emits nothing. Null key values match
-nulls, including in multi-column keys. There is no global right-side broadcast.
-Both sides use the same key names. Rename keys upstream if needed.
+The room has no busy rows, so subtraction keeps all its covered ranges. A
+left-only group has no intersection. A right-only group emits nothing. Null key
+values match nulls, including in multi-column keys. There is no global right-side
+broadcast. Both sides use the same key names. Rename keys upstream if needed.
 
 Groups follow their first appearance in the original left input, before empty
 rows are dropped. Ranges are sorted within each group. Swapping intersection's
@@ -174,9 +175,9 @@ result = shared.collect()
 
 Two DataFrames return a DataFrame. If either argument is a LazyFrame, the
 result stays lazy. Construction, `explain()` and `collect_schema()` read no
-input rows. Both sources enter one blocking native operation. Collection with
-the streaming engine also materializes both inputs. This is not bounded-memory
-streaming. Downstream filters, slices and projections apply to the completed
+input rows. Both inputs are evaluated together when you collect the result.
+The operation needs both complete inputs in memory, including with the streaming
+engine. Downstream filters, slices and projections apply to the completed
 geometry. Upstream operations change the intervals that the function sees.
 
 Use `left_start`, `left_end`, `right_start` and `right_end` for custom literal

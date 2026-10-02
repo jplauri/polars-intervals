@@ -1,4 +1,4 @@
-# Coverage and resource-load profiles
+# Coverage and load profiles { #coverage-and-resource-load-profiles }
 
 [`coverage_profile`](api.md#polars_intervals.coverage_profile) turns intervals
 into new segments describing how much is active at each coordinate. Use it for
@@ -7,7 +7,7 @@ an observation horizon.
 
 ## Coverage depth
 
-Each interval contributes one unit unless you explicitly name a weight column.
+Without `weight`, each interval contributes one unit.
 Columns called `weight` or `load` are otherwise ignored.
 
 ```python
@@ -25,12 +25,13 @@ read changes. Touching segments with equal loads merge. Equal loads separated by
 an uncovered gap remain separate segments.
 
 Coverage depth describes coordinates. To count overlaps for each input row, use
-[`overlap_count`](usage.md#count-overlaps).
+[`overlap_count`](usage.md#count-overlaps). To measure covered length inside each
+reporting window, use [`coverage_stats`](coverage-stats.md).
 
 ## Resource demand
 
-An explicit weight is the constant quantity used throughout an interval, such
-as the number of machines a job needs.
+Use `weight` for a constant quantity used throughout an interval, such as the
+number of machines a job needs.
 
 ```python
 jobs = reads.with_columns(pl.Series("demand", [2, 3, 3]))
@@ -49,8 +50,9 @@ latest nonempty end, including zero-weight intervals. Empty intervals do not
 extend the domain. An empty input or a group with only empty intervals has no
 inferred domain.
 
-Pass both bounds to restrict the domain. Rows are validated first, then clipped.
-Use `include_zero=True` to partition the entire domain, including uncovered gaps:
+Pass `domain_start` and `domain_end` to set an observation horizon. Rows are
+validated first, then clipped. Use `include_zero=True` to include uncovered gaps
+across the entire domain:
 
 ```python
 observed = pi.coverage_profile(
@@ -92,8 +94,9 @@ print(per_chromosome.rows())
 # [('chr2', 0, 4, 1), ('chr2', 5, 7, 1), ('chr1', 2, 5, 1)]
 ```
 
-The shared [frame rules](usage.md#frame-results) describe group keys and output
-order. Here, `start`, `end` and `load` are reserved output names.
+Groups appear in first-appearance order, with segments sorted by start within
+each group. See the shared [frame rules](usage.md#frame-results) for supported
+group keys. Here, `start`, `end` and `load` are reserved output names.
 
 Bounds apply to every group present in the input. A group containing only empty
 intervals produces a zero-load segment with explicit nonempty bounds and
@@ -132,8 +135,7 @@ in memory, including when collected with the streaming engine.
 
 ## Passing loads to other APIs
 
-To pass loads to a function that accepts 64-bit quantities, cast explicitly
-with `strict=True`:
+To reuse these `Int128` loads as 64-bit quantities, cast with `strict=True`:
 
 ```python
 bounded = load.with_columns(pl.col("load").cast(pl.UInt64, strict=True))

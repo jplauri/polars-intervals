@@ -80,26 +80,28 @@ or in `with_columns` to flag them.
 
 ### Frame results
 
+These functions return a DataFrame when all inputs are DataFrames. If any input
+is a LazyFrame, they return a LazyFrame and evaluate all inputs together when
+collected. Call them directly or with `.pipe(...)`.
+
 [`coverage_stats`](coverage-stats.md) appends source counts, exact covered and
 query lengths, and covered fractions to every query row. It preserves query
-payloads and global row order. Pass two DataFrames for an immediate result.
-If either input is lazy, both inputs participate in one deferred calculation.
-Use `by` for shared keys, including null-key matches.
+columns and their original row order. Use `by` to match groups across the two
+inputs, including null keys.
+
+#### New segment rows
 
 `coverage_profile`, `merge_intervals` and `interval_gaps` return new segment
-rows. Pass a DataFrame for an immediate result or a LazyFrame for a query that
-runs when collected. The result has the same frame kind as the input. Use these
-functions directly or with `.pipe(...)`.
+rows.
 
 [`subtract_intervals` and `intersect_intervals`](interval-geometry.md#subtract-and-intersect-two-collections)
-take two frames and return new covered ranges. Two DataFrames return a DataFrame.
-If either input is lazy, both inputs participate in one deferred query. All four
-endpoint columns must have exactly the same logical dtype. Shared group keys
-must also match in dtype. Result groups follow the left input's first appearances.
+take two frames and return new covered ranges. All four endpoint columns must
+have exactly the same logical dtype. Shared group keys must also match in dtype.
+Result groups follow their first appearance in the left input.
 
-Endpoint arguments take literal column names. Output endpoints are always
-named `start` and `end`. Endpoint and group-key dtypes are preserved, including
-in empty results. Other input columns are not retained.
+Endpoint arguments take literal column names. Output endpoints are always named
+`start` and `end`. Endpoint and group-key dtypes are preserved, including in
+empty results. Other input columns are not retained.
 
 Use `by="resource"` or an ordered list of distinct column names to solve groups
 independently. `by=None` and `by=[]` use one collection. Keys support String,
@@ -110,10 +112,10 @@ Groups appear in first-appearance order, with segments sorted by start within
 each group. Only groups present in the input can produce output. A grouped
 empty frame has no output groups.
 
-These functions need their complete input in memory, even with
+All frame operations above need their complete inputs in memory, even with
 `.collect(engine="streaming")`. All chunks participate in the same operation.
-Schema checks happen when the query is built. Row validation happens when it
-runs and covers every input row, including empty or clipped-away intervals.
+Schema checks happen when the query is built. Every input row is validated when
+it runs, including empty or clipped-away intervals.
 
 ### Count within groups
 
@@ -136,7 +138,7 @@ result = (
 print(result["overlaps"].to_list())  # [1, 0, 1, 0]
 ```
 
-This works for every per-row result and selection mask. Use
+This works for expressions that return one value or selection flag per row. Use
 `group_by(...).agg(...)` instead to get one list per group.
 
 ### Choose which rows to compare
@@ -155,6 +157,7 @@ computed from the full input, add it with `with_columns` first, then filter.
 | [Covering and coverage](#covering-and-coverage) | Cover a target, maximize covered length with a budget, or hit every interval with points |
 | [Choose representative intervals](#choose-representative-intervals) | Select rows so every input row is selected or overlaps a selected row |
 | [Coverage and load profiles](coverage-profile.md) | Measure how much is active at each coordinate |
+| [Per-query coverage statistics](coverage-stats.md) | Count source intervals and measure covered length inside each reporting window |
 
 The [API reference](api.md) has full signatures and edge cases.
 

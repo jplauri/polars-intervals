@@ -25,6 +25,8 @@ in that project.
 
 ## Checks
 
+Run the checks relevant to your change. The standard checks are:
+
 ```sh
 uv run --locked ruff check .
 uv run --locked ruff format --check .
@@ -55,13 +57,14 @@ The last setting also matches release CI and bounds compilation memory usage.
 ## Documentation
 
 Edit pages in `docs/` and API docstrings in `python/polars_intervals/`.
+Use an isolated environment to preview the site or check the build:
 
 ```sh
 uv run --locked --isolated --only-group docs mkdocs serve
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
-The site is written to `target/docs/`. Building it does not compile the Rust
+The site is written to `target/docs/`. These commands do not compile the Rust
 plugin. The **Documentation** workflow validates every pull request and push to
 `master`, and publishes successful `master` builds to
 [GitHub Pages](https://jplauri.github.io/polars-intervals/). Pull requests provide
