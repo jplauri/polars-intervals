@@ -160,4 +160,8 @@ the actual selected route. Earlier binary, sweep and provisional dispatch
 experiments remain separate in the selection notes, with their own raw samples,
 metadata and source archives. Their timings are not relabeled as production.
 
+A later cleanup replaced the native competitor's shared Rust validation with
+equivalent Polars checks, so the package no longer ships a benchmark-only
+binding. Saved timings measure the original competitor, not this change.
+
 </details>

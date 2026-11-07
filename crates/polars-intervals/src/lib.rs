@@ -64,8 +64,6 @@ mod _internal {
     #[pymodule_export]
     use super::coverage_stats::coverage_stats_py;
     #[pymodule_export]
-    use super::coverage_stats::validate_coverage_stats_py;
-    #[pymodule_export]
     use super::geometry::interval_gaps_py;
     #[pymodule_export]
     use super::geometry::merge_intervals_py;
