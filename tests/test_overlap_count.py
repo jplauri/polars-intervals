@@ -226,6 +226,27 @@ def test_datetime_preserves_single_ticks(unit):
     assert_series_equal(result["count"], pl.Series("count", [1, 1, 2], dtype=pl.UInt64))
 
 
+@pytest.mark.parametrize("dtype", [pl.Int64, pl.UInt64])
+def test_extreme_endpoints(dtype):
+    low, high = (-(2**63), 2**63 - 1) if dtype == pl.Int64 else (0, 2**64 - 1)
+    frame = pl.DataFrame(
+        {"start": [low, high - 2, high - 1, high], "end": [high] * 4},
+        schema={"start": dtype, "end": dtype},
+    )
+    assert frame.select(pi.overlap_count("start", "end")).to_series().to_list() == [2, 2, 2, 0]
+    for start, end in ((low + 1, low), (high, high - 1)):
+        reversed_row = pl.DataFrame({"start": [start], "end": [end]}, schema=frame.schema)
+        with pytest.raises(pl.exceptions.ComputeError, match="index 0"):
+            reversed_row.select(pi.overlap_count("start", "end"))
+
+
+def test_counts_exceed_endpoint_width():
+    frame = pl.DataFrame(
+        {"start": [0] * 300, "end": [1] * 300}, schema={"start": pl.UInt8, "end": pl.UInt8}
+    )
+    assert frame.select(pi.overlap_count("start", "end")).to_series().to_list() == [299] * 300
+
+
 def test_timezone_aware_intervals_across_clock_change():
     # Helsinki's repeated hour: the first interval ends at an earlier wall time,
     # but the physical instants are ordered and touch the second interval.

@@ -122,3 +122,10 @@ def test_extreme_values_and_single_ticks(dtype):
         schema={"start": dtype, "end": dtype},
     )
     assert_coloring(frame, frame.select(pi.assign_lanes("start", "end")).to_series())
+
+
+def test_labels_exceed_endpoint_width():
+    frame = pl.DataFrame(
+        {"start": [0] * 300, "end": [1] * 300}, schema={"start": pl.UInt8, "end": pl.UInt8}
+    )
+    assert frame.select(pi.assign_lanes("start", "end")).to_series().n_unique() == 300
