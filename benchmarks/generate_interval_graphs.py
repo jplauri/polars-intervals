@@ -7,10 +7,9 @@ import gzip
 import hashlib
 import json
 import random
-import shutil
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from itertools import chain, islice, pairwise
+from itertools import pairwise
 from pathlib import Path
 
 from jaist_interval_catalog import download_catalogs, iter_catalog
@@ -537,64 +536,31 @@ def iter_suite(suite: str = "smoke", seed: int = 42) -> Iterator[Instance]:
                 )
 
 
-def _prepare_output(output: Path, overwrite: bool) -> None:
-    resolved = output.resolve()
-    # Only the explicitly named output tree can be replaced. Never follow a junction,
-    # symlink, or remove the working directory / any of its ancestors.
-    if output.is_symlink() or output.is_junction() or Path.cwd().resolve().is_relative_to(resolved):
-        raise ValueError(
-            "output must be a dedicated dataset directory, not a link or workspace ancestor"
-        )
-    if output.exists():
-        if not output.is_dir():
-            raise ValueError("output exists and is not a directory")
-        if any(output.iterdir()):
-            if not overwrite:
-                raise ValueError("output directory is nonempty; use --overwrite to replace it")
-            shutil.rmtree(resolved)
-    (output / "shards").mkdir(parents=True, exist_ok=True)
-
-
 def write_dataset(
-    instances: Iterable[Instance],
-    output: Path | str,
-    *,
-    kind: str = "synthetic",
-    suite: str = "smoke",
-    seed: int | None = 42,
-    shard_size: int = 50_000,
-    overwrite: bool = False,
-) -> dict[str, object]:
-    """Stream one record at a time; publish the manifest only after full validation.
+    instances: Iterable[Instance], output: Path | str, *, overwrite: bool = False
+) -> int:
+    """Validate records into one deterministic gzip JSONL file and return the count.
 
-    Synthetic suites have only hundreds of IDs. Catalog uniqueness instead follows
-    from strictly increasing source indices and SHA-256 identities, requiring one
-    high-water mark per source rather than a set with millions of entries.
+    The file appears only after every record validates. Synthetic suites have only
+    hundreds of IDs. Catalog uniqueness instead follows from strictly increasing
+    source indices and SHA-256 identities, requiring one high-water mark per source
+    rather than a set with millions of entries.
     """
-    integer(shard_size, "shard_size", 1)
     output = Path(output)
-    _prepare_output(output, overwrite)
-    manifest = {
-        "schema_version": 1,
-        "kind": kind,
-        "suite": suite,
-        "seed": seed,
-        "instance_count": 0,
-        "shard_size": shard_size,
-        "shards": [],
-    }
+    if output.exists() and not overwrite:
+        raise ValueError("output exists; use --overwrite to replace it")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    partial = output.with_name(output.name + ".partial")
     seen_synthetic: set[str] = set()
     catalog_positions: dict[str, int] = {}
-    remaining = iter(instances)
-    while (first := next(remaining, None)) is not None:
-        relative = f"shards/part-{len(manifest['shards']):05d}.jsonl.gz"
-        count = 0
+    count = 0
+    try:
         # GzipFile rather than gzip.open: erase both timestamp AND original filename.
         with (
-            (output / relative).open("wb") as raw,
+            partial.open("wb") as raw,
             gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0, compresslevel=6) as out,
         ):
-            for instance in chain((first,), islice(remaining, shard_size - 1)):
+            for instance in instances:
                 stats = validate_instance(instance)
                 identity = instance.id
                 if instance.family == "jaist":
@@ -627,36 +593,20 @@ def write_dataset(
                 }
                 out.write((canonical_json(record) + "\n").encode("ascii"))
                 count += 1
-        manifest["shards"].append({"path": relative, "instance_count": count})
-        manifest["instance_count"] += count
-    (output / "dataset.json").write_bytes((canonical_json(manifest) + "\n").encode("ascii"))
-    return manifest
+        partial.replace(output)
+    finally:
+        partial.unlink(missing_ok=True)
+    return count
 
 
 def iter_dataset(path: Path | str) -> Iterator[dict[str, object]]:
-    """Read one complete record at a time, checking shard and dataset counts."""
-    path = Path(path)
-    manifest = json.loads((path / "dataset.json").read_text(encoding="ascii"))
-    if manifest.get("schema_version") != 1:
-        raise ValueError("unsupported dataset schema_version")
-    total = 0
-    for shard in manifest["shards"]:
-        shard_path = (path / shard["path"]).resolve()
-        if not shard_path.is_relative_to(path.resolve()):
-            raise ValueError("shard path escapes dataset directory")
-        count = 0
-        with gzip.open(shard_path, "rt", encoding="ascii") as lines:
-            for line in lines:
-                record = json.loads(line)
-                if not isinstance(record, dict):
-                    raise TypeError("dataset record must be a JSON object")
-                count += 1
-                yield record
-        if count != shard["instance_count"]:
-            raise ValueError("shard instance_count differs from manifest")
-        total += count
-    if total != manifest["instance_count"]:
-        raise ValueError("dataset instance_count differs from manifest")
+    """Read one complete record at a time."""
+    with gzip.open(path, "rt", encoding="ascii") as lines:
+        for line in lines:
+            record = json.loads(line)
+            if not isinstance(record, dict):
+                raise TypeError("dataset record must be a JSON object")
+            yield record
 
 
 def iter_jaist(sources: list[dict], catalog_kind: str) -> Iterator[Instance]:
@@ -698,7 +648,6 @@ def main(argv: list[str] | None = None) -> None:
     jaist.add_argument("--cache", type=Path, default=Path("benchmarks/generated/jaist-cache"))
     for command in (synthetic, jaist):
         command.add_argument("--output", type=Path, required=True)
-        command.add_argument("--shard-size", type=int, default=50_000)
         command.add_argument("--overwrite", action="store_true")
     args = parser.parse_args(argv)
     try:
@@ -708,13 +657,10 @@ def main(argv: list[str] | None = None) -> None:
             return
         if args.command == "synthetic":
             instances = iter_suite(args.suite, args.seed)
-            suite, seed = args.suite, args.seed
         else:
             if args.download:
                 if not args.n:
                     raise ValueError("--download requires --n")
-                if args.cache.resolve().is_relative_to(args.output.resolve()):
-                    raise ValueError("download cache must be outside the output dataset directory")
                 sources = download_catalogs(args.n, args.cache, args.catalog_kind)
             else:
                 if args.n:
@@ -722,22 +668,11 @@ def main(argv: list[str] | None = None) -> None:
                         "--n is only for downloads; local files declare or infer order"
                     )
                 sources = [{"path": path} for path in args.input]
-                if any(path.resolve().is_relative_to(args.output.resolve()) for path in args.input):
-                    raise ValueError("input sources must be outside the output dataset directory")
             instances = iter_jaist(sources, args.catalog_kind)
-            suite, seed = args.catalog_kind, None
-        manifest = write_dataset(
-            instances,
-            args.output,
-            kind=args.command,
-            suite=suite,
-            seed=seed,
-            shard_size=args.shard_size,
-            overwrite=args.overwrite,
-        )
+        count = write_dataset(instances, args.output, overwrite=args.overwrite)
     except (ValueError, TypeError, OSError, EOFError, UnicodeError) as error:
         parser.error(str(error))
-    print(f"Wrote {manifest['instance_count']} instances in {len(manifest['shards'])} shards")
+    print(f"Wrote {count} instances to {args.output}")
 
 
 if __name__ == "__main__":

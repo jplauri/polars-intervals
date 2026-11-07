@@ -473,16 +473,7 @@ def validated_result(result, record, groups, expected=None):
 def run_metadata(args):
     import polars_intervals as pi
 
-    corpora = {}
-    for path in args.dataset:
-        manifest = json.loads((path / "dataset.json").read_text(encoding="ascii"))
-        hashes = {"dataset.json": sha256(path / "dataset.json")}
-        for shard in manifest["shards"]:
-            target = (path / shard["path"]).resolve()
-            if not target.is_relative_to(path.resolve()):
-                raise ValueError("shard path escapes dataset directory")
-            hashes[shard["path"]] = sha256(target)
-        corpora[str(path)] = {"manifest": manifest, "sha256": hashes}
+    corpora = {str(path): sha256(path) for path in args.dataset}
     native = list(Path(pi.__file__).parent.glob("*.pyd")) + list(
         Path(pi.__file__).parent.glob("*.so")
     )

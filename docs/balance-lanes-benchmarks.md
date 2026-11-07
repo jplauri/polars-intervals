@@ -111,8 +111,8 @@ corpora first, then run the complete commands in the
 A small offline run is:
 
 ```sh
-python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 42 --output target/balance-smoke
-uv run --no-sync python benchmarks/balance_lanes.py --dataset target/balance-smoke --handcrafted --max-work 100000 --warmups 1 --repeats 5 --output benchmarks/results/balance-local-new
+python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 42 --output target/balance-smoke.jsonl.gz
+uv run --no-sync python benchmarks/balance_lanes.py --dataset target/balance-smoke.jsonl.gz --handcrafted --max-work 100000 --warmups 1 --repeats 5 --output benchmarks/results/balance-local-new
 cargo bench -p intervals-core --bench balance_lanes --locked
 ```
 

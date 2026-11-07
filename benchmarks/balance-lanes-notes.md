@@ -201,12 +201,12 @@ instance = Instance(
         "units": "integer ticks",
     },
 )
-write_dataset([instance], output_path, kind="external", suite="local", seed=None)
+write_dataset([instance], output_path)
 ```
 
 The variables are supplied by the caller's data loader. Record source identity,
 hash and units; validation checks lengths and integer geometry before writing
-shards. Set `PYTHONPATH=benchmarks` when importing from the repository root.
+the file. Set `PYTHONPATH=benchmarks` when importing from the repository root.
 Reversible temporal transforms, groups and chunk/slice variants are runner
 workloads, not new corpus families. Consult the runner help for options.
 
@@ -281,12 +281,12 @@ Generate the existing suites and import the two **offline fixture** populations
 before measuring. These commands create ignored data, not a new corpus format:
 
 ```powershell
-python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 42 --output target/balance-work/smoke
-python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 43 --output target/balance-work/smoke-43
-python benchmarks/generate_interval_graphs.py synthetic --suite exact --seed 42 --output target/balance-work/exact
-python benchmarks/generate_interval_graphs.py synthetic --suite scaling --seed 42 --output target/balance-work/scaling
-python benchmarks/generate_interval_graphs.py jaist --input benchmarks/fixtures/jaist_interval_list_tiny.txt --catalog-kind all --output target/balance-work/jaist-all
-python benchmarks/generate_interval_graphs.py jaist --input benchmarks/fixtures/jaist_interval_connected_tiny.txt --catalog-kind connected --output target/balance-work/jaist-connected
+python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 42 --output target/balance-work/smoke.jsonl.gz
+python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 43 --output target/balance-work/smoke-43.jsonl.gz
+python benchmarks/generate_interval_graphs.py synthetic --suite exact --seed 42 --output target/balance-work/exact.jsonl.gz
+python benchmarks/generate_interval_graphs.py synthetic --suite scaling --seed 42 --output target/balance-work/scaling.jsonl.gz
+python benchmarks/generate_interval_graphs.py jaist --input benchmarks/fixtures/jaist_interval_list_tiny.txt --catalog-kind all --output target/balance-work/jaist-all.jsonl.gz
+python benchmarks/generate_interval_graphs.py jaist --input benchmarks/fixtures/jaist_interval_connected_tiny.txt --catalog-kind connected --output target/balance-work/jaist-connected.jsonl.gz
 ```
 
 The following uses the shared release-plugin setup. Choose fresh output prefixes
@@ -297,9 +297,9 @@ Run sequentially after compilation and tests finish:
 uv sync --locked --reinstall-package polars-intervals --config-setting "build-args=--profile release"
 $balancePreviousThreads = $env:POLARS_MAX_THREADS
 $env:POLARS_MAX_THREADS = "1"
-uv run --no-sync python benchmarks/balance_lanes.py --dataset target/balance-work/smoke --dataset target/balance-work/smoke-43 --dataset target/balance-work/exact --dataset target/balance-work/jaist-all --dataset target/balance-work/jaist-connected --handcrafted --stress-sizes 1000 10000 100000 --max-work 100000 --warmups 1 --repeats 5 --output benchmarks/results/balance-polars-quality-windows-20260928
-uv run --no-sync python benchmarks/balance_lanes.py --dataset target/balance-work/scaling --max-work 100000 --warmups 1 --repeats 5 --output benchmarks/results/balance-polars-scaling-windows-20260928
-uv run --no-sync python benchmarks/balance_lanes.py --dataset target/balance-work/smoke --handcrafted --stress-sizes 1000 --max-work 100000 --workloads integer date datetime grouped sliced multi_chunk --engines auto streaming --warmups 1 --repeats 3 --output benchmarks/results/balance-polars-workloads-windows-20260928
+uv run --no-sync python benchmarks/balance_lanes.py --dataset target/balance-work/smoke.jsonl.gz --dataset target/balance-work/smoke-43.jsonl.gz --dataset target/balance-work/exact.jsonl.gz --dataset target/balance-work/jaist-all.jsonl.gz --dataset target/balance-work/jaist-connected.jsonl.gz --handcrafted --stress-sizes 1000 10000 100000 --max-work 100000 --warmups 1 --repeats 5 --output benchmarks/results/balance-polars-quality-windows-20260928
+uv run --no-sync python benchmarks/balance_lanes.py --dataset target/balance-work/scaling.jsonl.gz --max-work 100000 --warmups 1 --repeats 5 --output benchmarks/results/balance-polars-scaling-windows-20260928
+uv run --no-sync python benchmarks/balance_lanes.py --dataset target/balance-work/smoke.jsonl.gz --handcrafted --stress-sizes 1000 --max-work 100000 --workloads integer date datetime grouped sliced multi_chunk --engines auto streaming --warmups 1 --repeats 3 --output benchmarks/results/balance-polars-workloads-windows-20260928
 $env:POLARS_MAX_THREADS = $balancePreviousThreads
 
 $env:BALANCE_SIZES = "1000,10000,100000"

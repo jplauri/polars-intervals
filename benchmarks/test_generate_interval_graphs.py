@@ -110,14 +110,6 @@ def intervals(instance: Instance) -> list[tuple[int, int]]:
     return list(zip(instance.starts, instance.ends, strict=True))
 
 
-def dataset_bytes(directory: Path) -> dict[str, bytes]:
-    return {
-        path.relative_to(directory).as_posix(): path.read_bytes()
-        for path in sorted(directory.rglob("*"))
-        if path.is_file()
-    }
-
-
 def run_cli(*args: str, hash_seed: str = "1") -> subprocess.CompletedProcess[str]:
     # -S disables site packages, demonstrating that no compiled extension or
     # third-party package is needed. Block networking inside the subprocess too.
@@ -415,19 +407,16 @@ class FamilyTests(OfflineTests):
 
 
 class DatasetTests(OfflineTests):
-    def test_streaming_roundtrip_shards_and_deterministic_gzip(self):
+    def test_streaming_roundtrip_and_deterministic_gzip(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             source = list(iter_suite("smoke", 42))
-            manifest = write_dataset(iter(source), root / "one", shard_size=3)
-            write_dataset(iter(source), root / "two", shard_size=3)
-            self.assertEqual(dataset_bytes(root / "one"), dataset_bytes(root / "two"))
-            self.assertEqual(manifest["schema_version"], 1)
-            self.assertEqual(manifest["instance_count"], len(source))
-            self.assertEqual(
-                sum(shard["instance_count"] for shard in manifest["shards"]), len(source)
-            )
-            records = list(iter_dataset(root / "one"))
+            count = write_dataset(iter(source), root / "one.jsonl.gz")
+            write_dataset(iter(source), root / "two.jsonl.gz")
+            data = (root / "one.jsonl.gz").read_bytes()
+            self.assertEqual(data, (root / "two.jsonl.gz").read_bytes())
+            self.assertEqual(count, len(source))
+            records = list(iter_dataset(root / "one.jsonl.gz"))
             self.assertEqual([record["id"] for record in records], [item.id for item in source])
             for record, instance in zip(records, source, strict=True):
                 self.assertEqual(record["intervals"], [list(row) for row in intervals(instance)])
@@ -439,69 +428,36 @@ class DatasetTests(OfflineTests):
                 self.assertEqual(record["n"], len(instance.starts))
                 self.assertNotIn("lanes", record)
                 self.assertNotIn("assignment", record)
-            for shard in manifest["shards"]:
-                path = root / "one" / shard["path"]
-                data = path.read_bytes()
-                self.assertEqual(data[:2], b"\x1f\x8b")
-                self.assertEqual(data[4:8], b"\x00\x00\x00\x00")
-                self.assertFalse(data[3] & 8, "gzip filename header must be absent")
-                lines = gzip.decompress(data).decode("utf-8").splitlines()
-                self.assertEqual(len(lines), shard["instance_count"])
-                self.assertLessEqual(len(lines), 3)
-                for line in lines:
-                    self.assertEqual(
-                        line, json.dumps(json.loads(line), sort_keys=True, separators=(",", ":"))
-                    )
+            self.assertEqual(data[:2], b"\x1f\x8b")
+            self.assertEqual(data[4:8], b"\x00\x00\x00\x00")
+            self.assertFalse(data[3] & 8, "gzip filename header must be absent")
+            for line in gzip.decompress(data).decode("utf-8").splitlines():
+                self.assertEqual(
+                    line, json.dumps(json.loads(line), sort_keys=True, separators=(",", ":"))
+                )
 
     def test_output_rejection_and_explicit_overwrite(self):
         with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "dataset"
-            output.mkdir()
-            (output / "existing.txt").write_text("keep until overwrite", encoding="utf-8")
-            with self.assertRaises((ValueError, FileExistsError)):
+            output = Path(directory) / "dataset.jsonl.gz"
+            output.write_text("keep until overwrite", encoding="utf-8")
+            with self.assertRaises(ValueError):
                 write_dataset(iter_suite(), output)
-            self.assertEqual(
-                (output / "existing.txt").read_text(encoding="utf-8"), "keep until overwrite"
-            )
+            self.assertEqual(output.read_text(encoding="utf-8"), "keep until overwrite")
             write_dataset(iter_suite(), output, overwrite=True)
-            self.assertFalse((output / "existing.txt").exists())
             self.assertGreater(len(list(iter_dataset(output))), 0)
 
-    def test_duplicate_ids_are_rejected(self):
+    def test_duplicate_ids_are_rejected_before_publishing(self):
         instance = generate_instance("disjoint", {"n": 5}, 1)
-        with tempfile.TemporaryDirectory() as directory, self.assertRaises(ValueError):
-            write_dataset(iter((instance, instance)), Path(directory) / "dataset")
-
-    def test_writer_and_reader_are_lazy_between_shards(self):
         with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "dataset"
+            with self.assertRaises(ValueError):
+                write_dataset(iter((instance, instance)), Path(directory) / "dataset.jsonl.gz")
+            self.assertEqual(list(Path(directory).iterdir()), [])
 
-            def source():
-                for index in range(4):
-                    if index >= 2:
-                        self.assertTrue(any((output / "shards").glob("*.jsonl.gz")))
-                    yield generate_instance("disjoint", {"n": index + 1}, index)
-
-            manifest = write_dataset(source(), output, shard_size=1)
-            second = output / manifest["shards"][1]["path"]
-            second.write_bytes(b"invalid gzip")
-            reader = iter_dataset(output)
-            self.assertEqual(next(reader)["n"], 1)
-            with self.assertRaises((OSError, ValueError, EOFError)):
-                next(reader)
-
-    def test_empty_dataset_and_invalid_shard_size(self):
+    def test_empty_dataset(self):
         with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory) / "empty"
-            manifest = write_dataset(iter(()), output)
-            self.assertEqual(manifest["instance_count"], 0)
-            self.assertEqual(manifest["shards"], [])
+            output = Path(directory) / "empty.jsonl.gz"
+            self.assertEqual(write_dataset(iter(()), output), 0)
             self.assertEqual(list(iter_dataset(output)), [])
-            for shard_size in (0, -1):
-                with self.subTest(shard_size=shard_size), self.assertRaises(ValueError):
-                    write_dataset(
-                        iter(()), Path(directory) / str(shard_size), shard_size=shard_size
-                    )
 
     def test_complete_smoke_cli_is_reproducible_across_hash_seeds(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -513,22 +469,18 @@ class DatasetTests(OfflineTests):
                     "smoke",
                     "--seed",
                     "42",
-                    "--shard-size",
-                    "7",
                     "--output",
-                    str(root / name),
+                    str(root / f"{name}.jsonl.gz"),
                     hash_seed=seed,
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(dataset_bytes(root / "first"), dataset_bytes(root / "second"))
-            manifest = json.loads((root / "first" / "dataset.json").read_text(encoding="utf-8"))
-            records = list(iter_dataset(root / "first"))
-            self.assertEqual(manifest["instance_count"], len(records))
+            first, second = root / "first.jsonl.gz", root / "second.jsonl.gz"
+            self.assertEqual(first.read_bytes(), second.read_bytes())
+            records = list(iter_dataset(first))
             self.assertEqual({record["family"] for record in records}, FAMILIES)
-            self.assertEqual(manifest["seed"], 42)
-            rerun = run_cli("synthetic", "--output", str(root / "first"))
+            rerun = run_cli("synthetic", "--output", str(first))
             self.assertNotEqual(rerun.returncode, 0)
-            overwrite = run_cli("synthetic", "--output", str(root / "first"), "--overwrite")
+            overwrite = run_cli("synthetic", "--output", str(first), "--overwrite")
             self.assertEqual(overwrite.returncode, 0, overwrite.stderr)
 
     def test_list_families_cli(self):
@@ -658,13 +610,12 @@ class JaistTests(OfflineTests):
                     "--catalog-kind",
                     "all",
                     "--output",
-                    str(root / name),
-                    "--shard-size",
-                    "2",
+                    str(root / f"{name}.jsonl.gz"),
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(dataset_bytes(root / "first"), dataset_bytes(root / "second"))
-            records = list(iter_dataset(root / "first"))
+            first = (root / "first.jsonl.gz").read_bytes()
+            self.assertEqual(first, (root / "second.jsonl.gz").read_bytes())
+            records = list(iter_dataset(root / "first.jsonl.gz"))
             self.assertEqual(len(records), 4)
             self.assertEqual(len({record["id"] for record in records}), 4)
             for index, record in enumerate(records):
@@ -672,7 +623,7 @@ class JaistTests(OfflineTests):
                 self.assertEqual(record["provenance"]["catalog_index"], index)
                 self.assertEqual(record["provenance"]["catalog_n"], 3)
 
-    def test_failed_imports_never_publish_a_manifest(self):
+    def test_failed_imports_never_publish_output(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             bad_footer = root / "bad-footer.txt"
@@ -684,7 +635,7 @@ class JaistTests(OfflineTests):
                 ("connected", [fixture], "connected"),
             ):
                 with self.subTest(case=name):
-                    output = root / name
+                    output = root / f"{name}.jsonl.gz"
                     result = run_cli(
                         "jaist",
                         "--input",
@@ -693,11 +644,9 @@ class JaistTests(OfflineTests):
                         kind,
                         "--output",
                         str(output),
-                        "--shard-size",
-                        "1",
                     )
                     self.assertNotEqual(result.returncode, 0)
-                    self.assertFalse((output / "dataset.json").exists())
+                    self.assertEqual(list(root.glob(f"{name}*")), [])
 
     def test_explicit_downloader_with_mocked_network_and_cache(self):
         html = b'<a href="interval_disconnected_1.txt">1</a>'

@@ -26,7 +26,7 @@ without Python or the plugin. The table generator only reads saved results.
 | [`coverage_profile_core.py`](coverage_profile_core.py) | Core comparison runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`test_coverage_profile.py`](test_coverage_profile.py) | Baseline checks | Direct membership oracle on small grouped, temporal and wide-load inputs → native Polars baseline validation | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`minimum_cost_dominating_set.py`](minimum_cost_dominating_set.py) | End-to-end benchmark | Integer/temporal, grouped and multichunk inputs → checked release collection samples and provenance | [Dominating set](../docs/domination-benchmarks.md) |
-| [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated, sharded interval instances | [Interval-graph corpora](#interval-graph-corpora) |
+| [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated interval instances in one gzip JSON Lines file | [Interval-graph corpora](#interval-graph-corpora) |
 | [`test_generate_interval_graphs.py`](test_generate_interval_graphs.py) | Corpus checks | Tiny deterministic instances and local fixtures → structural and reproducibility checks | [Interval-graph corpora](#interval-graph-corpora) |
 | [`nesting_depth.py`](nesting_depth.py) | End-to-end benchmark | Exact analytic families, integer/temporal and grouped inputs → verified collection samples and environment metadata | [Nesting depth](../docs/nesting-depth-benchmarks.md) |
 | [`max_weight_clique.py`](max_weight_clique.py) | End-to-end benchmark | Numeric/temporal, grouped and multichunk inputs → verified collection samples and provenance | [Maximum-weight clique](../docs/clique-benchmarks.md) |
@@ -162,9 +162,9 @@ non-isomorphic small interval graphs.
 
 ```sh
 python benchmarks/generate_interval_graphs.py list-families
-python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 42 --output benchmarks/generated/interval_graphs
-python benchmarks/generate_interval_graphs.py synthetic --suite exact --seed 42 --output benchmarks/generated/interval_graphs-exact
-python benchmarks/generate_interval_graphs.py synthetic --suite scaling --seed 42 --output benchmarks/generated/interval_graphs-scaling
+python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 42 --output benchmarks/generated/interval_graphs.jsonl.gz
+python benchmarks/generate_interval_graphs.py synthetic --suite exact --seed 42 --output benchmarks/generated/interval_graphs-exact.jsonl.gz
+python benchmarks/generate_interval_graphs.py synthetic --suite scaling --seed 42 --output benchmarks/generated/interval_graphs-scaling.jsonl.gz
 ```
 
 `smoke` is the default and quickly exercises every family. `exact` uses several
@@ -210,8 +210,8 @@ orders into an ignored cache. Choose `all` or `connected` explicitly; the two
 catalogs remain separate in provenance.
 
 ```sh
-python benchmarks/generate_interval_graphs.py jaist --input /path/to/catalog --catalog-kind all --output benchmarks/generated/jaist-local
-python benchmarks/generate_interval_graphs.py jaist --download --n 8 9 10 11 12 --catalog-kind all --cache benchmarks/generated/jaist-cache --output benchmarks/generated/jaist
+python benchmarks/generate_interval_graphs.py jaist --input /path/to/catalog --catalog-kind all --output benchmarks/generated/jaist-local.jsonl.gz
+python benchmarks/generate_interval_graphs.py jaist --download --n 8 9 10 11 12 --catalog-kind all --cache benchmarks/generated/jaist-cache --output benchmarks/generated/jaist.jsonl.gz
 ```
 
 Published per-order files are plain ASCII endpoint sequences, one graph per line,
@@ -234,15 +234,12 @@ with an error. Synthetic generation and tests never download data.
 
 ### Storage, statistics, and reproducibility
 
-Each output directory contains `dataset.json` and
-`shards/part-00000.jsonl.gz`, `part-00001.jsonl.gz`, and so on. Use `--shard-size`
-to change the default 50,000 records per shard. A nonempty output directory is
-rejected unless `--overwrite` is supplied. Bulk outputs and download caches under
+Each corpus is one gzip-compressed JSON Lines file, written only after every
+record validates. An existing output is rejected unless `--overwrite` is
+supplied. Bulk outputs and download caches under
 `benchmarks/generated/` are ignored by git; do not commit generated corpora.
 
-The manifest records `schema_version: 1`, corpus `kind`, `suite`, suite `seed`,
-`instance_count`, `shard_size`, and ordered shard paths/counts. Each JSONL record
-contains `id`, `family`, per-instance `seed` (null for JAIST), `n`, `params`,
+Each record contains `id`, `family`, per-instance `seed` (null for JAIST), `n`, `params`,
 `stats`, `certificate`, `provenance`, and `intervals` as `[start, end]` pairs.
 `iter_dataset(path)` in the generator lazily yields these complete record dicts
 for future benchmark consumers.
@@ -260,10 +257,10 @@ SHA-256 over canonical identifying data derives stable IDs and per-instance
 seeds. Geometry seeds depend on suite seed, family, parameters, and replicate;
 row shuffles use separate deterministic seeds, so changing order preserves
 geometry and adding another family does not change existing instances. Output
-uses compact sorted-key JSON, stable record/shard order, and gzip with `mtime=0`
+uses compact sorted-key JSON, stable record order, and gzip with `mtime=0`
 and no stored filename. Files contain no timestamps or host paths. Identical
 generation commands in the same Python/zlib runtime produce byte-identical
-datasets, including compressed shards.
+files.
 
 Run the offline checks without building the extension:
 
