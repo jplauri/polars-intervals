@@ -32,8 +32,9 @@ Each row describes a half-open interval `[start, end)`: it includes its start
 and excludes its end. An interval with `start == end` is empty. Empty intervals
 overlap nothing.
 
-Endpoints must be non-null, with `start <= end` in every row. Both columns must
-have the same dtype, and nothing is cast for you:
+Endpoints must be non-null, with `start <= end` in every row. Errors name the
+original row index within the collection or group. Both columns must have the
+same dtype, and nothing is cast or broadcast for you:
 
 | Endpoint type | Requirement |
 | --- | --- |
@@ -42,7 +43,8 @@ have the same dtype, and nothing is cast for you:
 | `Datetime` | The same time unit and timezone |
 
 Other endpoint types, including `Int128`, floating-point, Boolean, Decimal,
-`Time` and `Duration`, are rejected.
+`Time` and `Duration`, are rejected. Date and Datetime endpoints use their
+physical integer days or ticks, without rounding or timezone arithmetic.
 
 ### Weights, costs, and other values
 
@@ -73,7 +75,9 @@ range limits.
 
 Most functions accept column names such as `"start"` or expressions such as
 `pl.col("start")`, and return an expression for an eager or lazy query. The
-input does not need to be sorted.
+input does not need to be sorted. Each expression solves its whole collection
+across all chunks, even with the streaming engine. Use `.over(...)` to solve
+each group separately, as shown below.
 
 Selections return a Boolean mask. Use it in `filter` to keep the chosen rows,
 or in `with_columns` to flag them.

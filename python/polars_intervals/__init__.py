@@ -448,16 +448,11 @@ def cluster_intervals(
         Duplicate nonempty intervals connect. Duplicate empty rows stay separate.
         Input permutations can renumber IDs while preserving the partition.
 
-        Supports matching Int8/16/32/64, UInt8/16/32/64, Date and Datetime endpoints.
-        Datetime units and timezone metadata must match exactly. All input rows
-        are validated before sorting. Interval errors name original row indices
-        within the collection or group. No casting or broadcasting is performed.
-
-        Works in eager/lazy select, with_columns, windows and group aggregations.
-        Every chunk in a group forms one collection, including streaming queries.
-        The operation blocks on that collection. Time is O(n log n) and extra
-        space is O(n), including canonical ID restoration. A verified start-sorted
-        collection permits linear work. Downstream filters retain assigned IDs.
+        Endpoints and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
+        Time is O(n log n) and extra space is O(n), including canonical ID
+        restoration. A verified start-sorted collection permits linear work.
+        Downstream filters retain assigned IDs.
 
     Examples:
         >>> import polars as pl
@@ -526,20 +521,10 @@ def merge_intervals(
             reversed intervals, or unsupported/mismatched endpoint or key dtypes.
 
     Notes:
-        Endpoints support matching Int8/16/32/64, UInt8/16/32/64, Date and Datetime.
-        Exact logical dtypes, units and timezone metadata survive empty results.
-        Keys support those types plus String and Boolean, including null values.
-        Keys cannot be named start/end. Groups appear in first-observed input
-        order before pruning. Groups with no union output contribute no rows.
-        Every original interval is validated, with original input row indices.
-
-        A LazyFrame remains deferred until collection. Schema resolution reads no
-        rows. The Rust adapter groups, sorts and builds output with the GIL
-        released. The lazy boundary materializes the whole input, including with
-        the streaming engine. Filters, projections and slices after the call
-        remain after the solve. Input operations before the call define its data.
-        An entirely optimizer-pruned node need not execute validation.
-        Time is O(n log n + z), space O(n + z), for z output ranges.
+        Inputs, grouping, output order and lazy execution follow the
+        [frame rules](https://jplauri.github.io/polars-intervals/usage/#frame-results).
+        Groups with no union output contribute no rows. Time is O(n log n + z),
+        space O(n + z), for z output ranges.
 
     Examples:
         >>> import polars as pl
@@ -643,19 +628,10 @@ def subtract_intervals(
         groups emit nothing, but all their rows still validate. An empty left
         input returns a typed empty result. An empty right returns the left union.
 
-        All four endpoints must have the same Int8/16/32/64, UInt8/16/32/64,
-        Date or Datetime dtype, including unit and timezone. Corresponding key
-        dtypes must match exactly. Keys support those types plus String and
-        Boolean. Logical types survive empty results. Every evaluated input row
-        validates before pruning. Errors name the side, with left errors checked
-        first. Reversed intervals also report their index within that side.
-
-        Both lazy sources stay deferred through construction, explain and schema
-        resolution. One blocking native call evaluates the complete collections
-        with the GIL released, including under the streaming engine. This needs
-        both inputs in memory. Downstream filters, projections and slices remain
-        after the operation. Upstream transformations define the input rows.
-        Entirely eliminated nodes need not execute validation.
+        Inputs, grouping and lazy execution follow the
+        [frame rules](https://jplauri.github.io/polars-intervals/usage/#frame-results).
+        Errors name the side, with left errors checked first, and the row
+        index within that side.
 
         Geometry uses only exact endpoint comparisons. For n left rows, m right
         rows and z output ranges, time is O(n log n + m log m + z) and auxiliary
@@ -832,8 +808,8 @@ def interval_gaps(
         split gaps. A fully covered or empty domain returns zero rows. Ungrouped
         empty/empty-only input returns the whole nonempty domain. Observed groups
         with no clipped coverage also return the whole domain. Grouped empty
-        input has no observed keys and returns no rows. Absent groups require a
-        future domain-table API. No infinite outer gaps are inferred.
+        input has no observed keys and returns no rows. No infinite outer gaps
+        are inferred.
 
         Python integers are range-checked against the endpoint dtype. Typed
         singleton Series bounds must match endpoint logical metadata exactly.
@@ -841,10 +817,9 @@ def interval_gaps(
         resolution and must match Datetime unit/timezone metadata. Use typed
         Series for millisecond/nanosecond bounds. Boolean bounds are rejected.
 
-        Uses merge_intervals' genuine lazy execution, optimizer safeguards,
-        grouping contract and whole-input materialization boundary. The same
-        blocking fallback is used under the streaming engine. All geometry uses
-        exact endpoint comparisons. Time is O(n log n + z), space O(n + z).
+        Grouping and lazy execution follow the
+        [frame rules](https://jplauri.github.io/polars-intervals/usage/#frame-results).
+        Time is O(n log n + z), space O(n + z).
 
     Examples:
         >>> import polars as pl
@@ -920,12 +895,9 @@ def coverage_profile(
             construction; row values and native domain checks run at execution.
 
     Notes:
-        Endpoints support Int8/16/32/64, UInt8/16/32/64, Date and Datetime with
-        exactly matching unit/timezone metadata. Quantities support only those
-        8/16/32/64-bit integers. No implicit casts, null filling or broadcasting
-        occur. Group keys support String, Boolean, those integers, Date and
-        Datetime, including null keys. Keys cannot use reserved output names
-        start/end/load. All chunks form one instance per observed key tuple.
+        Endpoints, quantities and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
+        Keys cannot be named start, end or load.
 
         Segments are half-open and nonempty. Touching equal loads coalesce even
         when the contributing rows change; equal loads across omitted gaps do
@@ -944,15 +916,8 @@ def coverage_profile(
         The native sweep uses exact checked Int128 loads without integrating
         duration times load. Time is O(n log n + z), space O(n + z) for n input
         rows and z output segments; verified ordered endpoint streams permit
-        linear work. Grouping, gathering and output assembly run natively with
-        the GIL released. Lazy input resolves its schema during construction and
-        defers the same native solve until execution. All rows and chunks are
-        materialized at that boundary, including with the streaming engine:
-        this is a whole-collection operation, not a streaming profile algorithm.
-        Input expressions and filters before the call define the collection.
-        Downstream filters, projections and slices stay after the profile node.
-        Polars may eliminate an unneeded node entirely, such as for head(0) or
-        a constant-false filter; validation runs only when that node executes.
+        linear work. Lazy execution follows the
+        [frame rules](https://jplauri.github.io/polars-intervals/usage/#frame-results).
 
         Coverage is a function over coordinates. It is distinct from per-row
         overlap_count, a selected maximum-weight clique, and row selection.
@@ -1065,16 +1030,10 @@ def minimum_cost_dominating_set(
         or be disjoint. It covers input vertices by overlap, not every point
         of a continuous coordinate target; use ``minimum_cost_cover`` for that.
 
-        Endpoints must have identical Int8/16/32/64, UInt8/16/32/64, Date, or
-        Datetime dtypes, including Datetime unit and timezone metadata. Explicit
-        costs accept only Int8/16/32/64 or UInt8/16/32/64. Physical integer
-        precision is retained; costs use checked i128 arithmetic. There is no
-        implicit casting, null filling, or scalar broadcasting.
-
-        All chunks form one collection, including with the streaming engine.
-        ``.over("group")`` solves each whole group and preserves row alignment;
-        grouped aggregation returns lists of Boolean values. Filtering BEFORE
-        optimization changes both the demand vertices and selectable candidates.
+        Endpoints, costs and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
+        Costs use checked i128 arithmetic. Filtering before optimization changes
+        both the demand vertices and the selectable candidates.
 
         The Rust core takes O(n log n) time and O(n) extra space, including
         validation and reconstruction. Unit and uniform explicit costs (including zero) use
@@ -1162,12 +1121,10 @@ def max_weight_with_capacity_profile(
         supplied profile have capacity zero. Valid empty profile rows have no
         effect, but all their values are still validated.
 
-        Endpoint columns must have exactly matching Int8/16/32/64, UInt8/16/32/64,
-        Date, or Datetime dtypes, including Datetime unit and timezone metadata.
-        Weights and capacities accept signed/unsigned integers up to 64 bits;
-        floats, Decimal and implicit casts are rejected. Objectives accumulate
-        exactly in checked i128. Capacity may be clamped to the number of
-        relevant non-empty jobs: no subset can use more capacity than that.
+        Endpoints, weights and capacities follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
+        Objectives accumulate exactly in checked i128. Capacity may be clamped to
+        the number of relevant non-empty jobs: no subset can use more than that.
 
         Positive empty jobs consume no capacity and are always selected, even
         with an empty profile. Nonpositive weights are omitted. An empty subset
@@ -1400,10 +1357,9 @@ def minimum_cover(
         must match exactly; no Date/Datetime, unit, timezone, or lossy numeric casts
         occur. Targets are scalar plugin configuration, never row-valued inputs.
 
-        Use in eager select, lazy with_columns, or directly in df.filter(...).
-        With .over("group"), each group covers the same scalar target independently;
-        group_by aggregation produces Boolean lists. All chunks form one instance.
-        The complete collection is required even with the streaming engine.
+        Grouping follows the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
+        With ``.over("group")``, each group covers the same scalar target.
 
         The exact Rust greedy algorithm sorts packed candidates by start, then
         repeatedly selects the eligible interval reaching furthest right. It uses
@@ -1527,17 +1483,9 @@ def max_weight_with_capacity(
         Capacity one is equivalent in objective to `max_weight_non_overlapping`
         and delegates to that specialized dynamic program.
 
-        Weights accept Int8/16/32/64 and UInt8/16/32/64, with exact checked i128
-        accumulation. Null, floating-point, Decimal, Boolean, temporal and Int128
-        weights are rejected. No implicit casts or scalar broadcasting occur.
-        Endpoints accept matching integer dtypes up to 64 bits, Date, or Datetime
-        with exactly matching units and timezone metadata, preserving precision.
-
-        Use directly in `df.filter(...)`, in eager or lazy queries, or with
-        `.over("group")` to optimize each group independently. Grouped aggregation
-        returns Boolean lists. All chunks form one instance. The full collection
-        is required even with the streaming engine. Filtering before optimization
-        changes the instance being solved.
+        Endpoints, weights and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
+        Weights accumulate exactly in checked i128.
 
         The exact Rust solver uses an interval min-cost flow network with residual
         edges and successive shortest paths. Empty/nonpositive rows are removed;
@@ -1621,18 +1569,8 @@ def max_weight_clique(
         and omitted weights agree. Tied masks are not promised stable across
         releases or row permutations.
 
-        Endpoints support matching Int8/16/32/64, UInt8/16/32/64, Date, or
-        Datetime, including exactly matching time unit and timezone metadata.
-        Physical integer days/timestamps preserve full precision. Explicit
-        weights support Int8/16/32/64 and UInt8/16/32/64 only. Float, Decimal,
-        Boolean, temporal, null-valued, and other weight dtypes are rejected.
-        There is no implicit casting, null filling, or scalar broadcasting.
-
-        Use ``df.filter(...)``, ``select``, or ``with_columns`` in eager or lazy
-        queries. ``.over("group")`` solves each whole group in original row
-        order; ``group_by(...).agg(...)`` returns lists of Boolean values. All
-        chunks form one instance, including with the streaming engine. Filtering
-        before optimization changes the instance being solved.
+        Endpoints, weights and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
 
         Positive nonempty intervals in a clique share a point. The Rust core
         finds the greatest active weight at a start coordinate, compares it with
@@ -1693,20 +1631,9 @@ def max_weight_non_overlapping(
         zero-weight rows are omitted. The empty subset is allowed with value 0,
         so all-negative input returns all False.
 
-        Weights accept Int8/16/32/64 and UInt8/16/32/64 only. Accumulation uses
-        checked i128 arithmetic without passing through floating point. Float,
-        Decimal, Boolean, temporal and other weight dtypes are rejected.
-        Floating-point weights may be considered in a separate design.
-
-        Endpoint support matches `overlap_count`: matching integer dtypes up
-        to 64 bits, Date, or Datetime with exactly matching time unit and timezone
-        metadata. Physical integer days/timestamps preserve temporal precision.
-
-        Use directly in `df.filter(...)`, or `.over("group")` to solve each
-        group independently. `group_by(...).agg(...)` returns lists of Boolean
-        values. All chunks belong to the same instance. The full collection is
-        required even with the streaming engine; filtering before optimization
-        changes the instance being solved.
+        Endpoints, weights and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
+        Weights accumulate in checked i128 arithmetic, never through floats.
 
         The exact Rust dynamic program sorts by finish and start, sweeps
         compatible predecessors, and reconstructs the optimal subset in
@@ -1784,19 +1711,9 @@ def assign_balanced_lanes(
         adds lanes to spread empties. Nonempty input uses
         ``k = max(1, maximum_nonempty_concurrency)``; empty-only input uses one.
 
-        Endpoints must have exactly matching Int8/16/32/64, UInt8/16/32/64,
-        Date, or Datetime dtypes, including time unit and timezone metadata.
-        Physical integer values retain precision. There is no coercion, scalar
-        broadcasting, null filling, or Python row loop.
-
-        Initial lane columns accept Int8/16/32/64 and UInt8/16/32/64, checked
-        losslessly. IDs must be contiguous ``0..k-1`` and k must be minimum.
-        Boolean, floats, temporal IDs and wider integers are unsupported. An
-        invalid starting assignment is rejected, never silently replaced.
-
-        All chunks form one collection. ``.over("group")`` solves each whole
-        group and preserves row order; grouped aggregation returns lists of
-        UInt32 IDs. The full collection is required even with streaming.
+        Endpoints, initial lanes and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
+        An invalid starting assignment is rejected, never silently replaced.
         Identical input and options give identical labels across chunking,
         eager/lazy execution, and equivalent order-preserving endpoint types.
         Row permutations need not preserve labels or heuristic quality.
@@ -1883,18 +1800,8 @@ def assign_lanes(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
         lane `0`. Nonempty input containing only empty intervals uses one lane;
         empty input returns empty output.
 
-        Endpoint rules match `overlap_count`: both columns must have the same
-        dtype among `Int8`, `Int16`, `Int32`, `Int64`, `UInt8`, `UInt16`, `UInt32`,
-        `UInt64`, `Date`, and `Datetime`. Datetime units (`ms`, `us`, `ns`) and
-        timezone metadata must match exactly. Physical integer days/timestamps
-        preserve temporal precision without timezone arithmetic. No implicit
-        coercion, scalar broadcasting, or null filling is performed. Float,
-        Time, Duration, and other dtypes are unsupported.
-
-        Use `.over("group")` to assign lanes independently within each group,
-        or `group_by(...).agg(...)` for lists of lane IDs. Assignment needs the
-        full collection, including all chunks, even with the streaming engine.
-        Filtering before assignment changes the collection being colored.
+        Endpoints and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
 
         The Rust algorithm sorts starts and reuses the earliest-ending lane
         with a min-heap: O(n log n) sorting and O(n log max(2, k)) assignment,
@@ -1944,26 +1851,11 @@ def overlap_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
             index. Null rows are not skipped or filled.
 
     Notes:
-        Both inputs must have equal lengths and the same dtype: `Int8`,
-        `Int16`, `Int32`, `Int64`, `UInt8`, `UInt16`, `UInt32`, `UInt64`,
-        `Date`, or `Datetime`. Datetime supports `ms`, `us`, and `ns`, including
-        timezone-aware columns. Both the time unit and timezone metadata must
-        match exactly; naive and timezone-aware Datetime do not match.
-        Date/Datetime, temporal/integer, differing time units, and differing
-        timezones are rejected. No casting or scalar broadcasting is performed.
-        Time, Duration, floating-point, and other dtypes are unsupported.
-
-        Temporal endpoints pass their native physical integer days or timestamps
-        to the same Rust algorithm, without rounding or timezone arithmetic.
-
-        Counts use the whole input collection, or each group when used with
-        `.over(...)` or `group_by`. Filtering before this expression changes
-        which intervals are compared; filtering afterwards only removes
-        rows from the result.
+        Endpoints and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
 
         The Rust algorithm takes O(n log n) time and O(n) additional space,
-        without materializing overlapping pairs. It needs the full input
-        collection even when the query uses the streaming engine.
+        without materializing overlapping pairs.
 
     Examples:
         Column names in a lazy query:
@@ -2050,15 +1942,8 @@ def nesting_depth(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
         [0, 8) and [2, 10) both contain [4, 5), but cannot contain each other, so
         the innermost interval has two containers and nesting depth only 1.
 
-        Supports Int8/16/32/64, UInt8/16/32/64, Date, and Datetime ms/us/ns,
-        including matching timezones. Logical dtypes must match exactly; no
-        coercion or scalar broadcasting occurs. Temporal endpoints use their
-        physical integer values without timezone arithmetic.
-
-        Each select computes globally across all chunks. With ``.over("group")``,
-        each group is solved independently and results retain row alignment.
-        Group aggregation returns a list of depths per group. The complete
-        collection is required, including with the streaming engine.
+        Endpoints and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
 
         The exact Rust dynamic program sorts packed records by start ascending
         and end descending, then maintains a monotone frontier of the greatest
@@ -2114,16 +1999,8 @@ def containment_count(start: str | pl.Expr, end: str | pl.Expr) -> pl.Expr:
             zero-based index within the input collection (or group).
 
     Notes:
-        Supports `Int8`, `Int16`, `Int32`, `Int64`, `UInt8`, `UInt16`,
-        `UInt32`, `UInt64`, `Date`, and `Datetime` (ms/us/ns, including
-        timezone-aware types). Datetime units and timezones must match.
-        No silent coercion, scalar broadcasting, or null skipping is performed.
-
-        Counts are exact over the entire input collection, across chunks.
-        Use `.over("group")` to count separately within each group while
-        preserving row order. `group_by(...).agg(...)` returns lists of counts.
-        Filtering before counting changes the collection; filtering afterwards
-        only removes result rows. Streaming still requires the full collection.
+        Endpoints and grouping follow the
+        [input rules](https://jplauri.github.io/polars-intervals/usage/#inputs).
 
         The Rust core sorts packed records by descending start, compresses end
         coordinates, and counts with a Fenwick tree. It inserts each complete
