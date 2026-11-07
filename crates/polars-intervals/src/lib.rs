@@ -1,13 +1,7 @@
-//! Interval algorithms for Rust Polars, backed by `intervals-core`.
+//! Polars expression plugin backed by `intervals-core`.
 //!
-//! [`overlap_count`], [`containment_count`], [`nesting_depth`], [`assign_lanes`],
-//! [`assign_balanced_lanes`],
-//! [`max_weight_clique`], [`max_weight_non_overlapping`] and
-//! [`max_weight_with_capacity`] adapt integer, Date, and Datetime [`Series`]
-//! to the core and Python expressions.
-//! [`minimum_cover`] and [`minimum_cost_cover`] select exact continuous target covers.
-//! [`minimum_cost_dominating_set`] selects rows dominating every interval vertex.
-//! [`minimum_stabbing_points`] returns one optimal list of discrete hitting points.
+//! The Python package is the only caller, so the crate has no public Rust API.
+//! It validates integer, Date, and Datetime columns and adapts them to the core.
 
 use polars::prelude::*;
 use std::borrow::Cow;
@@ -43,19 +37,12 @@ macro_rules! dispatch_endpoints {
 }
 
 mod cover;
-pub use cover::{minimum_cost_cover, minimum_cover};
-mod domination;
-pub use domination::minimum_cost_dominating_set;
-mod profile;
-pub use profile::max_weight_with_capacity_profile;
 mod coverage_profile;
-pub use coverage_profile::coverage_profile;
 mod coverage_stats;
-pub use coverage_stats::coverage_stats;
+mod domination;
 mod geometry;
-pub use geometry::{interval_gaps, merge_intervals};
+mod profile;
 mod set_geometry;
-pub use set_geometry::{intersect_intervals, subtract_intervals};
 
 #[pyo3::pymodule]
 mod _internal {
@@ -115,17 +102,7 @@ fn cluster_intervals_plugin(inputs: &[Series], kwargs: ClusterOptions) -> Polars
 }
 
 /// Label connected interval components in original row order.
-///
-/// Nonempty half-open intervals connect by strict overlap, or also by touching
-/// when `include_touching` is true. Every empty row is an isolated singleton.
-/// IDs are non-null UInt32, contiguous from zero, in first-original-row order.
-/// Matching integer, Date and Datetime inputs retain exact physical endpoints.
-/// All chunks form one collection. See [`intervals_core::cluster_intervals`].
-///
-/// # Errors
-/// Rejects unequal lengths, nulls, unsupported or mismatched logical dtypes,
-/// reversed intervals and IDs exceeding UInt32. Reports original row indices.
-pub fn cluster_intervals(
+fn cluster_intervals(
     starts: &Series,
     ends: &Series,
     include_touching: bool,
@@ -154,19 +131,7 @@ fn max_k_coverage_plugin(inputs: &[Series], kwargs: CoverageOptions) -> PolarsRe
 }
 
 /// Select at most `k` intervals whose union has maximum total physical measure.
-///
-/// Among maximum-coverage solutions, use the fewest intervals. Returns a non-null
-/// Boolean Series in original row order. Empty intervals are never selected.
-/// Uses matching integer, Date, and Datetime logical dtypes, including timezone
-/// metadata; exact physical days/ticks are widened before subtraction.
-/// Each supplied collection is solved globally, across all chunks. See
-/// [`intervals_core::max_k_coverage`] for the algorithm, complexity and ties.
-///
-/// # Errors
-///
-/// Rejects unequal lengths, null endpoints, mismatched/unsupported logical dtypes
-/// and reversed intervals, preserving original row indices even when `k=0`.
-pub fn max_k_coverage(starts: &Series, ends: &Series, k: usize) -> PolarsResult<Series> {
+fn max_k_coverage(starts: &Series, ends: &Series, k: usize) -> PolarsResult<Series> {
     evaluate(starts, ends, Algorithm::Coverage(k))
 }
 
@@ -185,21 +150,7 @@ fn minimum_stabbing_points_plugin(inputs: &[Series]) -> PolarsResult<Series> {
 }
 
 /// Select the minimum number of discrete points hitting every half-open interval.
-///
-/// Returns one non-null list with the exact endpoint logical dtype, including
-/// Date and Datetime unit/timezone metadata. Points are sorted and unique; empty
-/// input returns one empty list. Date predecessors are days; Datetime predecessors
-/// use the column's physical ms/us/ns tick. See [`intervals_core::minimum_stabbing_points`]
-/// for the exchange proof, sorted-input fast path and `O(n log n)` time / `O(n)`
-/// additional space bounds. Contiguous inputs are borrowed; multiple chunks are
-/// collected before invoking the core.
-///
-/// # Errors
-///
-/// Rejects unequal lengths, null endpoints, unsupported or mismatched logical
-/// dtypes, reversed intervals, and empty intervals. Interval errors preserve the
-/// original zero-based row index within the supplied collection.
-pub fn minimum_stabbing_points(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+fn minimum_stabbing_points(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     let points = evaluate(starts, ends, Algorithm::Stabbing)?;
     let points = logical_series(points, starts.dtype())?;
     Ok(Series::new("minimum_stabbing_points".into(), [points]))
@@ -334,146 +285,22 @@ fn max_weight_with_capacity_plugin(
 }
 
 /// Counts how many other intervals are contained by each row.
-///
-/// Containment means `a.start <= b.start && b.end <= a.end`, with self excluded.
-/// Duplicate rows count each other. Half-open empty intervals follow exactly
-/// the same endpoint predicate: `[0, 5)` contains `[5, 5)`.
-///
-/// Returns a non-null `UInt64` Series named `containment_count`, in original
-/// row order across all chunks. Takes `O(n log n)` time and `O(n)` extra space.
-///
-/// # Errors
-///
-/// Rejects unequal lengths, null endpoints, and `start > end` (reporting the
-/// first original row index). Logical dtypes must match exactly, including
-/// Datetime unit and timezone. Supports 8/16/32/64-bit signed/unsigned integers,
-/// Date, and Datetime; physical integers are extracted only after validation.
-/// No coercion or scalar broadcasting is performed.
-///
-/// # Examples
-///
-/// ```
-/// use polars::prelude::*;
-/// let starts = Series::new("start".into(), [0i64, 2, 4]);
-/// let ends = Series::new("end".into(), [10i64, 5, 12]);
-/// let counts = polars_intervals::containment_count(&starts, &ends)?;
-/// assert_eq!(counts.u64()?.into_no_null_iter().collect::<Vec<_>>(), [1, 0, 0]);
-/// # Ok::<(), PolarsError>(())
-/// ```
-pub fn containment_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+fn containment_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     evaluate(starts, ends, Algorithm::ContainmentCount)
 }
 
 /// Return the length of the longest strict containment chain above each interval.
-///
-/// Outermost intervals have depth zero. `A` strictly contains `B` exactly when
-/// `A.start <= B.start && B.end <= A.end && (A.start < B.start || B.end < A.end)`.
-/// Identical geometries share a depth and never add a level to one another;
-/// equal starts or equal ends alone still permit strict containment. Empty
-/// intervals follow this endpoint predicate: `[0, 5)` strictly contains `[5, 5)`,
-/// while identical `[5, 5)` rows do not strictly contain one another.
-///
-/// Returns a non-null `UInt64` Series named `nesting_depth`, in original row
-/// order. All chunks form one collection; each Python window/group is solved
-/// independently. Unlike [`containment_count`], this measures a longest chain,
-/// not the number of contained rows or containers. Several incomparable
-/// containers can all contain one interval whose depth is only one.
-/// See [`intervals_core::nesting_depths`] for the production algorithm; worst-case
-/// time is `O(n log n)` and additional space is `O(n)`.
-///
-/// # Errors
-///
-/// Rejects unequal lengths, null endpoints, unsupported or mismatched logical
-/// dtypes, and `start > end`, reporting the first original row index. Supports
-/// 8/16/32/64-bit signed/unsigned integers, Date, and Datetime with exactly
-/// matching units/timezones, using physical endpoints without coercion or
-/// scalar broadcasting. Empty input returns empty output.
-///
-/// # Examples
-///
-/// ```
-/// use polars::prelude::*;
-/// let starts = Series::new("start".into(), [0i64, 2, 2, 3]);
-/// let ends = Series::new("end".into(), [10i64, 8, 8, 7]);
-/// let depths = polars_intervals::nesting_depth(&starts, &ends)?;
-/// assert_eq!(depths.u64()?.into_no_null_iter().collect::<Vec<_>>(), [0, 1, 1, 2]);
-/// # Ok::<(), PolarsError>(())
-/// ```
-pub fn nesting_depth(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+fn nesting_depth(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     evaluate(starts, ends, Algorithm::NestingDepth)
 }
 
 /// Counts other overlapping intervals in the supplied start and end columns.
-///
-/// Both columns must have the same dtype: `Int8`, `Int16`, `Int32`, `Int64`,
-/// `UInt8`, `UInt16`, `UInt32`, `UInt64`, `Date`, or `Datetime`. Datetime units
-/// (ms, us, ns) and timezone metadata must match exactly. No dtype coercion is
-/// performed. Dates use physical integer days and datetimes use physical integer
-/// timestamps, preserving endpoint values without timezone arithmetic.
-/// Nulls are rejected in either column, even when both endpoints are null.
-///
-/// Intervals use half-open `[start, end)` semantics. Two non-empty intervals
-/// overlap when `a.start < b.end && b.start < a.end`. Touching endpoints do not
-/// overlap. Empty intervals (`start == end`) overlap nothing. Each row excludes
-/// itself, while duplicate non-empty intervals count each other.
-///
-/// Returns a non-null `UInt64` Series named `overlap_count`, with one count per
-/// input row in its original order. All chunks belong to the same collection.
-/// The core algorithm takes `O(n log n)` time and `O(n)` additional space.
-///
-/// # Errors
-///
-/// Returns a [`PolarsError`] for unequal lengths (without broadcasting),
-/// mismatched or unsupported dtypes, null endpoints, or any `start > end`.
-/// Invalid intervals report their zero-based index in the original input.
-///
-/// # Examples
-///
-/// ```
-/// use polars::prelude::*;
-/// use polars_intervals::overlap_count;
-///
-/// let starts = Series::new("start".into(), [1i64, 3, 2, 2]);
-/// let ends = Series::new("end".into(), [3i64, 5, 4, 2]);
-/// let counts = overlap_count(&starts, &ends)?;
-/// assert_eq!(counts.u64()?.into_no_null_iter().collect::<Vec<_>>(), [1, 1, 2, 0]);
-/// # Ok::<(), PolarsError>(())
-/// ```
-pub fn overlap_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+fn overlap_count(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     evaluate(starts, ends, Algorithm::OverlapCount)
 }
 
 /// Assign intervals to the minimum number of non-overlapping lanes.
-///
-/// Returns a non-null `UInt32` Series named `assign_lanes`, in original row
-/// order. Lane IDs are contiguous from zero and deterministic for identical
-/// input; no particular optimal coloring is promised across releases.
-/// The minimum lane count equals maximum concurrency of non-empty intervals.
-/// Empty intervals consume no capacity and receive lane zero. An all-empty,
-/// nonempty collection uses one lane; empty input returns empty output.
-///
-/// Uses the same matching integer, Date and Datetime dtypes, half-open semantics,
-/// null rejection, physical representations, and chunk handling as [`overlap_count`].
-/// Takes `O(n log n)` time and `O(n)` additional space.
-///
-/// # Errors
-///
-/// Returns a [`PolarsError`] for unequal lengths, mismatched or unsupported
-/// logical dtypes, null endpoints, reversed intervals (with original row index),
-/// or lane IDs exceeding `u32::MAX`. There is no coercion or broadcasting.
-///
-/// # Examples
-///
-/// ```
-/// use polars::prelude::*;
-/// use polars_intervals::assign_lanes;
-/// let starts = Series::new("start".into(), [0i64, 1, 2]);
-/// let ends = Series::new("end".into(), [2i64, 3, 4]);
-/// let lanes = assign_lanes(&starts, &ends)?;
-/// assert_eq!(lanes.n_unique()?, 2);
-/// # Ok::<(), PolarsError>(())
-/// ```
-pub fn assign_lanes(starts: &Series, ends: &Series) -> PolarsResult<Series> {
+fn assign_lanes(starts: &Series, ends: &Series) -> PolarsResult<Series> {
     evaluate(starts, ends, Algorithm::AssignLanes)
 }
 
@@ -506,39 +333,7 @@ fn assign_balanced_lanes_plugin(inputs: &[Series], kwargs: BalanceOptions) -> Po
 }
 
 /// Assign the minimum number of lanes while heuristically balancing row counts.
-///
-/// Returns non-null contiguous `UInt32` labels in original row order. Minimize
-/// `(max(size) - min(size), sum(size * size))` lexicographically using exact
-/// integers, never occupied duration. Without `initial_lanes`, starts from
-/// [`assign_lanes`]; otherwise starts from the supplied proper minimum-lane
-/// assignment. The result preserves the palette and never worsens its starting
-/// score, but individual rows may change lanes. A minimum lane count and proper
-/// coloring are guaranteed; globally optimal balance or an approximation ratio
-/// is not. Every empty row counts and
-/// may use any existing lane, unlike [`assign_lanes`], which uses lane zero.
-/// Nonempty empty-only input uses one lane; empty input uses zero lanes.
-///
-/// `max_work` bounds deterministic refinement work, not elapsed time; zero
-/// returns the validated starting assignment unchanged. Validation and fixed
-/// `O(n log n)` preparation are outside that budget; bounded refinement adds
-/// work beyond construction. See [`intervals_core::assign_balanced_lanes`] for
-/// work units and the algorithm. All chunks form one collection, including in
-/// streaming queries; Python window/group expressions solve each group whole.
-///
-/// # Errors
-///
-/// Endpoint validation matches [`assign_lanes`]: matching integer, Date, or
-/// Datetime dtypes including units/timezones, no nulls or broadcasting, and
-/// original row indices for reversed intervals. Identical inputs/options are
-/// deterministic; labels and heuristic quality need not survive row permutation.
-///
-/// In addition to endpoint errors, rejects unequal lane lengths, null lane IDs,
-/// sparse/noncontiguous labels, conflicts, or a nonminimum palette. Lane columns
-/// must be 8/16/32/64-bit signed/unsigned integers, with every value nonnegative
-/// and in the UInt32 range; no lossy cast is performed. Boolean, floating-point,
-/// temporal, and wider integer lane dtypes are unsupported, even on empty input.
-/// All validation precedes zero-budget or balance early returns.
-pub fn assign_balanced_lanes(
+fn assign_balanced_lanes(
     starts: &Series,
     ends: &Series,
     initial_lanes: Option<&Series>,
@@ -573,37 +368,7 @@ pub fn assign_balanced_lanes(
 }
 
 /// Select a globally maximum-weight subset of mutually non-overlapping intervals.
-///
-/// Returns a non-null Boolean Series named `max_weight_non_overlapping` in
-/// original row order. Endpoints follow the integer, Date and Datetime rules of
-/// [`overlap_count`], including matching units/timezones and half-open semantics.
-/// Weights must be non-null signed/unsigned integers of at most 64 bits. They are
-/// widened losslessly to `i128` for checked accumulation, never through floats.
-///
-/// The empty subset is allowed. Every positive empty interval is selected;
-/// nonpositive rows are omitted. Identical inputs give deterministic results,
-/// but no particular optimum on ties is promised across releases. All chunks
-/// form one instance. Takes `O(n log n)` time and `O(n)` additional space.
-///
-/// # Errors
-///
-/// Rejects unequal lengths, nulls, unsupported weight or endpoint dtypes,
-/// mismatched logical endpoint dtypes, reversed intervals (original row index),
-/// and objectives exceeding `i128`. No coercion or broadcasting is performed.
-///
-/// # Examples
-///
-/// ```
-/// use polars::prelude::*;
-/// use polars_intervals::max_weight_non_overlapping;
-/// let s = Series::new("s".into(), [0i64, 0, 4, 7]);
-/// let e = Series::new("e".into(), [10i64, 4, 7, 10]);
-/// let w = Series::new("w".into(), [15u64, 10, 10, 10]);
-/// let mask = max_weight_non_overlapping(&s, &e, &w)?;
-/// assert_eq!(mask.bool()?.no_null_iter().collect::<Vec<_>>(), [false, true, true, true]);
-/// # Ok::<(), PolarsError>(())
-/// ```
-pub fn max_weight_non_overlapping(
+fn max_weight_non_overlapping(
     starts: &Series,
     ends: &Series,
     weights: &Series,
@@ -612,28 +377,7 @@ pub fn max_weight_non_overlapping(
 }
 
 /// Select one globally maximum-weight clique of the interval intersection graph.
-///
-/// Returns a non-null Boolean Series in original row order. `None` assigns every
-/// row unit weight without constructing a weight vector. Explicit weights must
-/// be signed/unsigned integers up to 64 bits; nonpositive rows are omitted.
-/// Half-open nonempty intervals are adjacent exactly when they overlap; touching
-/// intervals are not adjacent. Each empty interval is an isolated vertex, hence
-/// may only be selected alone. The empty clique has weight zero.
-///
-/// Matching integer, Date and Datetime endpoints follow [`overlap_count`]. All
-/// chunks form one instance. Ties choose the earliest maximizing coordinate,
-/// prefer a nonempty clique over an equal-weight empty singleton, then choose
-/// the lowest original row among tied empty singletons. Tied masks are not a
-/// stability promise across releases. See [`intervals_core::max_weight_clique`]
-/// for the exact algorithm and its `O(n log n)` time / `O(n)` space bounds.
-///
-/// # Errors
-///
-/// Rejects unequal lengths, nulls, unsupported or mismatched logical dtypes,
-/// reversed intervals (with original row index), and checked i128 objective
-/// overflow. Every row is validated, including those with nonpositive weights.
-/// No implicit casting, null filling, or scalar broadcasting occurs.
-pub fn max_weight_clique(
+fn max_weight_clique(
     starts: &Series,
     ends: &Series,
     weights: Option<&Series>,
@@ -652,26 +396,7 @@ pub fn max_weight_clique(
 }
 
 /// Select a globally maximum-weight subset subject to maximum simultaneous capacity.
-///
-/// Returns a non-null Boolean Series named `max_weight_with_capacity` in original
-/// row order. Matching integer, Date, and Datetime endpoints follow
-/// [`overlap_count`]. Weights follow [`max_weight_non_overlapping`]: non-null
-/// signed/unsigned integers up to 64 bits, accumulated exactly in checked i128.
-/// Positive empty intervals consume no capacity and are always selected;
-/// nonpositive weights are omitted. Ties are deterministic but unspecified.
-/// Capacity zero permits only empty intervals; one delegates to the specialized
-/// weighted scheduler. Each collection (including all chunks) is one instance.
-///
-/// The core uses exact min-cost flow with sufficient-capacity and overlap-component
-/// fast paths: `O(n log n + sum(k * n_c * log(n_c + 1)))` time over constrained
-/// components, `O(n)` additional space. See [`intervals_core::max_weight_with_capacity`].
-///
-/// # Errors
-///
-/// Rejects unequal lengths, nulls, unsupported weights/endpoints, mismatched
-/// endpoint logical dtypes, reversed intervals with original row index, and
-/// i128 overflow. No dtype coercion or scalar broadcasting is performed.
-pub fn max_weight_with_capacity(
+fn max_weight_with_capacity(
     starts: &Series,
     ends: &Series,
     weights: &Series,

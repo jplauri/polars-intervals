@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Breaking Rust API change:** The unpublished `polars-intervals` crate no
+  longer exposes a Rust API. It builds only the Python extension.
+
 ## 0.3.0 — October 2, 2026
 
 Measure coverage for each query window, build interval unions and gaps, and

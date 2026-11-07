@@ -136,9 +136,9 @@ indiscriminately to the generator's `exact` preset (which includes `n=200`).
 
 Metamorphic checks cover safe translation/scaling, rank compression, row
 permutations, empty augmentation and order-only endpoints. Budget-limited repair
-is not assumed idempotent. The adapter tests dtype/schema errors independently;
-Python integration covers temporal metadata, DST, grouping, slices, unequal
-chunk boundaries and streaming whole-group evaluation.
+is not assumed idempotent. Python integration covers dtype and schema errors,
+temporal metadata, DST, grouping, slices, unequal chunk boundaries and streaming
+whole-group evaluation.
 
 ## Corpus and timing scope
 

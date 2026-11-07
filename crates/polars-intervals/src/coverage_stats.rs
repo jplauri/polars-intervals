@@ -14,28 +14,7 @@ const OUTPUT_NAMES: [&str; 4] = [
 ];
 
 /// Measure source-record count and union coverage separately for every query.
-///
-/// Returns only the four statistics, in global original query order. The Python
-/// wrapper attaches them to the original query frame without importing payloads
-/// through the native geometry binding. All four endpoints must have identical
-/// integer, Date, or Datetime dtypes. Groups match exact key tuples, including
-/// nulls. All chunks form one collection, and unmatched queries remain present.
-///
-/// `overlap_count` is non-null `UInt64`. The non-null `Int128` `covered_length`
-/// and `query_length` use physical integer units, days, or Datetime ticks.
-/// `covered_fraction` is `Float64`, null only for empty queries. Duplicate
-/// sources count independently but their covered coordinates count once.
-/// A query used as its own source includes itself when nonempty.
-/// See [`intervals_core::coverage_stats`] for exact arithmetic and complexity.
-///
-/// # Errors
-/// Rejects unequal endpoint/key lengths within either operand, unsupported or
-/// mismatched logical dtypes, invalid keys, nulls, and reversed intervals.
-/// Every original row validates before grouping or shortcuts, including
-/// source-only groups. Row errors name `queries` or `intervals` and the original
-/// index in that operand. Keys may be named `start` or `end`, but cannot collide
-/// with the four statistic names.
-pub fn coverage_stats(
+pub(crate) fn coverage_stats(
     query_starts: &Series,
     query_ends: &Series,
     query_keys: &[Series],

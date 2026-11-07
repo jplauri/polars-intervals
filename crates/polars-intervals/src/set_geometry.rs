@@ -5,20 +5,7 @@ use pyo3_polars::{PyDataFrame, PySeries};
 use std::borrow::Cow;
 
 /// Return the canonical half-open set difference of two interval collections.
-///
-/// Each collection represents its union. Empty intervals contribute nothing.
-/// Output columns are the supplied keys, `start`, and `end`. All four endpoint
-/// dtypes must match exactly. Groups match by key tuple, including nulls, and
-/// retain first appearance in the original left input. Right-only groups emit
-/// no rows. All chunks are processed together. See [`intervals_core::subtract_intervals`].
-///
-/// # Errors
-/// Rejects unequal endpoint/key lengths within either side, null endpoints,
-/// unsupported or mismatched logical dtypes, reversed intervals, and invalid
-/// keys. Every row validates before grouping or skipping either operand.
-/// Errors name the side, and the left side validates first. Reversed-row
-/// errors also give the original index within that side.
-pub fn subtract_intervals(
+pub(crate) fn subtract_intervals(
     left_starts: &Series,
     left_ends: &Series,
     left_keys: &[Series],
@@ -34,15 +21,7 @@ pub fn subtract_intervals(
 }
 
 /// Return the canonical geometric intersection of two interval unions.
-///
-/// Touching alone has empty intersection. Empty intervals contribute nothing.
-/// Schema, validation and grouping follow [`subtract_intervals`]. Swapping the
-/// inputs preserves keyed geometry but may change left-oriented group order.
-/// See [`intervals_core::intersect_intervals`].
-///
-/// # Errors
-/// Follows [`subtract_intervals`], including validation of unmatched groups.
-pub fn intersect_intervals(
+pub(crate) fn intersect_intervals(
     left_starts: &Series,
     left_ends: &Series,
     left_keys: &[Series],
