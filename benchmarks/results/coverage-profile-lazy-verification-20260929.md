@@ -53,7 +53,7 @@ the verified release library without recompiling it.
 
 [Raw samples](coverage-profile-lazy-20260929.csv),
 [metadata](coverage-profile-lazy-20260929.metadata.json), and
-[source archive](coverage-profile-lazy-20260929.sources.zip) contain 540 rotated
+[source archive](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-profile-lazy-20260929.sources.zip) contain 540 rotated
 samples from 24 fixtures: four cases, three sizes (8/1,000/100,000), two seeds,
 five samples and two warmups with one Polars thread. The `--lazy` flag adds
 complete plan construction and collection with auto and streaming engines to

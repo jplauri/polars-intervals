@@ -137,7 +137,6 @@ def main():
         "working_directory": str(Path.cwd()),
         "plugin": pi.__file__,
         "native_sha256": {p.name: sha256(p) for p in native_files},
-        "runner_sha256": sha256(Path(__file__)),
         "cases": len(cases),
         "warmups": 1,
         "samples": args.repeats,

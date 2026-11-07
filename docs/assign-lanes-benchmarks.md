@@ -88,7 +88,7 @@ See the shared guide for setup and publishing generated tables.
 
 Release-library and installed-plugin hashes match for this run.
 The [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.metadata.json)
-and [measured source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/scheduling-polars-20260930.sources.zip)
+and [measured source archive](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/scheduling-polars-20260930.sources.zip)
 preserve the build and all runner inputs.
 
 **History**

@@ -128,8 +128,8 @@ uv run --no-sync python benchmarks/coverage_profile.py --lazy --output benchmark
 ```
 
 Set `POLARS_MAX_THREADS=1` before starting the one-thread end-to-end runs, and
-`24` only for the thread-comparison command. Each run's metadata records exact
-filters, seeds, scopes, commands, versions and source hashes. Source ZIPs overlay
+`24` only for the thread-comparison command. Saved runs record exact filters,
+seeds, scopes, commands, versions and source hashes. Their source ZIPs overlay
 the recorded base revision and preserve uncommitted comparison implementations.
 
 Higher-case properties and reporting checks:
@@ -189,7 +189,7 @@ records deferred-execution tests, current wheel checks and the focused timing ru
 
 The main table's run was based on `2b2a2666386c971f6e8d63cbf47cd7a405d1f41b` with
 uncommitted feature sources.
-Its [source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.sources.zip)
+Its [source archive](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-profile-ponytail-20260929.sources.zip)
 declares version `0.2.0`; core and adapter match `280e515`. The base revision
 alone does not identify the measured code. Later `8284b66` sorting changes and
 shared input-check/conversion helpers affect timed paths. Runner provenance

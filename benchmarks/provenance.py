@@ -7,7 +7,6 @@ import os
 import platform
 import subprocess
 import sys
-import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -28,7 +27,7 @@ def command(*args):
 
 
 def verify_release(native, release=None):
-    """Return the matching release library and its source inputs, or fail."""
+    """Return the release library matching the installed plugin, or fail."""
     release = release or next(
         (
             ROOT / "target/release" / name
@@ -50,7 +49,7 @@ def verify_release(native, release=None):
     ]
     if any(path.stat().st_mtime_ns > release.stat().st_mtime_ns for path in inputs):
         raise ValueError("Rust inputs are newer than the release library; rebuild release first")
-    return release, inputs
+    return release
 
 
 def build_environment():
@@ -66,24 +65,10 @@ def build_environment():
     }
 
 
-def archive_sources(archive, paths):
-    """Create a source archive without overwriting an existing measurement."""
-    with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED) as saved:
-        for path in dict.fromkeys(ROOT / path for path in paths):
-            saved.write(path, path.relative_to(ROOT))
-    return {"source_archive": archive.name, "source_archive_sha256": sha256(archive)}
-
-
-def source_changes(hashes):
-    changed = [path for path, digest in hashes.items() if sha256(ROOT / path) != digest]
-    return {"sources_unchanged_during_run": not changed, "changed_sources_during_run": changed}
-
-
-def run_cargo_bench(output, paths, settings, invocation, metadata):
-    """Run a core benchmark and save its samples and source evidence under a new prefix."""
+def run_cargo_bench(output, settings, invocation, metadata):
+    """Run a core benchmark and save its samples and metadata under a new prefix."""
     metadata_path = output.with_suffix(".metadata.json")
-    archive_path = output.with_suffix(".sources.zip")
-    for path in (output, metadata_path, archive_path):
+    for path in (output, metadata_path):
         if path.exists():
             raise FileExistsError(f"refusing to overwrite historical evidence: {path}")
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -98,7 +83,6 @@ def run_cargo_bench(output, paths, settings, invocation, metadata):
         }
         | metadata
     )
-    metadata.update(archive_sources(archive_path, paths))
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     try:
         result = subprocess.run(invocation, cwd=ROOT, env={**os.environ, **settings}, check=False)
@@ -116,7 +100,6 @@ def run_cargo_bench(output, paths, settings, invocation, metadata):
             metadata.update(
                 returncode=1, error="No samples emitted; check selected cases and sizes"
             )
-    metadata.update(source_changes(metadata["source_sha256"]))
     metadata["status"] = "complete" if metadata["returncode"] == 0 else "failed"
     if output.exists():
         metadata["raw_sha256"] = sha256(output)
@@ -125,9 +108,15 @@ def run_cargo_bench(output, paths, settings, invocation, metadata):
 
 
 def environment():
-    """Machine, interpreter, toolchain and revision details for one run."""
+    """Machine, interpreter, toolchain and revision details for one run.
+
+    Benchmarks measure committed code, so the revision is the source provenance.
+    """
     import polars as pl
 
+    changes = command("git", "status", "--porcelain", "--", ".", ":(exclude)benchmarks/results")
+    if changes:
+        raise SystemExit(f"Commit or stash changes before benchmarking:\n{changes}")
     return {
         "timestamp_utc": datetime.now(UTC).isoformat(),
         "command": sys.argv,
@@ -144,7 +133,6 @@ def environment():
         },
         "rustc": command("rustc", "-Vv"),
         "revision": command("git", "rev-parse", "HEAD"),
-        "git_status": command("git", "status", "--porcelain"),
     }
 
 

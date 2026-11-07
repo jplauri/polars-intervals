@@ -75,7 +75,7 @@ Use a plot only when it makes a scaling trend, crossover or tradeoff clearer.
 Add brief notes only when they change how readers should interpret the result.
 These can cover missing measurements, restricted comparisons or meaningful
 memory costs. Explain them in plain language. Do not mention measurement dates
-or older builds. Keep source hashes and exact revisions in details. Put exact
+or older builds. Keep exact revisions in details. Put exact
 thread settings in details, except for the summary's thread condition.
 For algorithm-only results, replace the timing label with "Underlying algorithm
 time" and keep them separate from full Polars measurements.
@@ -100,8 +100,8 @@ table. Keep separate runs and scopes separate.
 Give timing boundaries, warmups, samples, threads, seeds and software versions.
 Briefly explain correctness evidence, distinguishing independent checks from
 agreement between candidates. Link the shared hardware and measurement guide
-instead of repeating them. Preserve settings and source/build hashes in linked
-metadata.
+instead of repeating them. Preserve settings, the revision and binary hashes in
+linked metadata.
 
 **Limitations**
 
@@ -112,8 +112,7 @@ results. Label proposed explanations as such.
 **Reproduce**
 
 Give the operation command and link the [shared setup](../docs/benchmarking.md#setup).
-Include raw samples, metadata, measured source archives and supplemental table
-downloads here.
+Include raw samples, metadata and supplemental table downloads here.
 
 **History**
 

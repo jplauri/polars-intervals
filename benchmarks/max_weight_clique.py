@@ -18,7 +18,7 @@ from time import perf_counter_ns
 import polars as pl
 import polars_intervals as pi
 from polars_intervals import _internal
-from provenance import ROOT, environment, sha256, verify_release
+from provenance import environment, sha256, verify_release
 
 # Focused workload matrix, not a Cartesian product. Group IDs are interleaved.
 CASES = [
@@ -142,7 +142,7 @@ def main():
     args = parser.parse_args()
     native = Path(_internal.__file__)
     try:
-        release, native_inputs = verify_release(native, args.release_library)
+        release = verify_release(native, args.release_library)
     except ValueError as error:
         parser.error(str(error))
     timing_path = args.output.with_suffix(".timings.csv")
@@ -157,20 +157,6 @@ def main():
         "native_sha256": sha256(native),
         "release_library": str(release),
         "release_sha256": sha256(release),
-        "native_input_sha256": {
-            str(path.relative_to(ROOT)): sha256(path) for path in sorted(native_inputs)
-        },
-        "source_sha256": {
-            str(p.relative_to(ROOT)): sha256(p)
-            for p in [
-                ROOT / "benchmarks/max_weight_clique.py",
-                ROOT / "crates/intervals-core/src/clique.rs",
-                ROOT / "crates/polars-intervals/src/lib.rs",
-                ROOT / "python/polars_intervals/__init__.py",
-                ROOT / "Cargo.lock",
-                ROOT / "uv.lock",
-            ]
-        },
         "sizes": args.sizes,
         "seeds": args.seeds,
         "samples": args.samples,

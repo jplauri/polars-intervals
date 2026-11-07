@@ -46,10 +46,10 @@ are historical evidence for the decision, not measurements of the final code.
 
 - Initial packed route: [samples](results/interval-geometry-core-20260929.csv),
   [metadata](results/interval-geometry-core-20260929.metadata.json),
-  [source snapshot](results/interval-geometry-core-20260929.sources.zip).
+  [source snapshot](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/interval-geometry-core-20260929.sources.zip).
 - Direct-buffer prototype: [samples](results/interval-geometry-core-borrowed-20260929.csv),
   [metadata](results/interval-geometry-core-borrowed-20260929.metadata.json),
-  [source snapshot](results/interval-geometry-core-borrowed-20260929.sources.zip).
+  [source snapshot](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/interval-geometry-core-borrowed-20260929.sources.zip).
 
 The native Polars competitor sorts nonempty rows and computes a grouped prefix
 maximum of ends. Shifting that maximum supplies the frontier before each row.

@@ -63,8 +63,9 @@ Follow the report template for displayed comparisons and ratio conventions.
 
 **Limits and provenance.** Synthetic fixtures on one machine characterize those
 workloads, not every application or platform. Record skips, bounded baselines
-and missing types. Preserve raw samples, environment, settings, source/build
-hashes and historical evidence in `benchmarks/results/`. Retain repeat runs
+and missing types. Runners refuse uncommitted changes and record the revision,
+environment, settings and binary hashes. Commit raw samples in
+`benchmarks/results/` only for runs a report or table uses. Retain repeat runs
 separately. Never relabel old timings as measurements of changed code.
 
 <details markdown="1">
@@ -74,10 +75,11 @@ Most core runners time production only. The coverage-profile runner retains
 private event, heap and weighted-index comparisons because they are needed to
 reproduce its production decision. Removed older candidates and their runners remain
 available in the [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb).
-Some run metadata records a base revision with uncommitted feature changes, so
-that revision may not contain the benchmark code. Use the snapshot to recover
-the suite and consult each run's source hashes and cleanup notes for differences
-from the measured sources.
+Some older runs measured a base revision with uncommitted feature changes, so
+that revision may not contain the benchmark code. Their source archives remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results).
+Use the `d742de3` snapshot to recover the suite and consult each run's source
+hashes and cleanup notes for differences from the measured sources.
 
 </details>
 

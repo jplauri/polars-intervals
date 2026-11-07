@@ -17,7 +17,7 @@ from time import perf_counter_ns
 import polars as pl
 import polars_intervals as pi
 from polars_intervals import _internal
-from provenance import ROOT, environment, sha256, verify_release
+from provenance import environment, sha256, verify_release
 
 CASES = [
     ("path", "start", "i64", 1, 1, "auto"),
@@ -165,7 +165,7 @@ def main():
     args = parser.parse_args()
     native = Path(_internal.__file__)
     try:
-        release, inputs = verify_release(native, args.release_library)
+        release = verify_release(native, args.release_library)
     except ValueError as error:
         parser.error(str(error))
     output, meta = (
@@ -182,16 +182,6 @@ def main():
         "native_sha256": sha256(native),
         "release_library": str(release),
         "release_sha256": sha256(release),
-        "source_sha256": {
-            str(p.relative_to(ROOT)): sha256(p)
-            for p in inputs
-            + [
-                Path(__file__),
-                ROOT / "benchmarks/provenance.py",
-                ROOT / "python/polars_intervals/__init__.py",
-                ROOT / "uv.lock",
-            ]
-        },
         "sizes": args.sizes,
         "seeds": args.seeds,
         "samples": args.samples,

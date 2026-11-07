@@ -10,7 +10,7 @@ from time import perf_counter_ns
 import polars as pl
 import polars_intervals as pi
 from polars.testing import assert_frame_equal
-from provenance import environment, sha256
+from provenance import environment
 
 SCENARIOS = [
     "disjoint",
@@ -297,14 +297,6 @@ def main():
             "repeats": args.repeats,
             "methods": args.methods,
             "seed": 42,
-            "source_sha256": {
-                str(path): sha256(path)
-                for path in [
-                    Path(__file__),
-                    Path("crates/intervals-core/src/containment.rs"),
-                    Path("crates/intervals-core/benches/support/containment.rs"),
-                ]
-            },
         },
         "pair_limit": PAIR_LIMIT,
         "results": [],

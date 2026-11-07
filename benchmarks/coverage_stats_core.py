@@ -1,10 +1,10 @@
-"""Measure full Rust per-query coverage calls with reproducible source archives."""
+"""Measure full Rust per-query coverage calls and record their provenance."""
 
 import argparse
 import platform
 from pathlib import Path
 
-from provenance import ROOT, command, run_cargo_bench, sha256
+from provenance import command, run_cargo_bench
 
 
 def main():
@@ -29,24 +29,6 @@ def main():
     if not set(args.dtypes.split(",")) <= {"i64", "u64", "i16"}:
         parser.error("Endpoint dtypes must be i64, u64 or i16")
     output = args.output.resolve()
-    paths = [
-        "Cargo.toml",
-        "Cargo.lock",
-        "rust-toolchain.toml",
-        "crates/intervals-core/Cargo.toml",
-        "crates/intervals-core/src/lib.rs",
-        "crates/intervals-core/src/coverage.rs",
-        "crates/intervals-core/src/geometry.rs",
-        "crates/intervals-core/src/coverage_stats.rs",
-        "crates/intervals-core/benches/coverage_stats.rs",
-        "crates/intervals-core/benches/support/coverage_stats_candidates.rs",
-        "crates/intervals-core/benches/support/allocations.rs",
-        "crates/intervals-core/benches/support/random.rs",
-        "crates/intervals-core/tests/coverage_stats.rs",
-        "crates/intervals-core/tests/support/coverage_stats.rs",
-        "benchmarks/coverage_stats_core.py",
-        "benchmarks/provenance.py",
-    ]
     settings = {
         "STATS_CSV": str(output),
         "STATS_SIZES": args.sizes,
@@ -99,7 +81,6 @@ def main():
             "payload preservation, native Polars, scans or lazy execution measured here. "
             "Sparse geometry is not measured with i16. Large lengths are verified in tests."
         ),
-        "source_sha256": {path: sha256(ROOT / path) for path in paths},
     }
     if platform.system() == "Windows":
         metadata["cpu_name"] = command(
@@ -107,7 +88,7 @@ def main():
         )
     invocation = ["cargo", "bench", "-p", "intervals-core", "--bench", "coverage_stats", "--locked"]
     try:
-        returncode = run_cargo_bench(output, paths, settings, invocation, metadata)
+        returncode = run_cargo_bench(output, settings, invocation, metadata)
     except FileExistsError as error:
         parser.error(str(error))
     raise SystemExit(returncode)

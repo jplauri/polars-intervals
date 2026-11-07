@@ -41,7 +41,7 @@ from generate_interval_graphs import (
     structural_stats,
     validate_instance,
 )
-from provenance import ROOT, environment, sha256
+from provenance import environment, sha256
 
 WORKLOADS = ("integer", "date", "datetime", "grouped", "sliced", "multi_chunk")
 QUALITY_FIELDS = [
@@ -486,19 +486,12 @@ def run_metadata(args):
     native = list(Path(pi.__file__).parent.glob("*.pyd")) + list(
         Path(pi.__file__).parent.glob("*.so")
     )
-    source_paths = [
-        Path(__file__),
-        Path(__file__).with_name("balance_lanes_fixtures.py"),
-        ROOT / "python/polars_intervals/__init__.py",
-    ]
-    source_paths.extend((ROOT / "crates").glob("**/*.rs"))
     return {
         **environment(),
         "arguments": vars(args),
         "build_profile": "release (operator-declared)",
         "plugin": pi.__file__,
         "native_sha256": {p.name: sha256(p) for p in native},
-        "source_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in source_paths},
         "corpora": corpora,
         "warmups": args.warmups,
         "samples": args.repeats,

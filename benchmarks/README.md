@@ -23,7 +23,7 @@ without Python or the plugin. The table generator only reads saved results.
 | [`interval_geometry_core.py`](interval_geometry_core.py) | Core comparison runner | Packed and indexed frontier scans, fused/materialized gaps and separate requested heap → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`test_interval_geometry.py`](test_interval_geometry.py) | Baseline checks | Independent graph/cell oracles, deferred validation and typed grouped lazy outputs → native competitor checks | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`coverage_profile.py`](coverage_profile.py) | End-to-end benchmark | Complete release calls against native Polars event sums/count aggregation, with optional lazy/streaming-engine collection, validation, groups and output assembly → raw samples and provenance | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
-| [`coverage_profile_core.py`](coverage_profile_core.py) | Core comparison runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples, source archive and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
+| [`coverage_profile_core.py`](coverage_profile_core.py) | Core comparison runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`test_coverage_profile.py`](test_coverage_profile.py) | Baseline checks | Direct membership oracle on small grouped, temporal and wide-load inputs → native Polars baseline validation | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`minimum_cost_dominating_set.py`](minimum_cost_dominating_set.py) | End-to-end benchmark | Integer/temporal, grouped and multichunk inputs → checked release collection samples and provenance | [Dominating set](../docs/domination-benchmarks.md) |
 | [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated, sharded interval instances | [Interval-graph corpora](#interval-graph-corpora) |
@@ -48,10 +48,10 @@ Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals
 Except for the geometry, set-geometry, coverage-statistics, dominating-set and coverage-profile comparisons, they time production
 only. Removed candidates and runners are preserved in the
 [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
-Historical metadata may reference a base revision with uncommitted feature
-changes. Consult each run's source hashes and cleanup notes for differences
-between the snapshot and the measured sources; see the
-[provenance guidance](../docs/benchmarking.md#measurement-rules).
+Runners refuse uncommitted changes and record the revision. Older runs that
+measured uncommitted changes keep their source archives at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results).
+See the [provenance guidance](../docs/benchmarking.md#measurement-rules).
 
 The dominating-set runner is `cargo bench -p intervals-core --bench
 minimum_cost_dominating_set --locked`. `DOMINATION_CSV` must name a new absolute
@@ -91,7 +91,7 @@ uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_po
 The runner includes public query construction and collection. It checks lane
 feasibility and the minimum lane count, or scheduling feasibility and the optimal
 total weight, outside timing. It records each seed separately and preserves the
-release hashes, source archive and thread settings.
+revision, release hashes and thread settings.
 
 Coverage/load profiles compare complete A event, B independent-stream, and C
 active-end heap calls. Weighted index streams are an additional B layout

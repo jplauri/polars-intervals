@@ -1,8 +1,7 @@
 """Run complete Rust coverage-profile comparisons and preserve source evidence.
 
 Run sequentially on an idle machine. This does not build or measure the Python
-extension. Sources are archived because a base revision alone cannot reproduce
-uncommitted candidate experiments.
+extension.
 """
 
 import argparse
@@ -10,10 +9,8 @@ import platform
 from pathlib import Path
 
 from provenance import (
-    ROOT,
     command,
     run_cargo_bench,
-    sha256,
 )
 
 
@@ -42,21 +39,6 @@ def main():
     if not set(args.weight_dtypes.split(",")) <= {"i64", "i128"}:
         parser.error("Weight dtypes must be i64 or i128")
     output = args.output.resolve()
-    paths = [
-        "Cargo.toml",
-        "Cargo.lock",
-        "rust-toolchain.toml",
-        "crates/intervals-core/Cargo.toml",
-        "crates/intervals-core/src/lib.rs",
-        "crates/intervals-core/src/coverage_profile.rs",
-        "crates/intervals-core/benches/coverage_profile.rs",
-        "crates/intervals-core/benches/support/coverage_profile_candidates.rs",
-        "crates/intervals-core/benches/support/allocations.rs",
-        "crates/intervals-core/benches/support/random.rs",
-        "crates/intervals-core/tests/coverage_profile_candidates.rs",
-        "benchmarks/coverage_profile_core.py",
-        "benchmarks/provenance.py",
-    ]
     settings = {
         "PROFILE_CSV": str(output),
         "PROFILE_SIZES": args.sizes,
@@ -114,7 +96,6 @@ def main():
             "Explicit core weights use the separately labelled weight_dtype. "
             "The public native adapter widens input weights to i128 before core dispatch."
         ),
-        "source_sha256": {path: sha256(ROOT / path) for path in paths},
         "limitations": (
             "Single-machine synthetic core experiment. No grouped, chunked, temporal Polars or "
             "native-Polars timing here; those belong to a separate end-to-end run. "
@@ -126,7 +107,7 @@ def main():
             "powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_Processor).Name"
         )
     try:
-        returncode = run_cargo_bench(output, paths, settings, invocation, metadata)
+        returncode = run_cargo_bench(output, settings, invocation, metadata)
     except FileExistsError as error:
         parser.error(str(error))
     raise SystemExit(returncode)

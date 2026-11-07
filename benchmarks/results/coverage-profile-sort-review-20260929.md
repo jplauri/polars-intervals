@@ -60,10 +60,10 @@ the original core file and retained the untimed wrapper cleanup.
 
 | Run, in execution order | Raw samples | Metadata | Measured source |
 | --- | --- | --- | --- |
-| Before | [CSV](coverage-profile-sort-before-20260929.csv) | [JSON](coverage-profile-sort-before-20260929.metadata.json) | [ZIP](coverage-profile-sort-before-20260929.sources.zip) |
-| After | [CSV](coverage-profile-sort-after-20260929.csv) | [JSON](coverage-profile-sort-after-20260929.metadata.json) | [ZIP](coverage-profile-sort-after-20260929.sources.zip) |
-| After repeat | [CSV](coverage-profile-sort-after-repeat-20260929.csv) | [JSON](coverage-profile-sort-after-repeat-20260929.metadata.json) | [ZIP](coverage-profile-sort-after-repeat-20260929.sources.zip) |
-| Before repeat | [CSV](coverage-profile-sort-before-repeat-20260929.csv) | [JSON](coverage-profile-sort-before-repeat-20260929.metadata.json) | [ZIP](coverage-profile-sort-before-repeat-20260929.sources.zip) |
+| Before | [CSV](coverage-profile-sort-before-20260929.csv) | [JSON](coverage-profile-sort-before-20260929.metadata.json) | [ZIP](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-profile-sort-before-20260929.sources.zip) |
+| After | [CSV](coverage-profile-sort-after-20260929.csv) | [JSON](coverage-profile-sort-after-20260929.metadata.json) | [ZIP](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-profile-sort-after-20260929.sources.zip) |
+| After repeat | [CSV](coverage-profile-sort-after-repeat-20260929.csv) | [JSON](coverage-profile-sort-after-repeat-20260929.metadata.json) | [ZIP](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-profile-sort-after-repeat-20260929.sources.zip) |
+| Before repeat | [CSV](coverage-profile-sort-before-repeat-20260929.csv) | [JSON](coverage-profile-sort-before-repeat-20260929.metadata.json) | [ZIP](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-profile-sort-before-repeat-20260929.sources.zip) |
 
 All 52 recorded source hashes, four archive hashes and four CSV hashes were
 verified. Every run reports unchanged sources during measurement.

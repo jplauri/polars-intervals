@@ -42,7 +42,8 @@ specialization of the offline sweep.
 
 Each CSV is a separate run. Do not pool medians or relabel the original binary
 timings as measurements of the later preallocated or selected production code.
-Metadata and source archives share each CSV's prefix in `benchmarks/results/`.
+Metadata shares each CSV's prefix in `benchmarks/results/`. Source archives
+remain at [`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results).
 
 - `coverage-stats-core-local.csv`: initial complete A/B experiment. Seven sizes
   from zero through one million, two seeds, five samples, and two warmups.
@@ -58,8 +59,9 @@ Metadata and source archives share each CSV's prefix in `benchmarks/results/`.
   binary search, and packed sweeps. Seven representative cases at 1k, 100k and
   one million query rows, Int64, two seeds, five samples and two warmups. Its
   metadata reports unchanged source hashes during measurement. The accompanying
-  `coverage-stats-core-production.sources.zip` preserves the measured core,
-  benchmark runner, tests, Cargo inputs and exact selection rule.
+  [source archive](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-stats-core-production.sources.zip)
+  preserves the measured core, benchmark runner, tests, Cargo inputs and exact
+  selection rule.
 
 The final selected production run, seed 7 with one million queries and sources,
 measured 58.4 ms for sorted disjoint inputs, 263 ms for shuffled sparse inputs,

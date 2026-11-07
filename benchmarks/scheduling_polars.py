@@ -19,12 +19,9 @@ import polars_intervals as pi
 from balance_lanes import validate_coloring
 from polars_intervals import _internal
 from provenance import (
-    ROOT,
-    archive_sources,
     build_environment,
     environment,
     sha256,
-    source_changes,
     verify_release,
 )
 
@@ -108,32 +105,14 @@ def main():
         parser.error("Need nonnegative sizes and positive sample/warmup counts")
     native = Path(_internal.__file__)
     try:
-        release, inputs = verify_release(native)
+        release = verify_release(native)
     except ValueError as error:
         parser.error(str(error))
     raw = args.output.with_suffix(".csv")
     meta = args.output.with_suffix(".metadata.json")
-    archive = args.output.with_suffix(".sources.zip")
-    if any(path.exists() for path in (raw, meta, archive)):
+    if any(path.exists() for path in (raw, meta)):
         parser.error("Use a new output prefix to preserve existing measurements")
     raw.parent.mkdir(parents=True, exist_ok=True)
-    sources = [
-        *inputs,
-        *ROOT.glob("python/polars_intervals/*.py"),
-        *(
-            ROOT / "benchmarks" / name
-            for name in (
-                "scheduling_polars.py",
-                "test_scheduling_polars.py",
-                "balance_lanes.py",
-                "balance_lanes_fixtures.py",
-                "generate_interval_graphs.py",
-                "provenance.py",
-            )
-        ),
-        ROOT / "pyproject.toml",
-        ROOT / "uv.lock",
-    ]
     metadata = environment() | {
         "settings": vars(args) | {"output": str(args.output)},
         "package_version": version("polars-intervals"),
@@ -151,10 +130,8 @@ def main():
         "release_path": str(release),
         "release_sha256": sha256(release),
         "build_environment": build_environment(),
-        "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in sources},
         "status": "running",
     }
-    metadata.update(archive_sources(archive, sources))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     count = 0
     with raw.open("x", newline="", encoding="utf-8") as stream:
@@ -215,7 +192,6 @@ def main():
                         stream.flush()
                         del frame, rows, expected, objectives
                         print(f"Checked n={n}, seed={seed}, {family}, {order}", flush=True)
-    metadata.update(source_changes(metadata["source_sha256"]))
     metadata.update(status="completed", samples=count, samples_sha256=sha256(raw))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(f"Saved {count} samples to {raw}")

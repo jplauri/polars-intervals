@@ -20,12 +20,10 @@ from polars_intervals import _internal
 
 from benchmarks.provenance import (
     ROOT,
-    archive_sources,
     build_environment,
     environment,
     resident_memory,
     sha256,
-    source_changes,
     verify_release,
 )
 from benchmarks.set_geometry_native import native_set_geometry
@@ -236,25 +234,15 @@ def main():
         parser.error("Seeds must fit UInt64")
     native = Path(_internal.__file__)
     try:
-        release, inputs = verify_release(native)
+        release = verify_release(native)
     except ValueError as error:
         parser.error(str(error))
-    raw, meta, archive, memory = [
-        args.output.with_suffix(ext)
-        for ext in (".csv", ".metadata.json", ".sources.zip", ".memory.json")
+    raw, meta, memory = [
+        args.output.with_suffix(ext) for ext in (".csv", ".metadata.json", ".memory.json")
     ]
-    if any(path.exists() for path in (raw, meta, archive, memory)):
+    if any(path.exists() for path in (raw, meta, memory)):
         parser.error("Use a new output prefix")
     raw.parent.mkdir(parents=True, exist_ok=True)
-    sources = [
-        *inputs,
-        *ROOT.glob("python/polars_intervals/*.py"),
-        *ROOT.glob("benchmarks/set_geometry*.py"),
-        ROOT / "benchmarks/test_set_geometry.py",
-        ROOT / "benchmarks/provenance.py",
-        ROOT / "uv.lock",
-        ROOT / "pyproject.toml",
-    ]
     metadata = environment() | {
         "settings": vars(args) | {"output": str(args.output)},
         "cases": CASES,
@@ -269,10 +257,8 @@ def main():
         "release_path": str(release),
         "release_sha256": sha256(release),
         "build_environment": build_environment(),
-        "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in sources},
         "status": "running",
     }
-    metadata.update(archive_sources(archive, sources))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     memories = []
     with (
@@ -388,7 +374,6 @@ def main():
         memory.write_text(json.dumps(memories, indent=2) + "\n", encoding="utf-8")
         metadata["memory_sha256"] = sha256(memory)
     metadata.update(status="complete", raw_sha256=sha256(raw))
-    metadata.update(source_changes(metadata["source_sha256"]))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
 
 
