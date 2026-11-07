@@ -159,7 +159,7 @@ where
         } else {
             intervals_core::subtract_intervals(ls, le, rs, re)
         }
-        .map_err(|error| polars_err!(ComputeError: "{error}"))
+        .map_err(super::compute_error)
     };
     let mut output = Vec::new();
     let mut key_rows = Vec::new();

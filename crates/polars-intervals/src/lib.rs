@@ -205,6 +205,10 @@ pub fn minimum_stabbing_points(starts: &Series, ends: &Series) -> PolarsResult<S
     Ok(Series::new("minimum_stabbing_points".into(), [points]))
 }
 
+fn compute_error(error: impl std::fmt::Display) -> PolarsError {
+    polars_err!(ComputeError: "{error}")
+}
+
 fn input_pair<'a, T>(inputs: &'a [T], name: &str) -> PolarsResult<&'a [T; 2]> {
     inputs.try_into().map_err(|_| {
         polars_err!(InvalidOperation: "{} requires exactly two inputs, got {}",
@@ -876,17 +880,16 @@ where
     match algorithm {
         Algorithm::Cluster(include_touching) => {
             let labels = intervals_core::cluster_intervals(&starts, &ends, include_touching)
-                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+                .map_err(compute_error)?;
             Ok(Series::from_vec(algorithm.name().into(), labels))
         }
         Algorithm::Coverage(k) => {
-            let mask = intervals_core::max_k_coverage(&starts, &ends, k)
-                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            let mask = intervals_core::max_k_coverage(&starts, &ends, k).map_err(compute_error)?;
             Ok(Series::new(algorithm.name().into(), mask))
         }
         Algorithm::Stabbing => {
-            let points = intervals_core::minimum_stabbing_points(&starts, &ends)
-                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            let points =
+                intervals_core::minimum_stabbing_points(&starts, &ends).map_err(compute_error)?;
             Ok(ChunkedArray::<T>::from_vec(algorithm.name().into(), points).into_series())
         }
         Algorithm::OverlapCount | Algorithm::ContainmentCount | Algorithm::NestingDepth => {
@@ -895,24 +898,23 @@ where
                 Algorithm::NestingDepth => intervals_core::nesting_depths(&starts, &ends),
                 _ => intervals_core::overlap_counts(&starts, &ends),
             }
-            .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            .map_err(compute_error)?;
             let counts: Vec<u64> = counts.into_iter().map(|count| count as u64).collect();
             Ok(Series::from_vec(algorithm.name().into(), counts))
         }
         Algorithm::AssignLanes => {
-            let lanes = intervals_core::assign_lanes(&starts, &ends)
-                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            let lanes = intervals_core::assign_lanes(&starts, &ends).map_err(compute_error)?;
             Ok(Series::from_vec(algorithm.name().into(), lanes))
         }
         Algorithm::AssignBalancedLanes(initial_lanes, max_work) => {
             let lanes =
                 intervals_core::assign_balanced_lanes(&starts, &ends, initial_lanes, max_work)
-                    .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+                    .map_err(compute_error)?;
             Ok(Series::from_vec(algorithm.name().into(), lanes))
         }
         Algorithm::MaxWeight(weights) => {
             let mask = intervals_core::max_weight_non_overlapping(&starts, &ends, weights)
-                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+                .map_err(compute_error)?;
             Ok(Series::new(algorithm.name().into(), mask))
         }
         Algorithm::Clique(weights) => {
@@ -920,7 +922,7 @@ where
                 Some(weights) => intervals_core::max_weight_clique(&starts, &ends, weights),
                 None => intervals_core::max_clique(&starts, &ends),
             }
-            .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            .map_err(compute_error)?;
             Ok(Series::new(algorithm.name().into(), mask))
         }
         Algorithm::DominatingSet(costs) => {
@@ -928,12 +930,12 @@ where
                 Some(costs) => intervals_core::minimum_cost_dominating_set(&starts, &ends, costs),
                 None => intervals_core::minimum_dominating_set(&starts, &ends),
             }
-            .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            .map_err(compute_error)?;
             Ok(Series::new(algorithm.name().into(), mask))
         }
         Algorithm::Capacity(weights, capacity) => {
             let mask = intervals_core::max_weight_with_capacity(&starts, &ends, weights, capacity)
-                .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+                .map_err(compute_error)?;
             Ok(Series::new(algorithm.name().into(), mask))
         }
         Algorithm::Cover(left, right) | Algorithm::CostCover(_, left, right) => {
@@ -948,7 +950,7 @@ where
                 }
                 _ => intervals_core::minimum_cover(&starts, &ends, left, right),
             };
-            let mask = result.map_err(|error| polars_err!(ComputeError: "{error}"))?;
+            let mask = result.map_err(compute_error)?;
             Ok(Series::new(algorithm.name().into(), mask))
         }
     }

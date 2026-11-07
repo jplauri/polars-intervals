@@ -128,7 +128,7 @@ where
             ),
             None => intervals_core::coverage_profile(starts, ends, domain, include_zero),
         }
-        .map_err(|error| polars_err!(ComputeError: "{error}"))
+        .map_err(super::compute_error)
     };
     let mut output = Vec::<CoverageSegment<T::Native>>::new();
     let mut key_rows = Vec::new();

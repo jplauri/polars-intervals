@@ -99,8 +99,7 @@ where
     let [interval_starts, interval_ends] =
         validated_values(interval_starts, interval_ends, NAME, "intervals")?;
     let solve = |qs: &[T::Native], qe: &[T::Native], ss: &[T::Native], se: &[T::Native]| {
-        intervals_core::coverage_stats(qs, qe, ss, se)
-            .map_err(|error| polars_err!(ComputeError: "{error}"))
+        intervals_core::coverage_stats(qs, qe, ss, se).map_err(super::compute_error)
     };
     let output = if query_starts.is_empty() {
         Vec::new()

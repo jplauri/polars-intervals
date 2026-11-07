@@ -90,7 +90,7 @@ where
         &profile_ends,
         capacities,
     )
-    .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+    .map_err(super::compute_error)?;
     Ok(Series::new("selected".into(), selected))
 }
 

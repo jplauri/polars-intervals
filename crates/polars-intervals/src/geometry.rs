@@ -87,8 +87,7 @@ where
 {
     let [starts, ends] = endpoint_values(starts, ends, name)?;
     // Validate before grouping/clipping so diagnostics always name original rows.
-    intervals_core::validate_intervals(&starts, &ends)
-        .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+    intervals_core::validate_intervals(&starts, &ends).map_err(super::compute_error)?;
     let domain = native_domain(domain)?;
     if domain.is_some_and(|(left, right)| left > right) {
         return Err(polars_err!(ComputeError: "{}", intervals_core::IntervalError::InvalidDomain));
@@ -98,7 +97,7 @@ where
             Some((left, right)) => intervals_core::interval_gaps(starts, ends, left, right),
             None => intervals_core::merge_intervals(starts, ends),
         }
-        .map_err(|error| polars_err!(ComputeError: "{error}"))
+        .map_err(super::compute_error)
     };
     let mut output = Vec::new();
     let mut key_rows = Vec::new();
