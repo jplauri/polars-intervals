@@ -1,9 +1,6 @@
 use intervals_core::{IntervalError, minimum_cost_dominating_set, minimum_dominating_set};
 use proptest::prelude::*;
 
-#[path = "../benches/support/domination.rs"]
-mod candidates;
-
 type Objective = (i128, usize);
 
 // This oracle works on the ORIGINAL graph. In particular, self-domination
@@ -65,14 +62,6 @@ fn check(s: &[i64], e: &[i64], w: &[i128]) -> (Vec<bool>, Objective) {
     let result = minimum_cost_dominating_set(s, e, w).unwrap();
     verify(s, e, w, &result, expected);
     assert_eq!(result, minimum_cost_dominating_set(s, e, w).unwrap());
-    for method in ["reduction", "fused", "heap", "quadratic"] {
-        let mask = candidates::run(s, e, Some(w), method).unwrap();
-        verify(s, e, w, &mask, expected);
-        assert_eq!(mask, candidates::run(s, e, Some(w), method).unwrap());
-        if ways == 1 {
-            assert_eq!(mask, winner, "unique optimum for {method}");
-        }
-    }
     if ways == 1 {
         assert_eq!(result, winner);
     }
@@ -85,19 +74,6 @@ fn check_units(s: &[i64], e: &[i64]) -> Vec<bool> {
     let result = minimum_dominating_set(s, e).unwrap();
     verify(s, e, &units, &result, expected);
     assert_eq!(result, minimum_dominating_set(s, e).unwrap());
-    for method in candidates::METHODS {
-        let mask = candidates::run::<_, i128>(s, e, None, method).unwrap();
-        verify(s, e, &units, &mask, expected);
-        assert_eq!(
-            mask,
-            candidates::run::<_, i128>(s, e, None, method).unwrap()
-        );
-        let explicit = candidates::run(s, e, Some(&units), method).unwrap();
-        verify(s, e, &units, &explicit, expected);
-        let zeros = vec![0; s.len()];
-        let zero_mask = candidates::run(s, e, Some(&zeros), method).unwrap();
-        verify(s, e, &zeros, &zero_mask, (0, expected.1));
-    }
     assert_eq!(check(s, e, &vec![0; s.len()]).1, (0, expected.1));
     result
 }
@@ -205,10 +181,10 @@ fn nested_cliques_endpoint_ties_and_equal_minimal_geometries() {
 fn already_dominated_rows_remain_eligible_greedy_representatives() {
     let (s, e) = ([0, 1, 3, 5, 8], [2, 5, 9, 6, 10]);
     assert_eq!(check_units(&s, &e).iter().filter(|&&m| m).count(), 2);
-    // This exact mask tests the deliberate furthest-reaching private greedy
-    // tie, without promising equal tied masks for different public algorithms.
+    // This exact mask tests the deliberate furthest-reaching greedy tie,
+    // without promising the same tied mask across releases.
     assert_eq!(
-        candidates::run::<_, i128>(&s, &e, None, "greedy").unwrap(),
+        minimum_dominating_set(&s, &e).unwrap(),
         [false, true, true, false, false]
     );
 }
@@ -257,7 +233,6 @@ fn target_boundaries_batches_expirations_and_identical_blocks() {
         check(&s, &e, &w);
     }
     check_units(&s, &e);
-    check_reduction(&s[..8], &e[..8]);
 }
 
 #[test]
@@ -266,12 +241,6 @@ fn generic_endpoint_order_and_wide_integer_costs_are_exact() {
         let w = [u64::MAX, u64::MAX];
         assert_eq!(minimum_dominating_set(s, e).unwrap(), [true, true]);
         assert_eq!(minimum_cost_dominating_set(s, e, &w).unwrap(), [true, true]);
-        for method in candidates::METHODS {
-            assert_eq!(
-                candidates::run(s, e, Some(&w), method).unwrap(),
-                [true, true]
-            );
-        }
     }
     generic(&[i64::MIN, 0], &[0, i64::MAX]);
     generic(&[0u64, u64::MAX - 1], &[1, u64::MAX]);
@@ -291,68 +260,47 @@ fn generic_endpoint_order_and_wide_integer_costs_are_exact() {
 
 #[test]
 fn checked_i128_arithmetic_rejects_only_unrepresentable_optima() {
-    for method in ["production", "reduction", "fused", "heap", "quadratic"] {
-        let run = |s: &[i64], e: &[i64], w: &[i128]| {
-            if method == "production" {
-                minimum_cost_dominating_set(s, e, w)
-            } else {
-                candidates::run(s, e, Some(w), method)
-            }
-        };
-        let duplicate = run(&[0, 0], &[5, 5], &[i128::MAX; 2]).unwrap();
-        assert_eq!(
-            objective(&[i128::MAX; 2], &duplicate),
-            (i128::MAX, 1),
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0, 2], &[1, 3], &[i128::MAX, 1]),
-            Err(IntervalError::CostOverflow),
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0, 0], &[0, 0], &[i128::MAX, 1]),
-            Err(IntervalError::CostOverflow),
-            "{method}"
-        );
-        // Uniform costs use the cardinality fast path but still accumulate
-        // the selected cost, including every isolated empty row.
-        assert_eq!(
-            run(&[0, 2], &[1, 3], &[i128::MAX; 2]),
-            Err(IntervalError::CostOverflow),
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0, 0], &[0, 0], &[i128::MAX; 2]),
-            Err(IntervalError::CostOverflow),
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0, 0], &[0, 1], &[i128::MAX, 0]).unwrap(),
-            [true, true],
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0, 0], &[0, 1], &[i128::MAX, 1]),
-            Err(IntervalError::CostOverflow),
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0, 3, 6], &[4, 7, 10], &[i128::MAX, 7, i128::MAX]).unwrap(),
-            [false, true, false],
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0, 3], &[2, 5], &[i128::MAX - 1, 1]).unwrap(),
-            [true, true],
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0], &[1], &[i128::MIN]),
-            Err(IntervalError::NegativeCost { index: 0 }),
-            "{method}"
-        );
-    }
+    let run = |s: &[i64], e: &[i64], w: &[i128]| minimum_cost_dominating_set(s, e, w);
+    let duplicate = run(&[0, 0], &[5, 5], &[i128::MAX; 2]).unwrap();
+    assert_eq!(objective(&[i128::MAX; 2], &duplicate), (i128::MAX, 1));
+    assert_eq!(
+        run(&[0, 2], &[1, 3], &[i128::MAX, 1]),
+        Err(IntervalError::CostOverflow)
+    );
+    assert_eq!(
+        run(&[0, 0], &[0, 0], &[i128::MAX, 1]),
+        Err(IntervalError::CostOverflow)
+    );
+    // Uniform costs use the cardinality fast path but still accumulate
+    // the selected cost, including every isolated empty row.
+    assert_eq!(
+        run(&[0, 2], &[1, 3], &[i128::MAX; 2]),
+        Err(IntervalError::CostOverflow)
+    );
+    assert_eq!(
+        run(&[0, 0], &[0, 0], &[i128::MAX; 2]),
+        Err(IntervalError::CostOverflow)
+    );
+    assert_eq!(
+        run(&[0, 0], &[0, 1], &[i128::MAX, 0]).unwrap(),
+        [true, true]
+    );
+    assert_eq!(
+        run(&[0, 0], &[0, 1], &[i128::MAX, 1]),
+        Err(IntervalError::CostOverflow)
+    );
+    assert_eq!(
+        run(&[0, 3, 6], &[4, 7, 10], &[i128::MAX, 7, i128::MAX]).unwrap(),
+        [false, true, false]
+    );
+    assert_eq!(
+        run(&[0, 3], &[2, 5], &[i128::MAX - 1, 1]).unwrap(),
+        [true, true]
+    );
+    assert_eq!(
+        run(&[0], &[1], &[i128::MIN]),
+        Err(IntervalError::NegativeCost { index: 0 })
+    );
 }
 
 #[test]
@@ -365,62 +313,42 @@ fn validation_precedes_pruning_empty_returns_and_uniform_fast_paths() {
         minimum_dominating_set(&[0, 4], &[0, 3]),
         Err(IntervalError::InvalidInterval { index: 1 })
     );
-    for method in [
-        "production",
-        "reduction",
-        "fused",
-        "heap",
-        "quadratic",
-        "greedy",
-    ] {
-        let run = |s: &[i64], e: &[i64], w: &[i128]| {
-            if method == "production" {
-                minimum_cost_dominating_set(s, e, w)
-            } else {
-                candidates::run(s, e, Some(w), method)
-            }
-        };
-        assert_eq!(
-            run(&[0, 4], &[0], &[1, 1]),
-            Err(IntervalError::LengthMismatch([("starts", 2), ("ends", 1)])),
-            "{method}"
-        );
-        assert_eq!(
-            run(&[0], &[0], &[]),
-            Err(IntervalError::LengthMismatch([
-                ("intervals", 1),
-                ("costs", 0)
-            ])),
-            "{method}"
-        );
-        assert_eq!(
-            run(&[], &[], &[1]),
-            Err(IntervalError::LengthMismatch([
-                ("intervals", 0),
-                ("costs", 1)
-            ])),
-            "{method}"
-        );
-        for (s, e) in [([0, 0, 4], [10, 0, 3]), ([0, 1, 4], [10, 2, 3])] {
-            for w in [[0; 3], [1; 3]] {
-                assert_eq!(
-                    run(&s, &e, &w),
-                    Err(IntervalError::InvalidInterval { index: 2 }),
-                    "{method}"
-                );
-            }
-        }
-        for (s, e) in [
-            ([0, 0, 0], [10, 10, 10]),
-            ([0, 1, 2], [10, 9, 8]),
-            ([4; 3], [4; 3]),
-        ] {
+    let run = |s: &[i64], e: &[i64], w: &[i128]| minimum_cost_dominating_set(s, e, w);
+    assert_eq!(
+        run(&[0, 4], &[0], &[1, 1]),
+        Err(IntervalError::LengthMismatch([("starts", 2), ("ends", 1)]))
+    );
+    assert_eq!(
+        run(&[0], &[0], &[]),
+        Err(IntervalError::LengthMismatch([
+            ("intervals", 1),
+            ("costs", 0)
+        ]))
+    );
+    assert_eq!(
+        run(&[], &[], &[1]),
+        Err(IntervalError::LengthMismatch([
+            ("intervals", 0),
+            ("costs", 1)
+        ]))
+    );
+    for (s, e) in [([0, 0, 4], [10, 0, 3]), ([0, 1, 4], [10, 2, 3])] {
+        for w in [[0; 3], [1; 3]] {
             assert_eq!(
-                run(&s, &e, &[0, 0, -1]),
-                Err(IntervalError::NegativeCost { index: 2 }),
-                "{method}"
+                run(&s, &e, &w),
+                Err(IntervalError::InvalidInterval { index: 2 })
             );
         }
+    }
+    for (s, e) in [
+        ([0, 0, 0], [10, 10, 10]),
+        ([0, 1, 2], [10, 9, 8]),
+        ([4; 3], [4; 3]),
+    ] {
+        assert_eq!(
+            run(&s, &e, &[0, 0, -1]),
+            Err(IntervalError::NegativeCost { index: 2 })
+        );
     }
 }
 
@@ -429,66 +357,6 @@ fn adding_a_vertex_can_raise_or_lower_the_optimum_because_it_adds_a_demand() {
     assert_eq!(check(&[0], &[2], &[5]).1, (5, 1));
     assert_eq!(check(&[0, 3], &[2, 4], &[5, 2]).1, (7, 2));
     assert_eq!(check(&[0, 3, 1], &[2, 4, 5], &[5, 2, 1]).1, (1, 1));
-}
-
-// Pairwise strict containment is independent of optimized target extraction.
-// Equal geometries are deduplicated ONLY after testing strict containment.
-fn naive_targets(s: &[i64], e: &[i64]) -> Vec<(i64, i64)> {
-    let mut targets: Vec<_> = (0..s.len())
-        .filter(|&i| {
-            s[i] < e[i]
-                && !(0..s.len()).any(|j| {
-                    s[j] < e[j] && s[i] <= s[j] && e[j] <= e[i] && (s[i] != s[j] || e[i] != e[j])
-                })
-        })
-        .map(|i| (s[i], e[i]))
-        .collect();
-    targets.sort_unstable();
-    targets.dedup();
-    targets
-}
-
-fn check_reduction(s: &[i64], e: &[i64]) {
-    let reduction = candidates::reduce(s, e).unwrap();
-    assert_eq!(reduction.targets, naive_targets(s, e));
-    assert!(
-        reduction
-            .targets
-            .windows(2)
-            .all(|w| w[0].0 < w[1].0 && w[0].1 < w[1].1)
-    );
-    assert_eq!(
-        reduction.empties,
-        (0..s.len()).filter(|&i| s[i] == e[i]).collect::<Vec<_>>()
-    );
-    let mut rows: Vec<_> = reduction.blocks.iter().map(|b| b.row).collect();
-    rows.sort_unstable();
-    assert_eq!(
-        rows,
-        (0..s.len()).filter(|&i| s[i] < e[i]).collect::<Vec<_>>()
-    );
-    for block in &reduction.blocks {
-        assert!(block.start < block.end);
-        for (j, &(ts, te)) in reduction.targets.iter().enumerate() {
-            assert_eq!(
-                block.start <= j && j < block.end,
-                s[block.row] < te && ts < e[block.row],
-                "row {} target {j}",
-                block.row
-            );
-        }
-    }
-    for bits in 0usize..1 << s.len() {
-        let mask: Vec<_> = (0..s.len()).map(|i| bits & (1 << i) != 0).collect();
-        let reduced = reduction.empties.iter().all(|&i| mask[i])
-            && (0..reduction.targets.len()).all(|j| {
-                reduction
-                    .blocks
-                    .iter()
-                    .any(|b| mask[b.row] && b.start <= j && j < b.end)
-            });
-        assert_eq!(dominates(s, e, &mask), reduced, "subset {bits:b}");
-    }
 }
 
 fn interval() -> impl Strategy<Value = (i64, i64)> {
@@ -530,16 +398,10 @@ fn solve(s: &[i64], e: &[i64], w: &[i128]) -> Objective {
 // PROPTEST_CASES=2048 cargo test -p intervals-core --test minimum_cost_dominating_set
 proptest! {
     #[test]
-    fn every_candidate_matches_original_graph_subset_oracle(input in rows(10)) {
+    fn optimizers_match_original_graph_subset_oracle(input in rows(10)) {
         let (s,e,w) = columns(&input);
         check(&s,&e,&w);
         check_units(&s,&e);
-    }
-
-    #[test]
-    fn reduction_preserves_every_subset_and_matches_naive_targets_and_adjacency(input in rows(7)) {
-        let (s,e,_) = columns(&input);
-        check_reduction(&s,&e);
     }
 
     #[test]

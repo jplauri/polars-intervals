@@ -1,5 +1,6 @@
 //! Original-row/cell oracle, independent of source merging or prefix searches.
-use intervals_core::{CoverageEndpoint, CoverageStats};
+// Importing from the parent lets the library's own route tests include it too.
+use super::{CoverageEndpoint, CoverageStats};
 
 pub fn cells<T: CoverageEndpoint>(qs: &[T], qe: &[T], ss: &[T], se: &[T]) -> Vec<CoverageStats> {
     qs.iter()

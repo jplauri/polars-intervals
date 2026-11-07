@@ -39,14 +39,13 @@ def main():
     }
     invocation = ["cargo", "bench", "-p", "intervals-core", "--bench", "set_geometry", "--locked"]
     metadata = {
-        "scope": "Complete core call including both-side validation, preparation, sortedness detection, sorting, union/scan/events, output allocation and destruction. No Python crossing or Polars. Compilation, fixtures, correctness and memory instrumentation excluded.",
+        "scope": "Complete core call including both-side validation, preparation, sortedness detection, sorting, union and scan, output allocation and destruction. No Python crossing or Polars. Compilation, fixtures, correctness and memory instrumentation excluded.",
         "memory": "Separate untimed call: peak requested live heap and allocation count, including algorithm buffers, output and reallocations. Excludes caller inputs, verification, stack, allocator overhead and RSS.",
-        "verification": "All retained candidates have independent original-row cell and bounded bitmap oracle tests. Timing instances at <=64 rows use cell oracle; large instances compare full output and invariants, not an independent large oracle.",
+        "verification": "Public calls have independent original-row cell and bounded bitmap oracle tests. Timing instances at <=64 rows use the cell oracle; large instances check invariants, not an independent large oracle.",
         "methods": {
-            "union_scan": "A: actual public implementation, canonical union then two-pointer scan.",
-            "fused": "B: validated sorted packed pairs with on-demand merged runs.",
-            "events": "C: tagged endpoint-event sweep with separate source counts.",
+            "union_scan": "Actual public implementation, canonical union then two-pointer scan.",
         },
+        "retired_candidates": "The fused and events comparisons remain at d6c3b01.",
         "limitations": "Single-machine synthetic core measurements. Not grouped/temporal/chunked Polars timings. Narrow i16 cases omitted when any endpoint is outside its range.",
     }
     try:

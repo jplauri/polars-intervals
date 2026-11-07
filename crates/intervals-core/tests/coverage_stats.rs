@@ -1,15 +1,9 @@
-#[path = "../benches/support/coverage_stats_candidates.rs"]
-mod candidates;
-// The candidate shares production preparation without exposing a public index.
-#[allow(dead_code)]
-#[path = "../src/geometry.rs"]
-mod geometry;
 #[path = "support/coverage_stats.rs"]
 mod oracle;
 
 use intervals_core::{
     CoverageEndpoint, CoverageStats, CoverageStatsError, IntervalError, coverage_stats,
-    intersect_intervals, merge_intervals, overlap_counts, subtract_intervals, validate_intervals,
+    intersect_intervals, merge_intervals, overlap_counts, subtract_intervals,
 };
 use proptest::prelude::*;
 
@@ -26,28 +20,23 @@ fn check<T: CoverageEndpoint + std::fmt::Debug>(
     let (qs, qe): (Vec<_>, Vec<_>) = queries.iter().copied().unzip();
     let (ss, se): (Vec<_>, Vec<_>) = sources.iter().copied().unzip();
     let expected = oracle::cells(&qs, &qe, &ss, &se);
-    for method in candidates::METHODS {
-        let actual = candidates::run(method, &qs, &qe, &ss, &se).unwrap();
-        assert_eq!(
-            actual, expected,
-            "{method}: queries={queries:?}, sources={sources:?}"
-        );
-        assert_eq!(actual.len(), queries.len());
-        for row in &actual {
-            assert!(row.overlap_count <= sources.len() as u64);
-            assert!(0 <= row.covered_length && row.covered_length <= row.query_length);
-            assert_eq!(row.overlap_count == 0, row.covered_length == 0);
-            if row.query_length == 0 {
-                assert_eq!(
-                    *row,
-                    CoverageStats {
-                        overlap_count: 0,
-                        covered_length: 0,
-                        query_length: 0,
-                        covered_fraction: None
-                    }
-                );
-            }
+    let actual = coverage_stats(&qs, &qe, &ss, &se).unwrap();
+    assert_eq!(actual, expected, "queries={queries:?}, sources={sources:?}");
+    assert_eq!(actual.len(), queries.len());
+    for row in &actual {
+        assert!(row.overlap_count <= sources.len() as u64);
+        assert!(0 <= row.covered_length && row.covered_length <= row.query_length);
+        assert_eq!(row.overlap_count == 0, row.covered_length == 0);
+        if row.query_length == 0 {
+            assert_eq!(
+                *row,
+                CoverageStats {
+                    overlap_count: 0,
+                    covered_length: 0,
+                    query_length: 0,
+                    covered_fraction: None
+                }
+            );
         }
     }
     expected
@@ -150,37 +139,35 @@ fn exact_extreme_lengths_and_prefix_cancellation() {
 
 #[test]
 fn validate_original_rows_before_empty_or_irrelevant_shortcuts() {
-    for method in candidates::METHODS {
-        for (qs, qe) in [(vec![], vec![]), (vec![0], vec![0]), (vec![0], vec![1])] {
-            let error = candidates::run(method, &qs, &qe, &[99, 8, 100], &[99, 9, 90]).unwrap_err();
-            assert_eq!(
-                error,
-                CoverageStatsError::Intervals(IntervalError::InvalidInterval { index: 2 })
-            );
-            assert!(error.to_string().contains("intervals"));
-        }
+    for (qs, qe) in [(vec![], vec![]), (vec![0], vec![0]), (vec![0], vec![1])] {
+        let error = coverage_stats(&qs, &qe, &[99, 8, 100], &[99, 9, 90]).unwrap_err();
         assert_eq!(
-            candidates::run(method, &[4, 9], &[5, 8], &[], &[]),
-            Err(CoverageStatsError::Queries(
-                IntervalError::InvalidInterval { index: 1 }
-            ))
+            error,
+            CoverageStatsError::Intervals(IntervalError::InvalidInterval { index: 2 })
         );
-        for query in [false, true] {
-            let result = if query {
-                candidates::run(method, &[0], &[], &[], &[])
+        assert!(error.to_string().contains("intervals"));
+    }
+    assert_eq!(
+        coverage_stats(&[4, 9], &[5, 8], &[], &[]),
+        Err(CoverageStatsError::Queries(
+            IntervalError::InvalidInterval { index: 1 }
+        ))
+    );
+    for query in [false, true] {
+        let result = if query {
+            coverage_stats(&[0], &[], &[], &[])
+        } else {
+            coverage_stats(&[], &[], &[0], &[])
+        };
+        let inner = IntervalError::LengthMismatch([("starts", 1), ("ends", 0)]);
+        assert_eq!(
+            result,
+            Err(if query {
+                CoverageStatsError::Queries(inner)
             } else {
-                candidates::run(method, &[], &[], &[0], &[])
-            };
-            let inner = IntervalError::LengthMismatch([("starts", 1), ("ends", 0)]);
-            assert_eq!(
-                result,
-                Err(if query {
-                    CoverageStatsError::Queries(inner)
-                } else {
-                    CoverageStatsError::Intervals(inner)
-                })
-            );
-        }
+                CoverageStatsError::Intervals(inner)
+            })
+        );
     }
 }
 
@@ -204,37 +191,6 @@ fn nonuniform_relabeling_changes_fraction_and_enlarging_can_reduce_fraction() {
     let b = check(&[(0, 10)], &[(0, 2)])[0];
     assert_eq!(a.overlap_count, b.overlap_count);
     assert!(a.covered_fraction > b.covered_fraction);
-}
-
-#[test]
-fn prefix_lookup_before_after_inside_runs_and_gaps_is_exact() {
-    let sources = [
-        (0u64, 1u64 << 54),
-        (3, 8),
-        ((1u64 << 54) + 2, (1u64 << 54) + 5),
-    ];
-    let boundaries = [
-        0,
-        1,
-        3,
-        8,
-        (1u64 << 54) - 1,
-        1u64 << 54,
-        (1u64 << 54) + 1,
-        (1u64 << 54) + 2,
-        (1u64 << 54) + 3,
-        (1u64 << 54) + 5,
-        (1u64 << 54) + 6,
-    ];
-    let (ss, se): (Vec<_>, Vec<_>) = sources.into_iter().unzip();
-    let expected = oracle::cells(&vec![0; boundaries.len()], &boundaries, &ss, &se);
-    assert_eq!(
-        candidates::prefixes(&ss, &se, &boundaries),
-        expected
-            .iter()
-            .map(|r| r.covered_length)
-            .collect::<Vec<_>>()
-    );
 }
 
 #[test]
@@ -265,46 +221,32 @@ fn rows(max: usize) -> impl Strategy<Value = Vec<(i64, i64)>> {
 
 proptest! {
     #[test]
-    fn prefix_lookup_matches_direct_cells_at_every_boundary(q in rows(18), s in rows(24)) {
-        let (ss,se):(Vec<_>,Vec<_>)=s.iter().copied().unzip();
-        let mut boundaries:Vec<_>=s.iter().chain(&q).flat_map(|&(a,b)|[a-1,a,a+1,b-1,b,b+1]).collect();
-        boundaries.extend([-14,14]);
-        boundaries.sort_unstable(); boundaries.dedup();
-        let expected=oracle::cells(&vec![-14;boundaries.len()],&boundaries,&ss,&se);
-        prop_assert_eq!(candidates::prefixes(&ss,&se,&boundaries),expected.iter().map(|r|r.covered_length).collect::<Vec<_>>());
-    }
-
-    #[test]
-    fn larger_candidates_preserve_structural_and_metamorphic_invariants(q in rows(512), s in rows(768)) {
+    fn larger_inputs_preserve_structural_and_metamorphic_invariants(q in rows(512), s in rows(768)) {
         // Sparse physical coordinates exceed f64's exact-integer range. No
         // quadratic cell oracle is used for these larger generated collections.
         let spread=|rows:Vec<(i64,i64)>|rows.into_iter().map(|(a,b)|((1i64<<54)+a*1_000_000_007,(1i64<<54)+b*1_000_000_007)).collect::<Vec<_>>();
         let q=spread(q); let s=spread(s);
         let (qs,qe):(Vec<_>,Vec<_>)=q.iter().copied().unzip();
-        let (ss,se):(Vec<_>,Vec<_>)=s.iter().copied().unzip();
-        let expected=solve(&q,&s);
+        let (mut ss,mut se):(Vec<_>,Vec<_>)=s.iter().copied().unzip();
+        let actual=solve(&q,&s);
         let nonempty=s.iter().filter(|&&(a,b)|a<b).count() as u64;
-        for method in candidates::METHODS {
-            let actual=candidates::run(method,&qs,&qe,&ss,&se).unwrap();
-            prop_assert_eq!(&actual,&expected);
-            for row in &actual {
-                prop_assert!(row.overlap_count<=nonempty);
-                prop_assert!(0<=row.covered_length && row.covered_length<=row.query_length);
-                prop_assert_eq!(row.covered_fraction.is_none(),row.query_length==0);
-                prop_assert_eq!(row.overlap_count==0,row.covered_length==0);
-            }
-            let mut ss=ss.clone(); let mut se=se.clone(); ss.reverse(); se.reverse();
-            prop_assert_eq!(candidates::run(method,&qs,&qe,&ss,&se).unwrap(),actual.clone());
-            ss.extend_from_within(..); se.extend_from_within(..);
-            for (a,b) in actual.iter().zip(candidates::run(method,&qs,&qe,&ss,&se).unwrap()) {
-                prop_assert_eq!(b.overlap_count,2*a.overlap_count);
-                prop_assert_eq!(b.covered_length,a.covered_length);
-                prop_assert_eq!(b.covered_fraction,a.covered_fraction);
-            }
-            let mut qs=qs.clone(); let mut qe=qe.clone(); qs.reverse(); qe.reverse();
-            let mut reversed=actual; reversed.reverse();
-            prop_assert_eq!(candidates::run(method,&qs,&qe,&ss[..ss.len()/2],&se[..se.len()/2]).unwrap(),reversed);
+        for row in &actual {
+            prop_assert!(row.overlap_count<=nonempty);
+            prop_assert!(0<=row.covered_length && row.covered_length<=row.query_length);
+            prop_assert_eq!(row.covered_fraction.is_none(),row.query_length==0);
+            prop_assert_eq!(row.overlap_count==0,row.covered_length==0);
         }
+        ss.reverse(); se.reverse();
+        prop_assert_eq!(coverage_stats(&qs,&qe,&ss,&se).unwrap(),actual.clone());
+        ss.extend_from_within(..); se.extend_from_within(..);
+        for (a,b) in actual.iter().zip(coverage_stats(&qs,&qe,&ss,&se).unwrap()) {
+            prop_assert_eq!(b.overlap_count,2*a.overlap_count);
+            prop_assert_eq!(b.covered_length,a.covered_length);
+            prop_assert_eq!(b.covered_fraction,a.covered_fraction);
+        }
+        let (mut qs,mut qe)=(qs,qe); qs.reverse(); qe.reverse();
+        let mut reversed=actual; reversed.reverse();
+        prop_assert_eq!(coverage_stats(&qs,&qe,&ss[..ss.len()/2],&se[..se.len()/2]).unwrap(),reversed);
     }
 
     #[test]

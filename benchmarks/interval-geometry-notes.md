@@ -14,8 +14,10 @@ The cleanup was checked for behavior, without new timing or memory claims.
 ## Candidates and timing boundaries
 
 The core runner calls the actual public core functions as `production`.
-The private candidates deliberately vary record layout, sortedness detection
-and gap emission. They share endpoint validation, but have independent scan
+The private candidates below remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/geometry_candidates.rs). The current runner times production
+only. They deliberately vary record layout, sortedness detection and gap
+emission. They share endpoint validation, but have independent scan
 implementations covered by the same original-problem oracles.
 
 | Method | Preparation and scan |

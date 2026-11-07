@@ -1,20 +1,13 @@
-//! Complete calls, rotated candidates, untimed independent checks and heap runs.
+//! Complete public calls, untimed independent checks and heap runs.
+//! The retired route comparison remains at d6c3b01.
 #[path = "support/allocations.rs"]
 mod allocations;
-#[path = "support/coverage_stats_candidates.rs"]
-mod candidates;
-#[allow(dead_code, unused_imports)]
-#[path = "../src/geometry.rs"]
-mod geometry;
 #[path = "../tests/support/coverage_stats.rs"]
 mod oracle;
 #[path = "support/random.rs"]
 mod random;
 
-use intervals_core::{
-    CoverageEndpoint, CoverageStats, CoverageStatsError, IntervalError, merge_intervals,
-    validate_intervals,
-};
+use intervals_core::{CoverageEndpoint, CoverageStats, coverage_stats, merge_intervals};
 use random::{random, shuffle};
 use std::{hint::black_box, io::Write, time::Instant};
 
@@ -223,12 +216,12 @@ fn measure<T: CoverageEndpoint + std::fmt::Debug>(
 ) {
     let (qs, qe): (Vec<_>, Vec<_>) = q.iter().copied().unzip();
     let (ss, se): (Vec<_>, Vec<_>) = s.iter().copied().unzip();
-    let expected = candidates::run("binary", &qs, &qe, &ss, &se).unwrap();
+    let expected = coverage_stats(&qs, &qe, &ss, &se).unwrap();
     if q.len().saturating_mul(s.len().saturating_mul(s.len())) <= 2_000_000 {
         assert_eq!(expected, oracle::cells(&qs, &qe, &ss, &se));
     }
     // Large fixtures: structural checks and direct original-row counts at up
-    // to eight query positions, plus whole-output candidate equality below.
+    // to eight query positions.
     for (i, row) in expected.iter().enumerate() {
         assert!(0 <= row.covered_length && row.covered_length <= row.query_length);
         assert!(row.overlap_count <= s.len() as u64);
@@ -258,22 +251,11 @@ fn measure<T: CoverageEndpoint + std::fmt::Debug>(
     } else {
         (spans[0], spans[spans.len() / 2], *spans.last().unwrap())
     };
-    let memory: Vec<_> = candidates::METHODS
-        .iter()
-        .map(|method| {
-            let (output, peak, count) =
-                allocations::measure(|| candidates::run(method, &qs, &qe, &ss, &se).unwrap());
-            assert_eq!(output, expected, "{method}");
-            (peak, count)
-        })
-        .collect();
-    for warmup in 0..settings.warmups {
-        for offset in 0..candidates::METHODS.len() {
-            let method = candidates::METHODS[(offset + warmup) % candidates::METHODS.len()];
-            drop(black_box(
-                candidates::run(method, &qs, &qe, &ss, &se).unwrap(),
-            ));
-        }
+    let (output, peak, allocations) =
+        allocations::measure(|| coverage_stats(&qs, &qe, &ss, &se).unwrap());
+    assert_eq!(output, expected);
+    for _ in 0..settings.warmups {
+        drop(black_box(coverage_stats(&qs, &qe, &ss, &se).unwrap()));
     }
     let iterations = if q.len() + s.len() <= 64 {
         128
@@ -283,26 +265,20 @@ fn measure<T: CoverageEndpoint + std::fmt::Debug>(
         1
     };
     for sample in 0..settings.samples {
-        for offset in 0..candidates::METHODS.len() {
-            let i = (offset + sample) % candidates::METHODS.len();
-            let method = candidates::METHODS[i];
-            let clock = Instant::now();
-            for _ in 0..iterations {
-                drop(black_box(
-                    candidates::run(
-                        method,
-                        black_box(&qs),
-                        black_box(&qe),
-                        black_box(&ss),
-                        black_box(&se),
-                    )
-                    .unwrap(),
-                ));
-            }
-            let ns = clock.elapsed().as_nanos();
-            let (peak, allocations) = memory[i];
-            writeln!(file,"{label},{},{},{p},{nonempty},{duplicates},{},{span_min},{span_median},{span_max},{method},{sample},{iterations},{ns},{},{peak},{allocations}",q.len(),s.len(),endpoints.len(),ns/iterations).unwrap();
+        let clock = Instant::now();
+        for _ in 0..iterations {
+            drop(black_box(
+                coverage_stats(
+                    black_box(&qs),
+                    black_box(&qe),
+                    black_box(&ss),
+                    black_box(&se),
+                )
+                .unwrap(),
+            ));
         }
+        let ns = clock.elapsed().as_nanos();
+        writeln!(file,"{label},{},{},{p},{nonempty},{duplicates},{},{span_min},{span_median},{span_max},production,{sample},{iterations},{ns},{},{peak},{allocations}",q.len(),s.len(),endpoints.len(),ns/iterations).unwrap();
     }
     file.flush().unwrap();
 }

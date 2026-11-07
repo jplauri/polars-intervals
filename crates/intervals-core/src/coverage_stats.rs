@@ -2,17 +2,16 @@ use crate::{
     CoverageEndpoint, CoverageStats, CoverageStatsError, geometry::merge_sorted, validate_intervals,
 };
 
-// Shared with the private offline-sweep benchmark through a #[path] import.
-pub(crate) struct Prepared<T> {
-    pub(crate) starts: Vec<T>,
-    pub(crate) ends: Vec<T>,
-    pub(crate) union: Vec<(T, T)>,
-    pub(crate) prefixes: Vec<i128>,
+struct Prepared<T> {
+    starts: Vec<T>,
+    ends: Vec<T>,
+    union: Vec<(T, T)>,
+    prefixes: Vec<i128>,
 }
 
 impl<T: CoverageEndpoint> Prepared<T> {
     // Call only after validating every row in both operands.
-    pub(crate) fn new(starts: &[T], ends: &[T]) -> Self {
+    fn new(starts: &[T], ends: &[T]) -> Self {
         let mut records: Vec<_> = starts
             .iter()
             .zip(ends)
@@ -40,7 +39,7 @@ impl<T: CoverageEndpoint> Prepared<T> {
         }
     }
 
-    pub(crate) fn prefix_at(&self, x: T, k: usize) -> i128 {
+    fn prefix_at(&self, x: T, k: usize) -> i128 {
         self.prefixes[k]
             + if k < self.union.len() && self.union[k].0 < x {
                 x.widened() - self.union[k].0.widened()
@@ -116,7 +115,7 @@ pub fn coverage_stats<T: CoverageEndpoint>(
     }
 }
 
-pub(crate) fn direct<T: CoverageEndpoint>(
+fn direct<T: CoverageEndpoint>(
     prepared: &Prepared<T>,
     qs: &[T],
     qe: &[T],
@@ -166,7 +165,7 @@ pub(crate) fn direct<T: CoverageEndpoint>(
     Ok(output)
 }
 
-pub(crate) fn sweep<T: CoverageEndpoint>(
+fn sweep<T: CoverageEndpoint>(
     prepared: &Prepared<T>,
     qs: &[T],
     qe: &[T],
@@ -230,4 +229,128 @@ pub(crate) fn sweep<T: CoverageEndpoint>(
         row.covered_fraction = Some(row.covered_length as f64 / row.query_length as f64);
     }
     Ok(output)
+}
+
+#[cfg(test)]
+#[path = "../tests/support/coverage_stats.rs"]
+mod oracle;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    fn prefixes<T: CoverageEndpoint>(ss: &[T], se: &[T], boundaries: &[T]) -> Vec<i128> {
+        let prepared = Prepared::new(ss, se);
+        boundaries
+            .iter()
+            .map(|&x| {
+                let k = prepared.union.partition_point(|&(_, end)| end <= x);
+                prepared.prefix_at(x, k)
+            })
+            .collect()
+    }
+
+    /// Run every route on the same input, so the selector never hides one.
+    fn check_routes<T: CoverageEndpoint + std::fmt::Debug>(q: &[(T, T)], s: &[(T, T)]) {
+        let (qs, qe): (Vec<_>, Vec<_>) = q.iter().copied().unzip();
+        let (ss, se): (Vec<_>, Vec<_>) = s.iter().copied().unzip();
+        let expected = oracle::cells(&qs, &qe, &ss, &se);
+        let prepared = Prepared::new(&ss, &se);
+        assert_eq!(direct(&prepared, &qs, &qe, false).unwrap(), expected);
+        assert_eq!(sweep(&prepared, &qs, &qe).unwrap(), expected);
+        if qs.is_sorted() && qe.is_sorted() {
+            assert_eq!(direct(&prepared, &qs, &qe, true).unwrap(), expected);
+        }
+    }
+
+    fn ordered<T: Ord + Copy>(rows: Vec<(T, T)>) -> Vec<(T, T)> {
+        rows.into_iter()
+            .map(|(a, b)| (a.min(b), a.max(b)))
+            .collect()
+    }
+
+    fn rows(max: usize) -> impl Strategy<Value = Vec<(i64, i64)>> {
+        prop::collection::vec((-12i64..=12, -12i64..=12), 0..=max).prop_map(ordered)
+    }
+
+    #[test]
+    fn prefix_lookup_before_after_inside_runs_and_gaps_is_exact() {
+        let sources = [
+            (0u64, 1u64 << 54),
+            (3, 8),
+            ((1u64 << 54) + 2, (1u64 << 54) + 5),
+        ];
+        let boundaries = [
+            0,
+            1,
+            3,
+            8,
+            (1u64 << 54) - 1,
+            1u64 << 54,
+            (1u64 << 54) + 1,
+            (1u64 << 54) + 2,
+            (1u64 << 54) + 3,
+            (1u64 << 54) + 5,
+            (1u64 << 54) + 6,
+        ];
+        let (ss, se): (Vec<_>, Vec<_>) = sources.into_iter().unzip();
+        let expected = oracle::cells(&vec![0; boundaries.len()], &boundaries, &ss, &se);
+        assert_eq!(
+            prefixes(&ss, &se, &boundaries),
+            expected
+                .iter()
+                .map(|r| r.covered_length)
+                .collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn every_route_matches_the_oracle_at_selector_boundaries() {
+        for p in [31, 32, 33] {
+            let sources: Vec<_> = (0..p).map(|i| (i * 4, i * 4 + 2)).collect();
+            let queries: Vec<_> = (0..p).rev().map(|i| (i * 4 - 1, i * 4 + 3)).collect();
+            let nested: Vec<_> = (0..p).map(|i| (i, p * 5 - i)).collect();
+            let ordered: Vec<_> = queries.iter().rev().copied().collect();
+            for q in [&queries, &nested, &ordered] {
+                check_routes(q, &sources);
+            }
+        }
+    }
+
+    proptest! {
+        #[test]
+        fn prefix_lookup_matches_direct_cells_at_every_boundary(q in rows(18), s in rows(24)) {
+            let (ss, se): (Vec<_>, Vec<_>) = s.iter().copied().unzip();
+            let mut boundaries: Vec<_> = s
+                .iter()
+                .chain(&q)
+                .flat_map(|&(a, b)| [a - 1, a, a + 1, b - 1, b, b + 1])
+                .collect();
+            boundaries.extend([-14, 14]);
+            boundaries.sort_unstable();
+            boundaries.dedup();
+            let expected = oracle::cells(&vec![-14; boundaries.len()], &boundaries, &ss, &se);
+            prop_assert_eq!(
+                prefixes(&ss, &se, &boundaries),
+                expected.iter().map(|r| r.covered_length).collect::<Vec<_>>()
+            );
+        }
+
+        #[test]
+        fn every_route_matches_the_oracle(q in rows(18), s in rows(24)) {
+            check_routes(&q, &s);
+        }
+
+        #[test]
+        fn every_route_matches_the_oracle_at_arbitrary_coordinates(
+            q in prop::collection::vec(any::<(i64, i64)>(), 0..=10),
+            s in prop::collection::vec(any::<(i64, i64)>(), 0..=12),
+            uq in prop::collection::vec(any::<(u64, u64)>(), 0..=10),
+            us in prop::collection::vec(any::<(u64, u64)>(), 0..=12),
+        ) {
+            check_routes(&ordered(q), &ordered(s));
+            check_routes(&ordered(uq), &ordered(us));
+        }
+    }
 }

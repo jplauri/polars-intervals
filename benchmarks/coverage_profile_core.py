@@ -65,29 +65,24 @@ def main():
             "Fixtures, compilation, correctness checks and memory runs excluded. "
             "No Python crossing or Polars work."
         ),
-        "timing": "Methods rotated each sample; tiny calls batched; warmups precede samples.",
+        "timing": "Tiny calls batched; warmups precede samples.",
         "memory": (
             "Separate untimed allocator run: peak requested live heap and allocation count, "
             "including output and reallocations; excludes input buffers, verification, "
             "allocator overhead, stack and process RSS."
         ),
         "correctness": (
-            "All candidates equal the independent direct-membership cell oracle at n<=1000; "
-            "large calls compare entire canonical outputs and structural/boundary invariants. "
-            "Named and Proptest candidate tests additionally use direct per-integer-tick checks."
+            "The public call equals the independent direct-membership cell oracle at n<=1000; "
+            "large calls check structural and boundary invariants. "
+            "Named and Proptest tests additionally use direct per-integer-tick checks."
         ),
         "candidates": {
             "production": (
                 "Retained public core: independently sorted endpoint-only unit streams or "
                 "natural-alignment (coordinate,weight) records."
             ),
-            "events": "One sorted coordinate/tagged-row-index array; departures before arrivals.",
-            "heap": "Verified/sorted start row indices, dynamically growing active-end heap.",
-            "streams_indices": (
-                "Weighted only: original preparation and shared-iterator sweep over row-index "
-                "streams, with source endpoint/weight lookups. Lower-memory comparison."
-            ),
         },
+        "retired_candidates": "The events, heap and streams_indices comparisons remain at d6c3b01.",
         "dimensions": (
             "Synthetic family, order, load mode, endpoint dtype, domain mode, zero mode, "
             "seed and n. Million-row cases are a focused subset marked in the harness. "

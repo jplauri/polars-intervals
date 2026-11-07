@@ -144,7 +144,9 @@ metrics; see the [memory definitions](benchmarking.md#memory-metrics).
 
 Follow the [shared setup](benchmarking.md#setup) and rebuild the release plugin.
 The runner verifies that the installed extension matches that release binary.
-Use a new output prefix for every run. In PowerShell:
+Use a new output prefix for every run. The core runner now times only the public
+calls. Its packed, indexed and materialized candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/geometry_candidates.rs). In PowerShell:
 
 ```powershell
 $env:POLARS_MAX_THREADS = "24"

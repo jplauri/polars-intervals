@@ -45,7 +45,7 @@ def main():
             "allocation and output destruction. Excludes fixture construction, compilation, "
             "correctness checks and memory runs. No Python crossing or Polars work."
         ),
-        "timing": "Candidates rotate per sample; tiny calls batched; warmups precede samples.",
+        "timing": "Tiny calls batched; warmups precede samples.",
         "phase_clocks": "Only whole-call wall time is measured; no internal phase clocks.",
         "memory": (
             "Separate untimed run: peak requested live heap and allocation count, including "
@@ -54,9 +54,9 @@ def main():
         ),
         "correctness": (
             "Original-source membership cell oracle for fixtures with n*m*m<=2000000. "
-            "Every fixture checks whole-output candidate equality and structural bounds. "
+            "Every fixture checks structural bounds. "
             "Large fixtures additionally check direct original-source counts at eight query "
-            "positions. Related candidates are not independent reduction validation. "
+            "positions. Unit tests check every route against the cell oracle. "
             "Named/Proptest tests compare cell and integer-tick oracles independently."
         ),
         "candidates": {
@@ -64,12 +64,8 @@ def main():
                 "Public core: direct scans for verified sorted starts AND ends at n>=m; "
                 "otherwise packed sweeps at n<=m and p>=32; otherwise preallocated binary."
             ),
-            "binary": "Preallocated binary queries using shared production source preparation.",
-            "sweep": (
-                "Private packed query-boundary sweeps with independent verified-order checks "
-                "for query starts and ends; original-row restoration. Shares source preparation."
-            ),
         },
+        "retired_candidates": "The forced binary and sweep route comparisons remain at d6c3b01.",
         "dimensions": (
             "Synthetic family, independent query/source order, n:m ratio, dtype, seed, n and m. "
             "p is source union run count. Also records nonempty/duplicate source rows, distinct "

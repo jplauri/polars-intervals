@@ -1,12 +1,10 @@
-//! Complete-call experiments; DOMINATION_* variables select new output and cases.
+//! Complete public calls; DOMINATION_* variables select new output and cases.
+//! The retired candidates remain at d6c3b01.
 #[path = "support/allocations.rs"]
 mod allocations;
-#[path = "support/domination.rs"]
-mod candidates;
 #[path = "support/random.rs"]
 mod random;
 
-use intervals_core::IntervalError;
 use random::{random, shuffle};
 use std::{hint::black_box, io::Write, time::Instant};
 
@@ -127,16 +125,12 @@ fn dataset(
     (s, e, c)
 }
 
-fn run<T: Ord + Copy>(s: &[T], e: &[T], w: Option<&[i64]>, method: &str) -> Vec<bool> {
-    if method == "production" {
-        w.map_or_else(
-            || intervals_core::minimum_dominating_set(s, e),
-            |w| intervals_core::minimum_cost_dominating_set(s, e, w),
-        )
-        .unwrap()
-    } else {
-        candidates::run(s, e, w, method).unwrap()
-    }
+fn run<T: Ord + Copy>(s: &[T], e: &[T], w: Option<&[i64]>) -> Vec<bool> {
+    w.map_or_else(
+        || intervals_core::minimum_dominating_set(s, e),
+        |w| intervals_core::minimum_cost_dominating_set(s, e, w),
+    )
+    .unwrap()
 }
 
 // Independent original-graph feasibility, O(n log n), with no reduced blocks.
@@ -229,10 +223,9 @@ fn stats<T: Ord + Copy>(s: &[T], e: &[T]) -> (usize, usize) {
     (m, count)
 }
 
-struct Settings<'a> {
+struct Settings {
     samples: usize,
     warmups: usize,
-    methods: &'a [&'a str],
 }
 
 fn measure<T: Ord + Copy>(
@@ -242,54 +235,40 @@ fn measure<T: Ord + Copy>(
     w: Option<&[i64]>,
     label: &str,
     family: &str,
-    settings: &Settings<'_>,
+    settings: &Settings,
 ) {
-    let expected = verify(s, e, w, &run(s, e, w, "production"));
+    let expected = verify(s, e, w, &run(s, e, w));
     let known = known_optimum(s, e, w, family);
     if let Some(optimum) = known {
         assert_eq!(expected, optimum);
     }
+    // Larger instances without a known optimum only check feasibility.
     let evidence = if s.len() <= 12 {
         "graph_subsets"
     } else if known.is_some() {
         "analytic"
     } else {
-        "candidate_agreement"
+        "feasibility"
     };
     let (m, nonempty) = stats(s, e);
-    let methods: Vec<_> = settings
-        .methods
-        .iter()
-        .copied()
-        .filter(|&method| {
-            (method != "quadratic" || s.len() <= 64)
-                && (method != "greedy" || w.is_none_or(|w| w.iter().all(|&x| x == w[0])))
-        })
-        .map(|method| {
-            let (mask, peak, count) = allocations::measure(|| run(s, e, w, method));
-            assert_eq!(verify(s, e, w, &mask), expected, "{label}/{method}");
-            for _ in 0..settings.warmups {
-                drop(black_box(run(s, e, w, method)));
-            }
-            (method, peak, count)
-        })
-        .collect();
+    let (mask, peak, count) = allocations::measure(|| run(s, e, w));
+    assert_eq!(verify(s, e, w, &mask), expected, "{label}");
+    for _ in 0..settings.warmups {
+        drop(black_box(run(s, e, w)));
+    }
     for sample in 0..settings.samples {
-        for offset in 0..methods.len() {
-            let (method, peak, count) = methods[(sample + offset) % methods.len()];
-            let tick = Instant::now();
-            let mask = black_box(run(black_box(s), black_box(e), black_box(w), method));
-            let ns = tick.elapsed().as_nanos();
-            assert_eq!(verify(s, e, w, &mask), expected, "{label}/{method}");
-            writeln!(
-                file,
-                "{label},{},{m},{nonempty},{method},{sample},{ns},{peak},{count},{},{},{evidence}",
-                s.len(),
-                expected.0,
-                expected.1
-            )
-            .unwrap();
-        }
+        let tick = Instant::now();
+        let mask = black_box(run(black_box(s), black_box(e), black_box(w)));
+        let ns = tick.elapsed().as_nanos();
+        assert_eq!(verify(s, e, w, &mask), expected, "{label}");
+        writeln!(
+            file,
+            "{label},{},{m},{nonempty},production,{sample},{ns},{peak},{count},{},{},{evidence}",
+            s.len(),
+            expected.0,
+            expected.1
+        )
+        .unwrap();
     }
     file.flush().unwrap();
 }
@@ -306,15 +285,9 @@ fn main() {
         .split(',')
         .map(|x| x.parse().unwrap())
         .collect();
-    let methods = value(
-        "DOMINATION_METHODS",
-        &format!("production,{}", candidates::METHODS.join(",")),
-    );
-    let methods: Vec<_> = methods.split(',').collect();
     let settings = Settings {
         samples: value("DOMINATION_SAMPLES", "5").parse().unwrap(),
         warmups: value("DOMINATION_WARMUPS", "2").parse().unwrap(),
-        methods: &methods,
     };
     assert!(settings.samples > 0 && settings.warmups > 0);
     let filter = value("DOMINATION_CASES", "");

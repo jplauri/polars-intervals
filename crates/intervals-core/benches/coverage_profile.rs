@@ -1,14 +1,12 @@
-//! Complete calls, rotated methods, separate untimed requested-heap measurement.
+//! Complete public calls, separate untimed requested-heap measurement.
+//! The retired candidates remain at d6c3b01.
 //! PROFILE_CSV must name a NEW file; PROFILE_* settings are read in main.
 #[path = "support/allocations.rs"]
 mod allocations;
-#[path = "support/coverage_profile_candidates.rs"]
-mod candidates;
 #[path = "support/random.rs"]
 mod random;
 
-use candidates::{METHODS, oracle, run};
-use intervals_core::CoverageSegment;
+use intervals_core::{CoverageSegment, IntervalError, coverage_profile, weighted_coverage_profile};
 use random::{random, shuffle};
 use std::{
     hint::black_box,
@@ -253,6 +251,91 @@ fn verify<T: Ord + Copy + std::fmt::Debug>(
     }
 }
 
+fn solve<T: Ord + Copy, W: Copy>(
+    s: &[T],
+    e: &[T],
+    w: Option<&[W]>,
+    domain: Option<(T, T)>,
+    zero: bool,
+) -> Vec<CoverageSegment<T>>
+where
+    i128: From<W>,
+{
+    match w {
+        None => coverage_profile(s, e, domain, zero),
+        Some(w) => weighted_coverage_profile(s, e, w, domain, zero),
+    }
+    .unwrap()
+}
+
+/// Independent O(n*u) membership oracle for SMALL, valid inputs only. It never
+/// calls production validation, preprocessing, emission, or signed events.
+fn oracle<T: Ord + Copy, W: Copy>(
+    starts: &[T],
+    ends: &[T],
+    weights: Option<&[W]>,
+    domain: Option<(T, T)>,
+    include_zero: bool,
+) -> Result<Vec<CoverageSegment<T>>, IntervalError>
+where
+    i128: From<W>,
+{
+    let domain = domain.or_else(|| {
+        let lo = (0..starts.len())
+            .filter(|&i| starts[i] < ends[i])
+            .map(|i| starts[i])
+            .min()?;
+        let hi = (0..ends.len())
+            .filter(|&i| starts[i] < ends[i])
+            .map(|i| ends[i])
+            .max()?;
+        Some((lo, hi))
+    });
+    let Some((lo, hi)) = domain.filter(|(lo, hi)| lo < hi) else {
+        return Ok(Vec::new());
+    };
+    let mut boundaries = vec![lo, hi];
+    for row in 0..starts.len() {
+        if starts[row] < ends[row] {
+            for point in [starts[row], ends[row]] {
+                if lo < point && point < hi {
+                    boundaries.push(point);
+                }
+            }
+        }
+    }
+    boundaries.sort_unstable();
+    boundaries.dedup();
+    let mut cells = Vec::new();
+    for pair in boundaries.windows(2) {
+        let mut load = 0i128;
+        for row in 0..starts.len() {
+            if starts[row] <= pair[0] && pair[0] < ends[row] {
+                load = load
+                    .checked_add(weights.map_or(1, |w| i128::from(w[row])))
+                    .ok_or(IntervalError::LoadOverflow)?;
+            }
+        }
+        if include_zero || load > 0 {
+            cells.push(CoverageSegment {
+                start: pair[0],
+                end: pair[1],
+                load,
+            });
+        }
+    }
+    let mut canonical: Vec<CoverageSegment<T>> = Vec::new();
+    for cell in cells {
+        match canonical.last_mut() {
+            Some(previous) if previous.end == cell.start && previous.load == cell.load => {
+                previous.end = cell.end;
+            }
+            _ => canonical.push(cell),
+        }
+    }
+    Ok(canonical)
+}
+
 struct Settings {
     samples: usize,
     warmups: usize,
@@ -269,40 +352,16 @@ fn measure<T: Ord + Copy + std::fmt::Debug, W: Copy>(
     i128: From<W>,
 {
     let (s, e, w) = data;
-    let methods: Vec<_> = METHODS
-        .iter()
-        .copied()
-        .filter(|&method| w.is_some() || method != "streams_indices")
-        .collect();
-    let expected = run("production", s, e, w, domain, case.zero).unwrap();
+    let expected = solve(s, e, w, domain, case.zero);
     verify(s, e, domain, case.zero, &expected);
     if s.len() <= 1000 {
         assert_eq!(expected, oracle(s, e, w, domain, case.zero).unwrap());
     }
     let (m, u, omega) = stats(s, e, w, domain);
-    let memory: Vec<_> = methods
-        .iter()
-        .map(|method| {
-            let (output, peak, count) =
-                allocations::measure(|| run(method, s, e, w, domain, case.zero).unwrap());
-            assert_eq!(output, expected, "{method}");
-            (peak, count)
-        })
-        .collect();
-    for warmup in 0..settings.warmups {
-        for offset in 0..methods.len() {
-            drop(black_box(
-                run(
-                    methods[(offset + warmup) % methods.len()],
-                    s,
-                    e,
-                    w,
-                    domain,
-                    case.zero,
-                )
-                .unwrap(),
-            ));
-        }
+    let (output, peak, count) = allocations::measure(|| solve(s, e, w, domain, case.zero));
+    assert_eq!(output, expected);
+    for _ in 0..settings.warmups {
+        drop(black_box(solve(s, e, w, domain, case.zero)));
     }
     let iterations = if s.len() <= 64 {
         128
@@ -312,27 +371,18 @@ fn measure<T: Ord + Copy + std::fmt::Debug, W: Copy>(
         1
     };
     for sample in 0..settings.samples {
-        for offset in 0..methods.len() {
-            let i = (sample + offset) % methods.len();
-            let method = methods[i];
-            let tick = Instant::now();
-            for _ in 0..iterations {
-                drop(black_box(
-                    run(
-                        method,
-                        black_box(s),
-                        black_box(e),
-                        black_box(w),
-                        domain,
-                        case.zero,
-                    )
-                    .unwrap(),
-                ));
-            }
-            let ns = tick.elapsed().as_nanos();
-            let (peak, count) = memory[i];
-            writeln!(file, "{label},{},{method},{sample},{iterations},{ns},{},{peak},{count},{m},{u},{},{omega},{},{},{},{},{},{}", s.len(), ns / iterations, expected.len(), size_of::<(T,usize)>(), align_of::<(T,usize)>(), size_of::<CoverageSegment<T>>(), align_of::<CoverageSegment<T>>(), w.map_or(0, |_| size_of::<(T,W)>()), w.map_or(0, |_| align_of::<(T,W)>())).unwrap();
+        let tick = Instant::now();
+        for _ in 0..iterations {
+            drop(black_box(solve(
+                black_box(s),
+                black_box(e),
+                black_box(w),
+                domain,
+                case.zero,
+            )));
         }
+        let ns = tick.elapsed().as_nanos();
+        writeln!(file, "{label},{},production,{sample},{iterations},{ns},{},{peak},{count},{m},{u},{},{omega},{},{},{},{},{},{}", s.len(), ns / iterations, expected.len(), size_of::<(T,usize)>(), align_of::<(T,usize)>(), size_of::<CoverageSegment<T>>(), align_of::<CoverageSegment<T>>(), w.map_or(0, |_| size_of::<(T,W)>()), w.map_or(0, |_| align_of::<(T,W)>())).unwrap();
     }
     file.flush().unwrap();
 }
@@ -408,7 +458,7 @@ fn main() {
     let mut file = std::io::BufWriter::new(output);
     writeln!(file, "dtype,family,order,weights,domain,include_zero,seed,weight_dtype,n,method,sample,iterations,batch_ns,total_ns,peak_bytes,allocations,m,u,z,omega,index_record_bytes,index_record_align,segment_bytes,segment_align,weight_record_bytes,weight_record_align").unwrap();
     eprintln!(
-        "scope=complete core call including validation/clipping/sortedness/preparation/coalescing/output/destruction; warmups={}; samples={}; memory=separate untimed peak requested heap excluding inputs; small independent oracle n<=1000; large candidate agreement plus invariants",
+        "scope=complete core call including validation/clipping/sortedness/preparation/coalescing/output/destruction; warmups={}; samples={}; memory=separate untimed peak requested heap excluding inputs; small independent oracle n<=1000; invariants at larger n",
         settings.warmups, settings.samples
     );
     for &case in CASES {

@@ -132,6 +132,8 @@ memory measurements cannot be substituted for one another.
 
 **Reproduce**
 
+The Rust core benchmark now times only the public call. The harness that forced
+each route remains at [`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/coverage_stats_candidates.rs).
 Follow the shared [release setup](benchmarking.md#setup), then run:
 
 ```sh

@@ -133,8 +133,10 @@ query memory. Each observation is one cold process, not a distribution.
 
 **Reproduce**
 
-Follow the [release-build setup](benchmarking.md#setup). Preserve the installed
-release plugin with `--no-sync`:
+Follow the [release-build setup](benchmarking.md#setup). The core runner now
+times only the public calls. Its fused and event candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/set_geometry_candidates.rs). Preserve the installed release
+plugin with `--no-sync`:
 
 ```sh
 uv run --no-sync python -m benchmarks.set_geometry_core --output benchmarks/results/set-geometry-core-new

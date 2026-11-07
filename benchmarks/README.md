@@ -55,11 +55,10 @@ See the [provenance guidance](../docs/benchmarking.md#measurement-rules).
 
 The dominating-set runner is `cargo bench -p intervals-core --bench
 minimum_cost_dominating_set --locked`. `DOMINATION_CSV` must name a new absolute
-output path. `DOMINATION_SIZES`, `DOMINATION_SEEDS`, `DOMINATION_DTYPES`,
-`DOMINATION_METHODS`, and `DOMINATION_CASES` accept comma-separated selections.
-`DOMINATION_SAMPLES` and `DOMINATION_WARMUPS` default to five and two. It compares
-complete production, covering, fused covering, heap DP and direct greedy calls,
-plus a bounded quadratic reference, with separate allocator instrumentation.
+output path. `DOMINATION_SIZES`, `DOMINATION_SEEDS`, `DOMINATION_DTYPES` and
+`DOMINATION_CASES` accept comma-separated selections. `DOMINATION_SAMPLES` and
+`DOMINATION_WARMUPS` default to five and two. It times complete public calls
+with separate allocator instrumentation.
 See the [report](../docs/domination-benchmarks.md) and [proofs](domination-notes.md).
 
 The maximum-weight clique runner is `cargo bench -p intervals-core --bench
@@ -93,13 +92,12 @@ feasibility and the minimum lane count, or scheduling feasibility and the optima
 total weight, outside timing. It records each seed separately and preserves the
 revision, release hashes and thread settings.
 
-Coverage/load profiles compare complete A event, B independent-stream, and C
-active-end heap calls. Weighted index streams are an additional B layout
-comparison against production's contiguous records. Earlier flat-record
-experiments remain in the archived source snapshots. The implementations in `benches/support/coverage_profile_candidates.rs`
-are private to benchmarks and tests; only one engine is exposed by the package.
+The coverage/load profile core runner times the public calls. Its A event,
+C active-end heap and weighted index-stream candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/coverage_profile_candidates.rs). Earlier flat-record
+experiments remain in the archived source snapshots.
 See [correctness and design notes](coverage-profile-notes.md). List core
-comparison options with `uv run --no-sync python benchmarks/coverage_profile_core.py --help`.
+runner options with `uv run --no-sync python benchmarks/coverage_profile_core.py --help`.
 Run complete Polars comparisons with:
 
 ```sh

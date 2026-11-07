@@ -116,7 +116,9 @@ universal-fastest claim follows from these fixtures.
 
 Follow the [release-build setup](benchmarking.md#setup), then preserve that build
 with `uv run --no-sync`. The runner checks the installed binary against the
-release build. Use a new output name for every run.
+release build. Use a new output name for every run. The core runner now times
+only the public call. Its event, heap and weighted-index candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/coverage_profile_candidates.rs).
 
 ```sh
 uv run --no-sync python benchmarks/coverage_profile_core.py --output benchmarks/results/coverage-profile-core-new.csv --weight-dtypes i128 --dtypes i64
@@ -135,7 +137,7 @@ the recorded base revision and preserve uncommitted comparison implementations.
 Higher-case properties and reporting checks:
 
 ```sh
-cargo test -p intervals-core --test coverage_profile --test coverage_profile_candidates --locked
+cargo test -p intervals-core --test coverage_profile --locked
 uv run --locked --no-sync python -m pytest benchmarks/test_coverage_profile.py
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
 uv run --locked --isolated --only-group plots python -m unittest discover -s benchmarks -p test_plot.py

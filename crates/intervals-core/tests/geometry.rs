@@ -1,9 +1,6 @@
-#[path = "../benches/support/geometry_candidates.rs"]
-mod candidates;
 #[path = "support/geometry.rs"]
 mod oracle;
 
-use candidates::{CLUSTER_METHODS, GAP_METHODS, MERGE_METHODS};
 use intervals_core::{
     IntervalError, cluster_intervals, coverage_profile, interval_gaps, merge_intervals,
     validate_intervals,
@@ -21,31 +18,17 @@ fn bounds() -> impl Strategy<Value = (i32, i32)> {
 
 fn check<T: Ord + Copy + std::fmt::Debug>(s: &[T], e: &[T], domain: (T, T)) {
     for touching in [false, true] {
-        let expected = oracle::graph(s, e, touching);
-        for method in CLUSTER_METHODS {
-            assert_eq!(
-                candidates::cluster(method, s, e, touching).unwrap(),
-                expected,
-                "cluster {method}"
-            );
-        }
-    }
-    let expected = oracle::cells(s, e, None);
-    for method in MERGE_METHODS {
         assert_eq!(
-            candidates::merge(method, s, e).unwrap(),
-            expected,
-            "merge {method}"
+            cluster_intervals(s, e, touching).unwrap(),
+            oracle::graph(s, e, touching),
+            "cluster, touching={touching}"
         );
     }
-    let expected = oracle::cells(s, e, Some(domain));
-    for method in GAP_METHODS {
-        assert_eq!(
-            candidates::gaps(method, s, e, domain.0, domain.1).unwrap(),
-            expected,
-            "gaps {method}"
-        );
-    }
+    assert_eq!(merge_intervals(s, e).unwrap(), oracle::cells(s, e, None));
+    assert_eq!(
+        interval_gaps(s, e, domain.0, domain.1).unwrap(),
+        oracle::cells(s, e, Some(domain))
+    );
 }
 
 fn unzip<T: Copy>(rows: &[(T, T)]) -> (Vec<T>, Vec<T>) {
@@ -179,44 +162,30 @@ fn domain_empty_outside_spanning_clipped_and_exact_boundary_cases() {
 }
 
 #[test]
-fn every_candidate_validates_original_rows_before_clipping_or_empty_domain() {
+fn every_operation_validates_original_rows_before_clipping_or_empty_domain() {
     let (s, e) = (&[30, 0, 20], &[40, 1, 10]);
     let error = IntervalError::InvalidInterval { index: 2 };
     assert_eq!(validate_intervals(s, e), Err(error));
-    for method in CLUSTER_METHODS {
-        assert_eq!(candidates::cluster(method, s, e, false), Err(error));
-    }
-    for method in MERGE_METHODS {
-        assert_eq!(candidates::merge(method, s, e), Err(error));
-    }
-    for method in GAP_METHODS {
-        for (l, r) in [(0, 0), (-20, -10), (100, 200)] {
-            assert_eq!(candidates::gaps(method, s, e, l, r), Err(error));
-        }
+    assert_eq!(cluster_intervals(s, e, false), Err(error));
+    assert_eq!(merge_intervals(s, e), Err(error));
+    for (l, r) in [(0, 0), (-20, -10), (100, 200)] {
+        assert_eq!(interval_gaps(s, e, l, r), Err(error));
     }
 }
 
 #[test]
-fn every_candidate_rejects_mismatched_lengths_and_reversed_domains() {
+fn every_operation_rejects_mismatched_lengths_and_reversed_domains() {
     for (s, e) in [(&[0][..], &[][..]), (&[][..], &[1][..])] {
         let error = IntervalError::LengthMismatch([("starts", s.len()), ("ends", e.len())]);
         assert_eq!(validate_intervals(s, e), Err(error));
-        for method in CLUSTER_METHODS {
-            assert_eq!(candidates::cluster(method, s, e, true), Err(error));
-        }
-        for method in MERGE_METHODS {
-            assert_eq!(candidates::merge(method, s, e), Err(error));
-        }
-        for method in GAP_METHODS {
-            assert_eq!(candidates::gaps(method, s, e, 0, 0), Err(error));
-        }
+        assert_eq!(cluster_intervals(s, e, true), Err(error));
+        assert_eq!(merge_intervals(s, e), Err(error));
+        assert_eq!(interval_gaps(s, e, 0, 0), Err(error));
     }
-    for method in GAP_METHODS {
-        assert_eq!(
-            candidates::gaps(method, &[0], &[0], 1, 0),
-            Err(IntervalError::InvalidDomain)
-        );
-    }
+    assert_eq!(
+        interval_gaps(&[0], &[0], 1, 0),
+        Err(IntervalError::InvalidDomain)
+    );
 }
 
 #[test]
@@ -333,7 +302,7 @@ fn large_structured_collections_have_known_answers_without_quadratic_oracles() {
 
 proptest! {
     #[test]
-    fn every_retained_candidate_matches_graph_cells_and_bitmap(
+    fn public_operations_match_graph_cells_and_bitmap(
         (s, e) in rows(),
         domain in bounds(),
     ) {
@@ -347,7 +316,7 @@ proptest! {
     }
 
     #[test]
-    fn wide_comparison_only_candidates_match_independent_oracles(
+    fn wide_comparison_only_endpoints_match_independent_oracles(
         pairs in prop::collection::vec((0usize..8, 0usize..8), 0..20),
         a in 0usize..8,
         b in 0usize..8,

@@ -1,5 +1,3 @@
-#[path = "../benches/support/set_geometry_candidates.rs"]
-mod candidates;
 #[path = "support/set_geometry.rs"]
 mod oracle;
 
@@ -43,16 +41,9 @@ fn check<T: Ord + Copy + std::fmt::Debug>(
     let (rs, re) = unzip(right);
     for (intersect, expected) in [(false, difference), (true, intersection)] {
         assert_eq!(oracle::cells(&ls, &le, &rs, &re, intersect), expected);
-        for method in candidates::METHODS {
-            let actual = if intersect {
-                candidates::intersect(method, &ls, &le, &rs, &re)
-            } else {
-                candidates::subtract(method, &ls, &le, &rs, &re)
-            }
-            .unwrap();
-            canonical(&actual);
-            assert_eq!(actual, expected, "{method}, intersection={intersect}");
-        }
+        let actual = run(left, right, intersect);
+        canonical(&actual);
+        assert_eq!(actual, expected, "intersection={intersect}");
     }
 }
 
@@ -207,62 +198,57 @@ fn many_holes_and_duplicates_have_linear_output() {
         .chain(std::iter::once((39_999, 40_000)))
         .collect();
     let (rs, re) = unzip(&right);
-    for method in candidates::METHODS {
-        assert_eq!(
-            candidates::subtract(method, &[0], &[40_000], &rs, &re).unwrap(),
-            difference
-        );
-        assert_eq!(
-            candidates::intersect(method, &[0], &[40_000], &rs, &re).unwrap(),
-            right
-        );
-        assert!(
-            candidates::subtract(method, &vec![0; 20_000], &vec![10; 20_000], &[0], &[10])
-                .unwrap()
-                .is_empty()
-        );
-        assert_eq!(
-            candidates::intersect(
-                method,
-                &vec![0; 20_000],
-                &vec![10; 20_000],
-                &vec![0; 10_000],
-                &vec![10; 10_000]
-            )
-            .unwrap(),
-            [(0, 10)]
-        );
-    }
+    assert_eq!(
+        subtract_intervals(&[0], &[40_000], &rs, &re).unwrap(),
+        difference
+    );
+    assert_eq!(
+        intersect_intervals(&[0], &[40_000], &rs, &re).unwrap(),
+        right
+    );
+    assert!(
+        subtract_intervals(&vec![0; 20_000], &vec![10; 20_000], &[0], &[10])
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(
+        intersect_intervals(
+            &vec![0; 20_000],
+            &vec![10; 20_000],
+            &vec![0; 10_000],
+            &vec![10; 10_000]
+        )
+        .unwrap(),
+        [(0, 10)]
+    );
 }
 
 #[test]
-fn every_candidate_reports_original_side_and_row_before_fast_paths() {
+fn errors_report_original_side_and_row_before_fast_paths() {
     use IntervalSetError::{Left, Right};
     let reversed = IntervalError::InvalidInterval { index: 2 };
-    for method in candidates::METHODS {
-        for operation in [candidates::subtract::<i32>, candidates::intersect::<i32>] {
-            assert_eq!(
-                operation(method, &[0, 10, 8], &[100, 10, 7], &[], &[]),
-                Err(Left(reversed))
-            );
-            assert_eq!(
-                operation(method, &[], &[], &[0, 10, 8], &[100, 10, 7]),
-                Err(Right(reversed))
-            );
-            assert_eq!(
-                operation(method, &[1], &[0], &[2], &[1]),
-                Err(Left(IntervalError::InvalidInterval { index: 0 }))
-            );
-            // Full cover, disjoint envelopes, and empty sets must not prune bad rows.
-            assert_eq!(
-                operation(method, &[0], &[1], &[-100, 100, 8], &[100, 100, 7]),
-                Err(Right(reversed))
-            );
-            for (s, e) in [(&[0][..], &[][..]), (&[][..], &[0][..])] {
-                let error = IntervalError::LengthMismatch([("starts", s.len()), ("ends", e.len())]);
-                assert_eq!(operation(method, s, e, &[], &[]), Err(Left(error)));
-                assert_eq!(operation(method, &[], &[], s, e), Err(Right(error)));
-            }
+    for operation in [subtract_intervals::<i32>, intersect_intervals::<i32>] {
+        assert_eq!(
+            operation(&[0, 10, 8], &[100, 10, 7], &[], &[]),
+            Err(Left(reversed))
+        );
+        assert_eq!(
+            operation(&[], &[], &[0, 10, 8], &[100, 10, 7]),
+            Err(Right(reversed))
+        );
+        assert_eq!(
+            operation(&[1], &[0], &[2], &[1]),
+            Err(Left(IntervalError::InvalidInterval { index: 0 }))
+        );
+        // Full cover, disjoint envelopes, and empty sets must not prune bad rows.
+        assert_eq!(
+            operation(&[0], &[1], &[-100, 100, 8], &[100, 100, 7]),
+            Err(Right(reversed))
+        );
+        for (s, e) in [(&[0][..], &[][..]), (&[][..], &[0][..])] {
+            let error = IntervalError::LengthMismatch([("starts", s.len()), ("ends", e.len())]);
+            assert_eq!(operation(s, e, &[], &[]), Err(Left(error)));
+            assert_eq!(operation(&[], &[], s, e), Err(Right(error)));
         }
     }
     let error = Right(IntervalError::InvalidInterval { index: 2 });
@@ -297,7 +283,7 @@ fn covered(rows: &[(i32, i32)], tick: i32) -> bool {
 
 proptest! {
     #[test]
-    fn all_candidates_match_two_independent_oracles(left in rows(), right in rows()) {
+    fn operations_match_two_independent_oracles(left in rows(), right in rows()) {
         let (ls, le) = unzip(&left);
         let (rs, re) = unzip(&right);
         let difference = oracle::cells(&ls, &le, &rs, &re, false);
@@ -432,18 +418,12 @@ proptest! {
         let a: Vec<_> = a.into_iter().map(|(s, e)| (s.min(e), s.max(e))).collect();
         let b: Vec<_> = b.into_iter().map(|(s, e)| (s.min(e), s.max(e))).collect();
         let boundaries: std::collections::BTreeSet<_> = a.iter().chain(&b).flat_map(|&(s, e)| [s, e]).collect();
-        let (ls, le) = unzip(&a);
-        let (rs, re) = unzip(&b);
         for intersection in [false, true] {
             let expected = run(&a, &b, intersection);
             canonical(&expected);
             prop_assert!(expected.len() <= boundaries.len() / 2);
             for &(s, e) in &expected {
                 prop_assert!(boundaries.contains(&s) && boundaries.contains(&e));
-            }
-            for method in candidates::METHODS {
-                let actual = if intersection { candidates::intersect(method, &ls, &le, &rs, &re) } else { candidates::subtract(method, &ls, &le, &rs, &re) }.unwrap();
-                prop_assert_eq!(&actual, &expected);
             }
             prop_assert_eq!(run(&a, &b, intersection), expected);
         }

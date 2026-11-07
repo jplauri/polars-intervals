@@ -71,15 +71,15 @@ separately. Never relabel old timings as measurements of changed code.
 <details markdown="1">
 <summary>Recovering historical runs</summary>
 
-Most core runners time production only. The coverage-profile runner retains
-private event, heap and weighted-index comparisons because they are needed to
-reproduce its production decision. Removed older candidates and their runners remain
-available in the [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb).
+Core runners time production only. The coverage-profile, interval-geometry,
+set-geometry, coverage-statistics and domination candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches), the last commit that has them. Older candidates and their
+runners remain in the [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb).
 Some older runs measured a base revision with uncommitted feature changes, so
 that revision may not contain the benchmark code. Their source archives remain at
 [`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results).
-Use the `d742de3` snapshot to recover the suite and consult each run's source
-hashes and cleanup notes for differences from the measured sources.
+Recover a run's suite from the snapshot that has its candidates. Consult each
+run's source hashes and cleanup notes for differences from the measured sources.
 
 </details>
 
