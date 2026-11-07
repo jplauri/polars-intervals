@@ -284,8 +284,8 @@ uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
 This reads saved measurements. It does not run benchmarks or compile Rust.
-Commit regenerated files in `docs/assets/benchmarks/` with the source/configuration
-change. The documentation CI build regenerates the assets before building the site.
+Generated tables in `docs/assets/benchmarks/` are not committed. The
+documentation CI build regenerates them before building the site.
 
 Copy and follow [report-template.md](report-template.md). Register the report's
 tables in [plots.toml](plots.toml).

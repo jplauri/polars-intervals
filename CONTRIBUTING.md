@@ -57,9 +57,11 @@ The last setting also matches release CI and bounds compilation memory usage.
 ## Documentation
 
 Edit pages in `docs/` and API docstrings in `python/polars_intervals/`.
-Use an isolated environment to preview the site or check the build:
+Use an isolated environment to preview the site or check the build. The first
+command generates the benchmark tables that the pages include:
 
 ```sh
+uv run --locked --isolated --only-group plots python benchmarks/plot.py
 uv run --locked --isolated --only-group docs mkdocs serve
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```

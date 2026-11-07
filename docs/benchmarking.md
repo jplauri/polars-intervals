@@ -103,9 +103,10 @@ uv run --locked --isolated --only-group plots python -m unittest discover -s ben
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
-The generator uses Polars aggregation only. Documentation CI regenerates assets
-before its strict build. Commit generated `docs/assets/benchmarks/<id>.md` and
-`<id>.csv`. Markdown snippets are excluded as standalone site pages:
+The generator uses Polars aggregation only. It writes
+`docs/assets/benchmarks/<id>.md` and `<id>.csv`, which git ignores.
+Documentation CI regenerates them before its strict build. Markdown snippets are
+excluded as standalone site pages:
 
 ```text
 ;--8<-- "docs/assets/benchmarks/overlap-headline.md"
@@ -182,5 +183,5 @@ repeat runs, not an arbitrary percentage threshold.
    Update the script inventory if needed. Preserve page URLs and repair
    affected links/anchors.
 5. Run generation, reporting tests, and the strict build above. Check source
-   agreement, generated assets, and representative wide/narrow rendered pages.
-   Commit the report, configuration, and generated assets together.
+   agreement, generated tables, and representative wide/narrow rendered pages.
+   Commit the report and configuration together.
