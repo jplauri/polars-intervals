@@ -1,4 +1,4 @@
-use super::cover::{TargetValue, physical_domain, scalar_physical};
+use super::cover::{TargetValue, physical_domain};
 use super::{
     endpoint_values, logical_series, native_domain, validate_endpoint_pair, validate_group_keys,
 };
@@ -7,46 +7,12 @@ use pyo3::prelude::*;
 use pyo3_polars::{PyDataFrame, PySeries};
 
 /// Return the canonical exact union of nonempty half-open intervals.
-///
-/// Overlap and touching both coalesce. Output columns are the supplied keys,
-/// `start`, and `end`, preserving exact endpoint and key logical dtypes.
-/// Groups retain first-observed order, including null keys. Each group's ranges
-/// are sorted and strictly separated. Empty input has a typed zero-row result.
-/// All chunks form one collection per group. See [`intervals_core::merge_intervals`].
-///
-/// # Errors
-/// Rejects unequal lengths, null endpoints, mismatched/unsupported dtypes,
-/// reversed intervals, and invalid keys. Keys must be distinct supported columns
-/// and cannot be named `start` or `end`. Row errors retain original input indices.
-pub fn merge_intervals(starts: &Series, ends: &Series, keys: &[Series]) -> PolarsResult<DataFrame> {
-    evaluate(starts, ends, keys, None)
-}
-
-/// Return maximal uncovered ranges in an explicit half-open scalar domain.
-///
-/// Uses [`merge_intervals`]'s schema, grouping and validation contract. Domain
-/// Scalar dtypes must match endpoints exactly, including Datetime metadata.
-/// Validates original intervals before clipping. Empty rows never split gaps.
-/// An observed group without coverage returns the entire nonempty domain.
-/// Ungrouped empty input has one collection. Grouped empty input has no groups.
-/// See [`intervals_core::interval_gaps`] for comparison-only complement logic.
-///
-/// # Errors
-/// In addition to [`merge_intervals`]'s errors, rejects null, mismatched or
-/// reversed bounds. Equal bounds are valid and produce a typed zero-row result.
-pub fn interval_gaps(
+pub(crate) fn merge_intervals(
     starts: &Series,
     ends: &Series,
     keys: &[Series],
-    domain_start: &Scalar,
-    domain_end: &Scalar,
 ) -> PolarsResult<DataFrame> {
-    validate_endpoint_pair(starts, ends, "interval_gaps")?;
-    let domain = (
-        scalar_physical(domain_start, starts.dtype())?,
-        scalar_physical(domain_end, starts.dtype())?,
-    );
-    evaluate(starts, ends, keys, Some(domain))
+    evaluate(starts, ends, keys, None)
 }
 
 fn evaluate(
@@ -87,8 +53,7 @@ where
 {
     let [starts, ends] = endpoint_values(starts, ends, name)?;
     // Validate before grouping/clipping so diagnostics always name original rows.
-    intervals_core::validate_intervals(&starts, &ends)
-        .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+    intervals_core::validate_intervals(&starts, &ends).map_err(super::compute_error)?;
     let domain = native_domain(domain)?;
     if domain.is_some_and(|(left, right)| left > right) {
         return Err(polars_err!(ComputeError: "{}", intervals_core::IntervalError::InvalidDomain));
@@ -98,7 +63,7 @@ where
             Some((left, right)) => intervals_core::interval_gaps(starts, ends, left, right),
             None => intervals_core::merge_intervals(starts, ends),
         }
-        .map_err(|error| polars_err!(ComputeError: "{error}"))
+        .map_err(super::compute_error)
     };
     let mut output = Vec::new();
     let mut key_rows = Vec::new();

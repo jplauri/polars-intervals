@@ -162,7 +162,7 @@ A higher-case PowerShell run is:
 
 ```powershell
 $env:PROPTEST_CASES = "2048"
-cargo test -p intervals-core --test coverage_profile --test coverage_profile_candidates --locked
+cargo test -p intervals-core --test coverage_profile --locked
 Remove-Item Env:PROPTEST_CASES
 ```
 

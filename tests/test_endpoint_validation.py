@@ -23,6 +23,7 @@ ALGORITHMS = {
     "minimum_stabbing_points": pi.minimum_stabbing_points,
     "domination_units": pi.minimum_cost_dominating_set,
     "domination_costs": lambda s, e: pi.minimum_cost_dominating_set(s, e, cost=ROWS),
+    "max_weight_clique": pi.max_weight_clique,
     "max_weight_non_overlapping": lambda s, e: pi.max_weight_non_overlapping(s, e, weight=ROWS),
     "capacity_0": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=0),
     "capacity_2": lambda s, e: pi.max_weight_with_capacity(s, e, weight=ROWS, capacity=2),
@@ -124,8 +125,8 @@ def test_lengths_must_match_without_broadcasting(algorithm, argument, scalar):
         pi.subtract_intervals,
         pi.intersect_intervals,
     ):
-        # DataFrames enforce column lengths; direct Series mismatch coverage is
-        # in the Rust integration suite. Expressions are rejected explicitly.
+        # DataFrames enforce equal column lengths, so frame inputs cannot
+        # mismatch. Expressions are rejected explicitly.
         with pytest.raises(TypeError, match="strings"):
             evaluate(frame, algorithm, args["start"], args["end"])
         return

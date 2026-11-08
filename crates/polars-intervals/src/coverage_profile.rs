@@ -1,4 +1,4 @@
-use super::cover::{TargetValue, physical_domain, scalar_physical};
+use super::cover::{TargetValue, physical_domain};
 use super::{
     endpoint_values, integer_values, logical_series, native_domain, validate_endpoint_pair,
     validate_group_keys, validate_integer_dtype,
@@ -9,49 +9,6 @@ use pyo3::prelude::*;
 use pyo3_polars::{PyDataFrame, PySeries};
 
 const NAME: &str = "coverage_profile";
-
-/// Compute the canonical half-open coverage/load function as new segment rows.
-///
-/// Omitted weights mean units, without allocating a ones column. Explicit
-/// weights are nonnegative 8/16/32/64-bit integers. Output columns are the
-/// supplied keys, `start`, `end`, and non-null `Int128` `load`. Endpoint/key
-/// logical dtypes and Datetime metadata are preserved exactly.
-///
-/// All chunks form one collection per key tuple. Native grouping retains null
-/// keys and first-appearance order. With no keys there is one collection even
-/// for empty input; grouped empty input has no groups. Key names must be distinct
-/// and cannot be `start`, `end`, or `load`.
-///
-/// An optional scalar domain clips contributions after every row is validated.
-/// Otherwise each group's nonempty intervals, including zero weights, establish
-/// its domain. Empty intervals never establish a domain or contribute. Full
-/// mode partitions that domain; sparse mode omits zero segments. Equal touching
-/// loads are coalesced. See [`intervals_core::coverage_profile`] for the sweep,
-/// checked arithmetic and `O(n log n + z)` time / `O(n + z)` space bounds.
-///
-/// # Errors
-/// Rejects unequal lengths, null endpoints/weights, unsupported or mismatched
-/// dtypes, invalid grouping keys, reversed intervals/domains, negative weights,
-/// and unrepresentable loads inside the domain. Row errors refer to original
-/// input indices, including rows that are empty, zero, or clipped away.
-pub fn coverage_profile(
-    starts: &Series,
-    ends: &Series,
-    weights: Option<&Series>,
-    keys: &[Series],
-    domain: Option<(&Scalar, &Scalar)>,
-    include_zero: bool,
-) -> PolarsResult<DataFrame> {
-    let domain = domain
-        .map(|(left, right)| -> PolarsResult<_> {
-            Ok((
-                scalar_physical(left, starts.dtype())?,
-                scalar_physical(right, starts.dtype())?,
-            ))
-        })
-        .transpose()?;
-    evaluate(starts, ends, weights, keys, domain, include_zero)
-}
 
 fn evaluate(
     starts: &Series,
@@ -128,7 +85,7 @@ where
             ),
             None => intervals_core::coverage_profile(starts, ends, domain, include_zero),
         }
-        .map_err(|error| polars_err!(ComputeError: "{error}"))
+        .map_err(super::compute_error)
     };
     let mut output = Vec::<CoverageSegment<T::Native>>::new();
     let mut key_rows = Vec::new();

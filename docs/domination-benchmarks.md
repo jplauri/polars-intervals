@@ -98,10 +98,10 @@ $env:POLARS_MAX_THREADS = '1'
 uv run --no-sync python benchmarks/minimum_cost_dominating_set.py --output benchmarks/results/domination-polars-new
 ```
 
-Optional `DOMINATION_CASES`, `DOMINATION_METHODS`, and `DOMINATION_DTYPES`
-select focused comparisons. Million-row cases are bounded by the runner's
-matrix; quadratic DP is omitted above 64 rows. Restore thread settings after
-the run. Run plot generation/reporting checks using [the shared commands](benchmarking.md#generate-plots).
+Optional `DOMINATION_CASES` and `DOMINATION_DTYPES` select focused runs.
+Million-row cases are bounded by the runner's matrix. The Rust benchmark now
+times only the public calls. Its candidates, including the quadratic DP, remain
+at [`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/domination.rs). Restore thread settings after the run. Run plot generation/reporting checks using [the shared commands](benchmarking.md#generate-plots).
 
 Raw data and run-specific metadata: [pilot](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-pilot-windows-20260929.csv),
 [large comparison](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/domination-core-comparison-windows-20260929.metadata.json),

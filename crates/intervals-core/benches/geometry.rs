@@ -1,15 +1,14 @@
-//! Complete core calls with rotated candidates and separate requested-heap runs.
-//! GEOMETRY_CSV must name a new file. All construction/checking is outside timing.
+//! Complete public calls and separate requested-heap runs. The retired
+//! candidates remain at d6c3b01. GEOMETRY_CSV must name a new file.
+//! All construction/checking is outside timing.
 #[path = "support/allocations.rs"]
 mod allocations;
-#[path = "support/geometry_candidates.rs"]
-mod candidates;
 #[path = "../tests/support/geometry.rs"]
 mod oracle;
 #[path = "support/random.rs"]
 mod random;
 
-use candidates::{CLUSTER_METHODS, GAP_METHODS, MERGE_METHODS};
+use intervals_core::{cluster_intervals, interval_gaps, merge_intervals};
 use std::{fmt::Debug, hint::black_box, io::Write, time::Instant};
 
 #[global_allocator]
@@ -198,7 +197,6 @@ impl<T> Output<T> {
 }
 
 fn run<T: Ord + Copy>(
-    method: &str,
     operation: &str,
     s: &[T],
     e: &[T],
@@ -206,10 +204,10 @@ fn run<T: Ord + Copy>(
     touching: bool,
 ) -> Output<T> {
     match operation {
-        "cluster" => Output::Labels(candidates::cluster(method, s, e, touching).unwrap()),
-        "merge" => Output::Ranges(candidates::merge(method, s, e).unwrap()),
-        "gaps" => Output::Ranges(candidates::gaps(method, s, e, domain.0, domain.1).unwrap()),
-        _ => unreachable!(),
+        "cluster" => Output::Labels(cluster_intervals(s, e, touching).unwrap()),
+        "merge" => Output::Ranges(merge_intervals(s, e).unwrap()),
+        "gaps" => Output::Ranges(interval_gaps(s, e, domain.0, domain.1).unwrap()),
+        _ => panic!("unknown operation {operation}"),
     }
 }
 
@@ -279,45 +277,24 @@ fn measure<T: Ord + Copy + Debug>(
         .zip(e)
         .filter(|&(&a, &b)| a.max(domain.0) < b.min(domain.1))
         .count();
-    let runs = intervals_core::merge_intervals(s, e).unwrap().len();
+    let runs = merge_intervals(s, e).unwrap().len();
     for operation in settings.operations.split(',') {
-        let methods = match operation {
-            "cluster" => CLUSTER_METHODS,
-            "merge" => MERGE_METHODS,
-            "gaps" => GAP_METHODS,
-            _ => panic!("unknown operation"),
-        };
         for touching in [false, true] {
             if operation != "cluster" && touching {
                 continue;
             }
-            let expected = run("production", operation, s, e, domain, touching);
+            let expected = run(operation, s, e, domain, touching);
             verify(&expected, operation, s, e, domain, touching);
             let components = if let Output::Labels(ids) = &expected {
                 ids.iter().copied().max().map_or(0, |id| id as usize + 1)
             } else {
                 0
             };
-            let memory: Vec<_> = methods
-                .iter()
-                .map(|method| {
-                    let (output, peak, count) =
-                        allocations::measure(|| run(method, operation, s, e, domain, touching));
-                    assert_eq!(output, expected, "{method}");
-                    (peak, count)
-                })
-                .collect();
-            for warmup in 0..settings.warmups {
-                for offset in 0..methods.len() {
-                    drop(black_box(run(
-                        methods[(warmup + offset) % methods.len()],
-                        operation,
-                        s,
-                        e,
-                        domain,
-                        touching,
-                    )));
-                }
+            let (output, peak, allocations) =
+                allocations::measure(|| run(operation, s, e, domain, touching));
+            assert_eq!(output, expected);
+            for _ in 0..settings.warmups {
+                drop(black_box(run(operation, s, e, domain, touching)));
             }
             let iterations = if s.len() <= 64 {
                 128
@@ -327,24 +304,18 @@ fn measure<T: Ord + Copy + Debug>(
                 1
             };
             for sample in 0..settings.samples {
-                for offset in 0..methods.len() {
-                    let i = (sample + offset) % methods.len();
-                    let method = methods[i];
-                    let start = Instant::now();
-                    for _ in 0..iterations {
-                        drop(black_box(run(
-                            method,
-                            operation,
-                            black_box(s),
-                            black_box(e),
-                            domain,
-                            touching,
-                        )));
-                    }
-                    let ns = start.elapsed().as_nanos();
-                    let (peak, allocations) = memory[i];
-                    writeln!(file,"{label},{operation},{touching},{},{method},{sample},{iterations},{ns},{},{peak},{allocations},{nonempty},{clipped},{components},{runs},{},{:?},{:?},1",s.len(),ns/iterations,expected.len(),domain.0,domain.1).unwrap();
+                let start = Instant::now();
+                for _ in 0..iterations {
+                    drop(black_box(run(
+                        operation,
+                        black_box(s),
+                        black_box(e),
+                        domain,
+                        touching,
+                    )));
                 }
+                let ns = start.elapsed().as_nanos();
+                writeln!(file,"{label},{operation},{touching},{},production,{sample},{iterations},{ns},{},{peak},{allocations},{nonempty},{clipped},{components},{runs},{},{:?},{:?},1",s.len(),ns/iterations,expected.len(),domain.0,domain.1).unwrap();
             }
         }
     }
@@ -386,7 +357,7 @@ fn main() {
     let mut file = std::io::BufWriter::new(output);
     writeln!(file,"dtype,family,order,domain,seed,operation,include_touching,n,method,sample,iterations,batch_ns,total_ns,peak_bytes,allocations,nonempty,clipped,components,runs,z,domain_start,domain_end,group_count").unwrap();
     eprintln!(
-        "scope=complete core call including validation,preparation,clipping,sorting,restoration,output/destruction; warmups={}; samples={}; memory=separate untimed peak requested heap including output, excluding inputs, allocator overhead, stack and RSS; graph/cell oracle n<=64, candidate agreement and invariants at larger n; i16 omits coordinates outside its range",
+        "scope=complete core call including validation,preparation,clipping,sorting,restoration,output/destruction; warmups={}; samples={}; memory=separate untimed peak requested heap including output, excluding inputs, allocator overhead, stack and RSS; graph/cell oracle n<=64, invariants at larger n; i16 omits coordinates outside its range",
         settings.warmups, settings.samples
     );
     // The bounded bitmap is an independent second oracle for a tiny fixture.

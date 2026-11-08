@@ -116,7 +116,9 @@ universal-fastest claim follows from these fixtures.
 
 Follow the [release-build setup](benchmarking.md#setup), then preserve that build
 with `uv run --no-sync`. The runner checks the installed binary against the
-release build. Use a new output name for every run.
+release build. Use a new output name for every run. The core runner now times
+only the public call. Its event, heap and weighted-index candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/coverage_profile_candidates.rs).
 
 ```sh
 uv run --no-sync python benchmarks/coverage_profile_core.py --output benchmarks/results/coverage-profile-core-new.csv --weight-dtypes i128 --dtypes i64
@@ -128,14 +130,14 @@ uv run --no-sync python benchmarks/coverage_profile.py --lazy --output benchmark
 ```
 
 Set `POLARS_MAX_THREADS=1` before starting the one-thread end-to-end runs, and
-`24` only for the thread-comparison command. Each run's metadata records exact
-filters, seeds, scopes, commands, versions and source hashes. Source ZIPs overlay
+`24` only for the thread-comparison command. Saved runs record exact filters,
+seeds, scopes, commands, versions and source hashes. Their source ZIPs overlay
 the recorded base revision and preserve uncommitted comparison implementations.
 
 Higher-case properties and reporting checks:
 
 ```sh
-cargo test -p intervals-core --test coverage_profile --test coverage_profile_candidates --locked
+cargo test -p intervals-core --test coverage_profile --locked
 uv run --locked --no-sync python -m pytest benchmarks/test_coverage_profile.py
 uv run --locked --isolated --only-group plots python benchmarks/plot.py
 uv run --locked --isolated --only-group plots python -m unittest discover -s benchmarks -p test_plot.py
@@ -189,7 +191,7 @@ records deferred-execution tests, current wheel checks and the focused timing ru
 
 The main table's run was based on `2b2a2666386c971f6e8d63cbf47cd7a405d1f41b` with
 uncommitted feature sources.
-Its [source archive](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-profile-ponytail-20260929.sources.zip)
+Its [source archive](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-profile-ponytail-20260929.sources.zip)
 declares version `0.2.0`; core and adapter match `280e515`. The base revision
 alone does not identify the measured code. Later `8284b66` sorting changes and
 shared input-check/conversion helpers affect timed paths. Runner provenance

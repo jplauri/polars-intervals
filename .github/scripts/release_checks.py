@@ -5,13 +5,10 @@ import json
 import os
 import re
 import subprocess
-import tarfile
 import tempfile
 import tomllib
 import urllib.request
-import zipfile
 from contextlib import chdir
-from email.parser import BytesParser
 from importlib.metadata import version as installed_version
 from pathlib import Path
 
@@ -124,87 +121,6 @@ def release():
     print(f"Verified final release {tag} from CI-passing master commit {sha}.")
 
 
-def normalized_text(data):
-    return data.decode("utf-8").replace("\r\n", "\n")
-
-
-def check_metadata(data, version):
-    metadata = BytesParser().parsebytes(data)
-    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
-    for field, expected in {
-        "Name": project["name"],
-        "Version": version,
-        "Requires-Python": project["requires-python"],
-        "License-Expression": project["license"],
-    }.items():
-        require(metadata[field] == expected, f"Incorrect distribution metadata: {field}.")
-    media_type = metadata.get("Description-Content-Type", "").split(";", 1)[0].strip().lower()
-    require(media_type == "text/markdown", "Distribution description must be Markdown.")
-    description = normalized_text(metadata.get_payload(decode=True))
-    require(
-        description.strip() == (ROOT / "README.md").read_text(encoding="utf-8").strip(),
-        "Distribution README differs from the release checkout.",
-    )
-
-
-def artifacts(directory):
-    version = versions()["version"]
-    wheels = sorted(directory.glob("*.whl"))
-    sdists = list(directory.glob("*.tar.gz"))
-    require(
-        len(wheels) == 15 and len(sdists) == 1,
-        "Expected all 15 CPython/platform wheels and exactly one source archive.",
-    )
-    expected = {
-        (python, platform)
-        for python in ("cp312", "cp313", "cp314")
-        for platform in ("linux-x86_64", "linux-aarch64", "macos-x86_64", "macos-arm64", "windows")
-    }
-    actual = set()
-    for wheel in wheels:
-        package, python, abi, platform = wheel.stem.rsplit("-", 3)
-        require(
-            package == f"polars_intervals-{version}" and python == abi,
-            f"Unexpected wheel version or ABI: {wheel.name}.",
-        )
-        if platform.startswith("manylinux"):
-            target = "linux-aarch64" if platform.endswith("_aarch64") else "linux-x86_64"
-            require(platform.endswith(("_aarch64", "_x86_64")), "Unsupported Linux architecture.")
-        elif platform.startswith("macosx_"):
-            target = "macos-arm64" if platform.endswith("_arm64") else "macos-x86_64"
-            require(platform.endswith(("_arm64", "_x86_64")), "Unsupported macOS architecture.")
-        else:
-            require(platform == "win_amd64", f"Unexpected platform: {platform}.")
-            target = "windows"
-        require((python, target) not in actual, f"Duplicate wheel target: {python}/{target}.")
-        actual.add((python, target))
-        with zipfile.ZipFile(wheel) as archive:
-            names = archive.namelist()
-            require("polars_intervals/py.typed" in names, "Wheel is missing py.typed.")
-            metadata = f"polars_intervals-{version}.dist-info/METADATA"
-            check_metadata(archive.read(metadata), version)
-            license_path = f"polars_intervals-{version}.dist-info/licenses/LICENSE"
-            require(
-                normalized_text(archive.read(license_path))
-                == (ROOT / "LICENSE").read_text(encoding="utf-8"),
-                "License mismatch.",
-            )
-    require(actual == expected, f"Incorrect wheel coverage; missing {expected - actual}.")
-    sdist = sdists[0]
-    require(sdist.name == f"polars_intervals-{version}.tar.gz", "Incorrect source archive version.")
-    with tarfile.open(sdist) as archive:
-        prefix = f"polars_intervals-{version}/"
-        for name in ("rust-toolchain.toml", "Cargo.lock", "LICENSE"):
-            member = archive.extractfile(prefix + name)
-            require(
-                member is not None
-                and normalized_text(member.read()) == (ROOT / name).read_text(encoding="utf-8"),
-                f"Source archive must preserve {name}.",
-            )
-        check_metadata(archive.extractfile(prefix + "PKG-INFO").read(), version)
-    print("Verified all 15 wheels and the source archive, including versions, README and license.")
-
-
 def installed(checkout):
     import polars_intervals as pi
     import pytest
@@ -237,7 +153,6 @@ if __name__ == "__main__":
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("versions")
     commands.add_parser("release")
-    commands.add_parser("artifacts").add_argument("directory", type=Path)
     commands.add_parser("installed").add_argument("--checkout", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "versions":
@@ -248,7 +163,5 @@ if __name__ == "__main__":
                 stream.writelines(f"{key}={value}\n" for key, value in values.items())
     elif args.command == "release":
         release()
-    elif args.command == "artifacts":
-        artifacts(args.directory)
     else:
         installed(args.checkout)

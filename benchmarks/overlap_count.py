@@ -479,18 +479,15 @@ def main() -> None:
     if min(args.groups) < 1 or args.max_join_rows < 0:
         parser.error("groups must be positive and max-join-rows must be non-negative")
 
-    repo = Path(__file__).resolve().parents[1]
     report = {
         "environment": {
             **environment(),
             "polars_intervals": version("polars-intervals"),
             "engine": "in-memory",
-            "script_sha256": sha256(Path(__file__)),
             "plugin_binary_sha256": plugin_hashes(Path(pi.__file__).parent),
             "reference_plugin_binary_sha256": (
                 plugin_hashes(args.compare_plugin) if args.compare_plugin else None
             ),
-            "core_source_sha256": sha256(repo / "crates/intervals-core/src/lib.rs"),
             "rustflags": os.environ.get("RUSTFLAGS", ""),
         },
         "configuration": {

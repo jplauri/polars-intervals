@@ -63,21 +63,23 @@ Follow the report template for displayed comparisons and ratio conventions.
 
 **Limits and provenance.** Synthetic fixtures on one machine characterize those
 workloads, not every application or platform. Record skips, bounded baselines
-and missing types. Preserve raw samples, environment, settings, source/build
-hashes and historical evidence in `benchmarks/results/`. Retain repeat runs
+and missing types. Runners refuse uncommitted changes and record the revision,
+environment, settings and binary hashes. Commit raw samples in
+`benchmarks/results/` only for runs a report or table uses. Retain repeat runs
 separately. Never relabel old timings as measurements of changed code.
 
 <details markdown="1">
 <summary>Recovering historical runs</summary>
 
-Most core runners time production only. The coverage-profile runner retains
-private event, heap and weighted-index comparisons because they are needed to
-reproduce its production decision. Removed older candidates and their runners remain
-available in the [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb).
-Some run metadata records a base revision with uncommitted feature changes, so
-that revision may not contain the benchmark code. Use the snapshot to recover
-the suite and consult each run's source hashes and cleanup notes for differences
-from the measured sources.
+Core runners time production only. The coverage-profile, interval-geometry,
+set-geometry, coverage-statistics and domination candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches), the last commit that has them. Older candidates and their
+runners remain in the [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb).
+Some older runs measured a base revision with uncommitted feature changes, so
+that revision may not contain the benchmark code. Their source archives remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results).
+Recover a run's suite from the snapshot that has its candidates. Consult each
+run's source hashes and cleanup notes for differences from the measured sources.
 
 </details>
 
@@ -103,9 +105,10 @@ uv run --locked --isolated --only-group plots python -m unittest discover -s ben
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
-The generator uses Polars aggregation only. Documentation CI regenerates assets
-before its strict build. Commit generated `docs/assets/benchmarks/<id>.md` and
-`<id>.csv`. Markdown snippets are excluded as standalone site pages:
+The generator uses Polars aggregation only. It writes
+`docs/assets/benchmarks/<id>.md` and `<id>.csv`, which git ignores.
+Documentation CI regenerates them before its strict build. Markdown snippets are
+excluded as standalone site pages:
 
 ```text
 ;--8<-- "docs/assets/benchmarks/overlap-headline.md"
@@ -182,5 +185,5 @@ repeat runs, not an arbitrary percentage threshold.
    Update the script inventory if needed. Preserve page URLs and repair
    affected links/anchors.
 5. Run generation, reporting tests, and the strict build above. Check source
-   agreement, generated assets, and representative wide/narrow rendered pages.
-   Commit the report, configuration, and generated assets together.
+   agreement, generated tables, and representative wide/narrow rendered pages.
+   Commit the report and configuration together.

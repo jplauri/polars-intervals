@@ -163,8 +163,9 @@ class OracleTests(unittest.TestCase):
     def test_certificate_is_scoring_only_and_checked(self):
         with tempfile.TemporaryDirectory() as directory:
             instance = generate_instance("planted_balanced", {"n": 20, "k": 3}, seed=42)
-            write_dataset([instance], directory)
-            item = next(iter_dataset(directory))
+            path = Path(directory) / "dataset.jsonl.gz"
+            write_dataset([instance], path)
+            item = next(iter_dataset(path))
             check_record(item)
             optimum = optimum_for(item, 3)
             self.assertEqual(
@@ -182,8 +183,9 @@ class OracleTests(unittest.TestCase):
 class CorpusTests(unittest.TestCase):
     def test_every_smoke_family_round_trips_without_mutating_record(self):
         with tempfile.TemporaryDirectory() as directory:
-            write_dataset(iter_suite("smoke", 42), directory, shard_size=3)
-            records = list(iter_dataset(directory))
+            path = Path(directory) / "smoke.jsonl.gz"
+            write_dataset(iter_suite("smoke", 42), path)
+            records = list(iter_dataset(path))
             self.assertEqual({item["family"] for item in records}, set(FAMILIES))
             self.assertEqual({item["params"]["order"] for item in records}, {"sorted", "shuffled"})
             for item in records:
@@ -201,14 +203,9 @@ class CorpusTests(unittest.TestCase):
         ]:
             with self.subTest(kind=kind), tempfile.TemporaryDirectory() as directory:
                 source = HERE / "fixtures" / filename
-                write_dataset(
-                    iter_jaist([{"path": source}], kind),
-                    directory,
-                    kind="jaist",
-                    suite=kind,
-                    seed=None,
-                )
-                records = list(iter_dataset(directory))
+                path = Path(directory) / f"{kind}.jsonl.gz"
+                write_dataset(iter_jaist([{"path": source}], kind), path)
+                records = list(iter_dataset(path))
                 self.assertEqual(len(records), count)
                 for item in records:
                     check_record(item)
@@ -230,8 +227,9 @@ class CorpusTests(unittest.TestCase):
             },
         )
         with tempfile.TemporaryDirectory() as directory:
-            write_dataset([instance], directory, kind="external", suite="local", seed=None)
-            item = next(iter_dataset(directory))
+            path = Path(directory) / "external.jsonl.gz"
+            write_dataset([instance], path)
+            item = next(iter_dataset(path))
             check_record(item)
             self.assertEqual(item["provenance"], instance.provenance)
             self.assertEqual(item["intervals"], [[0, 3], [4, 4], [2, 8]])

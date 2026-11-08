@@ -7,7 +7,7 @@ pub(crate) struct Candidate<T> {
     pub row: usize,
 }
 
-pub(crate) fn prepare<T: Ord + Copy>(
+fn prepare<T: Ord + Copy>(
     starts: &[T],
     ends: &[T],
     left: T,
@@ -66,7 +66,7 @@ pub fn minimum_cover<T: Ord + Copy>(
     Ok(mask)
 }
 
-pub(crate) fn greedy<T: Ord + Copy>(
+fn greedy<T: Ord + Copy>(
     candidates: &[Candidate<T>],
     mut frontier: T,
     right: T,
@@ -94,16 +94,16 @@ pub(crate) fn greedy<T: Ord + Copy>(
 }
 
 // Tuple order defines the objective, then deterministic predecessor ties.
-pub(crate) type Best = Option<(i128, usize, usize)>;
+type Best = Option<(i128, usize, usize)>;
 
-pub(crate) fn better(a: Best, b: Best) -> Best {
+fn better(a: Best, b: Best) -> Best {
     match (a, b) {
         (Some(a), Some(b)) => Some(a.min(b)),
         _ => a.or(b),
     }
 }
 
-pub(crate) struct Fenwick {
+struct Fenwick {
     tree: Vec<Best>,
 }
 
@@ -155,7 +155,7 @@ where
     Ok(())
 }
 
-pub(crate) fn coordinates<T: Ord + Copy>(candidates: &[Candidate<T>], left: T) -> Vec<T> {
+fn coordinates<T: Ord + Copy>(candidates: &[Candidate<T>], left: T) -> Vec<T> {
     let mut coordinates = Vec::with_capacity(candidates.len() + 1);
     coordinates.push(left);
     coordinates.extend(candidates.iter().map(|c| c.end));
@@ -163,12 +163,12 @@ pub(crate) fn coordinates<T: Ord + Copy>(candidates: &[Candidate<T>], left: T) -
     coordinates
 }
 
-pub(crate) struct Solution {
+struct Solution {
     pub back: Vec<Option<(usize, usize)>>,
     pub overflowed: bool,
 }
 
-pub(crate) fn dynamic_program<T: Ord + Copy, W: Copy>(
+fn dynamic_program<T: Ord + Copy, W: Copy>(
     candidates: &[Candidate<T>],
     coordinates: &[T],
     costs: &[W],
@@ -272,4 +272,67 @@ where
         return Err(IntervalError::InfeasibleCover);
     }
     Ok(mask)
+}
+
+#[cfg(test)]
+#[path = "../benches/support/covering.rs"]
+mod oracle;
+
+// White-box checks of the frontier DP and its Fenwick tree.
+#[cfg(test)]
+mod tests {
+    use super::oracle::{brute_force, covers, objective};
+    use super::*;
+    use proptest::prelude::*;
+
+    fn interval() -> impl Strategy<Value = (i32, i32)> {
+        (-8i32..=12, -8i32..=12).prop_map(|(a, b)| (a.min(b), a.max(b)))
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(256))]
+        #[test]
+        fn every_published_state_is_an_exact_continuous_prefix_cover(
+            rows in prop::collection::vec((interval(), 0i128..=20), 0..=11),
+            (l, r) in interval(),
+        ) {
+            let s: Vec<_> = rows.iter().map(|row| row.0.0).collect();
+            let e: Vec<_> = rows.iter().map(|row| row.0.1).collect();
+            let w: Vec<_> = rows.iter().map(|row| row.1).collect();
+            let mut prepared = prepare(&s, &e, l, r).unwrap();
+            prepared.sort_unstable_by_key(|c| (c.end, c.row));
+            let coordinates = coordinates(&prepared, l);
+            let solution = dynamic_program(&prepared, &coordinates, &w);
+            for (i, &end) in coordinates.iter().enumerate().skip(1) {
+                let mut mask = vec![false; s.len()];
+                let reachable = reconstruct(&solution.back[..=i], &mut mask);
+                let oracle = brute_force(&s, &e, &w, l, end);
+                // Prefix covers may use intervals ending later; the DP at i only uses ends <= i.
+                let allowed_s: Vec<_> = prepared.iter().filter(|c| c.end <= end).map(|c| c.start).collect();
+                let allowed_e: Vec<_> = prepared.iter().filter(|c| c.end <= end).map(|c| c.end).collect();
+                let allowed_w: Vec<_> = prepared.iter().filter(|c| c.end <= end).map(|c| w[c.row]).collect();
+                let prefix = brute_force(&allowed_s, &allowed_e, &allowed_w, l, end);
+                prop_assert_eq!(reachable, prefix.is_some());
+                if reachable {
+                    prop_assert!(oracle.is_some());
+                    prop_assert!(covers(&s, &e, &mask, l, end));
+                    prop_assert_eq!(Some(objective(&w, &mask)), prefix);
+                    prop_assert!(solution.back[i].unwrap().0 < i);
+                }
+            }
+        }
+
+        #[test]
+        fn fenwick_matches_naive_suffixes(values in prop::collection::vec(prop::option::of((0i128..100, 0usize..10)), 1..40)) {
+            let mut fenwick = Fenwick::new(values.len());
+            let mut naive = vec![None; values.len()];
+            for (i, value) in values.iter().enumerate() {
+                naive[i] = value.map(|(cost, count)| (cost, count, i));
+                fenwick.update(i, naive[i]);
+                for l in 0..values.len() {
+                    prop_assert_eq!(fenwick.suffix(l), naive[l..].iter().flatten().copied().min());
+                }
+            }
+        }
+    }
 }

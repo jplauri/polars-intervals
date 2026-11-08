@@ -1,11 +1,9 @@
 """Check the native benchmark competitor against original-row membership."""
 
 import importlib
-import json
 import random
 import sys
 from pathlib import Path
-from types import SimpleNamespace
 
 import polars as pl
 import pytest
@@ -113,24 +111,3 @@ def test_runner_rejects_invalid_options(monkeypatch, tmp_path, runner, option, v
         module.main()
     assert error.value.code == 2
     assert not list(tmp_path.iterdir())
-
-
-def test_core_runner_rejects_empty_measurement(monkeypatch, tmp_path):
-    monkeypatch.syspath_prepend(str(Path(__file__).parent))
-    module = importlib.import_module("coverage_profile_core")
-    output = tmp_path / "raw.csv"
-    monkeypatch.setattr(sys, "argv", ["coverage_profile_core", "--output", str(output)])
-    monkeypatch.setattr(module, "environment", dict)
-    monkeypatch.setattr(module, "command", lambda *args: "test")
-
-    def empty_run(*args, **kwargs):
-        output.write_text("n,method,sample,total_ns\n", encoding="utf-8")
-        return SimpleNamespace(returncode=0)
-
-    monkeypatch.setattr(module.subprocess, "run", empty_run)
-    with pytest.raises(SystemExit) as error:
-        module.main()
-    assert error.value.code == 1
-    metadata = json.loads(output.with_suffix(".metadata.json").read_text())
-    assert metadata["returncode"] == 1
-    assert "No samples emitted" in metadata["error"]

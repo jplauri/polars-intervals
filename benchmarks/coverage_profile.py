@@ -13,10 +13,10 @@ from polars_intervals import _internal
 
 if __package__:
     from .coverage_profile_native import native_profile
-    from .provenance import ROOT, archive_sources, environment, sha256, verify_release
+    from .provenance import environment, sha256, verify_release
 else:
     from coverage_profile_native import native_profile
-    from provenance import ROOT, archive_sources, environment, sha256, verify_release
+    from provenance import environment, sha256, verify_release
 
 # family, order, dtype, groups (0=ungrouped), chunks, load, domain, include_zero
 CASES = [
@@ -179,15 +179,14 @@ def main():
         parser.error("Need nonnegative sizes and positive samples/warmups")
     native = Path(_internal.__file__)
     try:
-        release, inputs = verify_release(native)
+        release = verify_release(native)
     except ValueError as error:
         parser.error(str(error))
     csv_path, metadata_path = (
         args.output.with_suffix(".csv"),
         args.output.with_suffix(".metadata.json"),
     )
-    archive_path = args.output.with_suffix(".sources.zip")
-    if csv_path.exists() or metadata_path.exists() or archive_path.exists():
+    if csv_path.exists() or metadata_path.exists():
         parser.error("Use a new output prefix")
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     metadata = environment() | {
@@ -209,31 +208,9 @@ def main():
         "baseline_omissions": "No claimed omissions for valid public fixtures; invalid error classes/text may differ. Public <=64-bit weights and addressable row counts cannot overflow i128; wider core overflow tests are separate. Native uses signed subtraction because unary Int128 negation is unsupported in Polars 1.44.2.",
         "native_sha256": sha256(native),
         "release_sha256": sha256(release),
-        "source_sha256": {
-            str(p.relative_to(ROOT)): sha256(p)
-            for p in [
-                *inputs,
-                Path(__file__),
-                ROOT / "benchmarks/coverage_profile_native.py",
-                ROOT / "python/polars_intervals/__init__.py",
-            ]
-        },
         "status": "running",
     }
     metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    metadata.update(
-        archive_sources(
-            archive_path,
-            [
-                *metadata["source_sha256"],
-                "Cargo.toml",
-                "rust-toolchain.toml",
-                "uv.lock",
-                "pyproject.toml",
-                "benchmarks/provenance.py",
-            ],
-        )
-    )
     with csv_path.open("w", newline="", encoding="utf-8") as out:
         writer = csv.writer(out)
         writer.writerow(

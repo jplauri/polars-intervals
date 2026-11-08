@@ -41,14 +41,11 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 Use `uv run --locked ruff format .` to format Python code.
 CI also verifies built distributions when code or build inputs change.
 
-On Windows, the direct Python binding requires the selected Python DLL on the
-runtime search path when running Rust tests. In PowerShell, prepare the shell
-after `uv sync --locked`:
+On Windows, point PyO3 at the project interpreter before running Cargo. In
+PowerShell, prepare the shell after `uv sync --locked`:
 
 ```powershell
 $env:PYO3_PYTHON = (Resolve-Path .venv/Scripts/python.exe).Path
-$pythonRuntime = & $env:PYO3_PYTHON -c 'import sys; print(sys.base_prefix)'
-$env:PATH = "$pythonRuntime;$env:PATH"
 $env:CARGO_BUILD_JOBS = "2"
 ```
 
@@ -57,9 +54,11 @@ The last setting also matches release CI and bounds compilation memory usage.
 ## Documentation
 
 Edit pages in `docs/` and API docstrings in `python/polars_intervals/`.
-Use an isolated environment to preview the site or check the build:
+Use an isolated environment to preview the site or check the build. The first
+command generates the benchmark tables that the pages include:
 
 ```sh
+uv run --locked --isolated --only-group plots python benchmarks/plot.py
 uv run --locked --isolated --only-group docs mkdocs serve
 uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
@@ -85,7 +84,7 @@ Check API examples against the installed plugin with:
 uv run --locked pytest --doctest-modules python/polars_intervals
 ```
 
-For the Rust API reference, set `RUSTDOCFLAGS` to `-D warnings` and run
+For the `intervals-core` API reference, set `RUSTDOCFLAGS` to `-D warnings` and run
 `cargo doc --workspace --no-deps --locked`. The output is written to `target/doc/`.
 
 ## Repository layout
@@ -93,15 +92,15 @@ For the Rust API reference, set `RUSTDOCFLAGS` to `-D warnings` and run
 | Location | Purpose |
 | --- | --- |
 | `crates/intervals-core` | Interval algorithms, independent of Polars and Python |
-| `crates/polars-intervals` | Polars input validation, Rust API, and expression plugin |
+| `crates/polars-intervals` | Polars input validation and expression plugin |
 | `python/polars_intervals` | Python expressions and API docstrings |
-| `tests` | Python integration tests |
+| `tests` | Python integration tests, which also test the plugin adapter |
 | `benchmarks` | Benchmark runners, reporting tools, and saved results |
 | `docs` | Documentation site and release guide |
 
 The generic `intervals_core::containment_counts(&starts, &ends)` API has no
-production dependencies. `polars_intervals::containment_count(&starts, &ends)`
-uses the shared integer, Date, and Datetime extraction path.
+production dependencies. The adapter crate has no public Rust API. Python is
+its only caller, so the adapter is tested from Python only.
 
 For publishing instructions, see the
 [release guide](https://github.com/jplauri/polars-intervals/blob/master/docs/releasing.md).

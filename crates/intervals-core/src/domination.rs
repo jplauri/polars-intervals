@@ -130,22 +130,19 @@ where
     for &row in &reduction.empties {
         mask[row] = true;
     }
-    prefix_heap(&reduction, Some(costs), &mut mask)?;
+    prefix_heap(&reduction, costs, &mut mask)?;
     check_selected_cost(&mask, costs)?;
     Ok(mask)
 }
 
-pub(crate) struct Reduction<T> {
-    pub targets: Vec<(T, T)>,
+struct Reduction<T> {
+    targets: Vec<(T, T)>,
     // Starts are nondecreasing: mapping reuses the extraction's sorted order.
-    pub blocks: Vec<cover::Candidate<usize>>,
-    pub empties: Vec<usize>,
+    blocks: Vec<cover::Candidate<usize>>,
+    empties: Vec<usize>,
 }
 
-pub(crate) fn reduce<T: Ord + Copy>(
-    starts: &[T],
-    ends: &[T],
-) -> Result<Reduction<T>, IntervalError> {
+fn reduce<T: Ord + Copy>(starts: &[T], ends: &[T]) -> Result<Reduction<T>, IntervalError> {
     validate_lengths(starts, ends)?;
     let mut rows = Vec::new();
     let mut empties = Vec::new();
@@ -209,9 +206,9 @@ pub(crate) fn reduce<T: Ord + Copy>(
 /// Insert each proposal only at a, when F[a] is known. Expiration b controls
 /// feasibility, not ordering. Buried expired entries are deliberately lazy:
 /// heap storage can reach O(n), even when the current active set is small.
-pub(crate) fn prefix_heap<T, W: Copy>(
+fn prefix_heap<T, W: Copy>(
     reduction: &Reduction<T>,
-    costs: Option<&[W]>,
+    costs: &[W],
     mask: &mut [bool],
 ) -> Result<(), IntervalError>
 where
@@ -224,9 +221,8 @@ where
     for j in 0..reduction.targets.len() {
         while next < reduction.blocks.len() && reduction.blocks[next].start == j {
             let c = reduction.blocks[next];
-            let row_cost = costs.map_or(1, |costs| i128::from(costs[c.row]));
             if let Some((cost, count)) = previous
-                && let Some(cost) = cost.checked_add(row_cost)
+                && let Some(cost) = cost.checked_add(i128::from(costs[c.row]))
             {
                 heap.push(Reverse((cost, count + 1, c.row, c.start, c.end)));
             }
@@ -251,7 +247,7 @@ where
     }
 }
 
-pub(crate) fn check_selected_cost<W: Copy>(mask: &[bool], costs: &[W]) -> Result<(), IntervalError>
+fn check_selected_cost<W: Copy>(mask: &[bool], costs: &[W]) -> Result<(), IntervalError>
 where
     i128: From<W>,
 {
@@ -264,4 +260,114 @@ where
         }
     }
     Ok(())
+}
+
+// The public optimizers share this reduction, so it needs its own oracle.
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use proptest::prelude::*;
+
+    // Self-domination never goes through overlap, so even duplicate empty
+    // rows remain mandatory in the original graph.
+    fn dominates(s: &[i64], e: &[i64], selected: &[bool]) -> bool {
+        (0..s.len()).all(|i| {
+            selected[i]
+                || (0..s.len()).any(|j| {
+                    selected[j] && s[i] < e[i] && s[j] < e[j] && s[i] < e[j] && s[j] < e[i]
+                })
+        })
+    }
+
+    // Pairwise strict containment is independent of optimized target extraction.
+    // Equal geometries are deduplicated ONLY after testing strict containment.
+    fn naive_targets(s: &[i64], e: &[i64]) -> Vec<(i64, i64)> {
+        let mut targets: Vec<_> = (0..s.len())
+            .filter(|&i| {
+                s[i] < e[i]
+                    && !(0..s.len()).any(|j| {
+                        s[j] < e[j]
+                            && s[i] <= s[j]
+                            && e[j] <= e[i]
+                            && (s[i] != s[j] || e[i] != e[j])
+                    })
+            })
+            .map(|i| (s[i], e[i]))
+            .collect();
+        targets.sort_unstable();
+        targets.dedup();
+        targets
+    }
+
+    fn check_reduction(s: &[i64], e: &[i64]) {
+        let reduction = reduce(s, e).unwrap();
+        assert_eq!(reduction.targets, naive_targets(s, e));
+        assert!(
+            reduction
+                .targets
+                .windows(2)
+                .all(|w| w[0].0 < w[1].0 && w[0].1 < w[1].1)
+        );
+        assert_eq!(
+            reduction.empties,
+            (0..s.len()).filter(|&i| s[i] == e[i]).collect::<Vec<_>>()
+        );
+        let mut rows: Vec<_> = reduction.blocks.iter().map(|b| b.row).collect();
+        rows.sort_unstable();
+        assert_eq!(
+            rows,
+            (0..s.len()).filter(|&i| s[i] < e[i]).collect::<Vec<_>>()
+        );
+        for block in &reduction.blocks {
+            assert!(block.start < block.end);
+            for (j, &(ts, te)) in reduction.targets.iter().enumerate() {
+                assert_eq!(
+                    block.start <= j && j < block.end,
+                    s[block.row] < te && ts < e[block.row],
+                    "row {} target {j}",
+                    block.row
+                );
+            }
+        }
+        for bits in 0usize..1 << s.len() {
+            let mask: Vec<_> = (0..s.len()).map(|i| bits & (1 << i) != 0).collect();
+            let reduced = reduction.empties.iter().all(|&i| mask[i])
+                && (0..reduction.targets.len()).all(|j| {
+                    reduction
+                        .blocks
+                        .iter()
+                        .any(|b| mask[b.row] && b.start <= j && j < b.end)
+                });
+            assert_eq!(dominates(s, e, &mask), reduced, "subset {bits:b}");
+        }
+    }
+
+    #[test]
+    fn target_boundaries_and_identical_blocks() {
+        // [1,4) touches the second target; [3,8) touches the third. Rows 6/7
+        // have the same block despite different geometry.
+        check_reduction(&[0, 4, 8, 12, 1, 0, 3, 3], &[2, 6, 10, 14, 4, 7, 7, 8]);
+    }
+
+    fn interval() -> impl Strategy<Value = (i64, i64)> {
+        prop_oneof![
+            5 => (-6i64..=6, -6i64..=6).prop_map(|(a, b)| (a.min(b), a.max(b))),
+            2 => (-5i64..=5, 1i64..=2).prop_map(|(block, len)| (4 * block, 4 * block + len)),
+            2 => (0i64..=6).prop_map(|radius| (-radius, radius + 1)),
+            1 => (-6i64..=6).prop_map(|x| (x, x)),
+        ]
+    }
+
+    proptest! {
+        #[test]
+        fn reduction_preserves_every_subset_and_matches_naive_targets_and_adjacency(
+            rows in prop_oneof![
+                4 => prop::collection::vec(interval(), 0..=7),
+                1 => (interval(), 0usize..=7).prop_map(|(row, n)| vec![row; n]),
+            ],
+        ) {
+            let (s, e): (Vec<_>, Vec<_>) = rows.into_iter().unzip();
+            check_reduction(&s, &e);
+        }
+    }
 }

@@ -41,7 +41,7 @@ from generate_interval_graphs import (
     structural_stats,
     validate_instance,
 )
-from provenance import ROOT, environment, sha256
+from provenance import environment, sha256
 
 WORKLOADS = ("integer", "date", "datetime", "grouped", "sliced", "multi_chunk")
 QUALITY_FIELDS = [
@@ -473,32 +473,16 @@ def validated_result(result, record, groups, expected=None):
 def run_metadata(args):
     import polars_intervals as pi
 
-    corpora = {}
-    for path in args.dataset:
-        manifest = json.loads((path / "dataset.json").read_text(encoding="ascii"))
-        hashes = {"dataset.json": sha256(path / "dataset.json")}
-        for shard in manifest["shards"]:
-            target = (path / shard["path"]).resolve()
-            if not target.is_relative_to(path.resolve()):
-                raise ValueError("shard path escapes dataset directory")
-            hashes[shard["path"]] = sha256(target)
-        corpora[str(path)] = {"manifest": manifest, "sha256": hashes}
+    corpora = {str(path): sha256(path) for path in args.dataset}
     native = list(Path(pi.__file__).parent.glob("*.pyd")) + list(
         Path(pi.__file__).parent.glob("*.so")
     )
-    source_paths = [
-        Path(__file__),
-        Path(__file__).with_name("balance_lanes_fixtures.py"),
-        ROOT / "python/polars_intervals/__init__.py",
-    ]
-    source_paths.extend((ROOT / "crates").glob("**/*.rs"))
     return {
         **environment(),
         "arguments": vars(args),
         "build_profile": "release (operator-declared)",
         "plugin": pi.__file__,
         "native_sha256": {p.name: sha256(p) for p in native},
-        "source_sha256": {str(p.relative_to(ROOT)): sha256(p) for p in source_paths},
         "corpora": corpora,
         "warmups": args.warmups,
         "samples": args.repeats,

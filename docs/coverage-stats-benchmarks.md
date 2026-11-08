@@ -132,6 +132,8 @@ memory measurements cannot be substituted for one another.
 
 **Reproduce**
 
+The Rust core benchmark now times only the public call. The harness that forced
+each route remains at [`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/coverage_stats_candidates.rs).
 Follow the shared [release setup](benchmarking.md#setup), then run:
 
 ```sh
@@ -146,10 +148,10 @@ Use new output prefixes. Raw samples retain separate `n`/`m`, union-run counts,
 multiplicity, distinct boundaries, query spans, groups, order, dtype, payload,
 chunks, source, seed and scope. Saved evidence:
 
-- Broad run: [3,440 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-local.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-local.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-local.sources.zip).
-- Million run: [216 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-million.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-million.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-million.sources.zip).
-- Mode run: [276 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-modes.csv), [20 RSS observations](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-modes.memory.json), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-modes.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-modes.sources.zip).
-- Final core: [630 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-core-production.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-core-production.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-core-production.sources.zip).
+- Broad run: [3,440 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-local.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-local.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-stats-polars-local.sources.zip).
+- Million run: [216 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-million.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-million.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-stats-polars-million.sources.zip).
+- Mode run: [276 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-modes.csv), [20 RSS observations](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-modes.memory.json), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-polars-modes.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-stats-polars-modes.sources.zip).
+- Final core: [630 samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-core-production.csv), [metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/coverage-stats-core-production.metadata.json), [sources](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results/coverage-stats-core-production.sources.zip).
 
 **History**
 
@@ -159,5 +161,9 @@ measured sources stayed unchanged during each run. The final core run measures
 the actual selected route. Earlier binary, sweep and provisional dispatch
 experiments remain separate in the selection notes, with their own raw samples,
 metadata and source archives. Their timings are not relabeled as production.
+
+A later cleanup replaced the native competitor's shared Rust validation with
+equivalent Polars checks, so the package no longer ships a benchmark-only
+binding. Saved timings measure the original competitor, not this change.
 
 </details>

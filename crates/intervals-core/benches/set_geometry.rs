@@ -1,13 +1,13 @@
-//! Complete A/B/C calls and separate requested-live-heap measurements.
+//! Complete public calls and separate requested-live-heap measurements.
+//! The retired candidates remain at d6c3b01.
 #[path = "support/allocations.rs"]
 mod allocations;
-#[path = "support/set_geometry_candidates.rs"]
-mod candidates;
 #[path = "../tests/support/set_geometry.rs"]
 mod oracle;
 #[path = "support/random.rs"]
 mod random;
 
+use intervals_core::{intersect_intervals, merge_intervals, subtract_intervals};
 use std::{fmt::Debug, hint::black_box, io::Write, time::Instant};
 
 #[global_allocator]
@@ -88,8 +88,8 @@ fn measure<T: Ord + Copy + Debug>(
     let n = ls.len() + rs.len();
     let useful_left = ls.iter().zip(le).filter(|(s, e)| s < e).count();
     let useful_right = rs.iter().zip(re).filter(|(s, e)| s < e).count();
-    let p = intervals_core::merge_intervals(ls, le).unwrap().len();
-    let q = intervals_core::merge_intervals(rs, re).unwrap().len();
+    let p = merge_intervals(ls, le).unwrap().len();
+    let q = merge_intervals(rs, re).unwrap().len();
     let mut endpoints: Vec<_> = data.iter().flatten().copied().collect();
     endpoints.sort_unstable();
     endpoints.dedup();
@@ -100,32 +100,24 @@ fn measure<T: Ord + Copy + Debug>(
         } else {
             "subtract"
         };
-        let run = |method| {
+        let run = |[ls, le, rs, re]: &[Vec<T>; 4]| {
             if intersection {
-                candidates::intersect(method, ls, le, rs, re)
+                intersect_intervals(ls, le, rs, re)
             } else {
-                candidates::subtract(method, ls, le, rs, re)
+                subtract_intervals(ls, le, rs, re)
             }
             .unwrap()
         };
-        let expected = run("union_scan");
+        let expected = run(data);
         assert!(expected.iter().all(|(s, e)| s < e));
         assert!(expected.windows(2).all(|w| w[0].1 < w[1].0));
         if n <= 64 {
             assert_eq!(expected, oracle::cells(ls, le, rs, re, intersection));
         }
-        let memory: Vec<_> = candidates::METHODS
-            .iter()
-            .map(|method| {
-                let (result, bytes, count) = allocations::measure(|| run(method));
-                assert_eq!(result, expected, "{method}");
-                (bytes, count)
-            })
-            .collect();
+        let (result, peak, allocations) = allocations::measure(|| run(data));
+        assert_eq!(result, expected);
         for _ in 0..warmups {
-            for method in candidates::METHODS {
-                drop(black_box(run(method)));
-            }
+            drop(black_box(run(data)));
         }
         let iterations = if n <= 64 {
             128
@@ -134,18 +126,14 @@ fn measure<T: Ord + Copy + Debug>(
         } else {
             1
         };
+        // The method column keeps the name saved runs use for the public route.
         for sample in 0..samples {
-            for offset in 0..candidates::METHODS.len() {
-                let index = (sample + offset) % candidates::METHODS.len();
-                let method = candidates::METHODS[index];
-                let begin = Instant::now();
-                for _ in 0..iterations {
-                    drop(black_box(run(black_box(method))));
-                }
-                let batch_ns = begin.elapsed().as_nanos();
-                let (peak, allocations) = memory[index];
-                writeln!(file, "{label},{operation},{n},{},{},{method},{sample},{iterations},{batch_ns},{},{peak},{allocations},{useful_left},{useful_right},{p},{q},{},{distinct}", ls.len(),rs.len(),batch_ns/iterations,expected.len()).unwrap();
+            let begin = Instant::now();
+            for _ in 0..iterations {
+                drop(black_box(run(black_box(data))));
             }
+            let batch_ns = begin.elapsed().as_nanos();
+            writeln!(file, "{label},{operation},{n},{},{},union_scan,{sample},{iterations},{batch_ns},{},{peak},{allocations},{useful_left},{useful_right},{p},{q},{},{distinct}", ls.len(),rs.len(),batch_ns/iterations,expected.len()).unwrap();
         }
     }
     file.flush().unwrap();

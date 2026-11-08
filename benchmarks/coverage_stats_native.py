@@ -8,7 +8,7 @@ requests see ends at or before it. Payloads remain in a Polars Struct.
 """
 
 import polars as pl
-from polars_intervals import _blocking_frame, _coverage_stats_input, _internal
+from polars_intervals import _blocking_frame, _coverage_stats_input
 
 
 def native_coverage_stats(
@@ -21,7 +21,7 @@ def native_coverage_stats(
     interval_end="end",
     by=None,
 ):
-    """Return the complete public result, with shared native validation included."""
+    """Return the complete public result, with all-row Polars validation included."""
     eager = isinstance(queries, pl.DataFrame) and isinstance(intervals, pl.DataFrame)
     intervals, keys, query_schema = _coverage_stats_input(
         queries, intervals, query_start, query_end, interval_start, interval_end, by
@@ -56,17 +56,19 @@ def native_coverage_stats(
     )
 
     def validate(frame):
-        geometry = frame.select("_s", "_e", "_source", *aliases)
-        query = geometry.filter(~pl.col("_source"))
-        source = geometry.filter(pl.col("_source"))
-        _internal.validate_coverage_stats(
-            query["_s"],
-            query["_e"],
-            [query[key] for key in aliases] if keys else [],
-            source["_s"],
-            source["_e"],
-            [source[key] for key in aliases] if keys else [],
+        null = pl.col("_s").is_null() | pl.col("_e").is_null()
+        invalid = (
+            frame.filter(null | (pl.col("_s") > pl.col("_e")))
+            .sort("_source", "_row")
+            .select("_source", "_row", null.alias("null"))
+            .head(1)
         )
+        if invalid.height:
+            side, row, is_null = invalid.row(0)
+            reason = "null endpoints" if is_null else "start greater than end"
+            raise pl.exceptions.ComputeError(
+                f"{'intervals' if side else 'queries'} row at index {row}: {reason}"
+            )
         return frame
 
     source = _blocking_frame(combined, validate, combined.collect_schema())

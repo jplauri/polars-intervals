@@ -23,12 +23,10 @@ from benchmarks.coverage_profile import fixture as profile_fixture
 from benchmarks.interval_geometry_native import native_cluster, native_gaps, native_merge
 from benchmarks.provenance import (
     ROOT,
-    archive_sources,
     build_environment,
     environment,
     resident_memory,
     sha256,
-    source_changes,
     verify_release,
 )
 
@@ -188,35 +186,15 @@ def main():
         parser.error("Need --output, nonnegative sizes and positive samples/warmups")
     native = Path(_internal.__file__)
     try:
-        release, inputs = verify_release(native)
+        release = verify_release(native)
     except ValueError as error:
         parser.error(str(error))
     raw = args.output.with_suffix(".csv")
     meta = args.output.with_suffix(".metadata.json")
-    archive = args.output.with_suffix(".sources.zip")
     memory = args.output.with_suffix(".memory.json")
-    if any(path.exists() for path in (raw, meta, archive, memory)):
+    if any(path.exists() for path in (raw, meta, memory)):
         parser.error("Use a new output prefix")
     raw.parent.mkdir(parents=True, exist_ok=True)
-    sources = list(
-        dict.fromkeys(
-            [
-                *inputs,
-                *ROOT.glob("python/polars_intervals/*.py"),
-                *ROOT.glob("benchmarks/interval_geometry*.py"),
-                ROOT / "benchmarks/test_interval_geometry.py",
-                ROOT / "tests/test_interval_geometry.py",
-                ROOT / "tests/dtypes.py",
-                ROOT / "benchmarks/coverage_profile.py",
-                ROOT / "benchmarks/coverage_profile_native.py",
-                ROOT / "benchmarks/provenance.py",
-                ROOT / "Cargo.toml",
-                ROOT / "rust-toolchain.toml",
-                ROOT / "uv.lock",
-                ROOT / "pyproject.toml",
-            ]
-        )
-    )
     metadata = environment() | {
         "settings": vars(args) | {"output": str(args.output)},
         "cases": CASES,
@@ -231,10 +209,8 @@ def main():
         "release_path": str(release),
         "native_path": str(native),
         "build_environment": build_environment(),
-        "source_sha256": {str(path.relative_to(ROOT)): sha256(path) for path in sources},
         "status": "running",
     }
-    metadata.update(archive_sources(archive, sources))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     memories = []
     with (
@@ -340,7 +316,6 @@ def main():
         memory.write_text(json.dumps(memories, indent=2) + "\n", encoding="utf-8")
     metadata["status"] = "complete"
     metadata["raw_sha256"] = sha256(raw)
-    metadata.update(source_changes(metadata["source_sha256"]))
     meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
 
 

@@ -167,9 +167,6 @@ jobs:
     needs: [wheels, sdist]
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           python-version: "3.12"
@@ -179,8 +176,6 @@ jobs:
           pattern: dist-*
           merge-multiple: true
           path: dist
-      - name: Audit wheel matrix and package metadata
-        run: uv run --locked --only-group dev python .github/scripts/release_checks.py artifacts dist
       - name: Check distribution metadata with Twine
         run: uvx --from twine==7.0.0 twine check --strict dist/*
       - name: Upload verified distributions

@@ -6,32 +6,7 @@ use pyo3_polars::PySeries;
 const NAME: &str = "max_weight_with_capacity_profile";
 
 /// Select a globally maximum-weight subset under a piecewise-constant capacity.
-///
-/// Jobs and profile segments are half-open. Unsorted profile segments are
-/// accepted; overlaps are rejected, and gaps/outside-profile time have capacity
-/// zero. Valid empty profile rows have no effect. Every selected non-empty job
-/// consumes one capacity unit throughout its lifetime. Positive empty jobs are
-/// always selected, while nonpositive weights are omitted.
-///
-/// Returns a non-null Boolean Series named `selected` in original job row order.
-/// Both collections include all chunks and may have different row counts.
-/// Endpoints must have exactly the same supported integer, Date or Datetime
-/// logical dtype, including time unit and timezone. Weights and capacities are
-/// non-null signed/unsigned 8/16/32/64-bit integers, widened exactly to `i128`.
-/// Capacities must be nonnegative; values larger than the candidate job count
-/// may be clamped without changing feasibility. No cast or broadcasting occurs.
-///
-/// Constant profiles dispatch to [`super::max_weight_with_capacity`]'s core
-/// kernel. See [`intervals_core::max_weight_with_capacity_profile`] for the exact
-/// flow formulation, preprocessing, fast paths and complexity. Ties are
-/// deterministic for identical inputs; a particular optimum is unspecified.
-///
-/// # Errors
-///
-/// Rejects unequal lengths within either collection, nulls, unsupported or
-/// mismatched dtypes, reversed jobs/profile rows, overlapping non-empty profile
-/// segments, negative capacities, and checked `i128` objective overflow.
-pub fn max_weight_with_capacity_profile(
+pub(crate) fn max_weight_with_capacity_profile(
     starts: &Series,
     ends: &Series,
     weights: &Series,
@@ -90,7 +65,7 @@ where
         &profile_ends,
         capacities,
     )
-    .map_err(|error| polars_err!(ComputeError: "{error}"))?;
+    .map_err(super::compute_error)?;
     Ok(Series::new("selected".into(), selected))
 }
 

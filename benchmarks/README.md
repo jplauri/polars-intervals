@@ -23,10 +23,10 @@ without Python or the plugin. The table generator only reads saved results.
 | [`interval_geometry_core.py`](interval_geometry_core.py) | Core comparison runner | Packed and indexed frontier scans, fused/materialized gaps and separate requested heap → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`test_interval_geometry.py`](test_interval_geometry.py) | Baseline checks | Independent graph/cell oracles, deferred validation and typed grouped lazy outputs → native competitor checks | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`coverage_profile.py`](coverage_profile.py) | End-to-end benchmark | Complete release calls against native Polars event sums/count aggregation, with optional lazy/streaming-engine collection, validation, groups and output assembly → raw samples and provenance | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
-| [`coverage_profile_core.py`](coverage_profile_core.py) | Core comparison runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples, source archive and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
+| [`coverage_profile_core.py`](coverage_profile_core.py) | Core comparison runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`test_coverage_profile.py`](test_coverage_profile.py) | Baseline checks | Direct membership oracle on small grouped, temporal and wide-load inputs → native Polars baseline validation | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`minimum_cost_dominating_set.py`](minimum_cost_dominating_set.py) | End-to-end benchmark | Integer/temporal, grouped and multichunk inputs → checked release collection samples and provenance | [Dominating set](../docs/domination-benchmarks.md) |
-| [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated, sharded interval instances | [Interval-graph corpora](#interval-graph-corpora) |
+| [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated interval instances in one gzip JSON Lines file | [Interval-graph corpora](#interval-graph-corpora) |
 | [`test_generate_interval_graphs.py`](test_generate_interval_graphs.py) | Corpus checks | Tiny deterministic instances and local fixtures → structural and reproducibility checks | [Interval-graph corpora](#interval-graph-corpora) |
 | [`nesting_depth.py`](nesting_depth.py) | End-to-end benchmark | Exact analytic families, integer/temporal and grouped inputs → verified collection samples and environment metadata | [Nesting depth](../docs/nesting-depth-benchmarks.md) |
 | [`max_weight_clique.py`](max_weight_clique.py) | End-to-end benchmark | Numeric/temporal, grouped and multichunk inputs → verified collection samples and provenance | [Maximum-weight clique](../docs/clique-benchmarks.md) |
@@ -48,18 +48,17 @@ Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals
 Except for the geometry, set-geometry, coverage-statistics, dominating-set and coverage-profile comparisons, they time production
 only. Removed candidates and runners are preserved in the
 [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
-Historical metadata may reference a base revision with uncommitted feature
-changes. Consult each run's source hashes and cleanup notes for differences
-between the snapshot and the measured sources; see the
-[provenance guidance](../docs/benchmarking.md#measurement-rules).
+Runners refuse uncommitted changes and record the revision. Older runs that
+measured uncommitted changes keep their source archives at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/benchmarks/results).
+See the [provenance guidance](../docs/benchmarking.md#measurement-rules).
 
 The dominating-set runner is `cargo bench -p intervals-core --bench
 minimum_cost_dominating_set --locked`. `DOMINATION_CSV` must name a new absolute
-output path. `DOMINATION_SIZES`, `DOMINATION_SEEDS`, `DOMINATION_DTYPES`,
-`DOMINATION_METHODS`, and `DOMINATION_CASES` accept comma-separated selections.
-`DOMINATION_SAMPLES` and `DOMINATION_WARMUPS` default to five and two. It compares
-complete production, covering, fused covering, heap DP and direct greedy calls,
-plus a bounded quadratic reference, with separate allocator instrumentation.
+output path. `DOMINATION_SIZES`, `DOMINATION_SEEDS`, `DOMINATION_DTYPES` and
+`DOMINATION_CASES` accept comma-separated selections. `DOMINATION_SAMPLES` and
+`DOMINATION_WARMUPS` default to five and two. It times complete public calls
+with separate allocator instrumentation.
 See the [report](../docs/domination-benchmarks.md) and [proofs](domination-notes.md).
 
 The maximum-weight clique runner is `cargo bench -p intervals-core --bench
@@ -91,15 +90,14 @@ uv run --no-sync python -m unittest discover -s benchmarks -p test_scheduling_po
 The runner includes public query construction and collection. It checks lane
 feasibility and the minimum lane count, or scheduling feasibility and the optimal
 total weight, outside timing. It records each seed separately and preserves the
-release hashes, source archive and thread settings.
+revision, release hashes and thread settings.
 
-Coverage/load profiles compare complete A event, B independent-stream, and C
-active-end heap calls. Weighted index streams are an additional B layout
-comparison against production's contiguous records. Earlier flat-record
-experiments remain in the archived source snapshots. The implementations in `benches/support/coverage_profile_candidates.rs`
-are private to benchmarks and tests; only one engine is exposed by the package.
+The coverage/load profile core runner times the public calls. Its A event,
+C active-end heap and weighted index-stream candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/coverage_profile_candidates.rs). Earlier flat-record
+experiments remain in the archived source snapshots.
 See [correctness and design notes](coverage-profile-notes.md). List core
-comparison options with `uv run --no-sync python benchmarks/coverage_profile_core.py --help`.
+runner options with `uv run --no-sync python benchmarks/coverage_profile_core.py --help`.
 Run complete Polars comparisons with:
 
 ```sh
@@ -162,9 +160,9 @@ non-isomorphic small interval graphs.
 
 ```sh
 python benchmarks/generate_interval_graphs.py list-families
-python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 42 --output benchmarks/generated/interval_graphs
-python benchmarks/generate_interval_graphs.py synthetic --suite exact --seed 42 --output benchmarks/generated/interval_graphs-exact
-python benchmarks/generate_interval_graphs.py synthetic --suite scaling --seed 42 --output benchmarks/generated/interval_graphs-scaling
+python benchmarks/generate_interval_graphs.py synthetic --suite smoke --seed 42 --output benchmarks/generated/interval_graphs.jsonl.gz
+python benchmarks/generate_interval_graphs.py synthetic --suite exact --seed 42 --output benchmarks/generated/interval_graphs-exact.jsonl.gz
+python benchmarks/generate_interval_graphs.py synthetic --suite scaling --seed 42 --output benchmarks/generated/interval_graphs-scaling.jsonl.gz
 ```
 
 `smoke` is the default and quickly exercises every family. `exact` uses several
@@ -210,8 +208,8 @@ orders into an ignored cache. Choose `all` or `connected` explicitly; the two
 catalogs remain separate in provenance.
 
 ```sh
-python benchmarks/generate_interval_graphs.py jaist --input /path/to/catalog --catalog-kind all --output benchmarks/generated/jaist-local
-python benchmarks/generate_interval_graphs.py jaist --download --n 8 9 10 11 12 --catalog-kind all --cache benchmarks/generated/jaist-cache --output benchmarks/generated/jaist
+python benchmarks/generate_interval_graphs.py jaist --input /path/to/catalog --catalog-kind all --output benchmarks/generated/jaist-local.jsonl.gz
+python benchmarks/generate_interval_graphs.py jaist --download --n 8 9 10 11 12 --catalog-kind all --cache benchmarks/generated/jaist-cache --output benchmarks/generated/jaist.jsonl.gz
 ```
 
 Published per-order files are plain ASCII endpoint sequences, one graph per line,
@@ -234,15 +232,12 @@ with an error. Synthetic generation and tests never download data.
 
 ### Storage, statistics, and reproducibility
 
-Each output directory contains `dataset.json` and
-`shards/part-00000.jsonl.gz`, `part-00001.jsonl.gz`, and so on. Use `--shard-size`
-to change the default 50,000 records per shard. A nonempty output directory is
-rejected unless `--overwrite` is supplied. Bulk outputs and download caches under
+Each corpus is one gzip-compressed JSON Lines file, written only after every
+record validates. An existing output is rejected unless `--overwrite` is
+supplied. Bulk outputs and download caches under
 `benchmarks/generated/` are ignored by git; do not commit generated corpora.
 
-The manifest records `schema_version: 1`, corpus `kind`, `suite`, suite `seed`,
-`instance_count`, `shard_size`, and ordered shard paths/counts. Each JSONL record
-contains `id`, `family`, per-instance `seed` (null for JAIST), `n`, `params`,
+Each record contains `id`, `family`, per-instance `seed` (null for JAIST), `n`, `params`,
 `stats`, `certificate`, `provenance`, and `intervals` as `[start, end]` pairs.
 `iter_dataset(path)` in the generator lazily yields these complete record dicts
 for future benchmark consumers.
@@ -260,10 +255,10 @@ SHA-256 over canonical identifying data derives stable IDs and per-instance
 seeds. Geometry seeds depend on suite seed, family, parameters, and replicate;
 row shuffles use separate deterministic seeds, so changing order preserves
 geometry and adding another family does not change existing instances. Output
-uses compact sorted-key JSON, stable record/shard order, and gzip with `mtime=0`
+uses compact sorted-key JSON, stable record order, and gzip with `mtime=0`
 and no stored filename. Files contain no timestamps or host paths. Identical
 generation commands in the same Python/zlib runtime produce byte-identical
-datasets, including compressed shards.
+files.
 
 Run the offline checks without building the extension:
 
@@ -284,8 +279,8 @@ uv run --locked --isolated --only-group docs mkdocs build --strict
 ```
 
 This reads saved measurements. It does not run benchmarks or compile Rust.
-Commit regenerated files in `docs/assets/benchmarks/` with the source/configuration
-change. The documentation CI build regenerates the assets before building the site.
+Generated tables in `docs/assets/benchmarks/` are not committed. The
+documentation CI build regenerates them before building the site.
 
 Copy and follow [report-template.md](report-template.md). Register the report's
 tables in [plots.toml](plots.toml).

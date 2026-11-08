@@ -1738,7 +1738,6 @@ dependencies = [
  "intervals-core",
  "polars",
  "polars-core",
- "proptest",
  "pyo3",
  "pyo3-polars",
  "serde",

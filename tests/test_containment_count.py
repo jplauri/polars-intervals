@@ -116,3 +116,10 @@ def test_extreme_endpoints(dtype):
         {"start": [low, high - 1, high], "end": [high] * 3}, schema={"start": dtype, "end": dtype}
     )
     assert frame.select(pi.containment_count("start", "end")).to_series().to_list() == [2, 1, 0]
+
+
+def test_counts_exceed_endpoint_width():
+    frame = pl.DataFrame(
+        {"start": [0] * 300, "end": [0] * 300}, schema={"start": pl.UInt8, "end": pl.UInt8}
+    )
+    assert frame.select(pi.containment_count("start", "end")).to_series().to_list() == [299] * 300

@@ -1,9 +1,8 @@
-"""Release identity and immutable source evidence shared by benchmark runners."""
+"""Release identity, clean-tree provenance and core-runner evidence."""
 
 import json
 import os
 import sys
-import zipfile
 
 import pytest
 
@@ -34,11 +33,10 @@ def test_verify_release_checks_identity_and_all_rust_inputs(monkeypatch, tmp_pat
     release.parent.mkdir(parents=True)
     release.write_bytes(native.read_bytes())
     os.utime(release, (200, 200))
-    actual, discovered = provenance.verify_release(native)
-    assert actual == release and set(discovered) == set(inputs)
+    assert provenance.verify_release(native) == release
     override = tmp_path / "explicit-library.dll"
     override.write_bytes(native.read_bytes())
-    assert provenance.verify_release(native, override)[0] == override
+    assert provenance.verify_release(native, override) == override
     native.write_bytes(b"different build")
     with pytest.raises(ValueError, match="must match"):
         provenance.verify_release(native)
@@ -50,42 +48,23 @@ def test_verify_release_checks_identity_and_all_rust_inputs(monkeypatch, tmp_pat
         os.utime(path, (100, 100))
 
 
-def test_archive_sources_and_change_detection_preserve_evidence(monkeypatch, tmp_path):
-    monkeypatch.setattr(provenance, "ROOT", tmp_path)
-    source = tmp_path / "source.py"
-    source.write_text("original")
-    hashes = {"source.py": provenance.sha256(source)}
-    archive = tmp_path / "sources.zip"
-    metadata = provenance.archive_sources(archive, [source, "source.py"])
-    assert metadata == {
-        "source_archive": archive.name,
-        "source_archive_sha256": provenance.sha256(archive),
-    }
-    with zipfile.ZipFile(archive) as saved:
-        assert saved.namelist() == ["source.py"]
-        assert saved.read("source.py") == b"original"
-    assert provenance.source_changes(hashes) == {
-        "sources_unchanged_during_run": True,
-        "changed_sources_during_run": [],
-    }
-    source.write_text("changed")
-    assert provenance.source_changes(hashes) == {
-        "sources_unchanged_during_run": False,
-        "changed_sources_during_run": ["source.py"],
-    }
-    with pytest.raises(FileExistsError):
-        provenance.archive_sources(archive, [source])
-    assert provenance.sha256(archive) == metadata["source_archive_sha256"]
+def test_environment_refuses_uncommitted_changes(monkeypatch):
+    outputs = {"status": " M crates/intervals-core/src/lib.rs", "rev-parse": "abc123"}
+    monkeypatch.setattr(provenance, "command", lambda *args: outputs.get(args[1], "tool"))
+    with pytest.raises(SystemExit, match="Commit or stash"):
+        provenance.environment()
+    outputs["status"] = ""
+    assert provenance.environment()["revision"] == "abc123"
 
 
-@pytest.mark.parametrize("suffix", [".csv", ".metadata.json", ".sources.zip"])
+@pytest.mark.parametrize("suffix", [".csv", ".metadata.json"])
 def test_core_runner_rejects_existing_evidence_before_writing(monkeypatch, tmp_path, suffix):
     monkeypatch.setattr(provenance, "ROOT", tmp_path)
     output = tmp_path / "run.csv"
     existing = output.with_suffix(suffix)
     existing.write_bytes(b"historical evidence")
     with pytest.raises(FileExistsError, match="refusing to overwrite"):
-        provenance.run_cargo_bench(output, [], {}, [], {})
+        provenance.run_cargo_bench(output, {}, [], {})
     assert list(tmp_path.iterdir()) == [existing]
     assert existing.read_bytes() == b"historical evidence"
 
@@ -108,10 +87,7 @@ def test_core_runner_preserves_evidence_and_finalizes_status(
     monkeypatch.setattr(provenance, "ROOT", tmp_path)
     monkeypatch.setattr(provenance, "environment", lambda: {"revision": "test revision"})
     monkeypatch.setattr(provenance, "command", lambda *args: "test cargo version")
-    source = tmp_path / "source.rs"
-    source.write_text("original")
     output = tmp_path / "results/run.csv"
-    hashes = {"source.rs": provenance.sha256(source)}
     invocation = [
         sys.executable,
         "-c",
@@ -123,7 +99,6 @@ assert json.loads(output.with_suffix('.metadata.json').read_text())['status'] ==
 contents = json.loads(sys.argv[1])
 if contents is not None:
     output.write_text(contents)
-Path('source.rs').write_text('changed during run')
 sys.exit(int(sys.argv[2]))
 """,
         json.dumps(contents),
@@ -132,23 +107,14 @@ sys.exit(int(sys.argv[2]))
     if launch_failure:
         invocation = [str(tmp_path / "missing-cargo")]
     result = provenance.run_cargo_bench(
-        output,
-        [source],
-        {"BENCHMARK_CSV": str(output)},
-        invocation,
-        {"source_sha256": hashes, "scope": "test complete call"},
+        output, {"BENCHMARK_CSV": str(output)}, invocation, {"scope": "test complete call"}
     )
     assert result == expected_code
     metadata = json.loads(output.with_suffix(".metadata.json").read_text())
     assert metadata["returncode"] == expected_code
     assert metadata["status"] == ("complete" if expected_code == 0 else "failed")
     assert metadata["scope"] == "test complete call"
-    assert metadata["source_sha256"] == hashes
-    assert metadata["changed_sources_during_run"] == ([] if launch_failure else ["source.rs"])
-    archive = output.with_suffix(".sources.zip")
-    assert metadata["source_archive_sha256"] == provenance.sha256(archive)
-    with zipfile.ZipFile(archive) as saved:
-        assert saved.read("source.rs") == b"original"
+    assert metadata["revision"] == "test revision"
     if contents is not None:
         assert output.read_text() == contents
         assert metadata["raw_sha256"] == provenance.sha256(output)

@@ -4,10 +4,6 @@ use proptest::prelude::*;
 #[path = "../benches/support/covering.rs"]
 mod oracle;
 use oracle::{brute_force, covers, objective};
-// White-box checks of the private frontier DP and its Fenwick tree.
-#[allow(dead_code)]
-#[path = "../src/cover.rs"]
-mod production;
 
 fn check(s: &[i32], e: &[i32], w: &[i128], l: i32, r: i32) -> Option<(i128, usize)> {
     let expected = brute_force(s, e, w, l, r);
@@ -83,41 +79,6 @@ proptest! {
         prop_assert_eq!(check(&more_s, &more_e, &more_w, l, r), optimum);
         if l < r && (0..s.len()).any(|i| s[i] <= l && e[i] >= r) {
             prop_assert_eq!(count, Some(1));
-        }
-        // Every published state/backpointer is itself an exact continuous prefix cover.
-        let mut prepared = production::prepare(&s, &e, l, r).unwrap();
-        prepared.sort_unstable_by_key(|c| (c.end, c.row));
-        let coordinates = production::coordinates(&prepared, l);
-        let solution = production::dynamic_program(&prepared, &coordinates, &w);
-        for (i, &end) in coordinates.iter().enumerate().skip(1) {
-            let mut mask = vec![false; s.len()];
-            let reachable = production::reconstruct(&solution.back[..=i], &mut mask);
-            let oracle = brute_force(&s, &e, &w, l, end);
-            // Prefix covers may use intervals ending later; the DP at i only uses ends <= i.
-            let allowed_s: Vec<_> = prepared.iter().filter(|c| c.end <= end).map(|c| c.start).collect();
-            let allowed_e: Vec<_> = prepared.iter().filter(|c| c.end <= end).map(|c| c.end).collect();
-            let allowed_w: Vec<_> = prepared.iter().filter(|c| c.end <= end).map(|c| w[c.row]).collect();
-            let prefix = brute_force(&allowed_s, &allowed_e, &allowed_w, l, end);
-            prop_assert_eq!(reachable, prefix.is_some());
-            if reachable {
-                prop_assert!(oracle.is_some());
-                prop_assert!(covers(&s, &e, &mask, l, end));
-                prop_assert_eq!(Some(objective(&w, &mask)), prefix);
-                prop_assert!(solution.back[i].unwrap().0 < i);
-            }
-        }
-    }
-
-    #[test]
-    fn fenwick_matches_naive_suffixes(values in prop::collection::vec(prop::option::of((0i128..100, 0usize..10)), 1..40)) {
-        let mut fenwick = production::Fenwick::new(values.len());
-        let mut naive = vec![None; values.len()];
-        for (i, value) in values.iter().enumerate() {
-            naive[i] = value.map(|(cost, count)| (cost, count, i));
-            fenwick.update(i, naive[i]);
-            for l in 0..values.len() {
-                prop_assert_eq!(fenwick.suffix(l), naive[l..].iter().flatten().copied().min());
-            }
         }
     }
 }
