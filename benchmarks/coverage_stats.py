@@ -5,30 +5,11 @@ after rebuilding the release plugin. ``size`` is max(n,m), not their sum.
 Every raw sample records query n and source m separately.
 """
 
-import argparse
-import csv
-import json
-import subprocess
-import sys
-import tempfile
-from pathlib import Path
-from time import perf_counter_ns
-
 import polars as pl
 import polars_intervals as pi
-from polars.testing import assert_frame_equal
-from polars_intervals import _internal
 
 from benchmarks.coverage_stats_native import native_coverage_stats
-from benchmarks.provenance import (
-    ROOT,
-    build_environment,
-    command,
-    environment,
-    resident_memory,
-    sha256,
-    verify_release,
-)
+from benchmarks.provenance import polars_parser, run_polars
 
 DIMENSIONS = [
     "family",
@@ -173,13 +154,13 @@ def fixture(size, case, seed):
     )
 
 
-def solve(queries, intervals, method, options):
+def solve(queries, intervals, _operation, method, options):
     return (pi.coverage_stats if method == "production" else native_coverage_stats)(
         queries, intervals, **options
     )
 
 
-def statistics(queries, intervals, options):
+def statistics(queries, intervals, options, _operation, _expected):
     by = options["by"]
     sizes = queries.group_by(by).len()["len"] if by else pl.Series([queries.height])
     matched = (
@@ -218,65 +199,21 @@ def statistics(queries, intervals, options):
     }
 
 
-def memory_worker(values):
-    case, size, seed, method = values
-    q, s, options = fixture(int(size), CASES[int(case)], int(seed))
-    before = resident_memory()
-    result = solve(q, s, method, options)
-    after = resident_memory()
-    print(
-        json.dumps(
-            {
-                "case": int(case),
-                "size": int(size),
-                "n": q.height,
-                "m": s.height,
-                "seed": int(seed),
-                "method": method,
-                "before": before,
-                "after": after,
-                "peak_increase_bytes": max(0, after["peak_rss_bytes"] - before["peak_rss_bytes"]),
-                "output_rows": result.height,
-            }
-        )
-    )
+def memory_fields(frames, before, after, result):
+    return {
+        "n": frames[0].height,
+        "m": frames[1].height,
+        "before": before,
+        "after": after,
+        "output_rows": result.height,
+    }
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    parser.add_argument("--sizes", type=int, nargs="+", default=[8, 1000, 10000, 100000])
-    parser.add_argument("--seeds", type=int, nargs="+", default=[7, 41])
-    parser.add_argument(
-        "--cases", type=int, nargs="+", choices=range(len(CASES)), default=list(range(len(CASES)))
+    parser = polars_parser(
+        __doc__, CASES, [8, 1000, 10000, 100000], SCOPES, ("eager", "lazy_complete")
     )
-    parser.add_argument("--scopes", nargs="+", choices=SCOPES, default=["eager", "lazy_complete"])
-    parser.add_argument("--samples", type=int, default=5)
-    parser.add_argument("--warmups", type=int, default=2)
-    parser.add_argument("--memory", action="store_true")
-    parser.add_argument("--memory-worker", nargs=4, help=argparse.SUPPRESS)
-    args = parser.parse_args()
-    if args.memory_worker:
-        memory_worker(args.memory_worker)
-        return
-    if args.output is None or min(args.sizes) < 0 or min(args.samples, args.warmups) < 1:
-        parser.error("Need output, nonnegative sizes and positive samples/warmups")
-    if any(seed < 0 or seed > 2**64 - 1 for seed in args.seeds):
-        parser.error("Seeds must fit UInt64")
-    native = Path(_internal.__file__)
-    try:
-        release = verify_release(native)
-    except ValueError as error:
-        parser.error(str(error))
-    raw, meta, memory = [
-        args.output.with_suffix(ext) for ext in (".csv", ".metadata.json", ".memory.json")
-    ]
-    if any(path.exists() for path in (raw, meta, memory)):
-        parser.error("Use a new output prefix")
-    raw.parent.mkdir(parents=True, exist_ok=True)
-    metadata = environment() | {
-        "settings": vars(args) | {"output": str(args.output)},
-        "cases": CASES,
+    notes = {
         "size": "size=max(n,m), with query n and source m recorded separately in every sample",
         "scope": "Both-side validation, grouping, source preparation, queries, four statistics, payload preservation and output materialization. Eager/lazy_complete/mixed_complete/streaming_complete include planning. lazy_plan excludes execution; lazy_collect uses a prebuilt plan. Input construction, correctness and returned-output destruction excluded.",
         "memory": "Separate cold process eager call: process RSS/peak RSS including runtime, inputs and retained output. Peak increase after fixture construction is not an allocation count or algorithm heap metric.",
@@ -284,130 +221,21 @@ def main():
         "native_candidate": "Grouped native endpoint/query-boundary sort, separate cumulative record starts/ends and exact Int128 integral of Boolean occupancy. All-row Polars validation included behind a whole-combined-input blocking boundary. Query payload carried in a Struct. No Python row/group loops, overlap pairs, or nested collect.",
         "ordering": "Warmups then rotating method order for each sample. Both return complete materialized four-statistic outputs.",
         "limitations": "Synthetic single-machine data. Scan cases include warm local Parquet I/O and are separate from memory cases. No out-of-core claim or hardware counters.",
-        "native_path": str(native),
-        "native_sha256": sha256(native),
-        "release_path": str(release),
-        "release_sha256": sha256(release),
-        "build_environment": build_environment(),
-        "status": "running",
     }
-    if sys.platform == "win32":
-        metadata["cpu_name"] = command(
-            "powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_Processor).Name"
-        )
-    meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    memories = []
-    with (
-        raw.open("w", newline="", encoding="utf-8") as stream,
-        tempfile.TemporaryDirectory(prefix="coverage-stats-") as temp,
-    ):
-        writer = None
-        for case_id in args.cases:
-            case = CASES[case_id]
-            for size in args.sizes:
-                for seed in args.seeds:
-                    q, s, options = fixture(size, case, seed)
-                    lhs, rhs = q.lazy(), s.lazy()
-                    if case[-1] == "parquet":
-                        paths = [
-                            Path(temp) / f"{side}.parquet" for side in ("queries", "intervals")
-                        ]
-                        for frame, path, divisor in zip((q, s), paths, (7, 11)):
-                            frame.write_parquet(
-                                path, row_group_size=max(1, frame.height // divisor)
-                            )
-                        lhs, rhs = [pl.scan_parquet(path) for path in paths]
-                    expected = solve(q, s, "production", options)
-                    stats = statistics(q, s, options)
-                    plans = {
-                        method: solve(lhs, rhs, method, options)
-                        for method in ("production", "native")
-                    }
-                    for plan in plans.values():
-                        assert_frame_equal(plan.collect(), expected, rel_tol=1e-15, abs_tol=1e-15)
-                    for scope in args.scopes:
-                        if case[-1] == "parquet" and scope in ("eager", "mixed_complete"):
-                            continue
-
-                        def call(
-                            method,
-                            scope=scope,
-                            q=q,
-                            s=s,
-                            options=options,
-                            lhs=lhs,
-                            rhs=rhs,
-                            plans=plans,
-                        ):
-                            if scope == "eager":
-                                return solve(q, s, method, options)
-                            if scope == "lazy_collect":
-                                return plans[method].collect()
-                            plan = solve(
-                                q if scope == "mixed_complete" else lhs, rhs, method, options
-                            )
-                            return (
-                                plan
-                                if scope == "lazy_plan"
-                                else plan.collect(
-                                    engine="streaming" if scope == "streaming_complete" else "auto"
-                                )
-                            )
-
-                        for method in plans:
-                            for _ in range(args.warmups):
-                                call(method)
-                        for sample in range(args.samples):
-                            for method in list(plans) if sample % 2 == 0 else list(reversed(plans)):
-                                begin = perf_counter_ns()
-                                result = call(method)
-                                elapsed = perf_counter_ns() - begin
-                                if scope == "lazy_plan":
-                                    assert result.collect_schema() == expected.schema
-                                else:
-                                    assert_frame_equal(
-                                        result, expected, rel_tol=1e-15, abs_tol=1e-15
-                                    )
-                                del result
-                                row = {
-                                    "case": case_id,
-                                    **dict(zip(DIMENSIONS, case)),
-                                    "seed": seed,
-                                    "size": size,
-                                    "scope": scope,
-                                    "method": method,
-                                    "sample": sample,
-                                    "ns": elapsed,
-                                    **stats,
-                                }
-                                if writer is None:
-                                    writer = csv.DictWriter(stream, fieldnames=list(row))
-                                    writer.writeheader()
-                                writer.writerow(row)
-                    if args.memory and case[-1] == "memory":
-                        for method in plans:
-                            output = subprocess.check_output(
-                                [
-                                    sys.executable,
-                                    "-m",
-                                    "benchmarks.coverage_stats",
-                                    "--memory-worker",
-                                    str(case_id),
-                                    str(size),
-                                    str(seed),
-                                    method,
-                                ],
-                                cwd=ROOT,
-                                text=True,
-                            )
-                            memories.append(json.loads(output))
-                    stream.flush()
-            print(f"case {case_id}: {case} complete", flush=True)
-    if args.memory:
-        memory.write_text(json.dumps(memories, indent=2) + "\n", encoding="utf-8")
-        metadata["memory_sha256"] = sha256(memory)
-    metadata.update(status="complete", raw_sha256=sha256(raw))
-    meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    run_polars(
+        "coverage_stats",
+        parser,
+        parser.parse_args(),
+        CASES,
+        DIMENSIONS,
+        fixture,
+        solve,
+        statistics,
+        notes,
+        size_column="size",
+        memory_fields=memory_fields,
+        record_cpu=True,
+    )
 
 
 if __name__ == "__main__":

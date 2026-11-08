@@ -31,6 +31,7 @@ Run the checks relevant to your change. The standard checks are:
 uv run --locked ruff check .
 uv run --locked ruff format --check .
 uv run --locked pytest --doctest-modules python/polars_intervals tests
+uv run --locked python -m pytest benchmarks/test_provenance.py benchmarks/test_coverage_profile.py benchmarks/test_coverage_stats.py benchmarks/test_interval_geometry.py benchmarks/test_set_geometry.py
 uv run --locked --only-group dev pytest .github/scripts/test_*.py
 uv lock --check
 cargo fmt --check

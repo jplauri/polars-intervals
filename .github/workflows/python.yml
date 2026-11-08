@@ -67,6 +67,10 @@ jobs:
       - name: Run Python tests and API examples
         if: needs.quality.outputs.build_required == 'true'
         run: uv run --locked pytest --doctest-modules python/polars_intervals tests
+      # python -m pytest puts the repository root on sys.path for the shared imports.
+      - name: Run benchmark runner tests
+        if: needs.quality.outputs.build_required == 'true'
+        run: uv run --locked python -m pytest benchmarks/test_provenance.py benchmarks/test_coverage_profile.py benchmarks/test_coverage_stats.py benchmarks/test_interval_geometry.py benchmarks/test_set_geometry.py
       - name: Documentation-only change
         if: needs.quality.outputs.build_required == 'false'
         run: echo "Native tests skipped for a documentation-only change."

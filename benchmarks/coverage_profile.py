@@ -1,22 +1,14 @@
 """Complete eager and optional lazy calls, with release verification and raw samples."""
 
-import argparse
-import csv
-import json
-from pathlib import Path
-from time import perf_counter_ns
-
 import polars as pl
 import polars_intervals as pi
-from polars.testing import assert_frame_equal
-from polars_intervals import _internal
 
 if __package__:
     from .coverage_profile_native import native_profile
-    from .provenance import environment, sha256, verify_release
+    from .provenance import polars_parser, run_polars
 else:
     from coverage_profile_native import native_profile
-    from provenance import environment, sha256, verify_release
+    from provenance import polars_parser, run_polars
 
 # family, order, dtype, groups (0=ungrouped), chunks, load, domain, include_zero
 CASES = [
@@ -39,6 +31,31 @@ CASES = [
     ("sequencing", "shuffled", "datetime_ns", 1000, 7, "units", "inferred", False),
     ("repeated", "shuffled", "date", 32, 1, "mixed", "extended", True),
 ]
+DIMENSIONS = ["family", "order", "dtype", "groups", "chunks", "weights", "domain", "include_zero"]
+COLUMNS = [
+    "case",
+    *DIMENSIONS,
+    "seed",
+    "n",
+    "m",
+    "u",
+    "z",
+    "omega",
+    "method",
+    "sample",
+    "ns",
+    "observed_groups",
+    "column_chunks",
+]
+METHODS = {
+    "production": pi.coverage_profile,
+    "native": native_profile,
+    "native_count": lambda df, **kw: native_profile(df, count_units=True, **kw),
+    "lazy": lambda df, **kw: pi.coverage_profile(df.lazy(), **kw).collect(),
+    "lazy_streaming": lambda df, **kw: pi.coverage_profile(df.lazy(), **kw).collect(
+        engine="streaming"
+    ),
+}
 
 
 def fixture(n, case, seed):
@@ -117,7 +134,11 @@ def fixture(n, case, seed):
     return df, options
 
 
-def statistics(df, options, output):
+def solve(df, _operation, method, options):
+    return METHODS[method](df, **options)
+
+
+def statistics(df, options, _operation, output):
     positive = df.lazy().filter(pl.col("start") < pl.col("end"))
     if options["weight"]:
         positive = positive.filter(pl.col("q") > 0)
@@ -156,42 +177,34 @@ def statistics(df, options, output):
         ]
     )
     peak = pi.coverage_profile(positive, by=options["by"])["load"].max() or 0
-    return positive.height, coords.n_unique(), output.height, peak
+    return {
+        "m": positive.height,
+        "u": coords.n_unique(),
+        "z": output.height,
+        "omega": peak,
+        "observed_groups": df["group"].n_unique() if options["by"] else 1,
+        "column_chunks": "|".join(str(column.n_chunks()) for column in df),
+    }
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--sizes", nargs="+", type=int, default=[0, 8, 1000, 10000, 100000])
-    parser.add_argument("--seeds", nargs="+", type=int, default=[7, 41])
-    parser.add_argument(
-        "--cases", nargs="+", type=int, choices=range(len(CASES)), default=list(range(len(CASES)))
-    )
-    parser.add_argument("--samples", type=int, default=5)
-    parser.add_argument("--warmups", type=int, default=2)
+    parser = polars_parser(__doc__, CASES, [0, 8, 1000, 10000, 100000])
     parser.add_argument(
         "--lazy",
         action="store_true",
         help="Also time lazy plan construction and collection, including the blocking profile step",
     )
     args = parser.parse_args()
-    if min(args.sizes) < 0 or args.samples < 1 or args.warmups < 1:
-        parser.error("Need nonnegative sizes and positive samples/warmups")
-    native = Path(_internal.__file__)
-    try:
-        release = verify_release(native)
-    except ValueError as error:
-        parser.error(str(error))
-    csv_path, metadata_path = (
-        args.output.with_suffix(".csv"),
-        args.output.with_suffix(".metadata.json"),
-    )
-    if csv_path.exists() or metadata_path.exists():
-        parser.error("Use a new output prefix")
-    csv_path.parent.mkdir(parents=True, exist_ok=True)
-    metadata = environment() | {
-        "settings": vars(args) | {"output": str(args.output)},
-        "cases": CASES,
+
+    def methods(options):
+        return [
+            "production",
+            "native",
+            *(["native_count"] if options["weight"] is None else []),
+            *(["lazy", "lazy_streaming"] if args.lazy else []),
+        ]
+
+    notes = {
         "scope": "Complete eager public/native calls including argument checks, native validation, partitioning, clipping, planning, sorting, scan, coalescing, output and key assembly. Fixture creation, correctness checks, and output destruction excluded.",
         "lazy_execution": (
             "The lazy and lazy_streaming methods also construct df.lazy(), the coverage_profile "
@@ -206,88 +219,21 @@ def main():
         "u_definition": "Distinct contributing clipped endpoints plus nonempty domain bounds per group. m excludes zero/empty/clipped-away rows; omega counts contributing rows. Inferred bounds include zero-weight nonempty intervals.",
         "fixture_counts": "groups is the requested group count (0 means ungrouped), chunks is the per-column split target. Observed_groups and column_chunks record actual counts; small collections may have fewer observed groups and different chunk counts. Grouped partial domains use the per-group coordinate horizon.",
         "baseline_omissions": "No claimed omissions for valid public fixtures; invalid error classes/text may differ. Public <=64-bit weights and addressable row counts cannot overflow i128; wider core overflow tests are separate. Native uses signed subtraction because unary Int128 negation is unsupported in Polars 1.44.2.",
-        "native_sha256": sha256(native),
-        "release_sha256": sha256(release),
-        "status": "running",
     }
-    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    with csv_path.open("w", newline="", encoding="utf-8") as out:
-        writer = csv.writer(out)
-        writer.writerow(
-            [
-                "case",
-                "family",
-                "order",
-                "dtype",
-                "groups",
-                "chunks",
-                "weights",
-                "domain",
-                "include_zero",
-                "seed",
-                "n",
-                "m",
-                "u",
-                "z",
-                "omega",
-                "method",
-                "sample",
-                "ns",
-                "observed_groups",
-                "column_chunks",
-            ]
-        )
-        for case_id in args.cases:
-            case = CASES[case_id]
-            for n in args.sizes:
-                for seed in args.seeds:
-                    df, options = fixture(n, case, seed)
-                    expected = pi.coverage_profile(df, **options)
-                    stats = statistics(df, options, expected)
-                    observed_groups = df["group"].n_unique() if options["by"] else 1
-                    column_chunks = "|".join(str(column.n_chunks()) for column in df)
-                    methods = {"production": pi.coverage_profile, "native": native_profile}
-                    if options["weight"] is None:
-                        methods["native_count"] = lambda df, **kw: native_profile(
-                            df, count_units=True, **kw
-                        )
-                    if args.lazy:
-                        methods["lazy"] = lambda df, **kw: pi.coverage_profile(
-                            df.lazy(), **kw
-                        ).collect()
-                        methods["lazy_streaming"] = lambda df, **kw: pi.coverage_profile(
-                            df.lazy(), **kw
-                        ).collect(engine="streaming")
-                    for solve in methods.values():
-                        assert_frame_equal(solve(df, **options), expected)
-                        for _ in range(args.warmups):
-                            solve(df, **options)
-                    names = list(methods)
-                    for sample in range(args.samples):
-                        for name in names[sample % len(names) :] + names[: sample % len(names)]:
-                            begin = perf_counter_ns()
-                            result = methods[name](df, **options)
-                            elapsed = perf_counter_ns() - begin
-                            assert_frame_equal(result, expected)
-                            del result
-                            writer.writerow(
-                                [
-                                    case_id,
-                                    *case,
-                                    seed,
-                                    n,
-                                    *stats,
-                                    name,
-                                    sample,
-                                    elapsed,
-                                    observed_groups,
-                                    column_chunks,
-                                ]
-                            )
-                    out.flush()
-            print(f"case {case_id}: {case[0]} complete", flush=True)
-    metadata["status"] = "complete"
-    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    run_polars(
+        "coverage_profile",
+        parser,
+        args,
+        CASES,
+        DIMENSIONS,
+        fixture,
+        solve,
+        statistics,
+        notes,
+        methods=methods,
+        columns=COLUMNS,
+        omit=("native_path", "release_path", "build_environment", "raw_sha256"),
+    )
 
 
 if __name__ == "__main__":
