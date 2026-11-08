@@ -13,6 +13,8 @@ without Python or the plugin. The table generator only reads saved results.
 
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
+| [`provenance.py`](provenance.py) | Shared runner | Flags, release and clean-tree checks, sample loop, CSV and metadata writers and RSS workers → raw samples and provenance | [Measurement rules](../docs/benchmarking.md#measurement-rules) |
+| [`test_provenance.py`](test_provenance.py) | Runner checks | Release identity, clean-tree refusal, saved CSV columns, metadata keys and Cargo settings → shared-runner checks | [Measurement rules](../docs/benchmarking.md#measurement-rules) |
 | [`coverage_stats.py`](coverage_stats.py) | End-to-end benchmark | Complete eager/lazy per-query statistics, native Polars sweep, payloads, separate query/source sizes and cold process RSS → raw samples and provenance | [Per-query coverage statistics](../docs/coverage-stats-benchmarks.md) |
 | [`coverage_stats_core.py`](coverage_stats_core.py) | Core comparison runner | Binary searches and offline boundary sweeps, including preparation and separate requested heap → raw samples and provenance | [Per-query coverage statistics](../docs/coverage-stats-benchmarks.md) |
 | [`test_coverage_stats.py`](test_coverage_stats.py) | Baseline checks | Original-row cell oracle, exact wide arithmetic, payloads and full deferred validation → native competitor checks | [Per-query coverage statistics](../docs/coverage-stats-benchmarks.md) |
@@ -43,6 +45,16 @@ without Python or the plugin. The table generator only reads saved results.
 | [`stabbing_temporal.py`](stabbing_temporal.py) | End-to-end benchmark | Integer/temporal fixtures → raw timing CSV on stdout | [Stabbing points](../docs/stabbing-benchmarks.md) |
 | [`plot.py`](plot.py) | Shared report generator | [`plots.toml`](plots.toml) and saved CSV/JSON → compact Markdown tables and exact summary CSV | [Reporting workflow](../docs/benchmarking.md#generate-plots) |
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
+
+The coverage-profile, coverage-statistics, interval-geometry and set-geometry
+runners share `run_polars` in [`provenance.py`](provenance.py). Their `_core`
+wrappers share `run_core`. Each runner keeps only its cases, fixture, solve
+function, statistics and metadata notes. CI runs their tests after building
+the plugin. To run them yourself:
+
+```sh
+uv run --no-sync python -m pytest benchmarks/test_provenance.py benchmarks/test_coverage_profile.py benchmarks/test_coverage_stats.py benchmarks/test_interval_geometry.py benchmarks/test_set_geometry.py
+```
 
 Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
 Except for the geometry, set-geometry, coverage-statistics, dominating-set and coverage-profile comparisons, they time production

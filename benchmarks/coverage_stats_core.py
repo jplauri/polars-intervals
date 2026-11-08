@@ -1,43 +1,9 @@
 """Measure full Rust per-query coverage calls and record their provenance."""
 
-import argparse
-import platform
-from pathlib import Path
-
-from provenance import command, run_cargo_bench
+from provenance import run_core
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--sizes", default="0,1,8,1000,10000,100000,1000000")
-    parser.add_argument("--seeds", default="7,41")
-    parser.add_argument("--samples", type=int, default=5)
-    parser.add_argument("--warmups", type=int, default=2)
-    parser.add_argument("--dtypes", default="i64,u64,i16")
-    parser.add_argument("--cases", default="")
-    args = parser.parse_args()
-    try:
-        sizes = [int(value) for value in args.sizes.split(",")]
-        seeds = [int(value) for value in args.seeds.split(",")]
-    except ValueError:
-        parser.error("Sizes and seeds must be comma-separated integers")
-    if min(sizes) < 0 or args.samples < 1 or args.warmups < 1:
-        parser.error("Need nonnegative sizes and positive samples/warmups")
-    if any(seed < 0 or seed > 2**64 - 1 for seed in seeds):
-        parser.error("Seeds must fit UInt64")
-    if not set(args.dtypes.split(",")) <= {"i64", "u64", "i16"}:
-        parser.error("Endpoint dtypes must be i64, u64 or i16")
-    output = args.output.resolve()
-    settings = {
-        "STATS_CSV": str(output),
-        "STATS_SIZES": args.sizes,
-        "STATS_SEEDS": args.seeds,
-        "STATS_SAMPLES": str(args.samples),
-        "STATS_WARMUPS": str(args.warmups),
-        "STATS_DTYPES": args.dtypes,
-        "STATS_CASES": args.cases,
-    }
     metadata = {
         "scope": (
             "Complete core call including both validations, source preparation, sorting, union "
@@ -78,16 +44,7 @@ def main():
             "Sparse geometry is not measured with i16. Large lengths are verified in tests."
         ),
     }
-    if platform.system() == "Windows":
-        metadata["cpu_name"] = command(
-            "powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_Processor).Name"
-        )
-    invocation = ["cargo", "bench", "-p", "intervals-core", "--bench", "coverage_stats", "--locked"]
-    try:
-        returncode = run_cargo_bench(output, settings, invocation, metadata)
-    except FileExistsError as error:
-        parser.error(str(error))
-    raise SystemExit(returncode)
+    run_core(__doc__, "coverage_stats", "STATS", metadata, record_cpu=True)
 
 
 if __name__ == "__main__":

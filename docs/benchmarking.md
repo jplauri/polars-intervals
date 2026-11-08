@@ -172,7 +172,10 @@ repeat runs, not an arbitrary percentage threshold.
 
 ### Adding an operation
 
-1. Reuse an appropriate runner and correctness checks. Record samples, omissions,
+1. Reuse `run_polars` or `run_core` from
+   [`benchmarks/provenance.py`](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/provenance.py)
+   and an appropriate correctness check. A runner supplies its cases, fixture,
+   solve function and metadata notes. The shared code records samples, omissions
    and run metadata without overwriting historical evidence.
 2. Copy the [report template](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/report-template.md)
    into `docs/` and follow it.

@@ -4,28 +4,10 @@ Run with ``uv run --no-sync python -m benchmarks.set_geometry --output ...``
 after rebuilding the release plugin. Inputs and correctness are outside timing.
 """
 
-import argparse
-import csv
-import json
-import subprocess
-import sys
-import tempfile
-from pathlib import Path
-from time import perf_counter_ns
-
 import polars as pl
 import polars_intervals as pi
-from polars.testing import assert_frame_equal
-from polars_intervals import _internal
 
-from benchmarks.provenance import (
-    ROOT,
-    build_environment,
-    environment,
-    resident_memory,
-    sha256,
-    verify_release,
-)
+from benchmarks.provenance import polars_parser, run_polars
 from benchmarks.set_geometry_native import native_set_geometry
 
 # Geometry, independent orders, dtype, groups, matching, chunks, payload, source.
@@ -158,7 +140,7 @@ def solve(left, right, operation, method, options):
     )
 
 
-def statistics(left, right, options, output):
+def statistics(left, right, options, _operation, output):
     by = options["by"]
     sizes = left.group_by(by).len()["len"] if by else pl.Series([left.height])
     keys_left = left.select(by).unique() if by else None
@@ -188,193 +170,35 @@ def statistics(left, right, options, output):
     }
 
 
-def memory_worker(values):
-    case, n, seed, operation, method = values
-    left, right, options = fixture(int(n), CASES[int(case)], int(seed))
-    before = resident_memory()
-    result = solve(left, right, operation, method, options)
-    after = resident_memory()
-    print(
-        json.dumps(
-            {
-                "case": int(case),
-                "n": int(n),
-                "seed": int(seed),
-                "operation": operation,
-                "method": method,
-                "before": before,
-                "after": after,
-                "peak_increase_bytes": max(0, after["peak_rss_bytes"] - before["peak_rss_bytes"]),
-                "z": result.height,
-            }
-        )
-    )
+def memory_fields(_frames, before, after, result):
+    return {"before": before, "after": after, "z": result.height}
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path)
-    parser.add_argument("--sizes", type=int, nargs="+", default=[8, 1000, 10000, 100000])
-    parser.add_argument("--seeds", type=int, nargs="+", default=[7, 41])
-    parser.add_argument(
-        "--cases", type=int, nargs="+", choices=range(len(CASES)), default=list(range(len(CASES)))
+    parser = polars_parser(
+        __doc__, CASES, [8, 1000, 10000, 100000], SCOPES, ("eager", "lazy_complete")
     )
-    parser.add_argument("--scopes", nargs="+", choices=SCOPES, default=["eager", "lazy_complete"])
-    parser.add_argument("--samples", type=int, default=5)
-    parser.add_argument("--warmups", type=int, default=2)
-    parser.add_argument("--memory", action="store_true")
-    parser.add_argument("--memory-worker", nargs=5, help=argparse.SUPPRESS)
-    args = parser.parse_args()
-    if args.memory_worker:
-        memory_worker(args.memory_worker)
-        return
-    if args.output is None or min(args.sizes) < 0 or min(args.samples, args.warmups) < 1:
-        parser.error("Need output, nonnegative sizes and positive samples/warmups")
-    if any(seed < 0 or seed > 2**64 - 1 for seed in args.seeds):
-        parser.error("Seeds must fit UInt64")
-    native = Path(_internal.__file__)
-    try:
-        release = verify_release(native)
-    except ValueError as error:
-        parser.error(str(error))
-    raw, meta, memory = [
-        args.output.with_suffix(ext) for ext in (".csv", ".metadata.json", ".memory.json")
-    ]
-    if any(path.exists() for path in (raw, meta, memory)):
-        parser.error("Use a new output prefix")
-    raw.parent.mkdir(parents=True, exist_ok=True)
-    metadata = environment() | {
-        "settings": vars(args) | {"output": str(args.output)},
-        "cases": CASES,
+    notes = {
         "scope": "Both-side validation, preparation, grouping, sorting, set scan/events, output construction and native crossing. Eager/lazy_complete/mixed_complete/streaming_complete include planning. lazy_plan excludes execution; lazy_collect uses a prebuilt plan. Input construction, correctness, returned-output destruction and memory observations excluded.",
         "memory": "Separate cold process eager call: before/after RSS and process peak RSS, including runtime, inputs and retained output. Peak increase after fixture creation is not allocation count or algorithm heap usage.",
         "verification": "Small original-row Boolean cell oracle in benchmarks/test_set_geometry.py. Every measured complete output checked outside timing against production. Large instances use cross-implementation agreement, not an independent large oracle.",
         "native_candidate": "D: all-row Polars validation behind a whole-combined-input blocking barrier, grouped signed endpoint events, per-source cumulative counts, Boolean membership and gap-aware coalescing. No Python row/group loops or nested collect.",
         "ordering": "Two warmups by default; candidate order rotates per sample; both methods fully materialize outputs.",
         "limitations": "Synthetic single-machine in-memory and separately labeled warm Parquet workloads. No out-of-core claim. No all-pairs join comparator or CPU hardware counters.",
-        "native_path": str(native),
-        "native_sha256": sha256(native),
-        "release_path": str(release),
-        "release_sha256": sha256(release),
-        "build_environment": build_environment(),
-        "status": "running",
     }
-    meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
-    memories = []
-    with (
-        raw.open("w", newline="", encoding="utf-8") as stream,
-        tempfile.TemporaryDirectory(prefix="set-geometry-") as temp,
-    ):
-        writer = None
-        for case_id in args.cases:
-            case = CASES[case_id]
-            for n in args.sizes:
-                for seed in args.seeds:
-                    left, right, options = fixture(n, case, seed)
-                    lhs, rhs = left.lazy(), right.lazy()
-                    if case[-1] == "parquet":
-                        paths = [Path(temp) / f"{side}.parquet" for side in ("left", "right")]
-                        for frame, path, divisor in zip((left, right), paths, (7, 11)):
-                            frame.write_parquet(
-                                path, row_group_size=max(1, frame.height // divisor)
-                            )
-                        lhs, rhs = [pl.scan_parquet(path) for path in paths]
-                    for operation in ("subtract", "intersect"):
-                        expected = solve(left, right, operation, "production", options)
-                        stats = statistics(left, right, options, expected)
-                        plans = {
-                            method: solve(lhs, rhs, operation, method, options)
-                            for method in ("production", "native")
-                        }
-                        for plan in plans.values():
-                            assert_frame_equal(plan.collect(), expected)
-                        for scope in args.scopes:
-                            if case[-1] == "parquet" and scope in ("eager", "mixed_complete"):
-                                continue
-
-                            def call(
-                                method,
-                                scope=scope,
-                                left=left,
-                                right=right,
-                                operation=operation,
-                                options=options,
-                                lhs=lhs,
-                                rhs=rhs,
-                                plans=plans,
-                            ):
-                                if scope == "eager":
-                                    return solve(left, right, operation, method, options)
-                                if scope == "lazy_collect":
-                                    return plans[method].collect()
-                                plan = solve(
-                                    left if scope == "mixed_complete" else lhs,
-                                    rhs,
-                                    operation,
-                                    method,
-                                    options,
-                                )
-                                if scope == "lazy_plan":
-                                    return plan
-                                return plan.collect(
-                                    engine="streaming" if scope == "streaming_complete" else "auto"
-                                )
-
-                            for method in plans:
-                                for _ in range(args.warmups):
-                                    call(method)
-                            for sample in range(args.samples):
-                                methods = list(plans) if sample % 2 == 0 else list(reversed(plans))
-                                for method in methods:
-                                    begin = perf_counter_ns()
-                                    result = call(method)
-                                    elapsed = perf_counter_ns() - begin
-                                    if scope == "lazy_plan":
-                                        assert result.collect_schema() == expected.schema
-                                    else:
-                                        assert_frame_equal(result, expected)
-                                    del result
-                                    row = {
-                                        "case": case_id,
-                                        **dict(zip(DIMENSIONS, case)),
-                                        "seed": seed,
-                                        "n": n,
-                                        "operation": operation,
-                                        "scope": scope,
-                                        "method": method,
-                                        "sample": sample,
-                                        "ns": elapsed,
-                                        **stats,
-                                    }
-                                    if writer is None:
-                                        writer = csv.DictWriter(stream, fieldnames=list(row))
-                                        writer.writeheader()
-                                    writer.writerow(row)
-                        if args.memory and case[-1] == "memory":
-                            for method in plans:
-                                text = subprocess.check_output(
-                                    [
-                                        sys.executable,
-                                        "-m",
-                                        "benchmarks.set_geometry",
-                                        "--memory-worker",
-                                        str(case_id),
-                                        str(n),
-                                        str(seed),
-                                        operation,
-                                        method,
-                                    ],
-                                    cwd=ROOT,
-                                    text=True,
-                                )
-                                memories.append(json.loads(text))
-                    stream.flush()
-            print(f"case {case_id}: {case} complete", flush=True)
-    if args.memory:
-        memory.write_text(json.dumps(memories, indent=2) + "\n", encoding="utf-8")
-        metadata["memory_sha256"] = sha256(memory)
-    metadata.update(status="complete", raw_sha256=sha256(raw))
-    meta.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    run_polars(
+        "set_geometry",
+        parser,
+        parser.parse_args(),
+        CASES,
+        DIMENSIONS,
+        fixture,
+        solve,
+        statistics,
+        notes,
+        operations=("subtract", "intersect"),
+        memory_fields=memory_fields,
+    )
 
 
 if __name__ == "__main__":

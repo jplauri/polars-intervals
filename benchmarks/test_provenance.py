@@ -1,8 +1,10 @@
-"""Release identity, clean-tree provenance and core-runner evidence."""
+"""Release identity, clean-tree provenance and shared-runner evidence."""
 
+import importlib
 import json
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -123,3 +125,94 @@ sys.exit(int(sys.argv[2]))
         assert "raw_sha256" not in metadata
     if expected_code == 1:
         assert metadata["error"]
+
+
+RESULTS = Path(__file__).parent / "results"
+RETIRED_KEYS = {
+    "git_status",
+    "source_sha256",
+    "source_archive",
+    "source_archive_sha256",
+    "sources_unchanged_during_run",
+    "changed_sources_during_run",
+}
+
+
+def saved_metadata(stem):
+    return json.loads((RESULTS / f"{stem}.metadata.json").read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize(
+    "runner,saved,flags",
+    [
+        ("interval_geometry", "interval-geometry-polars-20260929", []),
+        ("set_geometry", "set-geometry-polars-repeat-20261001", []),
+        ("coverage_stats", "coverage-stats-polars-local", []),
+        ("coverage_profile", "coverage-profile-lazy-20260929", ["--lazy"]),
+    ],
+)
+def test_polars_runners_keep_saved_columns_and_keys(monkeypatch, tmp_path, runner, saved, flags):
+    module = importlib.import_module(f"benchmarks.{runner}")
+    monkeypatch.setattr(provenance, "command", lambda *args: "")
+    monkeypatch.setattr(provenance, "verify_release", Path)
+    output = tmp_path / "run"
+    arguments = ["--sizes", "8", "--seeds", "7", "--cases", "0", "--samples", "1", "--warmups", "1"]
+    monkeypatch.setattr(sys, "argv", [runner, "--output", str(output), *arguments, *flags])
+    module.main()
+    headers = [
+        path.read_text(encoding="utf-8").splitlines()[0]
+        for path in (output.with_suffix(".csv"), RESULTS / f"{saved}.csv")
+    ]
+    assert headers[0] == headers[1]
+    fresh = json.loads(output.with_suffix(".metadata.json").read_text(encoding="utf-8"))
+    recorded = saved_metadata(saved)
+    assert fresh["status"] == "complete"
+    assert set(fresh) - {"cpu_name"} == set(recorded) - RETIRED_KEYS - {"cpu_name"}
+    assert set(fresh["settings"]) == set(recorded["settings"])
+
+
+@pytest.mark.parametrize(
+    "runner,saved,worker",
+    [
+        ("interval_geometry", "interval-geometry-polars-memory-20260929", "0 8 7 merge native"),
+        ("set_geometry", "set-geometry-polars-memory-20261001", "0 8 7 subtract native"),
+        ("coverage_stats", "coverage-stats-polars-modes", "0 8 7 native"),
+    ],
+)
+def test_memory_workers_keep_saved_fields(monkeypatch, capsys, runner, saved, worker):
+    module = importlib.import_module(f"benchmarks.{runner}")
+    monkeypatch.setattr(sys, "argv", [runner, "--memory-worker", *worker.split()])
+    module.main()
+    recorded = json.loads((RESULTS / f"{saved}.memory.json").read_text(encoding="utf-8"))
+    assert set(json.loads(capsys.readouterr().out)) == set(recorded[0])
+
+
+@pytest.mark.parametrize(
+    "runner,saved",
+    [
+        ("interval_geometry_core", "interval-geometry-core-final-20260929"),
+        ("set_geometry_core", "set-geometry-core-million-20260930"),
+        ("coverage_stats_core", "coverage-stats-core-production"),
+        ("coverage_profile_core", "coverage-profile-core-final-20260929"),
+    ],
+)
+def test_core_runners_keep_saved_settings(monkeypatch, tmp_path, runner, saved):
+    monkeypatch.syspath_prepend(str(Path(__file__).parent))
+    module = importlib.import_module(runner)
+    calls = []
+
+    def record(output, settings, invocation, metadata):
+        calls.append((output, settings, invocation))
+        return 0
+
+    monkeypatch.setitem(module.run_core.__globals__, "run_cargo_bench", record)
+    monkeypatch.setitem(module.run_core.__globals__, "command", lambda *args: "")
+    monkeypatch.setattr(sys, "argv", [runner, "--output", str(tmp_path / "run")])
+    with pytest.raises(SystemExit) as error:
+        module.main()
+    assert error.value.code == 0
+    output, settings, invocation = calls[0]
+    recorded = saved_metadata(saved)
+    assert output.name == "run.csv"
+    assert set(settings) == set(recorded["settings"])
+    assert invocation == recorded["cargo_command"]
