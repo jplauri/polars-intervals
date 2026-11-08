@@ -1,0 +1,2881 @@
+run,n,k,dtype,sample,ns,objective
+separate,1000,0,Int64,0,322000,0
+separate,1000,0,Int64,1,191300,0
+separate,1000,0,Int64,2,192600,0
+separate,1000,0,Date,0,267200,0
+separate,1000,0,Date,1,202800,0
+separate,1000,0,Date,2,247000,0
+separate,1000,0,"Datetime(time_unit='us', time_zone=None)",0,184200,0
+separate,1000,0,"Datetime(time_unit='us', time_zone=None)",1,167000,0
+separate,1000,0,"Datetime(time_unit='us', time_zone=None)",2,164700,0
+separate,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,167100,0
+separate,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,202400,0
+separate,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,182000,0
+separate,1000,1,Int64,0,204400,1000
+separate,1000,1,Int64,1,177100,1000
+separate,1000,1,Int64,2,169800,1000
+separate,1000,1,Date,0,191900,1000
+separate,1000,1,Date,1,181500,1000
+separate,1000,1,Date,2,184100,1000
+separate,1000,1,"Datetime(time_unit='us', time_zone=None)",0,194100,1000
+separate,1000,1,"Datetime(time_unit='us', time_zone=None)",1,182700,1000
+separate,1000,1,"Datetime(time_unit='us', time_zone=None)",2,178900,1000
+separate,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,200200,1000
+separate,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,232200,1000
+separate,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,178700,1000
+separate,1000,2,Int64,0,259900,1968
+separate,1000,2,Int64,1,330500,1968
+separate,1000,2,Int64,2,271000,1968
+separate,1000,2,Date,0,304900,1968
+separate,1000,2,Date,1,311900,1968
+separate,1000,2,Date,2,277600,1968
+separate,1000,2,"Datetime(time_unit='us', time_zone=None)",0,279300,1968
+separate,1000,2,"Datetime(time_unit='us', time_zone=None)",1,280500,1968
+separate,1000,2,"Datetime(time_unit='us', time_zone=None)",2,330100,1968
+separate,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,313900,1968
+separate,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,280800,1968
+separate,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,281800,1968
+separate,1000,4,Int64,0,306600,3808
+separate,1000,4,Int64,1,283200,3808
+separate,1000,4,Int64,2,307900,3808
+separate,1000,4,Date,0,323700,3808
+separate,1000,4,Date,1,314400,3808
+separate,1000,4,Date,2,316400,3808
+separate,1000,4,"Datetime(time_unit='us', time_zone=None)",0,338300,3808
+separate,1000,4,"Datetime(time_unit='us', time_zone=None)",1,332900,3808
+separate,1000,4,"Datetime(time_unit='us', time_zone=None)",2,323200,3808
+separate,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,342200,3808
+separate,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,316100,3808
+separate,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,328900,3808
+separate,1000,8,Int64,0,414500,7104
+separate,1000,8,Int64,1,494800,7104
+separate,1000,8,Int64,2,415700,7104
+separate,1000,8,Date,0,516600,7104
+separate,1000,8,Date,1,421900,7104
+separate,1000,8,Date,2,410800,7104
+separate,1000,8,"Datetime(time_unit='us', time_zone=None)",0,439300,7104
+separate,1000,8,"Datetime(time_unit='us', time_zone=None)",1,420500,7104
+separate,1000,8,"Datetime(time_unit='us', time_zone=None)",2,493000,7104
+separate,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,428600,7104
+separate,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,424400,7104
+separate,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,424600,7104
+separate,1000,16,Int64,0,560100,12188
+separate,1000,16,Int64,1,554500,12188
+separate,1000,16,Int64,2,562400,12188
+separate,1000,16,Date,0,563500,12188
+separate,1000,16,Date,1,553000,12188
+separate,1000,16,Date,2,586100,12188
+separate,1000,16,"Datetime(time_unit='us', time_zone=None)",0,554100,12188
+separate,1000,16,"Datetime(time_unit='us', time_zone=None)",1,571500,12188
+separate,1000,16,"Datetime(time_unit='us', time_zone=None)",2,556100,12188
+separate,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,565700,12188
+separate,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,623100,12188
+separate,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,658700,12188
+separate,1000,31,Int64,0,773800,16373
+separate,1000,31,Int64,1,748000,16373
+separate,1000,31,Int64,2,662500,16373
+separate,1000,31,Date,0,691900,16373
+separate,1000,31,Date,1,714400,16373
+separate,1000,31,Date,2,783700,16373
+separate,1000,31,"Datetime(time_unit='us', time_zone=None)",0,1033700,16373
+separate,1000,31,"Datetime(time_unit='us', time_zone=None)",1,988900,16373
+separate,1000,31,"Datetime(time_unit='us', time_zone=None)",2,736600,16373
+separate,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,796500,16373
+separate,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,712000,16373
+separate,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,712600,16373
+separate,1000,32,Int64,0,182500,16404
+separate,1000,32,Int64,1,262700,16404
+separate,1000,32,Int64,2,187700,16404
+separate,1000,32,Date,0,211800,16404
+separate,1000,32,Date,1,191100,16404
+separate,1000,32,Date,2,179500,16404
+separate,1000,32,"Datetime(time_unit='us', time_zone=None)",0,206300,16404
+separate,1000,32,"Datetime(time_unit='us', time_zone=None)",1,182400,16404
+separate,1000,32,"Datetime(time_unit='us', time_zone=None)",2,192800,16404
+separate,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,219400,16404
+separate,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,197500,16404
+separate,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,178600,16404
+separate,1000,33,Int64,0,187900,16404
+separate,1000,33,Int64,1,189000,16404
+separate,1000,33,Int64,2,208400,16404
+separate,1000,33,Date,0,211300,16404
+separate,1000,33,Date,1,181000,16404
+separate,1000,33,Date,2,166600,16404
+separate,1000,33,"Datetime(time_unit='us', time_zone=None)",0,222500,16404
+separate,1000,33,"Datetime(time_unit='us', time_zone=None)",1,230700,16404
+separate,1000,33,"Datetime(time_unit='us', time_zone=None)",2,248300,16404
+separate,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,178300,16404
+separate,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,198600,16404
+separate,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,188100,16404
+separate,1000,64,Int64,0,176700,16404
+separate,1000,64,Int64,1,202100,16404
+separate,1000,64,Int64,2,269800,16404
+separate,1000,64,Date,0,202000,16404
+separate,1000,64,Date,1,161400,16404
+separate,1000,64,Date,2,230500,16404
+separate,1000,64,"Datetime(time_unit='us', time_zone=None)",0,188500,16404
+separate,1000,64,"Datetime(time_unit='us', time_zone=None)",1,192000,16404
+separate,1000,64,"Datetime(time_unit='us', time_zone=None)",2,173300,16404
+separate,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,202300,16404
+separate,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,182400,16404
+separate,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,208200,16404
+separate,10000,0,Int64,0,238600,0
+separate,10000,0,Int64,1,215800,0
+separate,10000,0,Int64,2,192200,0
+separate,10000,0,Date,0,207100,0
+separate,10000,0,Date,1,176800,0
+separate,10000,0,Date,2,198700,0
+separate,10000,0,"Datetime(time_unit='us', time_zone=None)",0,248000,0
+separate,10000,0,"Datetime(time_unit='us', time_zone=None)",1,204200,0
+separate,10000,0,"Datetime(time_unit='us', time_zone=None)",2,250100,0
+separate,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,220700,0
+separate,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,232200,0
+separate,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,221600,0
+separate,10000,1,Int64,0,401200,10000
+separate,10000,1,Int64,1,290600,10000
+separate,10000,1,Int64,2,409300,10000
+separate,10000,1,Date,0,395300,10000
+separate,10000,1,Date,1,289500,10000
+separate,10000,1,Date,2,326500,10000
+separate,10000,1,"Datetime(time_unit='us', time_zone=None)",0,305200,10000
+separate,10000,1,"Datetime(time_unit='us', time_zone=None)",1,373100,10000
+separate,10000,1,"Datetime(time_unit='us', time_zone=None)",2,395100,10000
+separate,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,298300,10000
+separate,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,304500,10000
+separate,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,293900,10000
+separate,10000,2,Int64,0,1522100,19687
+separate,10000,2,Int64,1,1476600,19687
+separate,10000,2,Int64,2,1447100,19687
+separate,10000,2,Date,0,1273200,19687
+separate,10000,2,Date,1,1045400,19687
+separate,10000,2,Date,2,1059500,19687
+separate,10000,2,"Datetime(time_unit='us', time_zone=None)",0,1508400,19687
+separate,10000,2,"Datetime(time_unit='us', time_zone=None)",1,1460800,19687
+separate,10000,2,"Datetime(time_unit='us', time_zone=None)",2,1444700,19687
+separate,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,1383300,19687
+separate,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,1502600,19687
+separate,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,1471200,19687
+separate,10000,4,Int64,0,2032300,38122
+separate,10000,4,Int64,1,2135700,38122
+separate,10000,4,Int64,2,2073000,38122
+separate,10000,4,Date,0,1826700,38122
+separate,10000,4,Date,1,1569300,38122
+separate,10000,4,Date,2,1594100,38122
+separate,10000,4,"Datetime(time_unit='us', time_zone=None)",0,2100300,38122
+separate,10000,4,"Datetime(time_unit='us', time_zone=None)",1,2326100,38122
+separate,10000,4,"Datetime(time_unit='us', time_zone=None)",2,2016200,38122
+separate,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,1977400,38122
+separate,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,2091600,38122
+separate,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,2216000,38122
+separate,10000,8,Int64,0,1626500,71236
+separate,10000,8,Int64,1,1540800,71236
+separate,10000,8,Int64,2,1533900,71236
+separate,10000,8,Date,0,1460500,71236
+separate,10000,8,Date,1,1353500,71236
+separate,10000,8,Date,2,1507900,71236
+separate,10000,8,"Datetime(time_unit='us', time_zone=None)",0,1507100,71236
+separate,10000,8,"Datetime(time_unit='us', time_zone=None)",1,1502000,71236
+separate,10000,8,"Datetime(time_unit='us', time_zone=None)",2,1460700,71236
+separate,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,1569800,71236
+separate,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,1454700,71236
+separate,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,1449800,71236
+separate,10000,16,Int64,0,1640300,122440
+separate,10000,16,Int64,1,1698900,122440
+separate,10000,16,Int64,2,1638400,122440
+separate,10000,16,Date,0,1528100,122440
+separate,10000,16,Date,1,1543900,122440
+separate,10000,16,Date,2,1554200,122440
+separate,10000,16,"Datetime(time_unit='us', time_zone=None)",0,1814500,122440
+separate,10000,16,"Datetime(time_unit='us', time_zone=None)",1,1731900,122440
+separate,10000,16,"Datetime(time_unit='us', time_zone=None)",2,1813700,122440
+separate,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,1777600,122440
+separate,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,1704700,122440
+separate,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,1787000,122440
+separate,10000,31,Int64,0,1908800,164560
+separate,10000,31,Int64,1,1862600,164560
+separate,10000,31,Int64,2,1905400,164560
+separate,10000,31,Date,0,1734300,164560
+separate,10000,31,Date,1,1812700,164560
+separate,10000,31,Date,2,1712400,164560
+separate,10000,31,"Datetime(time_unit='us', time_zone=None)",0,1957200,164560
+separate,10000,31,"Datetime(time_unit='us', time_zone=None)",1,1910200,164560
+separate,10000,31,"Datetime(time_unit='us', time_zone=None)",2,1906200,164560
+separate,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,1910400,164560
+separate,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,2094000,164560
+separate,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,2204800,164560
+separate,10000,32,Int64,0,696300,164872
+separate,10000,32,Int64,1,694600,164872
+separate,10000,32,Int64,2,688300,164872
+separate,10000,32,Date,0,479000,164872
+separate,10000,32,Date,1,295600,164872
+separate,10000,32,Date,2,395700,164872
+separate,10000,32,"Datetime(time_unit='us', time_zone=None)",0,702800,164872
+separate,10000,32,"Datetime(time_unit='us', time_zone=None)",1,641900,164872
+separate,10000,32,"Datetime(time_unit='us', time_zone=None)",2,687100,164872
+separate,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,685700,164872
+separate,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,605200,164872
+separate,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,661200,164872
+separate,10000,33,Int64,0,658500,164872
+separate,10000,33,Int64,1,629800,164872
+separate,10000,33,Int64,2,667900,164872
+separate,10000,33,Date,0,258200,164872
+separate,10000,33,Date,1,295700,164872
+separate,10000,33,Date,2,412600,164872
+separate,10000,33,"Datetime(time_unit='us', time_zone=None)",0,611900,164872
+separate,10000,33,"Datetime(time_unit='us', time_zone=None)",1,607700,164872
+separate,10000,33,"Datetime(time_unit='us', time_zone=None)",2,613700,164872
+separate,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,602600,164872
+separate,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,634700,164872
+separate,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,691500,164872
+separate,10000,64,Int64,0,598500,164872
+separate,10000,64,Int64,1,611900,164872
+separate,10000,64,Int64,2,631500,164872
+separate,10000,64,Date,0,293900,164872
+separate,10000,64,Date,1,263000,164872
+separate,10000,64,Date,2,450500,164872
+separate,10000,64,"Datetime(time_unit='us', time_zone=None)",0,673800,164872
+separate,10000,64,"Datetime(time_unit='us', time_zone=None)",1,625800,164872
+separate,10000,64,"Datetime(time_unit='us', time_zone=None)",2,588300,164872
+separate,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,601300,164872
+separate,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,715900,164872
+separate,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,636400,164872
+separate,100000,0,Int64,0,812100,0
+separate,100000,0,Int64,1,723200,0
+separate,100000,0,Int64,2,756700,0
+separate,100000,0,Date,0,770000,0
+separate,100000,0,Date,1,749100,0
+separate,100000,0,Date,2,773100,0
+separate,100000,0,"Datetime(time_unit='us', time_zone=None)",0,760600,0
+separate,100000,0,"Datetime(time_unit='us', time_zone=None)",1,778300,0
+separate,100000,0,"Datetime(time_unit='us', time_zone=None)",2,830900,0
+separate,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,806100,0
+separate,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,767300,0
+separate,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,746100,0
+separate,100000,1,Int64,0,2910600,100000
+separate,100000,1,Int64,1,2731100,100000
+separate,100000,1,Int64,2,2803800,100000
+separate,100000,1,Date,0,2758800,100000
+separate,100000,1,Date,1,2636700,100000
+separate,100000,1,Date,2,2754400,100000
+separate,100000,1,"Datetime(time_unit='us', time_zone=None)",0,2746900,100000
+separate,100000,1,"Datetime(time_unit='us', time_zone=None)",1,2711100,100000
+separate,100000,1,"Datetime(time_unit='us', time_zone=None)",2,2737600,100000
+separate,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,2798600,100000
+separate,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,2664200,100000
+separate,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,2712600,100000
+separate,100000,2,Int64,0,6026100,196875
+separate,100000,2,Int64,1,5889200,196875
+separate,100000,2,Int64,2,5917700,196875
+separate,100000,2,Date,0,5135600,196875
+separate,100000,2,Date,1,4870000,196875
+separate,100000,2,Date,2,4741600,196875
+separate,100000,2,"Datetime(time_unit='us', time_zone=None)",0,5824300,196875
+separate,100000,2,"Datetime(time_unit='us', time_zone=None)",1,5752800,196875
+separate,100000,2,"Datetime(time_unit='us', time_zone=None)",2,5864600,196875
+separate,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,5661900,196875
+separate,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,6078000,196875
+separate,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,5824700,196875
+separate,100000,4,Int64,0,6698700,381250
+separate,100000,4,Int64,1,6595400,381250
+separate,100000,4,Int64,2,6562800,381250
+separate,100000,4,Date,0,5686500,381250
+separate,100000,4,Date,1,5655000,381250
+separate,100000,4,Date,2,5592800,381250
+separate,100000,4,"Datetime(time_unit='us', time_zone=None)",0,6754600,381250
+separate,100000,4,"Datetime(time_unit='us', time_zone=None)",1,6784300,381250
+separate,100000,4,"Datetime(time_unit='us', time_zone=None)",2,6731300,381250
+separate,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,6649100,381250
+separate,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,6461600,381250
+separate,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,6549200,381250
+separate,100000,8,Int64,0,8412500,712500
+separate,100000,8,Int64,1,8237400,712500
+separate,100000,8,Int64,2,8413100,712500
+separate,100000,8,Date,0,7308000,712500
+separate,100000,8,Date,1,7278400,712500
+separate,100000,8,Date,2,7161800,712500
+separate,100000,8,"Datetime(time_unit='us', time_zone=None)",0,8261300,712500
+separate,100000,8,"Datetime(time_unit='us', time_zone=None)",1,8284700,712500
+separate,100000,8,"Datetime(time_unit='us', time_zone=None)",2,8343400,712500
+separate,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,8345800,712500
+separate,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,8931400,712500
+separate,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,8248400,712500
+separate,100000,16,Int64,0,9834100,1225000
+separate,100000,16,Int64,1,10155100,1225000
+separate,100000,16,Int64,2,9861700,1225000
+separate,100000,16,Date,0,8951300,1225000
+separate,100000,16,Date,1,8864400,1225000
+separate,100000,16,Date,2,8767600,1225000
+separate,100000,16,"Datetime(time_unit='us', time_zone=None)",0,10092800,1225000
+separate,100000,16,"Datetime(time_unit='us', time_zone=None)",1,9817500,1225000
+separate,100000,16,"Datetime(time_unit='us', time_zone=None)",2,9961600,1225000
+separate,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,9903100,1225000
+separate,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,9979000,1225000
+separate,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,10087200,1225000
+separate,100000,31,Int64,0,11809200,1646875
+separate,100000,31,Int64,1,11881600,1646875
+separate,100000,31,Int64,2,11686200,1646875
+separate,100000,31,Date,0,11051800,1646875
+separate,100000,31,Date,1,10679100,1646875
+separate,100000,31,Date,2,11038700,1646875
+separate,100000,31,"Datetime(time_unit='us', time_zone=None)",0,12287300,1646875
+separate,100000,31,"Datetime(time_unit='us', time_zone=None)",1,12073200,1646875
+separate,100000,31,"Datetime(time_unit='us', time_zone=None)",2,13139600,1646875
+separate,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,11969200,1646875
+separate,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,12064900,1646875
+separate,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,11783300,1646875
+separate,100000,32,Int64,0,3793300,1650000
+separate,100000,32,Int64,1,3370500,1650000
+separate,100000,32,Int64,2,3622400,1650000
+separate,100000,32,Date,0,2808000,1650000
+separate,100000,32,Date,1,2848300,1650000
+separate,100000,32,Date,2,2758100,1650000
+separate,100000,32,"Datetime(time_unit='us', time_zone=None)",0,3604100,1650000
+separate,100000,32,"Datetime(time_unit='us', time_zone=None)",1,3500200,1650000
+separate,100000,32,"Datetime(time_unit='us', time_zone=None)",2,3502700,1650000
+separate,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,3538100,1650000
+separate,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,3555300,1650000
+separate,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,3510500,1650000
+separate,100000,33,Int64,0,3572100,1650000
+separate,100000,33,Int64,1,3577000,1650000
+separate,100000,33,Int64,2,3577600,1650000
+separate,100000,33,Date,0,2809400,1650000
+separate,100000,33,Date,1,2848000,1650000
+separate,100000,33,Date,2,2814300,1650000
+separate,100000,33,"Datetime(time_unit='us', time_zone=None)",0,3489800,1650000
+separate,100000,33,"Datetime(time_unit='us', time_zone=None)",1,3406900,1650000
+separate,100000,33,"Datetime(time_unit='us', time_zone=None)",2,3546900,1650000
+separate,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,3551300,1650000
+separate,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,3487300,1650000
+separate,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,3518800,1650000
+separate,100000,64,Int64,0,3754900,1650000
+separate,100000,64,Int64,1,3693000,1650000
+separate,100000,64,Int64,2,3705900,1650000
+separate,100000,64,Date,0,2818000,1650000
+separate,100000,64,Date,1,2944600,1650000
+separate,100000,64,Date,2,2925600,1650000
+separate,100000,64,"Datetime(time_unit='us', time_zone=None)",0,3667200,1650000
+separate,100000,64,"Datetime(time_unit='us', time_zone=None)",1,3742800,1650000
+separate,100000,64,"Datetime(time_unit='us', time_zone=None)",2,3674400,1650000
+separate,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,3558200,1650000
+separate,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,4472400,1650000
+separate,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,3738900,1650000
+separate,1000000,0,Int64,0,7064200,0
+separate,1000000,0,Int64,1,6860100,0
+separate,1000000,0,Int64,2,6626900,0
+separate,1000000,0,Date,0,6421400,0
+separate,1000000,0,Date,1,6410200,0
+separate,1000000,0,Date,2,6620300,0
+separate,1000000,0,"Datetime(time_unit='us', time_zone=None)",0,6752900,0
+separate,1000000,0,"Datetime(time_unit='us', time_zone=None)",1,6773600,0
+separate,1000000,0,"Datetime(time_unit='us', time_zone=None)",2,6497300,0
+separate,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,6674500,0
+separate,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,6971900,0
+separate,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,6740000,0
+separate,1000000,1,Int64,0,25486700,1000000
+separate,1000000,1,Int64,1,25629100,1000000
+separate,1000000,1,Int64,2,25446500,1000000
+separate,1000000,1,Date,0,24425800,1000000
+separate,1000000,1,Date,1,24172300,1000000
+separate,1000000,1,Date,2,24011900,1000000
+separate,1000000,1,"Datetime(time_unit='us', time_zone=None)",0,25913600,1000000
+separate,1000000,1,"Datetime(time_unit='us', time_zone=None)",1,25499100,1000000
+separate,1000000,1,"Datetime(time_unit='us', time_zone=None)",2,25662200,1000000
+separate,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,25170000,1000000
+separate,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,25357600,1000000
+separate,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,25373200,1000000
+separate,1000000,2,Int64,0,69759600,1968750
+separate,1000000,2,Int64,1,65134700,1968750
+separate,1000000,2,Int64,2,59481100,1968750
+separate,1000000,2,Date,0,51566000,1968750
+separate,1000000,2,Date,1,54123700,1968750
+separate,1000000,2,Date,2,52944400,1968750
+separate,1000000,2,"Datetime(time_unit='us', time_zone=None)",0,64201600,1968750
+separate,1000000,2,"Datetime(time_unit='us', time_zone=None)",1,64690200,1968750
+separate,1000000,2,"Datetime(time_unit='us', time_zone=None)",2,67316000,1968750
+separate,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,66405600,1968750
+separate,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,64630900,1968750
+separate,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,67000400,1968750
+separate,1000000,4,Int64,0,76924400,3812500
+separate,1000000,4,Int64,1,78210400,3812500
+separate,1000000,4,Int64,2,75196800,3812500
+separate,1000000,4,Date,0,61396300,3812500
+separate,1000000,4,Date,1,63419500,3812500
+separate,1000000,4,Date,2,62789600,3812500
+separate,1000000,4,"Datetime(time_unit='us', time_zone=None)",0,76348000,3812500
+separate,1000000,4,"Datetime(time_unit='us', time_zone=None)",1,75349400,3812500
+separate,1000000,4,"Datetime(time_unit='us', time_zone=None)",2,77144600,3812500
+separate,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,76045100,3812500
+separate,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,75556300,3812500
+separate,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,75961000,3812500
+separate,1000000,8,Int64,0,98333400,7125000
+separate,1000000,8,Int64,1,98096700,7125000
+separate,1000000,8,Int64,2,94454100,7125000
+separate,1000000,8,Date,0,85947400,7125000
+separate,1000000,8,Date,1,84311900,7125000
+separate,1000000,8,Date,2,84617600,7125000
+separate,1000000,8,"Datetime(time_unit='us', time_zone=None)",0,98943200,7125000
+separate,1000000,8,"Datetime(time_unit='us', time_zone=None)",1,99165700,7125000
+separate,1000000,8,"Datetime(time_unit='us', time_zone=None)",2,97814900,7125000
+separate,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,100076700,7125000
+separate,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,97325400,7125000
+separate,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,98109900,7125000
+separate,1000000,16,Int64,0,120138000,12250000
+separate,1000000,16,Int64,1,128066200,12250000
+separate,1000000,16,Int64,2,125901900,12250000
+separate,1000000,16,Date,0,109770000,12250000
+separate,1000000,16,Date,1,112216400,12250000
+separate,1000000,16,Date,2,113431900,12250000
+separate,1000000,16,"Datetime(time_unit='us', time_zone=None)",0,129234900,12250000
+separate,1000000,16,"Datetime(time_unit='us', time_zone=None)",1,129614700,12250000
+separate,1000000,16,"Datetime(time_unit='us', time_zone=None)",2,127125400,12250000
+separate,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,123149900,12250000
+separate,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,105462100,12250000
+separate,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,127822600,12250000
+separate,1000000,31,Int64,0,157029100,16468750
+separate,1000000,31,Int64,1,160993900,16468750
+separate,1000000,31,Int64,2,157163300,16468750
+separate,1000000,31,Date,0,149232000,16468750
+separate,1000000,31,Date,1,134279800,16468750
+separate,1000000,31,Date,2,143007000,16468750
+separate,1000000,31,"Datetime(time_unit='us', time_zone=None)",0,154886400,16468750
+separate,1000000,31,"Datetime(time_unit='us', time_zone=None)",1,157574100,16468750
+separate,1000000,31,"Datetime(time_unit='us', time_zone=None)",2,157769500,16468750
+separate,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,156366500,16468750
+separate,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,155553200,16468750
+separate,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,154220300,16468750
+separate,1000000,32,Int64,0,39423700,16500000
+separate,1000000,32,Int64,1,42365600,16500000
+separate,1000000,32,Int64,2,40892000,16500000
+separate,1000000,32,Date,0,28921900,16500000
+separate,1000000,32,Date,1,30066500,16500000
+separate,1000000,32,Date,2,29265400,16500000
+separate,1000000,32,"Datetime(time_unit='us', time_zone=None)",0,39639200,16500000
+separate,1000000,32,"Datetime(time_unit='us', time_zone=None)",1,39528100,16500000
+separate,1000000,32,"Datetime(time_unit='us', time_zone=None)",2,39884100,16500000
+separate,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,39356000,16500000
+separate,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,39442400,16500000
+separate,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,39736600,16500000
+separate,1000000,33,Int64,0,39136500,16500000
+separate,1000000,33,Int64,1,39617200,16500000
+separate,1000000,33,Int64,2,39667300,16500000
+separate,1000000,33,Date,0,29194900,16500000
+separate,1000000,33,Date,1,29103400,16500000
+separate,1000000,33,Date,2,29378400,16500000
+separate,1000000,33,"Datetime(time_unit='us', time_zone=None)",0,39339600,16500000
+separate,1000000,33,"Datetime(time_unit='us', time_zone=None)",1,39732500,16500000
+separate,1000000,33,"Datetime(time_unit='us', time_zone=None)",2,39375000,16500000
+separate,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,44255200,16500000
+separate,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,42141300,16500000
+separate,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,42934400,16500000
+separate,1000000,64,Int64,0,39090900,16500000
+separate,1000000,64,Int64,1,39615400,16500000
+separate,1000000,64,Int64,2,39666200,16500000
+separate,1000000,64,Date,0,29475200,16500000
+separate,1000000,64,Date,1,29516100,16500000
+separate,1000000,64,Date,2,29120900,16500000
+separate,1000000,64,"Datetime(time_unit='us', time_zone=None)",0,39354900,16500000
+separate,1000000,64,"Datetime(time_unit='us', time_zone=None)",1,39088600,16500000
+separate,1000000,64,"Datetime(time_unit='us', time_zone=None)",2,39432300,16500000
+separate,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,39242700,16500000
+separate,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,38983500,16500000
+separate,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,39327100,16500000
+shared,1000,0,Int64,0,284200,0
+shared,1000,0,Int64,1,159000,0
+shared,1000,0,Int64,2,141300,0
+shared,1000,0,Date,0,207800,0
+shared,1000,0,Date,1,296500,0
+shared,1000,0,Date,2,162800,0
+shared,1000,0,"Datetime(time_unit='us', time_zone=None)",0,163800,0
+shared,1000,0,"Datetime(time_unit='us', time_zone=None)",1,172600,0
+shared,1000,0,"Datetime(time_unit='us', time_zone=None)",2,170900,0
+shared,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,154600,0
+shared,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,155000,0
+shared,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,171000,0
+shared,1000,1,Int64,0,203700,1000
+shared,1000,1,Int64,1,170300,1000
+shared,1000,1,Int64,2,197600,1000
+shared,1000,1,Date,0,170300,1000
+shared,1000,1,Date,1,167900,1000
+shared,1000,1,Date,2,174400,1000
+shared,1000,1,"Datetime(time_unit='us', time_zone=None)",0,164100,1000
+shared,1000,1,"Datetime(time_unit='us', time_zone=None)",1,168700,1000
+shared,1000,1,"Datetime(time_unit='us', time_zone=None)",2,189000,1000
+shared,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,187200,1000
+shared,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,175200,1000
+shared,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,181300,1000
+shared,1000,2,Int64,0,284400,1968
+shared,1000,2,Int64,1,292400,1968
+shared,1000,2,Int64,2,296000,1968
+shared,1000,2,Date,0,307800,1968
+shared,1000,2,Date,1,298400,1968
+shared,1000,2,Date,2,310800,1968
+shared,1000,2,"Datetime(time_unit='us', time_zone=None)",0,247200,1968
+shared,1000,2,"Datetime(time_unit='us', time_zone=None)",1,315600,1968
+shared,1000,2,"Datetime(time_unit='us', time_zone=None)",2,315300,1968
+shared,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,281300,1968
+shared,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,273300,1968
+shared,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,271300,1968
+shared,1000,4,Int64,0,312000,3808
+shared,1000,4,Int64,1,381400,3808
+shared,1000,4,Int64,2,346600,3808
+shared,1000,4,Date,0,361400,3808
+shared,1000,4,Date,1,345300,3808
+shared,1000,4,Date,2,327500,3808
+shared,1000,4,"Datetime(time_unit='us', time_zone=None)",0,342600,3808
+shared,1000,4,"Datetime(time_unit='us', time_zone=None)",1,332800,3808
+shared,1000,4,"Datetime(time_unit='us', time_zone=None)",2,391800,3808
+shared,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,363200,3808
+shared,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,344200,3808
+shared,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,346300,3808
+shared,1000,8,Int64,0,442100,7104
+shared,1000,8,Int64,1,447100,7104
+shared,1000,8,Int64,2,443300,7104
+shared,1000,8,Date,0,454100,7104
+shared,1000,8,Date,1,455500,7104
+shared,1000,8,Date,2,436700,7104
+shared,1000,8,"Datetime(time_unit='us', time_zone=None)",0,424100,7104
+shared,1000,8,"Datetime(time_unit='us', time_zone=None)",1,452000,7104
+shared,1000,8,"Datetime(time_unit='us', time_zone=None)",2,430200,7104
+shared,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,432400,7104
+shared,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,453000,7104
+shared,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,436100,7104
+shared,1000,16,Int64,0,616900,12188
+shared,1000,16,Int64,1,589700,12188
+shared,1000,16,Int64,2,608900,12188
+shared,1000,16,Date,0,603300,12188
+shared,1000,16,Date,1,575000,12188
+shared,1000,16,Date,2,562900,12188
+shared,1000,16,"Datetime(time_unit='us', time_zone=None)",0,595100,12188
+shared,1000,16,"Datetime(time_unit='us', time_zone=None)",1,597000,12188
+shared,1000,16,"Datetime(time_unit='us', time_zone=None)",2,598200,12188
+shared,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,585800,12188
+shared,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,594200,12188
+shared,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,597000,12188
+shared,1000,31,Int64,0,768600,16373
+shared,1000,31,Int64,1,751300,16373
+shared,1000,31,Int64,2,764600,16373
+shared,1000,31,Date,0,755900,16373
+shared,1000,31,Date,1,774300,16373
+shared,1000,31,Date,2,749700,16373
+shared,1000,31,"Datetime(time_unit='us', time_zone=None)",0,777000,16373
+shared,1000,31,"Datetime(time_unit='us', time_zone=None)",1,827400,16373
+shared,1000,31,"Datetime(time_unit='us', time_zone=None)",2,785000,16373
+shared,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,775800,16373
+shared,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,747100,16373
+shared,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,746500,16373
+shared,1000,32,Int64,0,195200,16404
+shared,1000,32,Int64,1,188100,16404
+shared,1000,32,Int64,2,287300,16404
+shared,1000,32,Date,0,231900,16404
+shared,1000,32,Date,1,196200,16404
+shared,1000,32,Date,2,214100,16404
+shared,1000,32,"Datetime(time_unit='us', time_zone=None)",0,213700,16404
+shared,1000,32,"Datetime(time_unit='us', time_zone=None)",1,196500,16404
+shared,1000,32,"Datetime(time_unit='us', time_zone=None)",2,213900,16404
+shared,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,183000,16404
+shared,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,187500,16404
+shared,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,206600,16404
+shared,1000,33,Int64,0,196900,16404
+shared,1000,33,Int64,1,207900,16404
+shared,1000,33,Int64,2,227900,16404
+shared,1000,33,Date,0,197700,16404
+shared,1000,33,Date,1,186900,16404
+shared,1000,33,Date,2,228900,16404
+shared,1000,33,"Datetime(time_unit='us', time_zone=None)",0,187000,16404
+shared,1000,33,"Datetime(time_unit='us', time_zone=None)",1,190900,16404
+shared,1000,33,"Datetime(time_unit='us', time_zone=None)",2,174800,16404
+shared,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,199600,16404
+shared,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,199800,16404
+shared,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,186000,16404
+shared,1000,64,Int64,0,165000,16404
+shared,1000,64,Int64,1,168500,16404
+shared,1000,64,Int64,2,167800,16404
+shared,1000,64,Date,0,206400,16404
+shared,1000,64,Date,1,210100,16404
+shared,1000,64,Date,2,189000,16404
+shared,1000,64,"Datetime(time_unit='us', time_zone=None)",0,177500,16404
+shared,1000,64,"Datetime(time_unit='us', time_zone=None)",1,187900,16404
+shared,1000,64,"Datetime(time_unit='us', time_zone=None)",2,184200,16404
+shared,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,220200,16404
+shared,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,189900,16404
+shared,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,199500,16404
+shared,10000,0,Int64,0,252700,0
+shared,10000,0,Int64,1,209900,0
+shared,10000,0,Int64,2,194500,0
+shared,10000,0,Date,0,236500,0
+shared,10000,0,Date,1,203400,0
+shared,10000,0,Date,2,202100,0
+shared,10000,0,"Datetime(time_unit='us', time_zone=None)",0,204300,0
+shared,10000,0,"Datetime(time_unit='us', time_zone=None)",1,207400,0
+shared,10000,0,"Datetime(time_unit='us', time_zone=None)",2,207200,0
+shared,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,218100,0
+shared,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,196500,0
+shared,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,185900,0
+shared,10000,1,Int64,0,418400,10000
+shared,10000,1,Int64,1,290700,10000
+shared,10000,1,Int64,2,372700,10000
+shared,10000,1,Date,0,298100,10000
+shared,10000,1,Date,1,287300,10000
+shared,10000,1,Date,2,357000,10000
+shared,10000,1,"Datetime(time_unit='us', time_zone=None)",0,362500,10000
+shared,10000,1,"Datetime(time_unit='us', time_zone=None)",1,396600,10000
+shared,10000,1,"Datetime(time_unit='us', time_zone=None)",2,426100,10000
+shared,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,387000,10000
+shared,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,396300,10000
+shared,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,410600,10000
+shared,10000,2,Int64,0,1654600,19687
+shared,10000,2,Int64,1,1500100,19687
+shared,10000,2,Int64,2,1674500,19687
+shared,10000,2,Date,0,1356100,19687
+shared,10000,2,Date,1,1340200,19687
+shared,10000,2,Date,2,1189100,19687
+shared,10000,2,"Datetime(time_unit='us', time_zone=None)",0,1526300,19687
+shared,10000,2,"Datetime(time_unit='us', time_zone=None)",1,1746400,19687
+shared,10000,2,"Datetime(time_unit='us', time_zone=None)",2,1702400,19687
+shared,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,1515500,19687
+shared,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,1528800,19687
+shared,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,1531500,19687
+shared,10000,4,Int64,0,2276500,38122
+shared,10000,4,Int64,1,2267300,38122
+shared,10000,4,Int64,2,2345300,38122
+shared,10000,4,Date,0,1809100,38122
+shared,10000,4,Date,1,1736600,38122
+shared,10000,4,Date,2,1733200,38122
+shared,10000,4,"Datetime(time_unit='us', time_zone=None)",0,2278800,38122
+shared,10000,4,"Datetime(time_unit='us', time_zone=None)",1,2332000,38122
+shared,10000,4,"Datetime(time_unit='us', time_zone=None)",2,2309600,38122
+shared,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,2265200,38122
+shared,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,2264200,38122
+shared,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,2227000,38122
+shared,10000,8,Int64,0,1649700,71236
+shared,10000,8,Int64,1,1594000,71236
+shared,10000,8,Int64,2,1521100,71236
+shared,10000,8,Date,0,1371700,71236
+shared,10000,8,Date,1,1308700,71236
+shared,10000,8,Date,2,1372900,71236
+shared,10000,8,"Datetime(time_unit='us', time_zone=None)",0,1475300,71236
+shared,10000,8,"Datetime(time_unit='us', time_zone=None)",1,1513100,71236
+shared,10000,8,"Datetime(time_unit='us', time_zone=None)",2,1543300,71236
+shared,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,1564900,71236
+shared,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,1488900,71236
+shared,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,1487800,71236
+shared,10000,16,Int64,0,1605800,122440
+shared,10000,16,Int64,1,1639300,122440
+shared,10000,16,Int64,2,1666300,122440
+shared,10000,16,Date,0,1470600,122440
+shared,10000,16,Date,1,1505300,122440
+shared,10000,16,Date,2,1402100,122440
+shared,10000,16,"Datetime(time_unit='us', time_zone=None)",0,1664400,122440
+shared,10000,16,"Datetime(time_unit='us', time_zone=None)",1,1650400,122440
+shared,10000,16,"Datetime(time_unit='us', time_zone=None)",2,1685100,122440
+shared,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,1681300,122440
+shared,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,1879600,122440
+shared,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,1672200,122440
+shared,10000,31,Int64,0,1886500,164560
+shared,10000,31,Int64,1,1888000,164560
+shared,10000,31,Int64,2,1839400,164560
+shared,10000,31,Date,0,1969400,164560
+shared,10000,31,Date,1,1725200,164560
+shared,10000,31,Date,2,1759500,164560
+shared,10000,31,"Datetime(time_unit='us', time_zone=None)",0,1928700,164560
+shared,10000,31,"Datetime(time_unit='us', time_zone=None)",1,1936900,164560
+shared,10000,31,"Datetime(time_unit='us', time_zone=None)",2,1901800,164560
+shared,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,1927400,164560
+shared,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,1873200,164560
+shared,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,1880400,164560
+shared,10000,32,Int64,0,569200,164872
+shared,10000,32,Int64,1,632300,164872
+shared,10000,32,Int64,2,562500,164872
+shared,10000,32,Date,0,284200,164872
+shared,10000,32,Date,1,281200,164872
+shared,10000,32,Date,2,615900,164872
+shared,10000,32,"Datetime(time_unit='us', time_zone=None)",0,592100,164872
+shared,10000,32,"Datetime(time_unit='us', time_zone=None)",1,599900,164872
+shared,10000,32,"Datetime(time_unit='us', time_zone=None)",2,677800,164872
+shared,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,599800,164872
+shared,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,568300,164872
+shared,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,583100,164872
+shared,10000,33,Int64,0,593900,164872
+shared,10000,33,Int64,1,612500,164872
+shared,10000,33,Int64,2,584000,164872
+shared,10000,33,Date,0,261200,164872
+shared,10000,33,Date,1,258500,164872
+shared,10000,33,Date,2,253300,164872
+shared,10000,33,"Datetime(time_unit='us', time_zone=None)",0,583400,164872
+shared,10000,33,"Datetime(time_unit='us', time_zone=None)",1,663100,164872
+shared,10000,33,"Datetime(time_unit='us', time_zone=None)",2,631800,164872
+shared,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,617600,164872
+shared,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,589400,164872
+shared,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,636600,164872
+shared,10000,64,Int64,0,588600,164872
+shared,10000,64,Int64,1,572000,164872
+shared,10000,64,Int64,2,586100,164872
+shared,10000,64,Date,0,438400,164872
+shared,10000,64,Date,1,423800,164872
+shared,10000,64,Date,2,256200,164872
+shared,10000,64,"Datetime(time_unit='us', time_zone=None)",0,608400,164872
+shared,10000,64,"Datetime(time_unit='us', time_zone=None)",1,586900,164872
+shared,10000,64,"Datetime(time_unit='us', time_zone=None)",2,564100,164872
+shared,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,601300,164872
+shared,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,599600,164872
+shared,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,577100,164872
+shared,100000,0,Int64,0,752500,0
+shared,100000,0,Int64,1,779800,0
+shared,100000,0,Int64,2,752600,0
+shared,100000,0,Date,0,748900,0
+shared,100000,0,Date,1,747200,0
+shared,100000,0,Date,2,733300,0
+shared,100000,0,"Datetime(time_unit='us', time_zone=None)",0,789200,0
+shared,100000,0,"Datetime(time_unit='us', time_zone=None)",1,767900,0
+shared,100000,0,"Datetime(time_unit='us', time_zone=None)",2,896600,0
+shared,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,814600,0
+shared,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,756300,0
+shared,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,783300,0
+shared,100000,1,Int64,0,2639900,100000
+shared,100000,1,Int64,1,2744800,100000
+shared,100000,1,Int64,2,2705800,100000
+shared,100000,1,Date,0,2524200,100000
+shared,100000,1,Date,1,2566800,100000
+shared,100000,1,Date,2,2553900,100000
+shared,100000,1,"Datetime(time_unit='us', time_zone=None)",0,2651000,100000
+shared,100000,1,"Datetime(time_unit='us', time_zone=None)",1,2765400,100000
+shared,100000,1,"Datetime(time_unit='us', time_zone=None)",2,2612600,100000
+shared,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,2685300,100000
+shared,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,2636600,100000
+shared,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,2631800,100000
+shared,100000,2,Int64,0,5614000,196875
+shared,100000,2,Int64,1,5267700,196875
+shared,100000,2,Int64,2,5339100,196875
+shared,100000,2,Date,0,4623400,196875
+shared,100000,2,Date,1,4599600,196875
+shared,100000,2,Date,2,4535000,196875
+shared,100000,2,"Datetime(time_unit='us', time_zone=None)",0,5204200,196875
+shared,100000,2,"Datetime(time_unit='us', time_zone=None)",1,5188600,196875
+shared,100000,2,"Datetime(time_unit='us', time_zone=None)",2,5195900,196875
+shared,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,5302000,196875
+shared,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,5228100,196875
+shared,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,5064400,196875
+shared,100000,4,Int64,0,5928100,381250
+shared,100000,4,Int64,1,5904600,381250
+shared,100000,4,Int64,2,6218300,381250
+shared,100000,4,Date,0,5689200,381250
+shared,100000,4,Date,1,5139700,381250
+shared,100000,4,Date,2,6897700,381250
+shared,100000,4,"Datetime(time_unit='us', time_zone=None)",0,7414400,381250
+shared,100000,4,"Datetime(time_unit='us', time_zone=None)",1,6773300,381250
+shared,100000,4,"Datetime(time_unit='us', time_zone=None)",2,7137200,381250
+shared,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,6285200,381250
+shared,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,6190500,381250
+shared,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,6179500,381250
+shared,100000,8,Int64,0,7631700,712500
+shared,100000,8,Int64,1,7634100,712500
+shared,100000,8,Int64,2,7725900,712500
+shared,100000,8,Date,0,6888300,712500
+shared,100000,8,Date,1,6635400,712500
+shared,100000,8,Date,2,7301200,712500
+shared,100000,8,"Datetime(time_unit='us', time_zone=None)",0,8680800,712500
+shared,100000,8,"Datetime(time_unit='us', time_zone=None)",1,7760000,712500
+shared,100000,8,"Datetime(time_unit='us', time_zone=None)",2,7859000,712500
+shared,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,7509300,712500
+shared,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,7503300,712500
+shared,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,7263800,712500
+shared,100000,16,Int64,0,9457100,1225000
+shared,100000,16,Int64,1,9378200,1225000
+shared,100000,16,Int64,2,9939300,1225000
+shared,100000,16,Date,0,8805600,1225000
+shared,100000,16,Date,1,8785000,1225000
+shared,100000,16,Date,2,8593800,1225000
+shared,100000,16,"Datetime(time_unit='us', time_zone=None)",0,9621000,1225000
+shared,100000,16,"Datetime(time_unit='us', time_zone=None)",1,9300000,1225000
+shared,100000,16,"Datetime(time_unit='us', time_zone=None)",2,9571900,1225000
+shared,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,9437200,1225000
+shared,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,9510500,1225000
+shared,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,9634000,1225000
+shared,100000,31,Int64,0,11921100,1646875
+shared,100000,31,Int64,1,12013400,1646875
+shared,100000,31,Int64,2,11877500,1646875
+shared,100000,31,Date,0,10839400,1646875
+shared,100000,31,Date,1,11238300,1646875
+shared,100000,31,Date,2,10992000,1646875
+shared,100000,31,"Datetime(time_unit='us', time_zone=None)",0,12165900,1646875
+shared,100000,31,"Datetime(time_unit='us', time_zone=None)",1,11804300,1646875
+shared,100000,31,"Datetime(time_unit='us', time_zone=None)",2,11892700,1646875
+shared,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,12027400,1646875
+shared,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,11856700,1646875
+shared,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,12080700,1646875
+shared,100000,32,Int64,0,3383600,1650000
+shared,100000,32,Int64,1,3437500,1650000
+shared,100000,32,Int64,2,3398700,1650000
+shared,100000,32,Date,0,2745600,1650000
+shared,100000,32,Date,1,2794900,1650000
+shared,100000,32,Date,2,2868900,1650000
+shared,100000,32,"Datetime(time_unit='us', time_zone=None)",0,3324800,1650000
+shared,100000,32,"Datetime(time_unit='us', time_zone=None)",1,3404700,1650000
+shared,100000,32,"Datetime(time_unit='us', time_zone=None)",2,3363200,1650000
+shared,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,3436300,1650000
+shared,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,3460500,1650000
+shared,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,3420100,1650000
+shared,100000,33,Int64,0,3395400,1650000
+shared,100000,33,Int64,1,3379600,1650000
+shared,100000,33,Int64,2,3260300,1650000
+shared,100000,33,Date,0,2873600,1650000
+shared,100000,33,Date,1,2781800,1650000
+shared,100000,33,Date,2,2883200,1650000
+shared,100000,33,"Datetime(time_unit='us', time_zone=None)",0,3328400,1650000
+shared,100000,33,"Datetime(time_unit='us', time_zone=None)",1,3218100,1650000
+shared,100000,33,"Datetime(time_unit='us', time_zone=None)",2,3390200,1650000
+shared,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,3408700,1650000
+shared,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,3404600,1650000
+shared,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,3513000,1650000
+shared,100000,64,Int64,0,3269400,1650000
+shared,100000,64,Int64,1,3467300,1650000
+shared,100000,64,Int64,2,3391300,1650000
+shared,100000,64,Date,0,2849800,1650000
+shared,100000,64,Date,1,2832700,1650000
+shared,100000,64,Date,2,2884100,1650000
+shared,100000,64,"Datetime(time_unit='us', time_zone=None)",0,3759200,1650000
+shared,100000,64,"Datetime(time_unit='us', time_zone=None)",1,3449400,1650000
+shared,100000,64,"Datetime(time_unit='us', time_zone=None)",2,3456800,1650000
+shared,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,3461200,1650000
+shared,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,3337000,1650000
+shared,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,3423600,1650000
+shared,1000000,0,Int64,0,6967500,0
+shared,1000000,0,Int64,1,6751200,0
+shared,1000000,0,Int64,2,6928900,0
+shared,1000000,0,Date,0,6578200,0
+shared,1000000,0,Date,1,6378000,0
+shared,1000000,0,Date,2,6570600,0
+shared,1000000,0,"Datetime(time_unit='us', time_zone=None)",0,6789300,0
+shared,1000000,0,"Datetime(time_unit='us', time_zone=None)",1,6871600,0
+shared,1000000,0,"Datetime(time_unit='us', time_zone=None)",2,6796500,0
+shared,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,6940400,0
+shared,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,6604700,0
+shared,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,7010300,0
+shared,1000000,1,Int64,0,25375400,1000000
+shared,1000000,1,Int64,1,26004300,1000000
+shared,1000000,1,Int64,2,25244500,1000000
+shared,1000000,1,Date,0,23975900,1000000
+shared,1000000,1,Date,1,23902700,1000000
+shared,1000000,1,Date,2,23794200,1000000
+shared,1000000,1,"Datetime(time_unit='us', time_zone=None)",0,25277000,1000000
+shared,1000000,1,"Datetime(time_unit='us', time_zone=None)",1,25215400,1000000
+shared,1000000,1,"Datetime(time_unit='us', time_zone=None)",2,25208800,1000000
+shared,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,25265700,1000000
+shared,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,25409200,1000000
+shared,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,25280300,1000000
+shared,1000000,2,Int64,0,52766600,1968750
+shared,1000000,2,Int64,1,52132800,1968750
+shared,1000000,2,Int64,2,52165700,1968750
+shared,1000000,2,Date,0,44000500,1968750
+shared,1000000,2,Date,1,49365300,1968750
+shared,1000000,2,Date,2,49042600,1968750
+shared,1000000,2,"Datetime(time_unit='us', time_zone=None)",0,61931200,1968750
+shared,1000000,2,"Datetime(time_unit='us', time_zone=None)",1,59663500,1968750
+shared,1000000,2,"Datetime(time_unit='us', time_zone=None)",2,60443400,1968750
+shared,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,61367300,1968750
+shared,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,61130500,1968750
+shared,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,59094600,1968750
+shared,1000000,4,Int64,0,68209000,3812500
+shared,1000000,4,Int64,1,74053100,3812500
+shared,1000000,4,Int64,2,82020500,3812500
+shared,1000000,4,Date,0,60075800,3812500
+shared,1000000,4,Date,1,67287100,3812500
+shared,1000000,4,Date,2,62247500,3812500
+shared,1000000,4,"Datetime(time_unit='us', time_zone=None)",0,71177500,3812500
+shared,1000000,4,"Datetime(time_unit='us', time_zone=None)",1,73087300,3812500
+shared,1000000,4,"Datetime(time_unit='us', time_zone=None)",2,68676500,3812500
+shared,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,69375800,3812500
+shared,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,71340600,3812500
+shared,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,70836600,3812500
+shared,1000000,8,Int64,0,94712200,7125000
+shared,1000000,8,Int64,1,94289700,7125000
+shared,1000000,8,Int64,2,94713400,7125000
+shared,1000000,8,Date,0,84781400,7125000
+shared,1000000,8,Date,1,84943800,7125000
+shared,1000000,8,Date,2,84169000,7125000
+shared,1000000,8,"Datetime(time_unit='us', time_zone=None)",0,93603400,7125000
+shared,1000000,8,"Datetime(time_unit='us', time_zone=None)",1,93432100,7125000
+shared,1000000,8,"Datetime(time_unit='us', time_zone=None)",2,94300200,7125000
+shared,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,94818400,7125000
+shared,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,94184200,7125000
+shared,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,94510600,7125000
+shared,1000000,16,Int64,0,123270200,12250000
+shared,1000000,16,Int64,1,126714300,12250000
+shared,1000000,16,Int64,2,126907200,12250000
+shared,1000000,16,Date,0,116052300,12250000
+shared,1000000,16,Date,1,120191700,12250000
+shared,1000000,16,Date,2,116295000,12250000
+shared,1000000,16,"Datetime(time_unit='us', time_zone=None)",0,129945500,12250000
+shared,1000000,16,"Datetime(time_unit='us', time_zone=None)",1,125692700,12250000
+shared,1000000,16,"Datetime(time_unit='us', time_zone=None)",2,125493200,12250000
+shared,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,122629800,12250000
+shared,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,130971900,12250000
+shared,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,126840400,12250000
+shared,1000000,31,Int64,0,160665900,16468750
+shared,1000000,31,Int64,1,161081400,16468750
+shared,1000000,31,Int64,2,157603900,16468750
+shared,1000000,31,Date,0,145331600,16468750
+shared,1000000,31,Date,1,148814900,16468750
+shared,1000000,31,Date,2,152124900,16468750
+shared,1000000,31,"Datetime(time_unit='us', time_zone=None)",0,161427500,16468750
+shared,1000000,31,"Datetime(time_unit='us', time_zone=None)",1,161407700,16468750
+shared,1000000,31,"Datetime(time_unit='us', time_zone=None)",2,160470000,16468750
+shared,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,159005900,16468750
+shared,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,161656700,16468750
+shared,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,144920000,16468750
+shared,1000000,32,Int64,0,43620100,16500000
+shared,1000000,32,Int64,1,48582300,16500000
+shared,1000000,32,Int64,2,40182500,16500000
+shared,1000000,32,Date,0,29447400,16500000
+shared,1000000,32,Date,1,28932300,16500000
+shared,1000000,32,Date,2,30153400,16500000
+shared,1000000,32,"Datetime(time_unit='us', time_zone=None)",0,39644200,16500000
+shared,1000000,32,"Datetime(time_unit='us', time_zone=None)",1,40293100,16500000
+shared,1000000,32,"Datetime(time_unit='us', time_zone=None)",2,39560500,16500000
+shared,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,39531500,16500000
+shared,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,44765000,16500000
+shared,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,39587900,16500000
+shared,1000000,33,Int64,0,39044100,16500000
+shared,1000000,33,Int64,1,39443900,16500000
+shared,1000000,33,Int64,2,39813400,16500000
+shared,1000000,33,Date,0,29239400,16500000
+shared,1000000,33,Date,1,29153400,16500000
+shared,1000000,33,Date,2,29590500,16500000
+shared,1000000,33,"Datetime(time_unit='us', time_zone=None)",0,40087300,16500000
+shared,1000000,33,"Datetime(time_unit='us', time_zone=None)",1,39412200,16500000
+shared,1000000,33,"Datetime(time_unit='us', time_zone=None)",2,39665400,16500000
+shared,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,39631500,16500000
+shared,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,39649400,16500000
+shared,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,39866500,16500000
+shared,1000000,64,Int64,0,39466100,16500000
+shared,1000000,64,Int64,1,39424200,16500000
+shared,1000000,64,Int64,2,39734000,16500000
+shared,1000000,64,Date,0,29339200,16500000
+shared,1000000,64,Date,1,29961600,16500000
+shared,1000000,64,Date,2,29689800,16500000
+shared,1000000,64,"Datetime(time_unit='us', time_zone=None)",0,41416800,16500000
+shared,1000000,64,"Datetime(time_unit='us', time_zone=None)",1,40605600,16500000
+shared,1000000,64,"Datetime(time_unit='us', time_zone=None)",2,40513500,16500000
+shared,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,39760600,16500000
+shared,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,39525600,16500000
+shared,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,39714100,16500000
+shortcut_a,1000,0,Int64,0,202700,0
+shortcut_a,1000,0,Int64,1,296600,0
+shortcut_a,1000,0,Int64,2,187900,0
+shortcut_a,1000,0,Date,0,302800,0
+shortcut_a,1000,0,Date,1,224800,0
+shortcut_a,1000,0,Date,2,182100,0
+shortcut_a,1000,0,"Datetime(time_unit='us', time_zone=None)",0,186100,0
+shortcut_a,1000,0,"Datetime(time_unit='us', time_zone=None)",1,178300,0
+shortcut_a,1000,0,"Datetime(time_unit='us', time_zone=None)",2,258800,0
+shortcut_a,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,213400,0
+shortcut_a,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,175600,0
+shortcut_a,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,184300,0
+shortcut_a,1000,1,Int64,0,293800,1000
+shortcut_a,1000,1,Int64,1,199000,1000
+shortcut_a,1000,1,Int64,2,191500,1000
+shortcut_a,1000,1,Date,0,207700,1000
+shortcut_a,1000,1,Date,1,188500,1000
+shortcut_a,1000,1,Date,2,201400,1000
+shortcut_a,1000,1,"Datetime(time_unit='us', time_zone=None)",0,225400,1000
+shortcut_a,1000,1,"Datetime(time_unit='us', time_zone=None)",1,194300,1000
+shortcut_a,1000,1,"Datetime(time_unit='us', time_zone=None)",2,193700,1000
+shortcut_a,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,195900,1000
+shortcut_a,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,205900,1000
+shortcut_a,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,194000,1000
+shortcut_a,1000,2,Int64,0,291700,1968
+shortcut_a,1000,2,Int64,1,290800,1968
+shortcut_a,1000,2,Int64,2,276100,1968
+shortcut_a,1000,2,Date,0,327900,1968
+shortcut_a,1000,2,Date,1,302000,1968
+shortcut_a,1000,2,Date,2,293400,1968
+shortcut_a,1000,2,"Datetime(time_unit='us', time_zone=None)",0,297300,1968
+shortcut_a,1000,2,"Datetime(time_unit='us', time_zone=None)",1,344200,1968
+shortcut_a,1000,2,"Datetime(time_unit='us', time_zone=None)",2,312000,1968
+shortcut_a,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,298500,1968
+shortcut_a,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,300100,1968
+shortcut_a,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,304800,1968
+shortcut_a,1000,4,Int64,0,339000,3808
+shortcut_a,1000,4,Int64,1,376900,3808
+shortcut_a,1000,4,Int64,2,348700,3808
+shortcut_a,1000,4,Date,0,341600,3808
+shortcut_a,1000,4,Date,1,350400,3808
+shortcut_a,1000,4,Date,2,343000,3808
+shortcut_a,1000,4,"Datetime(time_unit='us', time_zone=None)",0,370000,3808
+shortcut_a,1000,4,"Datetime(time_unit='us', time_zone=None)",1,354300,3808
+shortcut_a,1000,4,"Datetime(time_unit='us', time_zone=None)",2,340600,3808
+shortcut_a,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,337900,3808
+shortcut_a,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,419800,3808
+shortcut_a,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,372500,3808
+shortcut_a,1000,8,Int64,0,466600,7104
+shortcut_a,1000,8,Int64,1,453600,7104
+shortcut_a,1000,8,Int64,2,488200,7104
+shortcut_a,1000,8,Date,0,436200,7104
+shortcut_a,1000,8,Date,1,422600,7104
+shortcut_a,1000,8,Date,2,520600,7104
+shortcut_a,1000,8,"Datetime(time_unit='us', time_zone=None)",0,562100,7104
+shortcut_a,1000,8,"Datetime(time_unit='us', time_zone=None)",1,476500,7104
+shortcut_a,1000,8,"Datetime(time_unit='us', time_zone=None)",2,470300,7104
+shortcut_a,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,450300,7104
+shortcut_a,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,469200,7104
+shortcut_a,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,439100,7104
+shortcut_a,1000,16,Int64,0,598300,12188
+shortcut_a,1000,16,Int64,1,609600,12188
+shortcut_a,1000,16,Int64,2,614400,12188
+shortcut_a,1000,16,Date,0,611000,12188
+shortcut_a,1000,16,Date,1,602300,12188
+shortcut_a,1000,16,Date,2,582700,12188
+shortcut_a,1000,16,"Datetime(time_unit='us', time_zone=None)",0,628100,12188
+shortcut_a,1000,16,"Datetime(time_unit='us', time_zone=None)",1,598800,12188
+shortcut_a,1000,16,"Datetime(time_unit='us', time_zone=None)",2,606000,12188
+shortcut_a,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,661000,12188
+shortcut_a,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,618300,12188
+shortcut_a,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,591000,12188
+shortcut_a,1000,31,Int64,0,804700,16373
+shortcut_a,1000,31,Int64,1,769900,16373
+shortcut_a,1000,31,Int64,2,759000,16373
+shortcut_a,1000,31,Date,0,793700,16373
+shortcut_a,1000,31,Date,1,745500,16373
+shortcut_a,1000,31,Date,2,753500,16373
+shortcut_a,1000,31,"Datetime(time_unit='us', time_zone=None)",0,749600,16373
+shortcut_a,1000,31,"Datetime(time_unit='us', time_zone=None)",1,751300,16373
+shortcut_a,1000,31,"Datetime(time_unit='us', time_zone=None)",2,743100,16373
+shortcut_a,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,771100,16373
+shortcut_a,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,770300,16373
+shortcut_a,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,758900,16373
+shortcut_a,1000,32,Int64,0,173400,16404
+shortcut_a,1000,32,Int64,1,173000,16404
+shortcut_a,1000,32,Int64,2,173400,16404
+shortcut_a,1000,32,Date,0,194300,16404
+shortcut_a,1000,32,Date,1,185100,16404
+shortcut_a,1000,32,Date,2,177100,16404
+shortcut_a,1000,32,"Datetime(time_unit='us', time_zone=None)",0,208500,16404
+shortcut_a,1000,32,"Datetime(time_unit='us', time_zone=None)",1,190500,16404
+shortcut_a,1000,32,"Datetime(time_unit='us', time_zone=None)",2,175700,16404
+shortcut_a,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,190000,16404
+shortcut_a,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,191800,16404
+shortcut_a,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,183300,16404
+shortcut_a,1000,33,Int64,0,190500,16404
+shortcut_a,1000,33,Int64,1,173400,16404
+shortcut_a,1000,33,Int64,2,170100,16404
+shortcut_a,1000,33,Date,0,235700,16404
+shortcut_a,1000,33,Date,1,177300,16404
+shortcut_a,1000,33,Date,2,217400,16404
+shortcut_a,1000,33,"Datetime(time_unit='us', time_zone=None)",0,197400,16404
+shortcut_a,1000,33,"Datetime(time_unit='us', time_zone=None)",1,191000,16404
+shortcut_a,1000,33,"Datetime(time_unit='us', time_zone=None)",2,183000,16404
+shortcut_a,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,196900,16404
+shortcut_a,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,177800,16404
+shortcut_a,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,209400,16404
+shortcut_a,1000,64,Int64,0,172400,16404
+shortcut_a,1000,64,Int64,1,174900,16404
+shortcut_a,1000,64,Int64,2,204000,16404
+shortcut_a,1000,64,Date,0,166200,16404
+shortcut_a,1000,64,Date,1,185100,16404
+shortcut_a,1000,64,Date,2,168100,16404
+shortcut_a,1000,64,"Datetime(time_unit='us', time_zone=None)",0,192700,16404
+shortcut_a,1000,64,"Datetime(time_unit='us', time_zone=None)",1,177700,16404
+shortcut_a,1000,64,"Datetime(time_unit='us', time_zone=None)",2,208000,16404
+shortcut_a,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,182400,16404
+shortcut_a,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,191200,16404
+shortcut_a,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,180200,16404
+shortcut_a,10000,0,Int64,0,227800,0
+shortcut_a,10000,0,Int64,1,212700,0
+shortcut_a,10000,0,Int64,2,202700,0
+shortcut_a,10000,0,Date,0,219700,0
+shortcut_a,10000,0,Date,1,223700,0
+shortcut_a,10000,0,Date,2,203200,0
+shortcut_a,10000,0,"Datetime(time_unit='us', time_zone=None)",0,197900,0
+shortcut_a,10000,0,"Datetime(time_unit='us', time_zone=None)",1,205200,0
+shortcut_a,10000,0,"Datetime(time_unit='us', time_zone=None)",2,198800,0
+shortcut_a,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,198300,0
+shortcut_a,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,198500,0
+shortcut_a,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,201700,0
+shortcut_a,10000,1,Int64,0,290800,10000
+shortcut_a,10000,1,Int64,1,360200,10000
+shortcut_a,10000,1,Int64,2,473100,10000
+shortcut_a,10000,1,Date,0,412000,10000
+shortcut_a,10000,1,Date,1,378900,10000
+shortcut_a,10000,1,Date,2,400200,10000
+shortcut_a,10000,1,"Datetime(time_unit='us', time_zone=None)",0,293900,10000
+shortcut_a,10000,1,"Datetime(time_unit='us', time_zone=None)",1,294500,10000
+shortcut_a,10000,1,"Datetime(time_unit='us', time_zone=None)",2,308700,10000
+shortcut_a,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,475700,10000
+shortcut_a,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,381700,10000
+shortcut_a,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,391500,10000
+shortcut_a,10000,2,Int64,0,1511900,19687
+shortcut_a,10000,2,Int64,1,1499600,19687
+shortcut_a,10000,2,Int64,2,1658900,19687
+shortcut_a,10000,2,Date,0,1195000,19687
+shortcut_a,10000,2,Date,1,1174200,19687
+shortcut_a,10000,2,Date,2,1169300,19687
+shortcut_a,10000,2,"Datetime(time_unit='us', time_zone=None)",0,1508000,19687
+shortcut_a,10000,2,"Datetime(time_unit='us', time_zone=None)",1,1492400,19687
+shortcut_a,10000,2,"Datetime(time_unit='us', time_zone=None)",2,1661600,19687
+shortcut_a,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,1569200,19687
+shortcut_a,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,1506700,19687
+shortcut_a,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,1540800,19687
+shortcut_a,10000,4,Int64,0,2228800,38122
+shortcut_a,10000,4,Int64,1,2367300,38122
+shortcut_a,10000,4,Int64,2,2255800,38122
+shortcut_a,10000,4,Date,0,2116300,38122
+shortcut_a,10000,4,Date,1,1971100,38122
+shortcut_a,10000,4,Date,2,1949100,38122
+shortcut_a,10000,4,"Datetime(time_unit='us', time_zone=None)",0,2238400,38122
+shortcut_a,10000,4,"Datetime(time_unit='us', time_zone=None)",1,2149400,38122
+shortcut_a,10000,4,"Datetime(time_unit='us', time_zone=None)",2,2221600,38122
+shortcut_a,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,2220100,38122
+shortcut_a,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,2180000,38122
+shortcut_a,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,2178400,38122
+shortcut_a,10000,8,Int64,0,1491000,71236
+shortcut_a,10000,8,Int64,1,1504300,71236
+shortcut_a,10000,8,Int64,2,1536300,71236
+shortcut_a,10000,8,Date,0,1347000,71236
+shortcut_a,10000,8,Date,1,1312500,71236
+shortcut_a,10000,8,Date,2,1237400,71236
+shortcut_a,10000,8,"Datetime(time_unit='us', time_zone=None)",0,1439900,71236
+shortcut_a,10000,8,"Datetime(time_unit='us', time_zone=None)",1,1532900,71236
+shortcut_a,10000,8,"Datetime(time_unit='us', time_zone=None)",2,1475600,71236
+shortcut_a,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,1451900,71236
+shortcut_a,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,1472700,71236
+shortcut_a,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,1436400,71236
+shortcut_a,10000,16,Int64,0,1664100,122440
+shortcut_a,10000,16,Int64,1,1763700,122440
+shortcut_a,10000,16,Int64,2,1772100,122440
+shortcut_a,10000,16,Date,0,1454200,122440
+shortcut_a,10000,16,Date,1,1435900,122440
+shortcut_a,10000,16,Date,2,1492400,122440
+shortcut_a,10000,16,"Datetime(time_unit='us', time_zone=None)",0,1650000,122440
+shortcut_a,10000,16,"Datetime(time_unit='us', time_zone=None)",1,1750600,122440
+shortcut_a,10000,16,"Datetime(time_unit='us', time_zone=None)",2,1616200,122440
+shortcut_a,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,1653900,122440
+shortcut_a,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,1746800,122440
+shortcut_a,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,1640900,122440
+shortcut_a,10000,31,Int64,0,1930600,164560
+shortcut_a,10000,31,Int64,1,1818700,164560
+shortcut_a,10000,31,Int64,2,1844900,164560
+shortcut_a,10000,31,Date,0,1790500,164560
+shortcut_a,10000,31,Date,1,1749600,164560
+shortcut_a,10000,31,Date,2,1716600,164560
+shortcut_a,10000,31,"Datetime(time_unit='us', time_zone=None)",0,1989900,164560
+shortcut_a,10000,31,"Datetime(time_unit='us', time_zone=None)",1,1867100,164560
+shortcut_a,10000,31,"Datetime(time_unit='us', time_zone=None)",2,1892200,164560
+shortcut_a,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,1870200,164560
+shortcut_a,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,1909500,164560
+shortcut_a,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,1940100,164560
+shortcut_a,10000,32,Int64,0,627400,164872
+shortcut_a,10000,32,Int64,1,588300,164872
+shortcut_a,10000,32,Int64,2,594800,164872
+shortcut_a,10000,32,Date,0,264800,164872
+shortcut_a,10000,32,Date,1,345200,164872
+shortcut_a,10000,32,Date,2,372200,164872
+shortcut_a,10000,32,"Datetime(time_unit='us', time_zone=None)",0,622200,164872
+shortcut_a,10000,32,"Datetime(time_unit='us', time_zone=None)",1,584400,164872
+shortcut_a,10000,32,"Datetime(time_unit='us', time_zone=None)",2,604900,164872
+shortcut_a,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,626700,164872
+shortcut_a,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,584400,164872
+shortcut_a,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,582600,164872
+shortcut_a,10000,33,Int64,0,689400,164872
+shortcut_a,10000,33,Int64,1,563500,164872
+shortcut_a,10000,33,Int64,2,492200,164872
+shortcut_a,10000,33,Date,0,243200,164872
+shortcut_a,10000,33,Date,1,374500,164872
+shortcut_a,10000,33,Date,2,265500,164872
+shortcut_a,10000,33,"Datetime(time_unit='us', time_zone=None)",0,566800,164872
+shortcut_a,10000,33,"Datetime(time_unit='us', time_zone=None)",1,587700,164872
+shortcut_a,10000,33,"Datetime(time_unit='us', time_zone=None)",2,605500,164872
+shortcut_a,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,561300,164872
+shortcut_a,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,605400,164872
+shortcut_a,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,525300,164872
+shortcut_a,10000,64,Int64,0,569100,164872
+shortcut_a,10000,64,Int64,1,522700,164872
+shortcut_a,10000,64,Int64,2,638800,164872
+shortcut_a,10000,64,Date,0,414400,164872
+shortcut_a,10000,64,Date,1,268400,164872
+shortcut_a,10000,64,Date,2,263700,164872
+shortcut_a,10000,64,"Datetime(time_unit='us', time_zone=None)",0,530900,164872
+shortcut_a,10000,64,"Datetime(time_unit='us', time_zone=None)",1,781200,164872
+shortcut_a,10000,64,"Datetime(time_unit='us', time_zone=None)",2,668200,164872
+shortcut_a,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,563300,164872
+shortcut_a,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,522300,164872
+shortcut_a,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,590100,164872
+shortcut_a,100000,0,Int64,0,709300,0
+shortcut_a,100000,0,Int64,1,902100,0
+shortcut_a,100000,0,Int64,2,723600,0
+shortcut_a,100000,0,Date,0,740800,0
+shortcut_a,100000,0,Date,1,711300,0
+shortcut_a,100000,0,Date,2,741000,0
+shortcut_a,100000,0,"Datetime(time_unit='us', time_zone=None)",0,765300,0
+shortcut_a,100000,0,"Datetime(time_unit='us', time_zone=None)",1,803700,0
+shortcut_a,100000,0,"Datetime(time_unit='us', time_zone=None)",2,829000,0
+shortcut_a,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,741700,0
+shortcut_a,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,733000,0
+shortcut_a,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,710100,0
+shortcut_a,100000,1,Int64,0,2569900,100000
+shortcut_a,100000,1,Int64,1,2641300,100000
+shortcut_a,100000,1,Int64,2,2592100,100000
+shortcut_a,100000,1,Date,0,2596800,100000
+shortcut_a,100000,1,Date,1,2591700,100000
+shortcut_a,100000,1,Date,2,2603500,100000
+shortcut_a,100000,1,"Datetime(time_unit='us', time_zone=None)",0,2592900,100000
+shortcut_a,100000,1,"Datetime(time_unit='us', time_zone=None)",1,2756700,100000
+shortcut_a,100000,1,"Datetime(time_unit='us', time_zone=None)",2,2644100,100000
+shortcut_a,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,2685000,100000
+shortcut_a,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,2631100,100000
+shortcut_a,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,2545900,100000
+shortcut_a,100000,2,Int64,0,5262800,196875
+shortcut_a,100000,2,Int64,1,5512400,196875
+shortcut_a,100000,2,Int64,2,5485000,196875
+shortcut_a,100000,2,Date,0,4511800,196875
+shortcut_a,100000,2,Date,1,4551500,196875
+shortcut_a,100000,2,Date,2,4578800,196875
+shortcut_a,100000,2,"Datetime(time_unit='us', time_zone=None)",0,5233800,196875
+shortcut_a,100000,2,"Datetime(time_unit='us', time_zone=None)",1,5662600,196875
+shortcut_a,100000,2,"Datetime(time_unit='us', time_zone=None)",2,5463100,196875
+shortcut_a,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,5403500,196875
+shortcut_a,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,5394300,196875
+shortcut_a,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,5390500,196875
+shortcut_a,100000,4,Int64,0,6386400,381250
+shortcut_a,100000,4,Int64,1,6303000,381250
+shortcut_a,100000,4,Int64,2,6227900,381250
+shortcut_a,100000,4,Date,0,5392800,381250
+shortcut_a,100000,4,Date,1,5300800,381250
+shortcut_a,100000,4,Date,2,5308800,381250
+shortcut_a,100000,4,"Datetime(time_unit='us', time_zone=None)",0,6196900,381250
+shortcut_a,100000,4,"Datetime(time_unit='us', time_zone=None)",1,6230900,381250
+shortcut_a,100000,4,"Datetime(time_unit='us', time_zone=None)",2,6330600,381250
+shortcut_a,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,6324900,381250
+shortcut_a,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,6240400,381250
+shortcut_a,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,6338600,381250
+shortcut_a,100000,8,Int64,0,7858500,712500
+shortcut_a,100000,8,Int64,1,7643300,712500
+shortcut_a,100000,8,Int64,2,7802300,712500
+shortcut_a,100000,8,Date,0,6410500,712500
+shortcut_a,100000,8,Date,1,6451900,712500
+shortcut_a,100000,8,Date,2,6966000,712500
+shortcut_a,100000,8,"Datetime(time_unit='us', time_zone=None)",0,7720600,712500
+shortcut_a,100000,8,"Datetime(time_unit='us', time_zone=None)",1,7852800,712500
+shortcut_a,100000,8,"Datetime(time_unit='us', time_zone=None)",2,7609400,712500
+shortcut_a,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,7467200,712500
+shortcut_a,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,7526000,712500
+shortcut_a,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,7633400,712500
+shortcut_a,100000,16,Int64,0,9478100,1225000
+shortcut_a,100000,16,Int64,1,9628400,1225000
+shortcut_a,100000,16,Int64,2,9649600,1225000
+shortcut_a,100000,16,Date,0,8872800,1225000
+shortcut_a,100000,16,Date,1,8638600,1225000
+shortcut_a,100000,16,Date,2,8855600,1225000
+shortcut_a,100000,16,"Datetime(time_unit='us', time_zone=None)",0,9545900,1225000
+shortcut_a,100000,16,"Datetime(time_unit='us', time_zone=None)",1,9695800,1225000
+shortcut_a,100000,16,"Datetime(time_unit='us', time_zone=None)",2,9789300,1225000
+shortcut_a,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,9829600,1225000
+shortcut_a,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,9700100,1225000
+shortcut_a,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,9701600,1225000
+shortcut_a,100000,31,Int64,0,11952800,1646875
+shortcut_a,100000,31,Int64,1,11853300,1646875
+shortcut_a,100000,31,Int64,2,11675300,1646875
+shortcut_a,100000,31,Date,0,11496900,1646875
+shortcut_a,100000,31,Date,1,11012400,1646875
+shortcut_a,100000,31,Date,2,11411000,1646875
+shortcut_a,100000,31,"Datetime(time_unit='us', time_zone=None)",0,11768300,1646875
+shortcut_a,100000,31,"Datetime(time_unit='us', time_zone=None)",1,12160200,1646875
+shortcut_a,100000,31,"Datetime(time_unit='us', time_zone=None)",2,11889500,1646875
+shortcut_a,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,11931900,1646875
+shortcut_a,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,12035100,1646875
+shortcut_a,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,11845000,1646875
+shortcut_a,100000,32,Int64,0,3666600,1650000
+shortcut_a,100000,32,Int64,1,3894100,1650000
+shortcut_a,100000,32,Int64,2,3529200,1650000
+shortcut_a,100000,32,Date,0,2983100,1650000
+shortcut_a,100000,32,Date,1,2739900,1650000
+shortcut_a,100000,32,Date,2,2808300,1650000
+shortcut_a,100000,32,"Datetime(time_unit='us', time_zone=None)",0,3518900,1650000
+shortcut_a,100000,32,"Datetime(time_unit='us', time_zone=None)",1,3609200,1650000
+shortcut_a,100000,32,"Datetime(time_unit='us', time_zone=None)",2,3711200,1650000
+shortcut_a,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,3663600,1650000
+shortcut_a,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,3715300,1650000
+shortcut_a,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,3671400,1650000
+shortcut_a,100000,33,Int64,0,3593600,1650000
+shortcut_a,100000,33,Int64,1,3642600,1650000
+shortcut_a,100000,33,Int64,2,3677400,1650000
+shortcut_a,100000,33,Date,0,2820500,1650000
+shortcut_a,100000,33,Date,1,2746600,1650000
+shortcut_a,100000,33,Date,2,2674600,1650000
+shortcut_a,100000,33,"Datetime(time_unit='us', time_zone=None)",0,3507400,1650000
+shortcut_a,100000,33,"Datetime(time_unit='us', time_zone=None)",1,3572800,1650000
+shortcut_a,100000,33,"Datetime(time_unit='us', time_zone=None)",2,3286400,1650000
+shortcut_a,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,3548000,1650000
+shortcut_a,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,3701600,1650000
+shortcut_a,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,3514900,1650000
+shortcut_a,100000,64,Int64,0,3571800,1650000
+shortcut_a,100000,64,Int64,1,3312600,1650000
+shortcut_a,100000,64,Int64,2,3478500,1650000
+shortcut_a,100000,64,Date,0,2853500,1650000
+shortcut_a,100000,64,Date,1,2812600,1650000
+shortcut_a,100000,64,Date,2,2841700,1650000
+shortcut_a,100000,64,"Datetime(time_unit='us', time_zone=None)",0,3610000,1650000
+shortcut_a,100000,64,"Datetime(time_unit='us', time_zone=None)",1,3677900,1650000
+shortcut_a,100000,64,"Datetime(time_unit='us', time_zone=None)",2,3537300,1650000
+shortcut_a,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,3720900,1650000
+shortcut_a,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,3316400,1650000
+shortcut_a,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,3626800,1650000
+shortcut_a,1000000,0,Int64,0,7024900,0
+shortcut_a,1000000,0,Int64,1,6621800,0
+shortcut_a,1000000,0,Int64,2,7106000,0
+shortcut_a,1000000,0,Date,0,6649000,0
+shortcut_a,1000000,0,Date,1,6587100,0
+shortcut_a,1000000,0,Date,2,6412800,0
+shortcut_a,1000000,0,"Datetime(time_unit='us', time_zone=None)",0,7036600,0
+shortcut_a,1000000,0,"Datetime(time_unit='us', time_zone=None)",1,7023900,0
+shortcut_a,1000000,0,"Datetime(time_unit='us', time_zone=None)",2,6819900,0
+shortcut_a,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,6950400,0
+shortcut_a,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,6835900,0
+shortcut_a,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,6974900,0
+shortcut_a,1000000,1,Int64,0,25600200,1000000
+shortcut_a,1000000,1,Int64,1,25773100,1000000
+shortcut_a,1000000,1,Int64,2,25560800,1000000
+shortcut_a,1000000,1,Date,0,25993300,1000000
+shortcut_a,1000000,1,Date,1,24682800,1000000
+shortcut_a,1000000,1,Date,2,26787500,1000000
+shortcut_a,1000000,1,"Datetime(time_unit='us', time_zone=None)",0,25930500,1000000
+shortcut_a,1000000,1,"Datetime(time_unit='us', time_zone=None)",1,26112000,1000000
+shortcut_a,1000000,1,"Datetime(time_unit='us', time_zone=None)",2,26000200,1000000
+shortcut_a,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,25847100,1000000
+shortcut_a,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,25262500,1000000
+shortcut_a,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,26000400,1000000
+shortcut_a,1000000,2,Int64,0,52253700,1968750
+shortcut_a,1000000,2,Int64,1,52551600,1968750
+shortcut_a,1000000,2,Int64,2,53953600,1968750
+shortcut_a,1000000,2,Date,0,50475500,1968750
+shortcut_a,1000000,2,Date,1,49377700,1968750
+shortcut_a,1000000,2,Date,2,50860800,1968750
+shortcut_a,1000000,2,"Datetime(time_unit='us', time_zone=None)",0,59959700,1968750
+shortcut_a,1000000,2,"Datetime(time_unit='us', time_zone=None)",1,60204600,1968750
+shortcut_a,1000000,2,"Datetime(time_unit='us', time_zone=None)",2,59720600,1968750
+shortcut_a,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,60765500,1968750
+shortcut_a,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,60981100,1968750
+shortcut_a,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,60531600,1968750
+shortcut_a,1000000,4,Int64,0,72538700,3812500
+shortcut_a,1000000,4,Int64,1,71966300,3812500
+shortcut_a,1000000,4,Int64,2,72122700,3812500
+shortcut_a,1000000,4,Date,0,62110500,3812500
+shortcut_a,1000000,4,Date,1,60822800,3812500
+shortcut_a,1000000,4,Date,2,61670900,3812500
+shortcut_a,1000000,4,"Datetime(time_unit='us', time_zone=None)",0,72309900,3812500
+shortcut_a,1000000,4,"Datetime(time_unit='us', time_zone=None)",1,71886700,3812500
+shortcut_a,1000000,4,"Datetime(time_unit='us', time_zone=None)",2,70883300,3812500
+shortcut_a,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,79110500,3812500
+shortcut_a,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,77170500,3812500
+shortcut_a,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,72958600,3812500
+shortcut_a,1000000,8,Int64,0,97292800,7125000
+shortcut_a,1000000,8,Int64,1,98592300,7125000
+shortcut_a,1000000,8,Int64,2,100807800,7125000
+shortcut_a,1000000,8,Date,0,92746400,7125000
+shortcut_a,1000000,8,Date,1,85653400,7125000
+shortcut_a,1000000,8,Date,2,85228600,7125000
+shortcut_a,1000000,8,"Datetime(time_unit='us', time_zone=None)",0,91496200,7125000
+shortcut_a,1000000,8,"Datetime(time_unit='us', time_zone=None)",1,94537800,7125000
+shortcut_a,1000000,8,"Datetime(time_unit='us', time_zone=None)",2,94546400,7125000
+shortcut_a,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,93692000,7125000
+shortcut_a,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,94739700,7125000
+shortcut_a,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,94566600,7125000
+shortcut_a,1000000,16,Int64,0,125755000,12250000
+shortcut_a,1000000,16,Int64,1,125319900,12250000
+shortcut_a,1000000,16,Int64,2,134265900,12250000
+shortcut_a,1000000,16,Date,0,116159500,12250000
+shortcut_a,1000000,16,Date,1,117605300,12250000
+shortcut_a,1000000,16,Date,2,118891600,12250000
+shortcut_a,1000000,16,"Datetime(time_unit='us', time_zone=None)",0,126599900,12250000
+shortcut_a,1000000,16,"Datetime(time_unit='us', time_zone=None)",1,126730600,12250000
+shortcut_a,1000000,16,"Datetime(time_unit='us', time_zone=None)",2,125473700,12250000
+shortcut_a,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,127068000,12250000
+shortcut_a,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,124007600,12250000
+shortcut_a,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,125566300,12250000
+shortcut_a,1000000,31,Int64,0,160333500,16468750
+shortcut_a,1000000,31,Int64,1,144188500,16468750
+shortcut_a,1000000,31,Int64,2,160581500,16468750
+shortcut_a,1000000,31,Date,0,151307800,16468750
+shortcut_a,1000000,31,Date,1,143928500,16468750
+shortcut_a,1000000,31,Date,2,141811100,16468750
+shortcut_a,1000000,31,"Datetime(time_unit='us', time_zone=None)",0,161883200,16468750
+shortcut_a,1000000,31,"Datetime(time_unit='us', time_zone=None)",1,160472700,16468750
+shortcut_a,1000000,31,"Datetime(time_unit='us', time_zone=None)",2,160588400,16468750
+shortcut_a,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,162112100,16468750
+shortcut_a,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,162826200,16468750
+shortcut_a,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,158625100,16468750
+shortcut_a,1000000,32,Int64,0,39387200,16500000
+shortcut_a,1000000,32,Int64,1,40365800,16500000
+shortcut_a,1000000,32,Int64,2,39798600,16500000
+shortcut_a,1000000,32,Date,0,30011600,16500000
+shortcut_a,1000000,32,Date,1,29455000,16500000
+shortcut_a,1000000,32,Date,2,29639700,16500000
+shortcut_a,1000000,32,"Datetime(time_unit='us', time_zone=None)",0,39692400,16500000
+shortcut_a,1000000,32,"Datetime(time_unit='us', time_zone=None)",1,39730900,16500000
+shortcut_a,1000000,32,"Datetime(time_unit='us', time_zone=None)",2,39918100,16500000
+shortcut_a,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,39168500,16500000
+shortcut_a,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,39919000,16500000
+shortcut_a,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,39661800,16500000
+shortcut_a,1000000,33,Int64,0,45557600,16500000
+shortcut_a,1000000,33,Int64,1,39498400,16500000
+shortcut_a,1000000,33,Int64,2,39848700,16500000
+shortcut_a,1000000,33,Date,0,31785100,16500000
+shortcut_a,1000000,33,Date,1,31612800,16500000
+shortcut_a,1000000,33,Date,2,35058800,16500000
+shortcut_a,1000000,33,"Datetime(time_unit='us', time_zone=None)",0,39870900,16500000
+shortcut_a,1000000,33,"Datetime(time_unit='us', time_zone=None)",1,40217400,16500000
+shortcut_a,1000000,33,"Datetime(time_unit='us', time_zone=None)",2,39843300,16500000
+shortcut_a,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,39317700,16500000
+shortcut_a,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,40514900,16500000
+shortcut_a,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,39996500,16500000
+shortcut_a,1000000,64,Int64,0,39648700,16500000
+shortcut_a,1000000,64,Int64,1,38901400,16500000
+shortcut_a,1000000,64,Int64,2,39564600,16500000
+shortcut_a,1000000,64,Date,0,29336900,16500000
+shortcut_a,1000000,64,Date,1,29838100,16500000
+shortcut_a,1000000,64,Date,2,29084800,16500000
+shortcut_a,1000000,64,"Datetime(time_unit='us', time_zone=None)",0,39228700,16500000
+shortcut_a,1000000,64,"Datetime(time_unit='us', time_zone=None)",1,39608400,16500000
+shortcut_a,1000000,64,"Datetime(time_unit='us', time_zone=None)",2,39680700,16500000
+shortcut_a,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,41234600,16500000
+shortcut_a,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,40609700,16500000
+shortcut_a,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,39416100,16500000
+no_shortcut_a,1000,0,Int64,0,307100,0
+no_shortcut_a,1000,0,Int64,1,173500,0
+no_shortcut_a,1000,0,Int64,2,251000,0
+no_shortcut_a,1000,0,Date,0,186400,0
+no_shortcut_a,1000,0,Date,1,187600,0
+no_shortcut_a,1000,0,Date,2,182200,0
+no_shortcut_a,1000,0,"Datetime(time_unit='us', time_zone=None)",0,174100,0
+no_shortcut_a,1000,0,"Datetime(time_unit='us', time_zone=None)",1,185200,0
+no_shortcut_a,1000,0,"Datetime(time_unit='us', time_zone=None)",2,159800,0
+no_shortcut_a,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,161000,0
+no_shortcut_a,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,169900,0
+no_shortcut_a,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,193600,0
+no_shortcut_a,1000,1,Int64,0,175000,1000
+no_shortcut_a,1000,1,Int64,1,151700,1000
+no_shortcut_a,1000,1,Int64,2,168500,1000
+no_shortcut_a,1000,1,Date,0,167800,1000
+no_shortcut_a,1000,1,Date,1,186100,1000
+no_shortcut_a,1000,1,Date,2,167400,1000
+no_shortcut_a,1000,1,"Datetime(time_unit='us', time_zone=None)",0,200900,1000
+no_shortcut_a,1000,1,"Datetime(time_unit='us', time_zone=None)",1,173600,1000
+no_shortcut_a,1000,1,"Datetime(time_unit='us', time_zone=None)",2,172800,1000
+no_shortcut_a,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,215500,1000
+no_shortcut_a,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,175700,1000
+no_shortcut_a,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,198300,1000
+no_shortcut_a,1000,2,Int64,0,301700,1968
+no_shortcut_a,1000,2,Int64,1,306300,1968
+no_shortcut_a,1000,2,Int64,2,392800,1968
+no_shortcut_a,1000,2,Date,0,323700,1968
+no_shortcut_a,1000,2,Date,1,331100,1968
+no_shortcut_a,1000,2,Date,2,291100,1968
+no_shortcut_a,1000,2,"Datetime(time_unit='us', time_zone=None)",0,314400,1968
+no_shortcut_a,1000,2,"Datetime(time_unit='us', time_zone=None)",1,348800,1968
+no_shortcut_a,1000,2,"Datetime(time_unit='us', time_zone=None)",2,336900,1968
+no_shortcut_a,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,326200,1968
+no_shortcut_a,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,359700,1968
+no_shortcut_a,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,332900,1968
+no_shortcut_a,1000,4,Int64,0,390100,3808
+no_shortcut_a,1000,4,Int64,1,419600,3808
+no_shortcut_a,1000,4,Int64,2,371500,3808
+no_shortcut_a,1000,4,Date,0,378800,3808
+no_shortcut_a,1000,4,Date,1,378300,3808
+no_shortcut_a,1000,4,Date,2,352900,3808
+no_shortcut_a,1000,4,"Datetime(time_unit='us', time_zone=None)",0,374500,3808
+no_shortcut_a,1000,4,"Datetime(time_unit='us', time_zone=None)",1,389100,3808
+no_shortcut_a,1000,4,"Datetime(time_unit='us', time_zone=None)",2,349000,3808
+no_shortcut_a,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,367700,3808
+no_shortcut_a,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,414500,3808
+no_shortcut_a,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,387200,3808
+no_shortcut_a,1000,8,Int64,0,458500,7104
+no_shortcut_a,1000,8,Int64,1,464800,7104
+no_shortcut_a,1000,8,Int64,2,569600,7104
+no_shortcut_a,1000,8,Date,0,483700,7104
+no_shortcut_a,1000,8,Date,1,469000,7104
+no_shortcut_a,1000,8,Date,2,462200,7104
+no_shortcut_a,1000,8,"Datetime(time_unit='us', time_zone=None)",0,596300,7104
+no_shortcut_a,1000,8,"Datetime(time_unit='us', time_zone=None)",1,494600,7104
+no_shortcut_a,1000,8,"Datetime(time_unit='us', time_zone=None)",2,493000,7104
+no_shortcut_a,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,504900,7104
+no_shortcut_a,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,508600,7104
+no_shortcut_a,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,483400,7104
+no_shortcut_a,1000,16,Int64,0,662000,12188
+no_shortcut_a,1000,16,Int64,1,636600,12188
+no_shortcut_a,1000,16,Int64,2,666300,12188
+no_shortcut_a,1000,16,Date,0,691800,12188
+no_shortcut_a,1000,16,Date,1,630800,12188
+no_shortcut_a,1000,16,Date,2,664100,12188
+no_shortcut_a,1000,16,"Datetime(time_unit='us', time_zone=None)",0,645300,12188
+no_shortcut_a,1000,16,"Datetime(time_unit='us', time_zone=None)",1,622900,12188
+no_shortcut_a,1000,16,"Datetime(time_unit='us', time_zone=None)",2,615400,12188
+no_shortcut_a,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,628600,12188
+no_shortcut_a,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,646000,12188
+no_shortcut_a,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,663900,12188
+no_shortcut_a,1000,31,Int64,0,781500,16373
+no_shortcut_a,1000,31,Int64,1,857800,16373
+no_shortcut_a,1000,31,Int64,2,822400,16373
+no_shortcut_a,1000,31,Date,0,847100,16373
+no_shortcut_a,1000,31,Date,1,775400,16373
+no_shortcut_a,1000,31,Date,2,806300,16373
+no_shortcut_a,1000,31,"Datetime(time_unit='us', time_zone=None)",0,863200,16373
+no_shortcut_a,1000,31,"Datetime(time_unit='us', time_zone=None)",1,785500,16373
+no_shortcut_a,1000,31,"Datetime(time_unit='us', time_zone=None)",2,809700,16373
+no_shortcut_a,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,783300,16373
+no_shortcut_a,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,781300,16373
+no_shortcut_a,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,929700,16373
+no_shortcut_a,1000,32,Int64,0,197700,16404
+no_shortcut_a,1000,32,Int64,1,192700,16404
+no_shortcut_a,1000,32,Int64,2,183500,16404
+no_shortcut_a,1000,32,Date,0,185000,16404
+no_shortcut_a,1000,32,Date,1,218700,16404
+no_shortcut_a,1000,32,Date,2,199900,16404
+no_shortcut_a,1000,32,"Datetime(time_unit='us', time_zone=None)",0,202000,16404
+no_shortcut_a,1000,32,"Datetime(time_unit='us', time_zone=None)",1,243800,16404
+no_shortcut_a,1000,32,"Datetime(time_unit='us', time_zone=None)",2,171600,16404
+no_shortcut_a,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,175000,16404
+no_shortcut_a,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,152700,16404
+no_shortcut_a,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,173700,16404
+no_shortcut_a,1000,33,Int64,0,191800,16404
+no_shortcut_a,1000,33,Int64,1,181100,16404
+no_shortcut_a,1000,33,Int64,2,172200,16404
+no_shortcut_a,1000,33,Date,0,185100,16404
+no_shortcut_a,1000,33,Date,1,181200,16404
+no_shortcut_a,1000,33,Date,2,199600,16404
+no_shortcut_a,1000,33,"Datetime(time_unit='us', time_zone=None)",0,186400,16404
+no_shortcut_a,1000,33,"Datetime(time_unit='us', time_zone=None)",1,194400,16404
+no_shortcut_a,1000,33,"Datetime(time_unit='us', time_zone=None)",2,161300,16404
+no_shortcut_a,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,202400,16404
+no_shortcut_a,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,195400,16404
+no_shortcut_a,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,194400,16404
+no_shortcut_a,1000,64,Int64,0,172600,16404
+no_shortcut_a,1000,64,Int64,1,170700,16404
+no_shortcut_a,1000,64,Int64,2,212400,16404
+no_shortcut_a,1000,64,Date,0,199600,16404
+no_shortcut_a,1000,64,Date,1,193800,16404
+no_shortcut_a,1000,64,Date,2,185400,16404
+no_shortcut_a,1000,64,"Datetime(time_unit='us', time_zone=None)",0,166900,16404
+no_shortcut_a,1000,64,"Datetime(time_unit='us', time_zone=None)",1,188900,16404
+no_shortcut_a,1000,64,"Datetime(time_unit='us', time_zone=None)",2,192700,16404
+no_shortcut_a,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,195600,16404
+no_shortcut_a,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,197300,16404
+no_shortcut_a,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,183700,16404
+no_shortcut_a,10000,0,Int64,0,217400,0
+no_shortcut_a,10000,0,Int64,1,241600,0
+no_shortcut_a,10000,0,Int64,2,208900,0
+no_shortcut_a,10000,0,Date,0,232900,0
+no_shortcut_a,10000,0,Date,1,217500,0
+no_shortcut_a,10000,0,Date,2,192000,0
+no_shortcut_a,10000,0,"Datetime(time_unit='us', time_zone=None)",0,165600,0
+no_shortcut_a,10000,0,"Datetime(time_unit='us', time_zone=None)",1,185400,0
+no_shortcut_a,10000,0,"Datetime(time_unit='us', time_zone=None)",2,231600,0
+no_shortcut_a,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,201500,0
+no_shortcut_a,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,209100,0
+no_shortcut_a,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,210300,0
+no_shortcut_a,10000,1,Int64,0,376500,10000
+no_shortcut_a,10000,1,Int64,1,430100,10000
+no_shortcut_a,10000,1,Int64,2,378700,10000
+no_shortcut_a,10000,1,Date,0,277000,10000
+no_shortcut_a,10000,1,Date,1,370600,10000
+no_shortcut_a,10000,1,Date,2,404700,10000
+no_shortcut_a,10000,1,"Datetime(time_unit='us', time_zone=None)",0,377000,10000
+no_shortcut_a,10000,1,"Datetime(time_unit='us', time_zone=None)",1,387200,10000
+no_shortcut_a,10000,1,"Datetime(time_unit='us', time_zone=None)",2,291100,10000
+no_shortcut_a,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,395200,10000
+no_shortcut_a,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,305200,10000
+no_shortcut_a,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,390000,10000
+no_shortcut_a,10000,2,Int64,0,1979600,19687
+no_shortcut_a,10000,2,Int64,1,1856800,19687
+no_shortcut_a,10000,2,Int64,2,1888200,19687
+no_shortcut_a,10000,2,Date,0,1753500,19687
+no_shortcut_a,10000,2,Date,1,1797500,19687
+no_shortcut_a,10000,2,Date,2,1761500,19687
+no_shortcut_a,10000,2,"Datetime(time_unit='us', time_zone=None)",0,2118000,19687
+no_shortcut_a,10000,2,"Datetime(time_unit='us', time_zone=None)",1,2002300,19687
+no_shortcut_a,10000,2,"Datetime(time_unit='us', time_zone=None)",2,2030000,19687
+no_shortcut_a,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,2072900,19687
+no_shortcut_a,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,2129400,19687
+no_shortcut_a,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,2021800,19687
+no_shortcut_a,10000,4,Int64,0,2572400,38122
+no_shortcut_a,10000,4,Int64,1,2528700,38122
+no_shortcut_a,10000,4,Int64,2,2578400,38122
+no_shortcut_a,10000,4,Date,0,2322100,38122
+no_shortcut_a,10000,4,Date,1,2287500,38122
+no_shortcut_a,10000,4,Date,2,2330900,38122
+no_shortcut_a,10000,4,"Datetime(time_unit='us', time_zone=None)",0,2569400,38122
+no_shortcut_a,10000,4,"Datetime(time_unit='us', time_zone=None)",1,2747100,38122
+no_shortcut_a,10000,4,"Datetime(time_unit='us', time_zone=None)",2,2823000,38122
+no_shortcut_a,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,2696200,38122
+no_shortcut_a,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,2736900,38122
+no_shortcut_a,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,2551400,38122
+no_shortcut_a,10000,8,Int64,0,1616100,71236
+no_shortcut_a,10000,8,Int64,1,1488700,71236
+no_shortcut_a,10000,8,Int64,2,1482900,71236
+no_shortcut_a,10000,8,Date,0,1354000,71236
+no_shortcut_a,10000,8,Date,1,1335700,71236
+no_shortcut_a,10000,8,Date,2,1519500,71236
+no_shortcut_a,10000,8,"Datetime(time_unit='us', time_zone=None)",0,1551200,71236
+no_shortcut_a,10000,8,"Datetime(time_unit='us', time_zone=None)",1,1492700,71236
+no_shortcut_a,10000,8,"Datetime(time_unit='us', time_zone=None)",2,1572700,71236
+no_shortcut_a,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,1490800,71236
+no_shortcut_a,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,1425800,71236
+no_shortcut_a,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,1574500,71236
+no_shortcut_a,10000,16,Int64,0,1657500,122440
+no_shortcut_a,10000,16,Int64,1,1598900,122440
+no_shortcut_a,10000,16,Int64,2,1667500,122440
+no_shortcut_a,10000,16,Date,0,1603600,122440
+no_shortcut_a,10000,16,Date,1,1595500,122440
+no_shortcut_a,10000,16,Date,2,1540500,122440
+no_shortcut_a,10000,16,"Datetime(time_unit='us', time_zone=None)",0,1706100,122440
+no_shortcut_a,10000,16,"Datetime(time_unit='us', time_zone=None)",1,1680300,122440
+no_shortcut_a,10000,16,"Datetime(time_unit='us', time_zone=None)",2,1943900,122440
+no_shortcut_a,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,1770300,122440
+no_shortcut_a,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,1704500,122440
+no_shortcut_a,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,1772700,122440
+no_shortcut_a,10000,31,Int64,0,1943400,164560
+no_shortcut_a,10000,31,Int64,1,1901500,164560
+no_shortcut_a,10000,31,Int64,2,1913300,164560
+no_shortcut_a,10000,31,Date,0,1778800,164560
+no_shortcut_a,10000,31,Date,1,1749400,164560
+no_shortcut_a,10000,31,Date,2,1715500,164560
+no_shortcut_a,10000,31,"Datetime(time_unit='us', time_zone=None)",0,2017100,164560
+no_shortcut_a,10000,31,"Datetime(time_unit='us', time_zone=None)",1,1976900,164560
+no_shortcut_a,10000,31,"Datetime(time_unit='us', time_zone=None)",2,1951400,164560
+no_shortcut_a,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,1937600,164560
+no_shortcut_a,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,2052400,164560
+no_shortcut_a,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,2031500,164560
+no_shortcut_a,10000,32,Int64,0,570200,164872
+no_shortcut_a,10000,32,Int64,1,760500,164872
+no_shortcut_a,10000,32,Int64,2,741900,164872
+no_shortcut_a,10000,32,Date,0,398500,164872
+no_shortcut_a,10000,32,Date,1,372100,164872
+no_shortcut_a,10000,32,Date,2,363400,164872
+no_shortcut_a,10000,32,"Datetime(time_unit='us', time_zone=None)",0,618400,164872
+no_shortcut_a,10000,32,"Datetime(time_unit='us', time_zone=None)",1,631500,164872
+no_shortcut_a,10000,32,"Datetime(time_unit='us', time_zone=None)",2,618600,164872
+no_shortcut_a,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,756000,164872
+no_shortcut_a,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,580700,164872
+no_shortcut_a,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,615000,164872
+no_shortcut_a,10000,33,Int64,0,636000,164872
+no_shortcut_a,10000,33,Int64,1,634900,164872
+no_shortcut_a,10000,33,Int64,2,704700,164872
+no_shortcut_a,10000,33,Date,0,388300,164872
+no_shortcut_a,10000,33,Date,1,407100,164872
+no_shortcut_a,10000,33,Date,2,362800,164872
+no_shortcut_a,10000,33,"Datetime(time_unit='us', time_zone=None)",0,608200,164872
+no_shortcut_a,10000,33,"Datetime(time_unit='us', time_zone=None)",1,620800,164872
+no_shortcut_a,10000,33,"Datetime(time_unit='us', time_zone=None)",2,623700,164872
+no_shortcut_a,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,673300,164872
+no_shortcut_a,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,655900,164872
+no_shortcut_a,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,627700,164872
+no_shortcut_a,10000,64,Int64,0,616000,164872
+no_shortcut_a,10000,64,Int64,1,704400,164872
+no_shortcut_a,10000,64,Int64,2,650700,164872
+no_shortcut_a,10000,64,Date,0,397300,164872
+no_shortcut_a,10000,64,Date,1,363900,164872
+no_shortcut_a,10000,64,Date,2,354300,164872
+no_shortcut_a,10000,64,"Datetime(time_unit='us', time_zone=None)",0,661200,164872
+no_shortcut_a,10000,64,"Datetime(time_unit='us', time_zone=None)",1,635900,164872
+no_shortcut_a,10000,64,"Datetime(time_unit='us', time_zone=None)",2,629500,164872
+no_shortcut_a,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,679700,164872
+no_shortcut_a,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,643200,164872
+no_shortcut_a,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,630700,164872
+no_shortcut_a,100000,0,Int64,0,818400,0
+no_shortcut_a,100000,0,Int64,1,804200,0
+no_shortcut_a,100000,0,Int64,2,775900,0
+no_shortcut_a,100000,0,Date,0,762800,0
+no_shortcut_a,100000,0,Date,1,705800,0
+no_shortcut_a,100000,0,Date,2,745000,0
+no_shortcut_a,100000,0,"Datetime(time_unit='us', time_zone=None)",0,744000,0
+no_shortcut_a,100000,0,"Datetime(time_unit='us', time_zone=None)",1,743500,0
+no_shortcut_a,100000,0,"Datetime(time_unit='us', time_zone=None)",2,742000,0
+no_shortcut_a,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,737600,0
+no_shortcut_a,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,765300,0
+no_shortcut_a,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,781800,0
+no_shortcut_a,100000,1,Int64,0,2677100,100000
+no_shortcut_a,100000,1,Int64,1,2698100,100000
+no_shortcut_a,100000,1,Int64,2,2628100,100000
+no_shortcut_a,100000,1,Date,0,2517400,100000
+no_shortcut_a,100000,1,Date,1,2629000,100000
+no_shortcut_a,100000,1,Date,2,2525200,100000
+no_shortcut_a,100000,1,"Datetime(time_unit='us', time_zone=None)",0,2577400,100000
+no_shortcut_a,100000,1,"Datetime(time_unit='us', time_zone=None)",1,2581100,100000
+no_shortcut_a,100000,1,"Datetime(time_unit='us', time_zone=None)",2,2653400,100000
+no_shortcut_a,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,2570300,100000
+no_shortcut_a,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,2542500,100000
+no_shortcut_a,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,2731000,100000
+no_shortcut_a,100000,2,Int64,0,5944500,196875
+no_shortcut_a,100000,2,Int64,1,6122400,196875
+no_shortcut_a,100000,2,Int64,2,5803900,196875
+no_shortcut_a,100000,2,Date,0,4952000,196875
+no_shortcut_a,100000,2,Date,1,5003500,196875
+no_shortcut_a,100000,2,Date,2,4762900,196875
+no_shortcut_a,100000,2,"Datetime(time_unit='us', time_zone=None)",0,5894800,196875
+no_shortcut_a,100000,2,"Datetime(time_unit='us', time_zone=None)",1,5821700,196875
+no_shortcut_a,100000,2,"Datetime(time_unit='us', time_zone=None)",2,5893700,196875
+no_shortcut_a,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,5873100,196875
+no_shortcut_a,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,5777000,196875
+no_shortcut_a,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,5642500,196875
+no_shortcut_a,100000,4,Int64,0,6536900,381250
+no_shortcut_a,100000,4,Int64,1,6423100,381250
+no_shortcut_a,100000,4,Int64,2,6407000,381250
+no_shortcut_a,100000,4,Date,0,5699400,381250
+no_shortcut_a,100000,4,Date,1,6000100,381250
+no_shortcut_a,100000,4,Date,2,5595400,381250
+no_shortcut_a,100000,4,"Datetime(time_unit='us', time_zone=None)",0,8149800,381250
+no_shortcut_a,100000,4,"Datetime(time_unit='us', time_zone=None)",1,6473500,381250
+no_shortcut_a,100000,4,"Datetime(time_unit='us', time_zone=None)",2,6910100,381250
+no_shortcut_a,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,6847500,381250
+no_shortcut_a,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,6590500,381250
+no_shortcut_a,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,6694400,381250
+no_shortcut_a,100000,8,Int64,0,8081100,712500
+no_shortcut_a,100000,8,Int64,1,8179400,712500
+no_shortcut_a,100000,8,Int64,2,8035000,712500
+no_shortcut_a,100000,8,Date,0,7303200,712500
+no_shortcut_a,100000,8,Date,1,7203400,712500
+no_shortcut_a,100000,8,Date,2,7270800,712500
+no_shortcut_a,100000,8,"Datetime(time_unit='us', time_zone=None)",0,8517900,712500
+no_shortcut_a,100000,8,"Datetime(time_unit='us', time_zone=None)",1,8058400,712500
+no_shortcut_a,100000,8,"Datetime(time_unit='us', time_zone=None)",2,8235300,712500
+no_shortcut_a,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,8338100,712500
+no_shortcut_a,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,8109500,712500
+no_shortcut_a,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,8843000,712500
+no_shortcut_a,100000,16,Int64,0,10243200,1225000
+no_shortcut_a,100000,16,Int64,1,9843800,1225000
+no_shortcut_a,100000,16,Int64,2,9972300,1225000
+no_shortcut_a,100000,16,Date,0,9048000,1225000
+no_shortcut_a,100000,16,Date,1,9090800,1225000
+no_shortcut_a,100000,16,Date,2,9059300,1225000
+no_shortcut_a,100000,16,"Datetime(time_unit='us', time_zone=None)",0,10246700,1225000
+no_shortcut_a,100000,16,"Datetime(time_unit='us', time_zone=None)",1,10161400,1225000
+no_shortcut_a,100000,16,"Datetime(time_unit='us', time_zone=None)",2,9961700,1225000
+no_shortcut_a,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,10067000,1225000
+no_shortcut_a,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,9994600,1225000
+no_shortcut_a,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,9923200,1225000
+no_shortcut_a,100000,31,Int64,0,12355800,1646875
+no_shortcut_a,100000,31,Int64,1,12543600,1646875
+no_shortcut_a,100000,31,Int64,2,16200100,1646875
+no_shortcut_a,100000,31,Date,0,11696600,1646875
+no_shortcut_a,100000,31,Date,1,11355900,1646875
+no_shortcut_a,100000,31,Date,2,11473000,1646875
+no_shortcut_a,100000,31,"Datetime(time_unit='us', time_zone=None)",0,12696400,1646875
+no_shortcut_a,100000,31,"Datetime(time_unit='us', time_zone=None)",1,12755300,1646875
+no_shortcut_a,100000,31,"Datetime(time_unit='us', time_zone=None)",2,12618100,1646875
+no_shortcut_a,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,12302400,1646875
+no_shortcut_a,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,12282600,1646875
+no_shortcut_a,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,12554400,1646875
+no_shortcut_a,100000,32,Int64,0,3549100,1650000
+no_shortcut_a,100000,32,Int64,1,3526400,1650000
+no_shortcut_a,100000,32,Int64,2,3677000,1650000
+no_shortcut_a,100000,32,Date,0,2773600,1650000
+no_shortcut_a,100000,32,Date,1,2852200,1650000
+no_shortcut_a,100000,32,Date,2,2714300,1650000
+no_shortcut_a,100000,32,"Datetime(time_unit='us', time_zone=None)",0,3618400,1650000
+no_shortcut_a,100000,32,"Datetime(time_unit='us', time_zone=None)",1,3563700,1650000
+no_shortcut_a,100000,32,"Datetime(time_unit='us', time_zone=None)",2,3618100,1650000
+no_shortcut_a,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,3613900,1650000
+no_shortcut_a,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,3842300,1650000
+no_shortcut_a,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,3557100,1650000
+no_shortcut_a,100000,33,Int64,0,3644900,1650000
+no_shortcut_a,100000,33,Int64,1,3560900,1650000
+no_shortcut_a,100000,33,Int64,2,3540000,1650000
+no_shortcut_a,100000,33,Date,0,2778200,1650000
+no_shortcut_a,100000,33,Date,1,2783200,1650000
+no_shortcut_a,100000,33,Date,2,2743600,1650000
+no_shortcut_a,100000,33,"Datetime(time_unit='us', time_zone=None)",0,3540900,1650000
+no_shortcut_a,100000,33,"Datetime(time_unit='us', time_zone=None)",1,3477700,1650000
+no_shortcut_a,100000,33,"Datetime(time_unit='us', time_zone=None)",2,3712100,1650000
+no_shortcut_a,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,3510300,1650000
+no_shortcut_a,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,3616600,1650000
+no_shortcut_a,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,3737200,1650000
+no_shortcut_a,100000,64,Int64,0,3719400,1650000
+no_shortcut_a,100000,64,Int64,1,4056000,1650000
+no_shortcut_a,100000,64,Int64,2,3842100,1650000
+no_shortcut_a,100000,64,Date,0,2982000,1650000
+no_shortcut_a,100000,64,Date,1,2838800,1650000
+no_shortcut_a,100000,64,Date,2,2809500,1650000
+no_shortcut_a,100000,64,"Datetime(time_unit='us', time_zone=None)",0,3572700,1650000
+no_shortcut_a,100000,64,"Datetime(time_unit='us', time_zone=None)",1,3528400,1650000
+no_shortcut_a,100000,64,"Datetime(time_unit='us', time_zone=None)",2,3620700,1650000
+no_shortcut_a,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,3582400,1650000
+no_shortcut_a,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,3726400,1650000
+no_shortcut_a,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,3725200,1650000
+no_shortcut_a,1000000,0,Int64,0,6937300,0
+no_shortcut_a,1000000,0,Int64,1,6475500,0
+no_shortcut_a,1000000,0,Int64,2,6879200,0
+no_shortcut_a,1000000,0,Date,0,6838700,0
+no_shortcut_a,1000000,0,Date,1,6304100,0
+no_shortcut_a,1000000,0,Date,2,6606100,0
+no_shortcut_a,1000000,0,"Datetime(time_unit='us', time_zone=None)",0,6982900,0
+no_shortcut_a,1000000,0,"Datetime(time_unit='us', time_zone=None)",1,6643400,0
+no_shortcut_a,1000000,0,"Datetime(time_unit='us', time_zone=None)",2,6642300,0
+no_shortcut_a,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,6891500,0
+no_shortcut_a,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,6663000,0
+no_shortcut_a,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,6670600,0
+no_shortcut_a,1000000,1,Int64,0,25457300,1000000
+no_shortcut_a,1000000,1,Int64,1,27266100,1000000
+no_shortcut_a,1000000,1,Int64,2,25692800,1000000
+no_shortcut_a,1000000,1,Date,0,23590500,1000000
+no_shortcut_a,1000000,1,Date,1,23716900,1000000
+no_shortcut_a,1000000,1,Date,2,23419900,1000000
+no_shortcut_a,1000000,1,"Datetime(time_unit='us', time_zone=None)",0,25514000,1000000
+no_shortcut_a,1000000,1,"Datetime(time_unit='us', time_zone=None)",1,25473900,1000000
+no_shortcut_a,1000000,1,"Datetime(time_unit='us', time_zone=None)",2,25462800,1000000
+no_shortcut_a,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,25492700,1000000
+no_shortcut_a,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,25430700,1000000
+no_shortcut_a,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,25633500,1000000
+no_shortcut_a,1000000,2,Int64,0,57053700,1968750
+no_shortcut_a,1000000,2,Int64,1,56319800,1968750
+no_shortcut_a,1000000,2,Int64,2,64696500,1968750
+no_shortcut_a,1000000,2,Date,0,58864800,1968750
+no_shortcut_a,1000000,2,Date,1,59884500,1968750
+no_shortcut_a,1000000,2,Date,2,59859500,1968750
+no_shortcut_a,1000000,2,"Datetime(time_unit='us', time_zone=None)",0,67091500,1968750
+no_shortcut_a,1000000,2,"Datetime(time_unit='us', time_zone=None)",1,69442100,1968750
+no_shortcut_a,1000000,2,"Datetime(time_unit='us', time_zone=None)",2,67535900,1968750
+no_shortcut_a,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,65274300,1968750
+no_shortcut_a,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,66549600,1968750
+no_shortcut_a,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,69575800,1968750
+no_shortcut_a,1000000,4,Int64,0,79382500,3812500
+no_shortcut_a,1000000,4,Int64,1,79159800,3812500
+no_shortcut_a,1000000,4,Int64,2,78396700,3812500
+no_shortcut_a,1000000,4,Date,0,67559300,3812500
+no_shortcut_a,1000000,4,Date,1,67886100,3812500
+no_shortcut_a,1000000,4,Date,2,67924000,3812500
+no_shortcut_a,1000000,4,"Datetime(time_unit='us', time_zone=None)",0,77919900,3812500
+no_shortcut_a,1000000,4,"Datetime(time_unit='us', time_zone=None)",1,79283200,3812500
+no_shortcut_a,1000000,4,"Datetime(time_unit='us', time_zone=None)",2,77419100,3812500
+no_shortcut_a,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,77351300,3812500
+no_shortcut_a,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,78324800,3812500
+no_shortcut_a,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,80170900,3812500
+no_shortcut_a,1000000,8,Int64,0,103012500,7125000
+no_shortcut_a,1000000,8,Int64,1,102506600,7125000
+no_shortcut_a,1000000,8,Int64,2,105024700,7125000
+no_shortcut_a,1000000,8,Date,0,93017200,7125000
+no_shortcut_a,1000000,8,Date,1,89303900,7125000
+no_shortcut_a,1000000,8,Date,2,90750000,7125000
+no_shortcut_a,1000000,8,"Datetime(time_unit='us', time_zone=None)",0,97912600,7125000
+no_shortcut_a,1000000,8,"Datetime(time_unit='us', time_zone=None)",1,103088400,7125000
+no_shortcut_a,1000000,8,"Datetime(time_unit='us', time_zone=None)",2,105591900,7125000
+no_shortcut_a,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,101640900,7125000
+no_shortcut_a,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,102093500,7125000
+no_shortcut_a,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,101732100,7125000
+no_shortcut_a,1000000,16,Int64,0,133652700,12250000
+no_shortcut_a,1000000,16,Int64,1,133051600,12250000
+no_shortcut_a,1000000,16,Int64,2,126982300,12250000
+no_shortcut_a,1000000,16,Date,0,124416500,12250000
+no_shortcut_a,1000000,16,Date,1,124768000,12250000
+no_shortcut_a,1000000,16,Date,2,124587200,12250000
+no_shortcut_a,1000000,16,"Datetime(time_unit='us', time_zone=None)",0,133993500,12250000
+no_shortcut_a,1000000,16,"Datetime(time_unit='us', time_zone=None)",1,133206600,12250000
+no_shortcut_a,1000000,16,"Datetime(time_unit='us', time_zone=None)",2,131386200,12250000
+no_shortcut_a,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,133835200,12250000
+no_shortcut_a,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,134812100,12250000
+no_shortcut_a,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,132796600,12250000
+no_shortcut_a,1000000,31,Int64,0,169246100,16468750
+no_shortcut_a,1000000,31,Int64,1,168982100,16468750
+no_shortcut_a,1000000,31,Int64,2,164169300,16468750
+no_shortcut_a,1000000,31,Date,0,158577500,16468750
+no_shortcut_a,1000000,31,Date,1,159272400,16468750
+no_shortcut_a,1000000,31,Date,2,157427500,16468750
+no_shortcut_a,1000000,31,"Datetime(time_unit='us', time_zone=None)",0,167357300,16468750
+no_shortcut_a,1000000,31,"Datetime(time_unit='us', time_zone=None)",1,168910500,16468750
+no_shortcut_a,1000000,31,"Datetime(time_unit='us', time_zone=None)",2,162161200,16468750
+no_shortcut_a,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,168439600,16468750
+no_shortcut_a,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,162907200,16468750
+no_shortcut_a,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,169419700,16468750
+no_shortcut_a,1000000,32,Int64,0,39756000,16500000
+no_shortcut_a,1000000,32,Int64,1,39750500,16500000
+no_shortcut_a,1000000,32,Int64,2,39269900,16500000
+no_shortcut_a,1000000,32,Date,0,29871100,16500000
+no_shortcut_a,1000000,32,Date,1,29209900,16500000
+no_shortcut_a,1000000,32,Date,2,28985100,16500000
+no_shortcut_a,1000000,32,"Datetime(time_unit='us', time_zone=None)",0,39221600,16500000
+no_shortcut_a,1000000,32,"Datetime(time_unit='us', time_zone=None)",1,39379600,16500000
+no_shortcut_a,1000000,32,"Datetime(time_unit='us', time_zone=None)",2,39456600,16500000
+no_shortcut_a,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,39750000,16500000
+no_shortcut_a,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,39212200,16500000
+no_shortcut_a,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,40069800,16500000
+no_shortcut_a,1000000,33,Int64,0,39618900,16500000
+no_shortcut_a,1000000,33,Int64,1,39741100,16500000
+no_shortcut_a,1000000,33,Int64,2,40327500,16500000
+no_shortcut_a,1000000,33,Date,0,29356200,16500000
+no_shortcut_a,1000000,33,Date,1,29449100,16500000
+no_shortcut_a,1000000,33,Date,2,29588400,16500000
+no_shortcut_a,1000000,33,"Datetime(time_unit='us', time_zone=None)",0,39830400,16500000
+no_shortcut_a,1000000,33,"Datetime(time_unit='us', time_zone=None)",1,39319500,16500000
+no_shortcut_a,1000000,33,"Datetime(time_unit='us', time_zone=None)",2,39297500,16500000
+no_shortcut_a,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,39414700,16500000
+no_shortcut_a,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,39456700,16500000
+no_shortcut_a,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,40162000,16500000
+no_shortcut_a,1000000,64,Int64,0,39854000,16500000
+no_shortcut_a,1000000,64,Int64,1,40206600,16500000
+no_shortcut_a,1000000,64,Int64,2,39978000,16500000
+no_shortcut_a,1000000,64,Date,0,29491400,16500000
+no_shortcut_a,1000000,64,Date,1,29442900,16500000
+no_shortcut_a,1000000,64,Date,2,29744600,16500000
+no_shortcut_a,1000000,64,"Datetime(time_unit='us', time_zone=None)",0,40182000,16500000
+no_shortcut_a,1000000,64,"Datetime(time_unit='us', time_zone=None)",1,40022000,16500000
+no_shortcut_a,1000000,64,"Datetime(time_unit='us', time_zone=None)",2,40606700,16500000
+no_shortcut_a,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,39723000,16500000
+no_shortcut_a,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,39572900,16500000
+no_shortcut_a,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,39464900,16500000
+no_shortcut_b,1000,0,Int64,0,413800,0
+no_shortcut_b,1000,0,Int64,1,181100,0
+no_shortcut_b,1000,0,Int64,2,290500,0
+no_shortcut_b,1000,0,Date,0,190200,0
+no_shortcut_b,1000,0,Date,1,153900,0
+no_shortcut_b,1000,0,Date,2,196700,0
+no_shortcut_b,1000,0,"Datetime(time_unit='us', time_zone=None)",0,177700,0
+no_shortcut_b,1000,0,"Datetime(time_unit='us', time_zone=None)",1,153900,0
+no_shortcut_b,1000,0,"Datetime(time_unit='us', time_zone=None)",2,160200,0
+no_shortcut_b,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,184000,0
+no_shortcut_b,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,220800,0
+no_shortcut_b,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,161600,0
+no_shortcut_b,1000,1,Int64,0,208500,1000
+no_shortcut_b,1000,1,Int64,1,182600,1000
+no_shortcut_b,1000,1,Int64,2,164500,1000
+no_shortcut_b,1000,1,Date,0,182300,1000
+no_shortcut_b,1000,1,Date,1,172600,1000
+no_shortcut_b,1000,1,Date,2,202300,1000
+no_shortcut_b,1000,1,"Datetime(time_unit='us', time_zone=None)",0,187200,1000
+no_shortcut_b,1000,1,"Datetime(time_unit='us', time_zone=None)",1,180400,1000
+no_shortcut_b,1000,1,"Datetime(time_unit='us', time_zone=None)",2,179100,1000
+no_shortcut_b,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,208100,1000
+no_shortcut_b,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,181800,1000
+no_shortcut_b,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,183800,1000
+no_shortcut_b,1000,2,Int64,0,319200,1968
+no_shortcut_b,1000,2,Int64,1,343000,1968
+no_shortcut_b,1000,2,Int64,2,327400,1968
+no_shortcut_b,1000,2,Date,0,344600,1968
+no_shortcut_b,1000,2,Date,1,317700,1968
+no_shortcut_b,1000,2,Date,2,391500,1968
+no_shortcut_b,1000,2,"Datetime(time_unit='us', time_zone=None)",0,333800,1968
+no_shortcut_b,1000,2,"Datetime(time_unit='us', time_zone=None)",1,332000,1968
+no_shortcut_b,1000,2,"Datetime(time_unit='us', time_zone=None)",2,340900,1968
+no_shortcut_b,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,330200,1968
+no_shortcut_b,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,309400,1968
+no_shortcut_b,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,331900,1968
+no_shortcut_b,1000,4,Int64,0,357900,3808
+no_shortcut_b,1000,4,Int64,1,386800,3808
+no_shortcut_b,1000,4,Int64,2,379600,3808
+no_shortcut_b,1000,4,Date,0,398500,3808
+no_shortcut_b,1000,4,Date,1,377500,3808
+no_shortcut_b,1000,4,Date,2,407900,3808
+no_shortcut_b,1000,4,"Datetime(time_unit='us', time_zone=None)",0,352800,3808
+no_shortcut_b,1000,4,"Datetime(time_unit='us', time_zone=None)",1,375500,3808
+no_shortcut_b,1000,4,"Datetime(time_unit='us', time_zone=None)",2,372600,3808
+no_shortcut_b,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,484600,3808
+no_shortcut_b,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,389200,3808
+no_shortcut_b,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,430500,3808
+no_shortcut_b,1000,8,Int64,0,484200,7104
+no_shortcut_b,1000,8,Int64,1,452200,7104
+no_shortcut_b,1000,8,Int64,2,482500,7104
+no_shortcut_b,1000,8,Date,0,485800,7104
+no_shortcut_b,1000,8,Date,1,554800,7104
+no_shortcut_b,1000,8,Date,2,472100,7104
+no_shortcut_b,1000,8,"Datetime(time_unit='us', time_zone=None)",0,464600,7104
+no_shortcut_b,1000,8,"Datetime(time_unit='us', time_zone=None)",1,508700,7104
+no_shortcut_b,1000,8,"Datetime(time_unit='us', time_zone=None)",2,476800,7104
+no_shortcut_b,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,490500,7104
+no_shortcut_b,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,511600,7104
+no_shortcut_b,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,494400,7104
+no_shortcut_b,1000,16,Int64,0,635900,12188
+no_shortcut_b,1000,16,Int64,1,681900,12188
+no_shortcut_b,1000,16,Int64,2,638100,12188
+no_shortcut_b,1000,16,Date,0,623400,12188
+no_shortcut_b,1000,16,Date,1,633300,12188
+no_shortcut_b,1000,16,Date,2,681900,12188
+no_shortcut_b,1000,16,"Datetime(time_unit='us', time_zone=None)",0,645900,12188
+no_shortcut_b,1000,16,"Datetime(time_unit='us', time_zone=None)",1,628500,12188
+no_shortcut_b,1000,16,"Datetime(time_unit='us', time_zone=None)",2,658000,12188
+no_shortcut_b,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,627500,12188
+no_shortcut_b,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,632100,12188
+no_shortcut_b,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,642900,12188
+no_shortcut_b,1000,31,Int64,0,813100,16373
+no_shortcut_b,1000,31,Int64,1,782700,16373
+no_shortcut_b,1000,31,Int64,2,806700,16373
+no_shortcut_b,1000,31,Date,0,788900,16373
+no_shortcut_b,1000,31,Date,1,805800,16373
+no_shortcut_b,1000,31,Date,2,803100,16373
+no_shortcut_b,1000,31,"Datetime(time_unit='us', time_zone=None)",0,802200,16373
+no_shortcut_b,1000,31,"Datetime(time_unit='us', time_zone=None)",1,790700,16373
+no_shortcut_b,1000,31,"Datetime(time_unit='us', time_zone=None)",2,837300,16373
+no_shortcut_b,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,910000,16373
+no_shortcut_b,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,848400,16373
+no_shortcut_b,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,815900,16373
+no_shortcut_b,1000,32,Int64,0,264600,16404
+no_shortcut_b,1000,32,Int64,1,203900,16404
+no_shortcut_b,1000,32,Int64,2,193900,16404
+no_shortcut_b,1000,32,Date,0,158300,16404
+no_shortcut_b,1000,32,Date,1,204700,16404
+no_shortcut_b,1000,32,Date,2,192300,16404
+no_shortcut_b,1000,32,"Datetime(time_unit='us', time_zone=None)",0,201700,16404
+no_shortcut_b,1000,32,"Datetime(time_unit='us', time_zone=None)",1,193800,16404
+no_shortcut_b,1000,32,"Datetime(time_unit='us', time_zone=None)",2,182600,16404
+no_shortcut_b,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,254000,16404
+no_shortcut_b,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,171900,16404
+no_shortcut_b,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,149400,16404
+no_shortcut_b,1000,33,Int64,0,218200,16404
+no_shortcut_b,1000,33,Int64,1,192300,16404
+no_shortcut_b,1000,33,Int64,2,209500,16404
+no_shortcut_b,1000,33,Date,0,188500,16404
+no_shortcut_b,1000,33,Date,1,184400,16404
+no_shortcut_b,1000,33,Date,2,193100,16404
+no_shortcut_b,1000,33,"Datetime(time_unit='us', time_zone=None)",0,185200,16404
+no_shortcut_b,1000,33,"Datetime(time_unit='us', time_zone=None)",1,192100,16404
+no_shortcut_b,1000,33,"Datetime(time_unit='us', time_zone=None)",2,210900,16404
+no_shortcut_b,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,216200,16404
+no_shortcut_b,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,191400,16404
+no_shortcut_b,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,202900,16404
+no_shortcut_b,1000,64,Int64,0,166400,16404
+no_shortcut_b,1000,64,Int64,1,194700,16404
+no_shortcut_b,1000,64,Int64,2,236300,16404
+no_shortcut_b,1000,64,Date,0,185100,16404
+no_shortcut_b,1000,64,Date,1,361900,16404
+no_shortcut_b,1000,64,Date,2,197600,16404
+no_shortcut_b,1000,64,"Datetime(time_unit='us', time_zone=None)",0,208600,16404
+no_shortcut_b,1000,64,"Datetime(time_unit='us', time_zone=None)",1,202200,16404
+no_shortcut_b,1000,64,"Datetime(time_unit='us', time_zone=None)",2,208800,16404
+no_shortcut_b,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,219600,16404
+no_shortcut_b,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,201500,16404
+no_shortcut_b,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,190900,16404
+no_shortcut_b,10000,0,Int64,0,272000,0
+no_shortcut_b,10000,0,Int64,1,213900,0
+no_shortcut_b,10000,0,Int64,2,223200,0
+no_shortcut_b,10000,0,Date,0,203500,0
+no_shortcut_b,10000,0,Date,1,229800,0
+no_shortcut_b,10000,0,Date,2,219600,0
+no_shortcut_b,10000,0,"Datetime(time_unit='us', time_zone=None)",0,220500,0
+no_shortcut_b,10000,0,"Datetime(time_unit='us', time_zone=None)",1,234100,0
+no_shortcut_b,10000,0,"Datetime(time_unit='us', time_zone=None)",2,230700,0
+no_shortcut_b,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,210500,0
+no_shortcut_b,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,199400,0
+no_shortcut_b,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,213300,0
+no_shortcut_b,10000,1,Int64,0,416400,10000
+no_shortcut_b,10000,1,Int64,1,380600,10000
+no_shortcut_b,10000,1,Int64,2,283500,10000
+no_shortcut_b,10000,1,Date,0,373000,10000
+no_shortcut_b,10000,1,Date,1,408000,10000
+no_shortcut_b,10000,1,Date,2,389600,10000
+no_shortcut_b,10000,1,"Datetime(time_unit='us', time_zone=None)",0,405500,10000
+no_shortcut_b,10000,1,"Datetime(time_unit='us', time_zone=None)",1,387900,10000
+no_shortcut_b,10000,1,"Datetime(time_unit='us', time_zone=None)",2,397200,10000
+no_shortcut_b,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,425300,10000
+no_shortcut_b,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,405400,10000
+no_shortcut_b,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,298000,10000
+no_shortcut_b,10000,2,Int64,0,2835800,19687
+no_shortcut_b,10000,2,Int64,1,2044600,19687
+no_shortcut_b,10000,2,Int64,2,2151700,19687
+no_shortcut_b,10000,2,Date,0,2779700,19687
+no_shortcut_b,10000,2,Date,1,1772900,19687
+no_shortcut_b,10000,2,Date,2,1741800,19687
+no_shortcut_b,10000,2,"Datetime(time_unit='us', time_zone=None)",0,2167700,19687
+no_shortcut_b,10000,2,"Datetime(time_unit='us', time_zone=None)",1,2881600,19687
+no_shortcut_b,10000,2,"Datetime(time_unit='us', time_zone=None)",2,2064600,19687
+no_shortcut_b,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,2014700,19687
+no_shortcut_b,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,2164000,19687
+no_shortcut_b,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,2022600,19687
+no_shortcut_b,10000,4,Int64,0,2747600,38122
+no_shortcut_b,10000,4,Int64,1,2742100,38122
+no_shortcut_b,10000,4,Int64,2,2718900,38122
+no_shortcut_b,10000,4,Date,0,2434000,38122
+no_shortcut_b,10000,4,Date,1,2324200,38122
+no_shortcut_b,10000,4,Date,2,2662600,38122
+no_shortcut_b,10000,4,"Datetime(time_unit='us', time_zone=None)",0,2640400,38122
+no_shortcut_b,10000,4,"Datetime(time_unit='us', time_zone=None)",1,2743800,38122
+no_shortcut_b,10000,4,"Datetime(time_unit='us', time_zone=None)",2,2697400,38122
+no_shortcut_b,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,2786800,38122
+no_shortcut_b,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,2580200,38122
+no_shortcut_b,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,2654500,38122
+no_shortcut_b,10000,8,Int64,0,1721300,71236
+no_shortcut_b,10000,8,Int64,1,1667200,71236
+no_shortcut_b,10000,8,Int64,2,1529000,71236
+no_shortcut_b,10000,8,Date,0,1352800,71236
+no_shortcut_b,10000,8,Date,1,1388600,71236
+no_shortcut_b,10000,8,Date,2,1351000,71236
+no_shortcut_b,10000,8,"Datetime(time_unit='us', time_zone=None)",0,1541700,71236
+no_shortcut_b,10000,8,"Datetime(time_unit='us', time_zone=None)",1,1527900,71236
+no_shortcut_b,10000,8,"Datetime(time_unit='us', time_zone=None)",2,1626100,71236
+no_shortcut_b,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,1591600,71236
+no_shortcut_b,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,1575300,71236
+no_shortcut_b,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,1534300,71236
+no_shortcut_b,10000,16,Int64,0,1780100,122440
+no_shortcut_b,10000,16,Int64,1,1984100,122440
+no_shortcut_b,10000,16,Int64,2,1716700,122440
+no_shortcut_b,10000,16,Date,0,1595500,122440
+no_shortcut_b,10000,16,Date,1,1555000,122440
+no_shortcut_b,10000,16,Date,2,1639100,122440
+no_shortcut_b,10000,16,"Datetime(time_unit='us', time_zone=None)",0,1538900,122440
+no_shortcut_b,10000,16,"Datetime(time_unit='us', time_zone=None)",1,1526300,122440
+no_shortcut_b,10000,16,"Datetime(time_unit='us', time_zone=None)",2,1637400,122440
+no_shortcut_b,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,1598800,122440
+no_shortcut_b,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,1529300,122440
+no_shortcut_b,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,1681200,122440
+no_shortcut_b,10000,31,Int64,0,1863800,164560
+no_shortcut_b,10000,31,Int64,1,1837100,164560
+no_shortcut_b,10000,31,Int64,2,1860000,164560
+no_shortcut_b,10000,31,Date,0,1770600,164560
+no_shortcut_b,10000,31,Date,1,1863000,164560
+no_shortcut_b,10000,31,Date,2,1770500,164560
+no_shortcut_b,10000,31,"Datetime(time_unit='us', time_zone=None)",0,1845200,164560
+no_shortcut_b,10000,31,"Datetime(time_unit='us', time_zone=None)",1,1801800,164560
+no_shortcut_b,10000,31,"Datetime(time_unit='us', time_zone=None)",2,1833900,164560
+no_shortcut_b,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,1961200,164560
+no_shortcut_b,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,1777600,164560
+no_shortcut_b,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,1856900,164560
+no_shortcut_b,10000,32,Int64,0,560500,164872
+no_shortcut_b,10000,32,Int64,1,502600,164872
+no_shortcut_b,10000,32,Int64,2,549700,164872
+no_shortcut_b,10000,32,Date,0,393200,164872
+no_shortcut_b,10000,32,Date,1,404100,164872
+no_shortcut_b,10000,32,Date,2,364200,164872
+no_shortcut_b,10000,32,"Datetime(time_unit='us', time_zone=None)",0,503500,164872
+no_shortcut_b,10000,32,"Datetime(time_unit='us', time_zone=None)",1,622500,164872
+no_shortcut_b,10000,32,"Datetime(time_unit='us', time_zone=None)",2,486800,164872
+no_shortcut_b,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,490700,164872
+no_shortcut_b,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,569200,164872
+no_shortcut_b,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,523400,164872
+no_shortcut_b,10000,33,Int64,0,476300,164872
+no_shortcut_b,10000,33,Int64,1,457300,164872
+no_shortcut_b,10000,33,Int64,2,520900,164872
+no_shortcut_b,10000,33,Date,0,392200,164872
+no_shortcut_b,10000,33,Date,1,411200,164872
+no_shortcut_b,10000,33,Date,2,374600,164872
+no_shortcut_b,10000,33,"Datetime(time_unit='us', time_zone=None)",0,509300,164872
+no_shortcut_b,10000,33,"Datetime(time_unit='us', time_zone=None)",1,487800,164872
+no_shortcut_b,10000,33,"Datetime(time_unit='us', time_zone=None)",2,477000,164872
+no_shortcut_b,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,506000,164872
+no_shortcut_b,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,478800,164872
+no_shortcut_b,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,469200,164872
+no_shortcut_b,10000,64,Int64,0,528600,164872
+no_shortcut_b,10000,64,Int64,1,536700,164872
+no_shortcut_b,10000,64,Int64,2,458200,164872
+no_shortcut_b,10000,64,Date,0,394100,164872
+no_shortcut_b,10000,64,Date,1,379200,164872
+no_shortcut_b,10000,64,Date,2,256200,164872
+no_shortcut_b,10000,64,"Datetime(time_unit='us', time_zone=None)",0,563600,164872
+no_shortcut_b,10000,64,"Datetime(time_unit='us', time_zone=None)",1,491600,164872
+no_shortcut_b,10000,64,"Datetime(time_unit='us', time_zone=None)",2,513500,164872
+no_shortcut_b,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,480100,164872
+no_shortcut_b,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,477800,164872
+no_shortcut_b,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,486000,164872
+no_shortcut_b,100000,0,Int64,0,810100,0
+no_shortcut_b,100000,0,Int64,1,719400,0
+no_shortcut_b,100000,0,Int64,2,753500,0
+no_shortcut_b,100000,0,Date,0,737200,0
+no_shortcut_b,100000,0,Date,1,742000,0
+no_shortcut_b,100000,0,Date,2,753400,0
+no_shortcut_b,100000,0,"Datetime(time_unit='us', time_zone=None)",0,790500,0
+no_shortcut_b,100000,0,"Datetime(time_unit='us', time_zone=None)",1,744000,0
+no_shortcut_b,100000,0,"Datetime(time_unit='us', time_zone=None)",2,719800,0
+no_shortcut_b,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,789700,0
+no_shortcut_b,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,743900,0
+no_shortcut_b,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,762600,0
+no_shortcut_b,100000,1,Int64,0,2536400,100000
+no_shortcut_b,100000,1,Int64,1,2543000,100000
+no_shortcut_b,100000,1,Int64,2,2618100,100000
+no_shortcut_b,100000,1,Date,0,2647500,100000
+no_shortcut_b,100000,1,Date,1,2567100,100000
+no_shortcut_b,100000,1,Date,2,2571300,100000
+no_shortcut_b,100000,1,"Datetime(time_unit='us', time_zone=None)",0,2533900,100000
+no_shortcut_b,100000,1,"Datetime(time_unit='us', time_zone=None)",1,2614700,100000
+no_shortcut_b,100000,1,"Datetime(time_unit='us', time_zone=None)",2,2603600,100000
+no_shortcut_b,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,2669000,100000
+no_shortcut_b,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,2616600,100000
+no_shortcut_b,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,2539000,100000
+no_shortcut_b,100000,2,Int64,0,5911900,196875
+no_shortcut_b,100000,2,Int64,1,5586600,196875
+no_shortcut_b,100000,2,Int64,2,5717600,196875
+no_shortcut_b,100000,2,Date,0,5051800,196875
+no_shortcut_b,100000,2,Date,1,5183000,196875
+no_shortcut_b,100000,2,Date,2,5006000,196875
+no_shortcut_b,100000,2,"Datetime(time_unit='us', time_zone=None)",0,5926300,196875
+no_shortcut_b,100000,2,"Datetime(time_unit='us', time_zone=None)",1,5579100,196875
+no_shortcut_b,100000,2,"Datetime(time_unit='us', time_zone=None)",2,5833300,196875
+no_shortcut_b,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,5664300,196875
+no_shortcut_b,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,5622500,196875
+no_shortcut_b,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,5558400,196875
+no_shortcut_b,100000,4,Int64,0,6362600,381250
+no_shortcut_b,100000,4,Int64,1,6371200,381250
+no_shortcut_b,100000,4,Int64,2,6297100,381250
+no_shortcut_b,100000,4,Date,0,5837600,381250
+no_shortcut_b,100000,4,Date,1,7085200,381250
+no_shortcut_b,100000,4,Date,2,5685100,381250
+no_shortcut_b,100000,4,"Datetime(time_unit='us', time_zone=None)",0,6577100,381250
+no_shortcut_b,100000,4,"Datetime(time_unit='us', time_zone=None)",1,6528100,381250
+no_shortcut_b,100000,4,"Datetime(time_unit='us', time_zone=None)",2,6508500,381250
+no_shortcut_b,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,6547800,381250
+no_shortcut_b,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,6474200,381250
+no_shortcut_b,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,6599600,381250
+no_shortcut_b,100000,8,Int64,0,8158100,712500
+no_shortcut_b,100000,8,Int64,1,7965200,712500
+no_shortcut_b,100000,8,Int64,2,8279900,712500
+no_shortcut_b,100000,8,Date,0,7363700,712500
+no_shortcut_b,100000,8,Date,1,7400900,712500
+no_shortcut_b,100000,8,Date,2,7267100,712500
+no_shortcut_b,100000,8,"Datetime(time_unit='us', time_zone=None)",0,8114900,712500
+no_shortcut_b,100000,8,"Datetime(time_unit='us', time_zone=None)",1,8160100,712500
+no_shortcut_b,100000,8,"Datetime(time_unit='us', time_zone=None)",2,8193400,712500
+no_shortcut_b,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,8068000,712500
+no_shortcut_b,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,7973000,712500
+no_shortcut_b,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,8198300,712500
+no_shortcut_b,100000,16,Int64,0,9933500,1225000
+no_shortcut_b,100000,16,Int64,1,10096800,1225000
+no_shortcut_b,100000,16,Int64,2,10118000,1225000
+no_shortcut_b,100000,16,Date,0,9328200,1225000
+no_shortcut_b,100000,16,Date,1,9157400,1225000
+no_shortcut_b,100000,16,Date,2,9116900,1225000
+no_shortcut_b,100000,16,"Datetime(time_unit='us', time_zone=None)",0,9959500,1225000
+no_shortcut_b,100000,16,"Datetime(time_unit='us', time_zone=None)",1,9788200,1225000
+no_shortcut_b,100000,16,"Datetime(time_unit='us', time_zone=None)",2,10057300,1225000
+no_shortcut_b,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,10078400,1225000
+no_shortcut_b,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,9930000,1225000
+no_shortcut_b,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,10070700,1225000
+no_shortcut_b,100000,31,Int64,0,12187100,1646875
+no_shortcut_b,100000,31,Int64,1,12276600,1646875
+no_shortcut_b,100000,31,Int64,2,12103000,1646875
+no_shortcut_b,100000,31,Date,0,11721200,1646875
+no_shortcut_b,100000,31,Date,1,11413000,1646875
+no_shortcut_b,100000,31,Date,2,11991800,1646875
+no_shortcut_b,100000,31,"Datetime(time_unit='us', time_zone=None)",0,12519500,1646875
+no_shortcut_b,100000,31,"Datetime(time_unit='us', time_zone=None)",1,12551200,1646875
+no_shortcut_b,100000,31,"Datetime(time_unit='us', time_zone=None)",2,12521900,1646875
+no_shortcut_b,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,12518500,1646875
+no_shortcut_b,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,12396000,1646875
+no_shortcut_b,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,12413500,1646875
+no_shortcut_b,100000,32,Int64,0,3857800,1650000
+no_shortcut_b,100000,32,Int64,1,3760000,1650000
+no_shortcut_b,100000,32,Int64,2,3795900,1650000
+no_shortcut_b,100000,32,Date,0,2871900,1650000
+no_shortcut_b,100000,32,Date,1,2849000,1650000
+no_shortcut_b,100000,32,Date,2,3058500,1650000
+no_shortcut_b,100000,32,"Datetime(time_unit='us', time_zone=None)",0,3719700,1650000
+no_shortcut_b,100000,32,"Datetime(time_unit='us', time_zone=None)",1,3516400,1650000
+no_shortcut_b,100000,32,"Datetime(time_unit='us', time_zone=None)",2,3534400,1650000
+no_shortcut_b,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,3708500,1650000
+no_shortcut_b,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,3661500,1650000
+no_shortcut_b,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,3811800,1650000
+no_shortcut_b,100000,33,Int64,0,3695500,1650000
+no_shortcut_b,100000,33,Int64,1,3618500,1650000
+no_shortcut_b,100000,33,Int64,2,3784400,1650000
+no_shortcut_b,100000,33,Date,0,2821700,1650000
+no_shortcut_b,100000,33,Date,1,2834900,1650000
+no_shortcut_b,100000,33,Date,2,2891000,1650000
+no_shortcut_b,100000,33,"Datetime(time_unit='us', time_zone=None)",0,3551500,1650000
+no_shortcut_b,100000,33,"Datetime(time_unit='us', time_zone=None)",1,3301400,1650000
+no_shortcut_b,100000,33,"Datetime(time_unit='us', time_zone=None)",2,3694500,1650000
+no_shortcut_b,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,3693000,1650000
+no_shortcut_b,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,3525700,1650000
+no_shortcut_b,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,3712100,1650000
+no_shortcut_b,100000,64,Int64,0,3607300,1650000
+no_shortcut_b,100000,64,Int64,1,3702300,1650000
+no_shortcut_b,100000,64,Int64,2,3586200,1650000
+no_shortcut_b,100000,64,Date,0,2877800,1650000
+no_shortcut_b,100000,64,Date,1,2803500,1650000
+no_shortcut_b,100000,64,Date,2,2875800,1650000
+no_shortcut_b,100000,64,"Datetime(time_unit='us', time_zone=None)",0,3704900,1650000
+no_shortcut_b,100000,64,"Datetime(time_unit='us', time_zone=None)",1,3558100,1650000
+no_shortcut_b,100000,64,"Datetime(time_unit='us', time_zone=None)",2,3565600,1650000
+no_shortcut_b,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,3596200,1650000
+no_shortcut_b,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,3620500,1650000
+no_shortcut_b,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,3507600,1650000
+no_shortcut_b,1000000,0,Int64,0,7157100,0
+no_shortcut_b,1000000,0,Int64,1,6553600,0
+no_shortcut_b,1000000,0,Int64,2,6977600,0
+no_shortcut_b,1000000,0,Date,0,6617600,0
+no_shortcut_b,1000000,0,Date,1,6540900,0
+no_shortcut_b,1000000,0,Date,2,6653500,0
+no_shortcut_b,1000000,0,"Datetime(time_unit='us', time_zone=None)",0,6950300,0
+no_shortcut_b,1000000,0,"Datetime(time_unit='us', time_zone=None)",1,6622700,0
+no_shortcut_b,1000000,0,"Datetime(time_unit='us', time_zone=None)",2,7008200,0
+no_shortcut_b,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,7027900,0
+no_shortcut_b,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,6702300,0
+no_shortcut_b,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,6872900,0
+no_shortcut_b,1000000,1,Int64,0,25824400,1000000
+no_shortcut_b,1000000,1,Int64,1,25642600,1000000
+no_shortcut_b,1000000,1,Int64,2,25502400,1000000
+no_shortcut_b,1000000,1,Date,0,25115100,1000000
+no_shortcut_b,1000000,1,Date,1,32017800,1000000
+no_shortcut_b,1000000,1,Date,2,27489200,1000000
+no_shortcut_b,1000000,1,"Datetime(time_unit='us', time_zone=None)",0,25392300,1000000
+no_shortcut_b,1000000,1,"Datetime(time_unit='us', time_zone=None)",1,25263100,1000000
+no_shortcut_b,1000000,1,"Datetime(time_unit='us', time_zone=None)",2,25372600,1000000
+no_shortcut_b,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,25368500,1000000
+no_shortcut_b,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,25749600,1000000
+no_shortcut_b,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,25686800,1000000
+no_shortcut_b,1000000,2,Int64,0,57094900,1968750
+no_shortcut_b,1000000,2,Int64,1,57117600,1968750
+no_shortcut_b,1000000,2,Int64,2,61656600,1968750
+no_shortcut_b,1000000,2,Date,0,55808200,1968750
+no_shortcut_b,1000000,2,Date,1,58061600,1968750
+no_shortcut_b,1000000,2,Date,2,56574300,1968750
+no_shortcut_b,1000000,2,"Datetime(time_unit='us', time_zone=None)",0,68003900,1968750
+no_shortcut_b,1000000,2,"Datetime(time_unit='us', time_zone=None)",1,68656800,1968750
+no_shortcut_b,1000000,2,"Datetime(time_unit='us', time_zone=None)",2,65696800,1968750
+no_shortcut_b,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,67245200,1968750
+no_shortcut_b,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,65973100,1968750
+no_shortcut_b,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,68621300,1968750
+no_shortcut_b,1000000,4,Int64,0,79082400,3812500
+no_shortcut_b,1000000,4,Int64,1,79221900,3812500
+no_shortcut_b,1000000,4,Int64,2,78568100,3812500
+no_shortcut_b,1000000,4,Date,0,67100900,3812500
+no_shortcut_b,1000000,4,Date,1,69461900,3812500
+no_shortcut_b,1000000,4,Date,2,68845300,3812500
+no_shortcut_b,1000000,4,"Datetime(time_unit='us', time_zone=None)",0,78104300,3812500
+no_shortcut_b,1000000,4,"Datetime(time_unit='us', time_zone=None)",1,82143800,3812500
+no_shortcut_b,1000000,4,"Datetime(time_unit='us', time_zone=None)",2,78149300,3812500
+no_shortcut_b,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,79326500,3812500
+no_shortcut_b,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,78785600,3812500
+no_shortcut_b,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,78337500,3812500
+no_shortcut_b,1000000,8,Int64,0,105656600,7125000
+no_shortcut_b,1000000,8,Int64,1,101492600,7125000
+no_shortcut_b,1000000,8,Int64,2,100974500,7125000
+no_shortcut_b,1000000,8,Date,0,90851000,7125000
+no_shortcut_b,1000000,8,Date,1,86588000,7125000
+no_shortcut_b,1000000,8,Date,2,90953400,7125000
+no_shortcut_b,1000000,8,"Datetime(time_unit='us', time_zone=None)",0,101617000,7125000
+no_shortcut_b,1000000,8,"Datetime(time_unit='us', time_zone=None)",1,102351400,7125000
+no_shortcut_b,1000000,8,"Datetime(time_unit='us', time_zone=None)",2,108348300,7125000
+no_shortcut_b,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,102899500,7125000
+no_shortcut_b,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,103715800,7125000
+no_shortcut_b,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,102961000,7125000
+no_shortcut_b,1000000,16,Int64,0,132086900,12250000
+no_shortcut_b,1000000,16,Int64,1,128519100,12250000
+no_shortcut_b,1000000,16,Int64,2,128173300,12250000
+no_shortcut_b,1000000,16,Date,0,124205300,12250000
+no_shortcut_b,1000000,16,Date,1,125637200,12250000
+no_shortcut_b,1000000,16,Date,2,123370000,12250000
+no_shortcut_b,1000000,16,"Datetime(time_unit='us', time_zone=None)",0,132710400,12250000
+no_shortcut_b,1000000,16,"Datetime(time_unit='us', time_zone=None)",1,130304900,12250000
+no_shortcut_b,1000000,16,"Datetime(time_unit='us', time_zone=None)",2,132785100,12250000
+no_shortcut_b,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,133530300,12250000
+no_shortcut_b,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,127609600,12250000
+no_shortcut_b,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,133658700,12250000
+no_shortcut_b,1000000,31,Int64,0,167322000,16468750
+no_shortcut_b,1000000,31,Int64,1,163898200,16468750
+no_shortcut_b,1000000,31,Int64,2,167124800,16468750
+no_shortcut_b,1000000,31,Date,0,159947900,16468750
+no_shortcut_b,1000000,31,Date,1,154233200,16468750
+no_shortcut_b,1000000,31,Date,2,156796800,16468750
+no_shortcut_b,1000000,31,"Datetime(time_unit='us', time_zone=None)",0,169462600,16468750
+no_shortcut_b,1000000,31,"Datetime(time_unit='us', time_zone=None)",1,138444800,16468750
+no_shortcut_b,1000000,31,"Datetime(time_unit='us', time_zone=None)",2,168672000,16468750
+no_shortcut_b,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,169910000,16468750
+no_shortcut_b,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,166876300,16468750
+no_shortcut_b,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,155823600,16468750
+no_shortcut_b,1000000,32,Int64,0,39371500,16500000
+no_shortcut_b,1000000,32,Int64,1,39406900,16500000
+no_shortcut_b,1000000,32,Int64,2,39607800,16500000
+no_shortcut_b,1000000,32,Date,0,29423700,16500000
+no_shortcut_b,1000000,32,Date,1,29398900,16500000
+no_shortcut_b,1000000,32,Date,2,29228300,16500000
+no_shortcut_b,1000000,32,"Datetime(time_unit='us', time_zone=None)",0,38870700,16500000
+no_shortcut_b,1000000,32,"Datetime(time_unit='us', time_zone=None)",1,39423800,16500000
+no_shortcut_b,1000000,32,"Datetime(time_unit='us', time_zone=None)",2,39162400,16500000
+no_shortcut_b,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,39016500,16500000
+no_shortcut_b,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,39324100,16500000
+no_shortcut_b,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,39092500,16500000
+no_shortcut_b,1000000,33,Int64,0,39019200,16500000
+no_shortcut_b,1000000,33,Int64,1,38945500,16500000
+no_shortcut_b,1000000,33,Int64,2,38809200,16500000
+no_shortcut_b,1000000,33,Date,0,29099800,16500000
+no_shortcut_b,1000000,33,Date,1,29340600,16500000
+no_shortcut_b,1000000,33,Date,2,29470400,16500000
+no_shortcut_b,1000000,33,"Datetime(time_unit='us', time_zone=None)",0,39590500,16500000
+no_shortcut_b,1000000,33,"Datetime(time_unit='us', time_zone=None)",1,40790700,16500000
+no_shortcut_b,1000000,33,"Datetime(time_unit='us', time_zone=None)",2,39446200,16500000
+no_shortcut_b,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,39403100,16500000
+no_shortcut_b,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,39506600,16500000
+no_shortcut_b,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,39808200,16500000
+no_shortcut_b,1000000,64,Int64,0,39891900,16500000
+no_shortcut_b,1000000,64,Int64,1,39868200,16500000
+no_shortcut_b,1000000,64,Int64,2,39456200,16500000
+no_shortcut_b,1000000,64,Date,0,29090200,16500000
+no_shortcut_b,1000000,64,Date,1,29007500,16500000
+no_shortcut_b,1000000,64,Date,2,30192900,16500000
+no_shortcut_b,1000000,64,"Datetime(time_unit='us', time_zone=None)",0,42262200,16500000
+no_shortcut_b,1000000,64,"Datetime(time_unit='us', time_zone=None)",1,44071400,16500000
+no_shortcut_b,1000000,64,"Datetime(time_unit='us', time_zone=None)",2,40665900,16500000
+no_shortcut_b,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,39625700,16500000
+no_shortcut_b,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,38980400,16500000
+no_shortcut_b,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,39235400,16500000
+shortcut_b,1000,0,Int64,0,399800,0
+shortcut_b,1000,0,Int64,1,312300,0
+shortcut_b,1000,0,Int64,2,226000,0
+shortcut_b,1000,0,Date,0,183300,0
+shortcut_b,1000,0,Date,1,143000,0
+shortcut_b,1000,0,Date,2,181000,0
+shortcut_b,1000,0,"Datetime(time_unit='us', time_zone=None)",0,191500,0
+shortcut_b,1000,0,"Datetime(time_unit='us', time_zone=None)",1,189000,0
+shortcut_b,1000,0,"Datetime(time_unit='us', time_zone=None)",2,186300,0
+shortcut_b,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,173100,0
+shortcut_b,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,184400,0
+shortcut_b,1000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,251700,0
+shortcut_b,1000,1,Int64,0,190000,1000
+shortcut_b,1000,1,Int64,1,183000,1000
+shortcut_b,1000,1,Int64,2,199700,1000
+shortcut_b,1000,1,Date,0,171900,1000
+shortcut_b,1000,1,Date,1,199000,1000
+shortcut_b,1000,1,Date,2,263400,1000
+shortcut_b,1000,1,"Datetime(time_unit='us', time_zone=None)",0,192600,1000
+shortcut_b,1000,1,"Datetime(time_unit='us', time_zone=None)",1,191200,1000
+shortcut_b,1000,1,"Datetime(time_unit='us', time_zone=None)",2,212300,1000
+shortcut_b,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,185400,1000
+shortcut_b,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,191700,1000
+shortcut_b,1000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,197200,1000
+shortcut_b,1000,2,Int64,0,282100,1968
+shortcut_b,1000,2,Int64,1,263600,1968
+shortcut_b,1000,2,Int64,2,384400,1968
+shortcut_b,1000,2,Date,0,354400,1968
+shortcut_b,1000,2,Date,1,312500,1968
+shortcut_b,1000,2,Date,2,266500,1968
+shortcut_b,1000,2,"Datetime(time_unit='us', time_zone=None)",0,284800,1968
+shortcut_b,1000,2,"Datetime(time_unit='us', time_zone=None)",1,315700,1968
+shortcut_b,1000,2,"Datetime(time_unit='us', time_zone=None)",2,301500,1968
+shortcut_b,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,380400,1968
+shortcut_b,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,301400,1968
+shortcut_b,1000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,286900,1968
+shortcut_b,1000,4,Int64,0,370000,3808
+shortcut_b,1000,4,Int64,1,358700,3808
+shortcut_b,1000,4,Int64,2,337800,3808
+shortcut_b,1000,4,Date,0,394000,3808
+shortcut_b,1000,4,Date,1,340500,3808
+shortcut_b,1000,4,Date,2,325500,3808
+shortcut_b,1000,4,"Datetime(time_unit='us', time_zone=None)",0,357900,3808
+shortcut_b,1000,4,"Datetime(time_unit='us', time_zone=None)",1,371300,3808
+shortcut_b,1000,4,"Datetime(time_unit='us', time_zone=None)",2,327900,3808
+shortcut_b,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,348300,3808
+shortcut_b,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,358800,3808
+shortcut_b,1000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,349800,3808
+shortcut_b,1000,8,Int64,0,435100,7104
+shortcut_b,1000,8,Int64,1,459100,7104
+shortcut_b,1000,8,Int64,2,466000,7104
+shortcut_b,1000,8,Date,0,478600,7104
+shortcut_b,1000,8,Date,1,464500,7104
+shortcut_b,1000,8,Date,2,449700,7104
+shortcut_b,1000,8,"Datetime(time_unit='us', time_zone=None)",0,557600,7104
+shortcut_b,1000,8,"Datetime(time_unit='us', time_zone=None)",1,560500,7104
+shortcut_b,1000,8,"Datetime(time_unit='us', time_zone=None)",2,542000,7104
+shortcut_b,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,621600,7104
+shortcut_b,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,472100,7104
+shortcut_b,1000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,481200,7104
+shortcut_b,1000,16,Int64,0,588100,12188
+shortcut_b,1000,16,Int64,1,622100,12188
+shortcut_b,1000,16,Int64,2,597700,12188
+shortcut_b,1000,16,Date,0,590400,12188
+shortcut_b,1000,16,Date,1,612400,12188
+shortcut_b,1000,16,Date,2,608000,12188
+shortcut_b,1000,16,"Datetime(time_unit='us', time_zone=None)",0,630200,12188
+shortcut_b,1000,16,"Datetime(time_unit='us', time_zone=None)",1,625800,12188
+shortcut_b,1000,16,"Datetime(time_unit='us', time_zone=None)",2,600800,12188
+shortcut_b,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,607300,12188
+shortcut_b,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,600300,12188
+shortcut_b,1000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,617600,12188
+shortcut_b,1000,31,Int64,0,773000,16373
+shortcut_b,1000,31,Int64,1,746600,16373
+shortcut_b,1000,31,Int64,2,758100,16373
+shortcut_b,1000,31,Date,0,764400,16373
+shortcut_b,1000,31,Date,1,740200,16373
+shortcut_b,1000,31,Date,2,752700,16373
+shortcut_b,1000,31,"Datetime(time_unit='us', time_zone=None)",0,749800,16373
+shortcut_b,1000,31,"Datetime(time_unit='us', time_zone=None)",1,745300,16373
+shortcut_b,1000,31,"Datetime(time_unit='us', time_zone=None)",2,831500,16373
+shortcut_b,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,773000,16373
+shortcut_b,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,799900,16373
+shortcut_b,1000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,744200,16373
+shortcut_b,1000,32,Int64,0,176800,16404
+shortcut_b,1000,32,Int64,1,173800,16404
+shortcut_b,1000,32,Int64,2,185800,16404
+shortcut_b,1000,32,Date,0,172500,16404
+shortcut_b,1000,32,Date,1,184600,16404
+shortcut_b,1000,32,Date,2,222100,16404
+shortcut_b,1000,32,"Datetime(time_unit='us', time_zone=None)",0,214900,16404
+shortcut_b,1000,32,"Datetime(time_unit='us', time_zone=None)",1,206800,16404
+shortcut_b,1000,32,"Datetime(time_unit='us', time_zone=None)",2,208600,16404
+shortcut_b,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,192200,16404
+shortcut_b,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,200400,16404
+shortcut_b,1000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,200100,16404
+shortcut_b,1000,33,Int64,0,159800,16404
+shortcut_b,1000,33,Int64,1,192200,16404
+shortcut_b,1000,33,Int64,2,175900,16404
+shortcut_b,1000,33,Date,0,172800,16404
+shortcut_b,1000,33,Date,1,174500,16404
+shortcut_b,1000,33,Date,2,202400,16404
+shortcut_b,1000,33,"Datetime(time_unit='us', time_zone=None)",0,184100,16404
+shortcut_b,1000,33,"Datetime(time_unit='us', time_zone=None)",1,191700,16404
+shortcut_b,1000,33,"Datetime(time_unit='us', time_zone=None)",2,200300,16404
+shortcut_b,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,203600,16404
+shortcut_b,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,185800,16404
+shortcut_b,1000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,172800,16404
+shortcut_b,1000,64,Int64,0,183500,16404
+shortcut_b,1000,64,Int64,1,177500,16404
+shortcut_b,1000,64,Int64,2,168600,16404
+shortcut_b,1000,64,Date,0,199900,16404
+shortcut_b,1000,64,Date,1,178500,16404
+shortcut_b,1000,64,Date,2,179100,16404
+shortcut_b,1000,64,"Datetime(time_unit='us', time_zone=None)",0,189300,16404
+shortcut_b,1000,64,"Datetime(time_unit='us', time_zone=None)",1,165500,16404
+shortcut_b,1000,64,"Datetime(time_unit='us', time_zone=None)",2,170500,16404
+shortcut_b,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,182500,16404
+shortcut_b,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,185700,16404
+shortcut_b,1000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,195600,16404
+shortcut_b,10000,0,Int64,0,208200,0
+shortcut_b,10000,0,Int64,1,164800,0
+shortcut_b,10000,0,Int64,2,216600,0
+shortcut_b,10000,0,Date,0,175700,0
+shortcut_b,10000,0,Date,1,252900,0
+shortcut_b,10000,0,Date,2,245400,0
+shortcut_b,10000,0,"Datetime(time_unit='us', time_zone=None)",0,215500,0
+shortcut_b,10000,0,"Datetime(time_unit='us', time_zone=None)",1,206800,0
+shortcut_b,10000,0,"Datetime(time_unit='us', time_zone=None)",2,214000,0
+shortcut_b,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,217100,0
+shortcut_b,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,204600,0
+shortcut_b,10000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,215800,0
+shortcut_b,10000,1,Int64,0,451500,10000
+shortcut_b,10000,1,Int64,1,380100,10000
+shortcut_b,10000,1,Int64,2,384900,10000
+shortcut_b,10000,1,Date,0,401900,10000
+shortcut_b,10000,1,Date,1,384800,10000
+shortcut_b,10000,1,Date,2,375900,10000
+shortcut_b,10000,1,"Datetime(time_unit='us', time_zone=None)",0,310300,10000
+shortcut_b,10000,1,"Datetime(time_unit='us', time_zone=None)",1,428000,10000
+shortcut_b,10000,1,"Datetime(time_unit='us', time_zone=None)",2,431100,10000
+shortcut_b,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,413700,10000
+shortcut_b,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,289900,10000
+shortcut_b,10000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,407000,10000
+shortcut_b,10000,2,Int64,0,1482000,19687
+shortcut_b,10000,2,Int64,1,1601300,19687
+shortcut_b,10000,2,Int64,2,1684900,19687
+shortcut_b,10000,2,Date,0,1398200,19687
+shortcut_b,10000,2,Date,1,1398200,19687
+shortcut_b,10000,2,Date,2,1402400,19687
+shortcut_b,10000,2,"Datetime(time_unit='us', time_zone=None)",0,1472900,19687
+shortcut_b,10000,2,"Datetime(time_unit='us', time_zone=None)",1,1606400,19687
+shortcut_b,10000,2,"Datetime(time_unit='us', time_zone=None)",2,1663100,19687
+shortcut_b,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,1643000,19687
+shortcut_b,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,1625800,19687
+shortcut_b,10000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,1585500,19687
+shortcut_b,10000,4,Int64,0,2240800,38122
+shortcut_b,10000,4,Int64,1,2307700,38122
+shortcut_b,10000,4,Int64,2,2220200,38122
+shortcut_b,10000,4,Date,0,1885700,38122
+shortcut_b,10000,4,Date,1,2032400,38122
+shortcut_b,10000,4,Date,2,1913300,38122
+shortcut_b,10000,4,"Datetime(time_unit='us', time_zone=None)",0,2222600,38122
+shortcut_b,10000,4,"Datetime(time_unit='us', time_zone=None)",1,2237100,38122
+shortcut_b,10000,4,"Datetime(time_unit='us', time_zone=None)",2,2272900,38122
+shortcut_b,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,2180900,38122
+shortcut_b,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,2246700,38122
+shortcut_b,10000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,2222200,38122
+shortcut_b,10000,8,Int64,0,1629000,71236
+shortcut_b,10000,8,Int64,1,1467300,71236
+shortcut_b,10000,8,Int64,2,1461400,71236
+shortcut_b,10000,8,Date,0,1303800,71236
+shortcut_b,10000,8,Date,1,1299600,71236
+shortcut_b,10000,8,Date,2,1224700,71236
+shortcut_b,10000,8,"Datetime(time_unit='us', time_zone=None)",0,1540100,71236
+shortcut_b,10000,8,"Datetime(time_unit='us', time_zone=None)",1,1573900,71236
+shortcut_b,10000,8,"Datetime(time_unit='us', time_zone=None)",2,1496200,71236
+shortcut_b,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,1513400,71236
+shortcut_b,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,1499900,71236
+shortcut_b,10000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,1544600,71236
+shortcut_b,10000,16,Int64,0,1704200,122440
+shortcut_b,10000,16,Int64,1,1675700,122440
+shortcut_b,10000,16,Int64,2,1658600,122440
+shortcut_b,10000,16,Date,0,1460500,122440
+shortcut_b,10000,16,Date,1,1499700,122440
+shortcut_b,10000,16,Date,2,1492200,122440
+shortcut_b,10000,16,"Datetime(time_unit='us', time_zone=None)",0,1685800,122440
+shortcut_b,10000,16,"Datetime(time_unit='us', time_zone=None)",1,1522300,122440
+shortcut_b,10000,16,"Datetime(time_unit='us', time_zone=None)",2,1627800,122440
+shortcut_b,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,1624000,122440
+shortcut_b,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,1545700,122440
+shortcut_b,10000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,1563000,122440
+shortcut_b,10000,31,Int64,0,1791900,164560
+shortcut_b,10000,31,Int64,1,1829400,164560
+shortcut_b,10000,31,Int64,2,1741100,164560
+shortcut_b,10000,31,Date,0,1719900,164560
+shortcut_b,10000,31,Date,1,1682400,164560
+shortcut_b,10000,31,Date,2,1641400,164560
+shortcut_b,10000,31,"Datetime(time_unit='us', time_zone=None)",0,1733200,164560
+shortcut_b,10000,31,"Datetime(time_unit='us', time_zone=None)",1,1838000,164560
+shortcut_b,10000,31,"Datetime(time_unit='us', time_zone=None)",2,1786300,164560
+shortcut_b,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,1797700,164560
+shortcut_b,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,1862400,164560
+shortcut_b,10000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,1843100,164560
+shortcut_b,10000,32,Int64,0,525500,164872
+shortcut_b,10000,32,Int64,1,586800,164872
+shortcut_b,10000,32,Int64,2,510000,164872
+shortcut_b,10000,32,Date,0,460500,164872
+shortcut_b,10000,32,Date,1,439900,164872
+shortcut_b,10000,32,Date,2,501900,164872
+shortcut_b,10000,32,"Datetime(time_unit='us', time_zone=None)",0,501200,164872
+shortcut_b,10000,32,"Datetime(time_unit='us', time_zone=None)",1,514000,164872
+shortcut_b,10000,32,"Datetime(time_unit='us', time_zone=None)",2,512500,164872
+shortcut_b,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,500600,164872
+shortcut_b,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,516200,164872
+shortcut_b,10000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,515700,164872
+shortcut_b,10000,33,Int64,0,497700,164872
+shortcut_b,10000,33,Int64,1,499200,164872
+shortcut_b,10000,33,Int64,2,501700,164872
+shortcut_b,10000,33,Date,0,445800,164872
+shortcut_b,10000,33,Date,1,429000,164872
+shortcut_b,10000,33,Date,2,410900,164872
+shortcut_b,10000,33,"Datetime(time_unit='us', time_zone=None)",0,648800,164872
+shortcut_b,10000,33,"Datetime(time_unit='us', time_zone=None)",1,520400,164872
+shortcut_b,10000,33,"Datetime(time_unit='us', time_zone=None)",2,504600,164872
+shortcut_b,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,489300,164872
+shortcut_b,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,509600,164872
+shortcut_b,10000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,514400,164872
+shortcut_b,10000,64,Int64,0,481600,164872
+shortcut_b,10000,64,Int64,1,517700,164872
+shortcut_b,10000,64,Int64,2,549900,164872
+shortcut_b,10000,64,Date,0,435600,164872
+shortcut_b,10000,64,Date,1,410200,164872
+shortcut_b,10000,64,Date,2,545600,164872
+shortcut_b,10000,64,"Datetime(time_unit='us', time_zone=None)",0,603200,164872
+shortcut_b,10000,64,"Datetime(time_unit='us', time_zone=None)",1,646100,164872
+shortcut_b,10000,64,"Datetime(time_unit='us', time_zone=None)",2,624200,164872
+shortcut_b,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,606200,164872
+shortcut_b,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,620800,164872
+shortcut_b,10000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,590000,164872
+shortcut_b,100000,0,Int64,0,760300,0
+shortcut_b,100000,0,Int64,1,755000,0
+shortcut_b,100000,0,Int64,2,727600,0
+shortcut_b,100000,0,Date,0,772500,0
+shortcut_b,100000,0,Date,1,861800,0
+shortcut_b,100000,0,Date,2,795000,0
+shortcut_b,100000,0,"Datetime(time_unit='us', time_zone=None)",0,779400,0
+shortcut_b,100000,0,"Datetime(time_unit='us', time_zone=None)",1,748600,0
+shortcut_b,100000,0,"Datetime(time_unit='us', time_zone=None)",2,739300,0
+shortcut_b,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,747900,0
+shortcut_b,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,716500,0
+shortcut_b,100000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,800200,0
+shortcut_b,100000,1,Int64,0,2625800,100000
+shortcut_b,100000,1,Int64,1,2573800,100000
+shortcut_b,100000,1,Int64,2,2557500,100000
+shortcut_b,100000,1,Date,0,2609600,100000
+shortcut_b,100000,1,Date,1,2532500,100000
+shortcut_b,100000,1,Date,2,2476000,100000
+shortcut_b,100000,1,"Datetime(time_unit='us', time_zone=None)",0,2500300,100000
+shortcut_b,100000,1,"Datetime(time_unit='us', time_zone=None)",1,2776000,100000
+shortcut_b,100000,1,"Datetime(time_unit='us', time_zone=None)",2,2551200,100000
+shortcut_b,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,2735200,100000
+shortcut_b,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,2593700,100000
+shortcut_b,100000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,2576000,100000
+shortcut_b,100000,2,Int64,0,5113000,196875
+shortcut_b,100000,2,Int64,1,5255700,196875
+shortcut_b,100000,2,Int64,2,5146000,196875
+shortcut_b,100000,2,Date,0,4737200,196875
+shortcut_b,100000,2,Date,1,4394500,196875
+shortcut_b,100000,2,Date,2,4560300,196875
+shortcut_b,100000,2,"Datetime(time_unit='us', time_zone=None)",0,5706100,196875
+shortcut_b,100000,2,"Datetime(time_unit='us', time_zone=None)",1,5436200,196875
+shortcut_b,100000,2,"Datetime(time_unit='us', time_zone=None)",2,5504400,196875
+shortcut_b,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,5358000,196875
+shortcut_b,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,5347500,196875
+shortcut_b,100000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,5262500,196875
+shortcut_b,100000,4,Int64,0,6025100,381250
+shortcut_b,100000,4,Int64,1,6374600,381250
+shortcut_b,100000,4,Int64,2,6248600,381250
+shortcut_b,100000,4,Date,0,5518900,381250
+shortcut_b,100000,4,Date,1,5285300,381250
+shortcut_b,100000,4,Date,2,5310800,381250
+shortcut_b,100000,4,"Datetime(time_unit='us', time_zone=None)",0,6558700,381250
+shortcut_b,100000,4,"Datetime(time_unit='us', time_zone=None)",1,6047100,381250
+shortcut_b,100000,4,"Datetime(time_unit='us', time_zone=None)",2,7433300,381250
+shortcut_b,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,6680900,381250
+shortcut_b,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,6325200,381250
+shortcut_b,100000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,6317500,381250
+shortcut_b,100000,8,Int64,0,7696400,712500
+shortcut_b,100000,8,Int64,1,7744000,712500
+shortcut_b,100000,8,Int64,2,7971500,712500
+shortcut_b,100000,8,Date,0,9339500,712500
+shortcut_b,100000,8,Date,1,7436300,712500
+shortcut_b,100000,8,Date,2,7888700,712500
+shortcut_b,100000,8,"Datetime(time_unit='us', time_zone=None)",0,8250500,712500
+shortcut_b,100000,8,"Datetime(time_unit='us', time_zone=None)",1,7860300,712500
+shortcut_b,100000,8,"Datetime(time_unit='us', time_zone=None)",2,7428100,712500
+shortcut_b,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,8116600,712500
+shortcut_b,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,7870500,712500
+shortcut_b,100000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,7991000,712500
+shortcut_b,100000,16,Int64,0,9991300,1225000
+shortcut_b,100000,16,Int64,1,9712800,1225000
+shortcut_b,100000,16,Int64,2,9938500,1225000
+shortcut_b,100000,16,Date,0,9028700,1225000
+shortcut_b,100000,16,Date,1,8845300,1225000
+shortcut_b,100000,16,Date,2,8958700,1225000
+shortcut_b,100000,16,"Datetime(time_unit='us', time_zone=None)",0,9933500,1225000
+shortcut_b,100000,16,"Datetime(time_unit='us', time_zone=None)",1,9902000,1225000
+shortcut_b,100000,16,"Datetime(time_unit='us', time_zone=None)",2,9769900,1225000
+shortcut_b,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,9305400,1225000
+shortcut_b,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,9603600,1225000
+shortcut_b,100000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,9725600,1225000
+shortcut_b,100000,31,Int64,0,11975900,1646875
+shortcut_b,100000,31,Int64,1,11900000,1646875
+shortcut_b,100000,31,Int64,2,12101300,1646875
+shortcut_b,100000,31,Date,0,11052200,1646875
+shortcut_b,100000,31,Date,1,11056700,1646875
+shortcut_b,100000,31,Date,2,11524400,1646875
+shortcut_b,100000,31,"Datetime(time_unit='us', time_zone=None)",0,12394700,1646875
+shortcut_b,100000,31,"Datetime(time_unit='us', time_zone=None)",1,11986700,1646875
+shortcut_b,100000,31,"Datetime(time_unit='us', time_zone=None)",2,12048600,1646875
+shortcut_b,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,11940200,1646875
+shortcut_b,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,12006000,1646875
+shortcut_b,100000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,12230200,1646875
+shortcut_b,100000,32,Int64,0,3448500,1650000
+shortcut_b,100000,32,Int64,1,4014600,1650000
+shortcut_b,100000,32,Int64,2,3667000,1650000
+shortcut_b,100000,32,Date,0,3089100,1650000
+shortcut_b,100000,32,Date,1,2788600,1650000
+shortcut_b,100000,32,Date,2,2763700,1650000
+shortcut_b,100000,32,"Datetime(time_unit='us', time_zone=None)",0,3620900,1650000
+shortcut_b,100000,32,"Datetime(time_unit='us', time_zone=None)",1,3369400,1650000
+shortcut_b,100000,32,"Datetime(time_unit='us', time_zone=None)",2,3809100,1650000
+shortcut_b,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,3415000,1650000
+shortcut_b,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,3663200,1650000
+shortcut_b,100000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,3651500,1650000
+shortcut_b,100000,33,Int64,0,3477500,1650000
+shortcut_b,100000,33,Int64,1,4017800,1650000
+shortcut_b,100000,33,Int64,2,3659900,1650000
+shortcut_b,100000,33,Date,0,2875900,1650000
+shortcut_b,100000,33,Date,1,2835300,1650000
+shortcut_b,100000,33,Date,2,2784500,1650000
+shortcut_b,100000,33,"Datetime(time_unit='us', time_zone=None)",0,3671800,1650000
+shortcut_b,100000,33,"Datetime(time_unit='us', time_zone=None)",1,3358700,1650000
+shortcut_b,100000,33,"Datetime(time_unit='us', time_zone=None)",2,3556400,1650000
+shortcut_b,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,3544800,1650000
+shortcut_b,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,3807200,1650000
+shortcut_b,100000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,3683700,1650000
+shortcut_b,100000,64,Int64,0,3569100,1650000
+shortcut_b,100000,64,Int64,1,3705200,1650000
+shortcut_b,100000,64,Int64,2,3512200,1650000
+shortcut_b,100000,64,Date,0,2942500,1650000
+shortcut_b,100000,64,Date,1,2842300,1650000
+shortcut_b,100000,64,Date,2,2829700,1650000
+shortcut_b,100000,64,"Datetime(time_unit='us', time_zone=None)",0,3624500,1650000
+shortcut_b,100000,64,"Datetime(time_unit='us', time_zone=None)",1,3979400,1650000
+shortcut_b,100000,64,"Datetime(time_unit='us', time_zone=None)",2,3708900,1650000
+shortcut_b,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,3827100,1650000
+shortcut_b,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,3784800,1650000
+shortcut_b,100000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,3465000,1650000
+shortcut_b,1000000,0,Int64,0,6818700,0
+shortcut_b,1000000,0,Int64,1,7127000,0
+shortcut_b,1000000,0,Int64,2,6995700,0
+shortcut_b,1000000,0,Date,0,6547500,0
+shortcut_b,1000000,0,Date,1,6756300,0
+shortcut_b,1000000,0,Date,2,6661700,0
+shortcut_b,1000000,0,"Datetime(time_unit='us', time_zone=None)",0,6921300,0
+shortcut_b,1000000,0,"Datetime(time_unit='us', time_zone=None)",1,10303400,0
+shortcut_b,1000000,0,"Datetime(time_unit='us', time_zone=None)",2,6884800,0
+shortcut_b,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",0,7178300,0
+shortcut_b,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",1,6907200,0
+shortcut_b,1000000,0,"Datetime(time_unit='ns', time_zone='UTC')",2,6772000,0
+shortcut_b,1000000,1,Int64,0,25434300,1000000
+shortcut_b,1000000,1,Int64,1,26022300,1000000
+shortcut_b,1000000,1,Int64,2,25539400,1000000
+shortcut_b,1000000,1,Date,0,24088200,1000000
+shortcut_b,1000000,1,Date,1,23869200,1000000
+shortcut_b,1000000,1,Date,2,23693100,1000000
+shortcut_b,1000000,1,"Datetime(time_unit='us', time_zone=None)",0,25483900,1000000
+shortcut_b,1000000,1,"Datetime(time_unit='us', time_zone=None)",1,25665000,1000000
+shortcut_b,1000000,1,"Datetime(time_unit='us', time_zone=None)",2,25749300,1000000
+shortcut_b,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",0,25242100,1000000
+shortcut_b,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",1,25583000,1000000
+shortcut_b,1000000,1,"Datetime(time_unit='ns', time_zone='UTC')",2,25748500,1000000
+shortcut_b,1000000,2,Int64,0,52303700,1968750
+shortcut_b,1000000,2,Int64,1,55538900,1968750
+shortcut_b,1000000,2,Int64,2,52711500,1968750
+shortcut_b,1000000,2,Date,0,49258000,1968750
+shortcut_b,1000000,2,Date,1,48704800,1968750
+shortcut_b,1000000,2,Date,2,59583800,1968750
+shortcut_b,1000000,2,"Datetime(time_unit='us', time_zone=None)",0,73144600,1968750
+shortcut_b,1000000,2,"Datetime(time_unit='us', time_zone=None)",1,59681400,1968750
+shortcut_b,1000000,2,"Datetime(time_unit='us', time_zone=None)",2,58849800,1968750
+shortcut_b,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",0,59321200,1968750
+shortcut_b,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",1,60650200,1968750
+shortcut_b,1000000,2,"Datetime(time_unit='ns', time_zone='UTC')",2,60023900,1968750
+shortcut_b,1000000,4,Int64,0,71817000,3812500
+shortcut_b,1000000,4,Int64,1,72136700,3812500
+shortcut_b,1000000,4,Int64,2,72024200,3812500
+shortcut_b,1000000,4,Date,0,64229200,3812500
+shortcut_b,1000000,4,Date,1,61622600,3812500
+shortcut_b,1000000,4,Date,2,59943900,3812500
+shortcut_b,1000000,4,"Datetime(time_unit='us', time_zone=None)",0,72752400,3812500
+shortcut_b,1000000,4,"Datetime(time_unit='us', time_zone=None)",1,70490900,3812500
+shortcut_b,1000000,4,"Datetime(time_unit='us', time_zone=None)",2,71003900,3812500
+shortcut_b,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",0,72801700,3812500
+shortcut_b,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",1,71526800,3812500
+shortcut_b,1000000,4,"Datetime(time_unit='ns', time_zone='UTC')",2,71990800,3812500
+shortcut_b,1000000,8,Int64,0,94394400,7125000
+shortcut_b,1000000,8,Int64,1,94507400,7125000
+shortcut_b,1000000,8,Int64,2,94463100,7125000
+shortcut_b,1000000,8,Date,0,84333500,7125000
+shortcut_b,1000000,8,Date,1,84337400,7125000
+shortcut_b,1000000,8,Date,2,89051200,7125000
+shortcut_b,1000000,8,"Datetime(time_unit='us', time_zone=None)",0,101782000,7125000
+shortcut_b,1000000,8,"Datetime(time_unit='us', time_zone=None)",1,99916600,7125000
+shortcut_b,1000000,8,"Datetime(time_unit='us', time_zone=None)",2,94741400,7125000
+shortcut_b,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",0,96590800,7125000
+shortcut_b,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",1,94126900,7125000
+shortcut_b,1000000,8,"Datetime(time_unit='ns', time_zone='UTC')",2,95350400,7125000
+shortcut_b,1000000,16,Int64,0,131318300,12250000
+shortcut_b,1000000,16,Int64,1,125650400,12250000
+shortcut_b,1000000,16,Int64,2,125117300,12250000
+shortcut_b,1000000,16,Date,0,120354300,12250000
+shortcut_b,1000000,16,Date,1,116099500,12250000
+shortcut_b,1000000,16,Date,2,114259900,12250000
+shortcut_b,1000000,16,"Datetime(time_unit='us', time_zone=None)",0,124660200,12250000
+shortcut_b,1000000,16,"Datetime(time_unit='us', time_zone=None)",1,121443900,12250000
+shortcut_b,1000000,16,"Datetime(time_unit='us', time_zone=None)",2,125477700,12250000
+shortcut_b,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",0,125853500,12250000
+shortcut_b,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",1,119989400,12250000
+shortcut_b,1000000,16,"Datetime(time_unit='ns', time_zone='UTC')",2,125308000,12250000
+shortcut_b,1000000,31,Int64,0,150687500,16468750
+shortcut_b,1000000,31,Int64,1,159143700,16468750
+shortcut_b,1000000,31,Int64,2,156922000,16468750
+shortcut_b,1000000,31,Date,0,151484600,16468750
+shortcut_b,1000000,31,Date,1,149091700,16468750
+shortcut_b,1000000,31,Date,2,152702600,16468750
+shortcut_b,1000000,31,"Datetime(time_unit='us', time_zone=None)",0,154639700,16468750
+shortcut_b,1000000,31,"Datetime(time_unit='us', time_zone=None)",1,161101300,16468750
+shortcut_b,1000000,31,"Datetime(time_unit='us', time_zone=None)",2,161267800,16468750
+shortcut_b,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",0,163013500,16468750
+shortcut_b,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",1,160761500,16468750
+shortcut_b,1000000,31,"Datetime(time_unit='ns', time_zone='UTC')",2,152529900,16468750
+shortcut_b,1000000,32,Int64,0,40301400,16500000
+shortcut_b,1000000,32,Int64,1,40948700,16500000
+shortcut_b,1000000,32,Int64,2,48009300,16500000
+shortcut_b,1000000,32,Date,0,29415400,16500000
+shortcut_b,1000000,32,Date,1,29166100,16500000
+shortcut_b,1000000,32,Date,2,30046900,16500000
+shortcut_b,1000000,32,"Datetime(time_unit='us', time_zone=None)",0,39611500,16500000
+shortcut_b,1000000,32,"Datetime(time_unit='us', time_zone=None)",1,39567200,16500000
+shortcut_b,1000000,32,"Datetime(time_unit='us', time_zone=None)",2,40115800,16500000
+shortcut_b,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",0,40326500,16500000
+shortcut_b,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",1,39855800,16500000
+shortcut_b,1000000,32,"Datetime(time_unit='ns', time_zone='UTC')",2,39490100,16500000
+shortcut_b,1000000,33,Int64,0,41833400,16500000
+shortcut_b,1000000,33,Int64,1,40253300,16500000
+shortcut_b,1000000,33,Int64,2,40919000,16500000
+shortcut_b,1000000,33,Date,0,29827900,16500000
+shortcut_b,1000000,33,Date,1,29000500,16500000
+shortcut_b,1000000,33,Date,2,29645300,16500000
+shortcut_b,1000000,33,"Datetime(time_unit='us', time_zone=None)",0,39382900,16500000
+shortcut_b,1000000,33,"Datetime(time_unit='us', time_zone=None)",1,39242700,16500000
+shortcut_b,1000000,33,"Datetime(time_unit='us', time_zone=None)",2,39695600,16500000
+shortcut_b,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",0,39527400,16500000
+shortcut_b,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",1,39467900,16500000
+shortcut_b,1000000,33,"Datetime(time_unit='ns', time_zone='UTC')",2,39453200,16500000
+shortcut_b,1000000,64,Int64,0,39671500,16500000
+shortcut_b,1000000,64,Int64,1,39287400,16500000
+shortcut_b,1000000,64,Int64,2,39393400,16500000
+shortcut_b,1000000,64,Date,0,30341600,16500000
+shortcut_b,1000000,64,Date,1,29890000,16500000
+shortcut_b,1000000,64,Date,2,29138400,16500000
+shortcut_b,1000000,64,"Datetime(time_unit='us', time_zone=None)",0,39463100,16500000
+shortcut_b,1000000,64,"Datetime(time_unit='us', time_zone=None)",1,39228900,16500000
+shortcut_b,1000000,64,"Datetime(time_unit='us', time_zone=None)",2,39718200,16500000
+shortcut_b,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",0,44857900,16500000
+shortcut_b,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",1,40218700,16500000
+shortcut_b,1000000,64,"Datetime(time_unit='ns', time_zone='UTC')",2,40307600,16500000

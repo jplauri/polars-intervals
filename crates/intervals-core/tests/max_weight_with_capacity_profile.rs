@@ -1,3 +1,6 @@
+#[path = "../benches/support/profile_reference.rs"]
+mod reference;
+
 use intervals_core::{
     IntervalError, max_weight_non_overlapping, max_weight_with_capacity,
     max_weight_with_capacity_profile as solve,
@@ -322,6 +325,25 @@ proptest! {
         let profile = coalesce(&units(&caps, true));
         let (mask, _) = check(&rows, &profile);
         prop_assert_eq!(mask.len(), rows.len());
+    }
+
+    #[test]
+    fn profile_and_one_segment_capacity_match_the_reference_oracle(
+        rows in jobs(), caps in capacities(), k in 0usize..=4,
+    ) {
+        let profile = units(&caps, true);
+        let segments: Vec<_> = profile.iter().map(|&(s, e, c)| (s, e, c as usize)).collect();
+        prop_assert_eq!(
+            reference::verify(&rows, &segments, &selected(&rows, &profile)),
+            reference::brute_force(&rows, &segments)
+        );
+        // Constant capacity is one segment spanning every job.
+        let (s, e, w) = columns(&rows);
+        let segment = [(-6, 10, k)];
+        prop_assert_eq!(
+            reference::verify(&rows, &segment, &max_weight_with_capacity(&s, &e, &w, k).unwrap()),
+            reference::brute_force(&rows, &segment)
+        );
     }
 
     #[test]

@@ -36,6 +36,7 @@ mod clique;
 pub use clique::{max_clique, max_weight_clique};
 mod capacity;
 pub use capacity::max_weight_with_capacity;
+mod capacity_flow;
 mod capacity_profile;
 pub use capacity_profile::max_weight_with_capacity_profile;
 mod cover;

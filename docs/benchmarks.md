@@ -32,8 +32,8 @@ objective.
 | [Lane balancing](balance-lanes-benchmarks.md) | Improve row-count balance using the fewest lanes | Improved balance on 108/132 datasets · under 25 ms for 100k rows (one Polars thread) |
 | [Weighted scheduling](weighted-scheduling-benchmarks.md) | Select nonoverlapping intervals with maximum total weight | Exact · under 270 ms for 1M rows |
 | [Maximum-weight clique](clique-benchmarks.md) | Select mutually overlapping intervals with maximum total weight | Exact · under 150 ms for 1M rows (one Polars thread) |
-| [Capacity scheduling](capacity-scheduling-benchmarks.md) | Maximize weight under an overlap limit | Exact · under 120 ms for 1M rows in small independent overlap groups |
-| [Scheduling with changing capacity](capacity-profile-benchmarks.md) | Maximize weight under an overlap limit that changes over time | Exact · under 170 ms for 1M rows in small independent overlap groups |
+| [Capacity scheduling](capacity-scheduling-benchmarks.md) | Maximize weight under an overlap limit | Exact · under 170 ms for 1M rows in small independent overlap groups |
+| [Scheduling with changing capacity](capacity-profile-benchmarks.md) | Maximize weight under an overlap limit that changes over time | Exact · under 180 ms for 1M rows in small independent overlap groups |
 | [Minimum covering](covering-benchmarks.md) | Cover a target with the fewest intervals | Exact · under 70 ms for 1M rows |
 | [Minimum-cost covering](cost-covering-benchmarks.md) | Cover a target at minimum total cost | Exact · under 270 ms for 1M rows |
 | [Minimum-cost dominating set](domination-benchmarks.md) | Select cheapest representatives so every interval is selected or overlaps one | Exact · under 18 ms for 100k rows (one Polars thread) |
