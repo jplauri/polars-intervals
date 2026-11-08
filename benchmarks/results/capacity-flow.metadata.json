@@ -1,0 +1,318 @@
+{
+  "description": "Measurements for sharing the capacity flow engine and for the constant-capacity first-path shortcut decision. Each row names its run.",
+  "revisions": {
+    "separate": "8888e963218cdba10cc2ed33856e483919e69b25",
+    "shared": "a0d5912e04f267b1d2fecab91db8cbab2438bed0",
+    "no_shortcut": "a914f5828f95b57ae24e4e78c0215cc5b8d298ea"
+  },
+  "runs": {
+    "separate": {
+      "revision": "8888e963218cdba10cc2ed33856e483919e69b25"
+    },
+    "shared": {
+      "revision": "a0d5912e04f267b1d2fecab91db8cbab2438bed0"
+    },
+    "shortcut_a": {
+      "revision": "a0d5912e04f267b1d2fecab91db8cbab2438bed0"
+    },
+    "no_shortcut_a": {
+      "revision": "a914f5828f95b57ae24e4e78c0215cc5b8d298ea"
+    },
+    "no_shortcut_b": {
+      "revision": "a914f5828f95b57ae24e4e78c0215cc5b8d298ea"
+    },
+    "shortcut_b": {
+      "revision": "a0d5912e04f267b1d2fecab91db8cbab2438bed0"
+    }
+  },
+  "run_order": "separate, shared, shortcut_a, no_shortcut_a, no_shortcut_b, shortcut_b. Adjacent runs compare builds. Before each run a 15-second CPU check waited for an idle machine. An earlier first run of the shared build is omitted: its core suite ran about 15% slower than every later run of the same binary.",
+  "commands": {
+    "core": "cargo bench -p intervals-core --bench max_weight_with_capacity --locked",
+    "profile_core": "cargo bench -p intervals-core --bench max_weight_with_capacity_profile --locked",
+    "polars": "uv run --no-sync python benchmarks/capacity_temporal.py",
+    "profile_polars": "uv run --no-sync python benchmarks/capacity_profile_temporal.py",
+    "plugin": "uv sync --locked --reinstall-package polars-intervals --config-setting \"build-args=--profile release\"",
+    "verification": "benchmarks/provenance.py verify_release and environment, before each built run",
+    "repeats": "Runs other than shared use the saved release benchmark executables and plugin of each build, with the plugin hash recorded in repeat_runs."
+  },
+  "settings": {
+    "cargo_bench_defaults": "CAPACITY_BENCH_MAX_N, CAPACITY_BENCH_SAMPLES, CAPACITY_BENCH_FAMILY and PROFILE_BENCH_* unset: 3 samples, sizes through 1,000,000.",
+    "polars_threads": 24,
+    "thread_environment": {
+      "POLARS_MAX_THREADS": null,
+      "RAYON_NUM_THREADS": null,
+      "CARGO_BUILD_JOBS": null
+    },
+    "polars_runners": "One unrecorded warmup and three samples per case. Default Polars thread pool."
+  },
+  "correctness": "Every timed core output is checked against the independent reference flow in benches/support/capacity_reference.rs or the atomic-segment oracle in benches/support/profile_reference.rs, with exhaustive checks on ten-row restrictions. Polars outputs are checked against independent clique optima. Objectives match across every revision and run.",
+  "omissions": {
+    "core_workloads_omitted_per_run": 182,
+    "rule": "n * min(k, peak) > 2,000,000 reference-flow work budget. The same workloads are omitted in every run."
+  },
+  "memory_metric": "Peak requested live heap bytes in a separate untimed call. Excludes inputs, verification, allocator bookkeeping, stacks and RSS.",
+  "files": {
+    "capacity-flow-core.csv": {
+      "rows": 36252,
+      "sha256": "160f25716c77c2bcf3b623fdc2f6408892b6b36133d44969ef6da063417f9b5c"
+    },
+    "capacity-flow-polars.csv": {
+      "rows": 2880,
+      "sha256": "33cf27a5c51c5941198faf45162d2b5a03f88f1d24bb5b62cc9f60272c0dd77d"
+    },
+    "capacity-flow-profile-core.csv": {
+      "rows": 1338,
+      "sha256": "2a905267773218917ef15d7409062449801b20e4eff807e73ce985867454857a"
+    },
+    "capacity-flow-profile-polars.csv": {
+      "rows": 480,
+      "sha256": "4e6e4de1b1b9607078e8149ee9c05c1e1c58606d7a9882174b220769f808f1af"
+    }
+  },
+  "builds": {
+    "separate": {
+      "timestamp_utc": "2026-11-08T08:56:25.933005+00:00",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "processor": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+      "logical_cpus": 24,
+      "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+      "executable": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\.venv\\Scripts\\python.exe",
+      "polars": "1.44.2",
+      "polars_threads": 24,
+      "thread_environment": {
+        "POLARS_MAX_THREADS": null,
+        "RAYON_NUM_THREADS": null,
+        "CARGO_BUILD_JOBS": null
+      },
+      "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+      "revision": "8888e963218cdba10cc2ed33856e483919e69b25",
+      "native_path": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\python\\polars_intervals\\_internal.cp314-win_amd64.pyd",
+      "native_sha256": "b8dc0dde35c41e4e1a58ed4a6a7b00d72f613acdf13caf0cc5b607b2177726a4",
+      "release_path": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\target\\release\\polars_intervals.dll",
+      "release_sha256": "b8dc0dde35c41e4e1a58ed4a6a7b00d72f613acdf13caf0cc5b607b2177726a4",
+      "build_environment": {
+        "RUSTFLAGS": null,
+        "CARGO_ENCODED_RUSTFLAGS": null,
+        "CARGO_PROFILE_RELEASE_OPT_LEVEL": null,
+        "CARGO_PROFILE_RELEASE_LTO": null,
+        "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": null
+      },
+      "source_sha256": {
+        "Cargo.lock": "3009cf1e2a45d84ff1f0292f530ec3a84739667f66b821f364e03b5c5e2570bc",
+        "crates/intervals-core/src/capacity.rs": "9a5f0061f136ceac1691022ef4bcf52c09687f182e83d63cc27d1b7406b62332",
+        "crates/intervals-core/src/capacity_profile.rs": "7d91fd28a8a7c1e89a24d6fbb99cca066d4c4fbf752d7847d46bae74b39d8b02",
+        "crates/intervals-core/src/lib.rs": "a316616a45869474c088ea2d33e910b81babf10018652abdedcb8cbdbcd9934d",
+        "crates/intervals-core/src/weighted.rs": "3913191dbc91cc0cbf8de07559cdecac0ba4a0e2b3c25f1de6ec0f741498565a",
+        "crates/intervals-core/benches/max_weight_with_capacity.rs": "c4d44e24ae15e1cfeccc2e609225e31f0cad7226197e2361f907eb4b2e41129c",
+        "crates/intervals-core/benches/max_weight_with_capacity_profile.rs": "e7cfe98a41ab36ba38c5f30bbf6dde5a0da71b039d6fc7a41dae31fee30955e5",
+        "crates/intervals-core/benches/support/allocations.rs": "a6adeab442ae00fce6e180ac65109e85805451d44580ef936c6e2c4f2db501b9",
+        "crates/intervals-core/benches/support/capacity_reference.rs": "6fa59d00a90146723581c02c5adce1c338dcde99740068e4f26dce08dbee8ced",
+        "crates/intervals-core/benches/support/profile_reference.rs": "3f5698d56bb20087259ddbc77d96277bcec4db71664a8572b59fac6257d358bd",
+        "benchmarks/capacity_temporal.py": "39553f0be28d794735f320c4f9adac20f6039a32b16eb76b58ecae35724e23a0",
+        "benchmarks/capacity_profile_temporal.py": "167eb612e9a827fc7ee87c820d31ccdbb8a47e0f68bbce4a54a970d897b487b5"
+      },
+      "timeline_utc": [
+        "2026-11-08T08:56:26Z start core",
+        "2026-11-08T09:00:14Z done core",
+        "2026-11-08T09:00:14Z start profile-core",
+        "2026-11-08T09:00:23Z done profile-core",
+        "2026-11-08T09:00:23Z start polars",
+        "2026-11-08T09:00:36Z done polars",
+        "2026-11-08T09:00:36Z start profile-polars",
+        "2026-11-08T09:00:46Z done profile-polars",
+        "2026-11-08T09:00:46Z suite complete"
+      ]
+    },
+    "shared": {
+      "timestamp_utc": "2026-11-08T11:09:45.641078+00:00",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "processor": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+      "logical_cpus": 24,
+      "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+      "executable": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\.venv\\Scripts\\python.exe",
+      "polars": "1.44.2",
+      "polars_threads": 24,
+      "thread_environment": {
+        "POLARS_MAX_THREADS": null,
+        "RAYON_NUM_THREADS": null,
+        "CARGO_BUILD_JOBS": null
+      },
+      "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+      "revision": "a0d5912e04f267b1d2fecab91db8cbab2438bed0",
+      "native_path": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\python\\polars_intervals\\_internal.cp314-win_amd64.pyd",
+      "native_sha256": "29ad98156846600245ba2d2a8dd2ce3599ff337d37709c0c756a089d24f7528e",
+      "release_path": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\target\\release\\polars_intervals.dll",
+      "release_sha256": "29ad98156846600245ba2d2a8dd2ce3599ff337d37709c0c756a089d24f7528e",
+      "build_environment": {
+        "RUSTFLAGS": null,
+        "CARGO_ENCODED_RUSTFLAGS": null,
+        "CARGO_PROFILE_RELEASE_OPT_LEVEL": null,
+        "CARGO_PROFILE_RELEASE_LTO": null,
+        "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": null
+      },
+      "source_sha256": {
+        "Cargo.lock": "3009cf1e2a45d84ff1f0292f530ec3a84739667f66b821f364e03b5c5e2570bc",
+        "crates/intervals-core/src/capacity.rs": "0c741bc0d18e46317cd56a5a96e05820d1f9c3a761b1500a8c7514ea00e90245",
+        "crates/intervals-core/src/capacity_flow.rs": "93f07d89191d8f1b7b6c8a110723897d51e286718b9cf557c885d37c9f57947a",
+        "crates/intervals-core/src/capacity_profile.rs": "31f5dd836684b810f21fb73cf3009edba9d55378ec9006d41ab8072f7251f89c",
+        "crates/intervals-core/src/lib.rs": "91b126505c421341f176261c657e9c5e73db3c273fb543c6f78422a196a0150a",
+        "crates/intervals-core/src/weighted.rs": "3913191dbc91cc0cbf8de07559cdecac0ba4a0e2b3c25f1de6ec0f741498565a",
+        "crates/intervals-core/benches/max_weight_with_capacity.rs": "c4d44e24ae15e1cfeccc2e609225e31f0cad7226197e2361f907eb4b2e41129c",
+        "crates/intervals-core/benches/max_weight_with_capacity_profile.rs": "e7cfe98a41ab36ba38c5f30bbf6dde5a0da71b039d6fc7a41dae31fee30955e5",
+        "crates/intervals-core/benches/support/allocations.rs": "a6adeab442ae00fce6e180ac65109e85805451d44580ef936c6e2c4f2db501b9",
+        "crates/intervals-core/benches/support/capacity_reference.rs": "6fa59d00a90146723581c02c5adce1c338dcde99740068e4f26dce08dbee8ced",
+        "crates/intervals-core/benches/support/profile_reference.rs": "3f5698d56bb20087259ddbc77d96277bcec4db71664a8572b59fac6257d358bd",
+        "benchmarks/capacity_temporal.py": "39553f0be28d794735f320c4f9adac20f6039a32b16eb76b58ecae35724e23a0",
+        "benchmarks/capacity_profile_temporal.py": "167eb612e9a827fc7ee87c820d31ccdbb8a47e0f68bbce4a54a970d897b487b5"
+      },
+      "timeline_utc": [
+        "2026-11-08T11:09:46Z start core",
+        "2026-11-08T11:14:11Z done core",
+        "2026-11-08T11:14:11Z start profile-core",
+        "2026-11-08T11:14:22Z done profile-core",
+        "2026-11-08T11:14:22Z start polars",
+        "2026-11-08T11:14:38Z done polars",
+        "2026-11-08T11:14:38Z start profile-polars",
+        "2026-11-08T11:14:49Z done profile-polars",
+        "2026-11-08T11:14:49Z suite complete"
+      ]
+    },
+    "no_shortcut": {
+      "timestamp_utc": "2026-11-08T11:30:13.817117+00:00",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "processor": "AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD",
+      "logical_cpus": 24,
+      "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+      "executable": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\.venv\\Scripts\\python.exe",
+      "polars": "1.44.2",
+      "polars_threads": 24,
+      "thread_environment": {
+        "POLARS_MAX_THREADS": null,
+        "RAYON_NUM_THREADS": null,
+        "CARGO_BUILD_JOBS": null
+      },
+      "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.1\nLLVM version: 22.1.8",
+      "revision": "a914f5828f95b57ae24e4e78c0215cc5b8d298ea",
+      "native_path": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\python\\polars_intervals\\_internal.cp314-win_amd64.pyd",
+      "native_sha256": "824b5ef020c7426f08fd1e8913f9c656438e81ff7962fb4944dd82afd081f64d",
+      "release_path": "D:\\polars-intervals\\.claude\\worktrees\\optimistic-chaplygin-4d76b1\\target\\release\\polars_intervals.dll",
+      "release_sha256": "824b5ef020c7426f08fd1e8913f9c656438e81ff7962fb4944dd82afd081f64d",
+      "build_environment": {
+        "RUSTFLAGS": null,
+        "CARGO_ENCODED_RUSTFLAGS": null,
+        "CARGO_PROFILE_RELEASE_OPT_LEVEL": null,
+        "CARGO_PROFILE_RELEASE_LTO": null,
+        "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": null
+      },
+      "source_sha256": {
+        "Cargo.lock": "3009cf1e2a45d84ff1f0292f530ec3a84739667f66b821f364e03b5c5e2570bc",
+        "crates/intervals-core/src/capacity.rs": "0c741bc0d18e46317cd56a5a96e05820d1f9c3a761b1500a8c7514ea00e90245",
+        "crates/intervals-core/src/capacity_flow.rs": "2d218b7e6cecb7d3dc456d8e3ffd71a90e1eca7cee70d5dd17e0c0f7c25ad003",
+        "crates/intervals-core/src/capacity_profile.rs": "31f5dd836684b810f21fb73cf3009edba9d55378ec9006d41ab8072f7251f89c",
+        "crates/intervals-core/src/lib.rs": "91b126505c421341f176261c657e9c5e73db3c273fb543c6f78422a196a0150a",
+        "crates/intervals-core/src/weighted.rs": "3913191dbc91cc0cbf8de07559cdecac0ba4a0e2b3c25f1de6ec0f741498565a",
+        "crates/intervals-core/benches/max_weight_with_capacity.rs": "c4d44e24ae15e1cfeccc2e609225e31f0cad7226197e2361f907eb4b2e41129c",
+        "crates/intervals-core/benches/max_weight_with_capacity_profile.rs": "e7cfe98a41ab36ba38c5f30bbf6dde5a0da71b039d6fc7a41dae31fee30955e5",
+        "crates/intervals-core/benches/support/allocations.rs": "a6adeab442ae00fce6e180ac65109e85805451d44580ef936c6e2c4f2db501b9",
+        "crates/intervals-core/benches/support/capacity_reference.rs": "6fa59d00a90146723581c02c5adce1c338dcde99740068e4f26dce08dbee8ced",
+        "crates/intervals-core/benches/support/profile_reference.rs": "3f5698d56bb20087259ddbc77d96277bcec4db71664a8572b59fac6257d358bd",
+        "benchmarks/capacity_temporal.py": "39553f0be28d794735f320c4f9adac20f6039a32b16eb76b58ecae35724e23a0",
+        "benchmarks/capacity_profile_temporal.py": "167eb612e9a827fc7ee87c820d31ccdbb8a47e0f68bbce4a54a970d897b487b5"
+      },
+      "timeline_utc": [
+        "2026-11-08T11:30:14Z start core",
+        "2026-11-08T11:35:18Z done core",
+        "2026-11-08T11:35:18Z start polars",
+        "2026-11-08T11:35:34Z done polars",
+        "2026-11-08T11:35:35Z suite complete"
+      ]
+    }
+  },
+  "binary_sha256": {
+    "before": {
+      "max_weight_with_capacity.exe": "97ad97352c388cbec8e4513570d5252b3c5d60a3c002840afba7d0579df70f32",
+      "max_weight_with_capacity_profile.exe": "4fd6702b4dbbe9c64f337f5f4e92878032f562d53eff58b3de388cad43974f15",
+      "polars_intervals.dll": "b8dc0dde35c41e4e1a58ed4a6a7b00d72f613acdf13caf0cc5b607b2177726a4"
+    },
+    "after": {
+      "max_weight_with_capacity.exe": "71836fd105832fc1172a1b5841defba652fdca3145d4bf5760d8be175339c653",
+      "max_weight_with_capacity_profile.exe": "f7791475178fa551166efbe25aaf17028580af4a74d8dd2846d8e3a4e761e4a4",
+      "polars_intervals.dll": "29ad98156846600245ba2d2a8dd2ce3599ff337d37709c0c756a089d24f7528e"
+    },
+    "no-first-path": {
+      "max_weight_with_capacity.exe": "7ded632a9bfcb080d8e270741a3f4561d5cb58819099627732612fe51265d356",
+      "max_weight_with_capacity_profile.exe": "f7791475178fa551166efbe25aaf17028580af4a74d8dd2846d8e3a4e761e4a4",
+      "polars_intervals.dll": "824b5ef020c7426f08fd1e8913f9c656438e81ff7962fb4944dd82afd081f64d"
+    }
+  },
+  "repeat_runs": {
+    "final-separate": {
+      "binaries": "binary set: before  plugin sha256: b8dc0dde35c41e4e1a58ed4a6a7b00d72f613acdf13caf0cc5b607b2177726a4",
+      "timeline_utc": [
+        "2026-11-08T12:13:14Z start core",
+        "2026-11-08T12:16:51Z done core",
+        "2026-11-08T12:16:51Z start profile-core",
+        "2026-11-08T12:16:59Z done profile-core",
+        "2026-11-08T12:16:59Z start polars",
+        "2026-11-08T12:17:13Z done polars",
+        "2026-11-08T12:17:13Z start profile-polars",
+        "2026-11-08T12:17:22Z done profile-polars",
+        "2026-11-08T12:17:23Z complete"
+      ]
+    },
+    "final-shared-repeat": {
+      "binaries": "binary set: after  plugin sha256: 29ad98156846600245ba2d2a8dd2ce3599ff337d37709c0c756a089d24f7528e",
+      "timeline_utc": [
+        "2026-11-08T12:17:39Z start core",
+        "2026-11-08T12:21:15Z done core",
+        "2026-11-08T12:21:15Z start profile-core",
+        "2026-11-08T12:21:23Z done profile-core",
+        "2026-11-08T12:21:23Z start polars",
+        "2026-11-08T12:21:37Z done polars",
+        "2026-11-08T12:21:37Z start profile-polars",
+        "2026-11-08T12:21:46Z done profile-polars",
+        "2026-11-08T12:21:46Z complete"
+      ]
+    },
+    "final-shortcut-a": {
+      "binaries": "binary set: after  plugin sha256: 29ad98156846600245ba2d2a8dd2ce3599ff337d37709c0c756a089d24f7528e",
+      "timeline_utc": [
+        "2026-11-08T12:22:02Z start core",
+        "2026-11-08T12:25:40Z done core",
+        "2026-11-08T12:25:40Z start polars",
+        "2026-11-08T12:25:54Z done polars",
+        "2026-11-08T12:25:54Z complete"
+      ]
+    },
+    "final-no-shortcut-a": {
+      "binaries": "binary set: no-first-path  plugin sha256: 824b5ef020c7426f08fd1e8913f9c656438e81ff7962fb4944dd82afd081f64d",
+      "timeline_utc": [
+        "2026-11-08T12:26:10Z start core",
+        "2026-11-08T12:30:07Z done core",
+        "2026-11-08T12:30:07Z start polars",
+        "2026-11-08T12:30:22Z done polars",
+        "2026-11-08T12:30:22Z complete"
+      ]
+    },
+    "final-no-shortcut-b": {
+      "binaries": "binary set: no-first-path  plugin sha256: 824b5ef020c7426f08fd1e8913f9c656438e81ff7962fb4944dd82afd081f64d",
+      "timeline_utc": [
+        "2026-11-08T12:30:38Z start core",
+        "2026-11-08T12:34:35Z done core",
+        "2026-11-08T12:34:35Z start polars",
+        "2026-11-08T12:34:50Z done polars",
+        "2026-11-08T12:34:50Z complete"
+      ]
+    },
+    "final-shortcut-b": {
+      "binaries": "binary set: after  plugin sha256: 29ad98156846600245ba2d2a8dd2ce3599ff337d37709c0c756a089d24f7528e",
+      "timeline_utc": [
+        "2026-11-08T12:35:06Z start core",
+        "2026-11-08T12:38:44Z done core",
+        "2026-11-08T12:38:44Z start polars",
+        "2026-11-08T12:38:58Z done polars",
+        "2026-11-08T12:38:58Z complete"
+      ]
+    }
+  }
+}

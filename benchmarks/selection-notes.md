@@ -89,7 +89,7 @@ flow solves the correction problem.
 #### Solvers and optimality
 
 Production A and C share compact adjacency storage and exact SSP. A uses timeline-specific initial
-potentials in `capacity_profile.rs`. It augments shortest residual paths with
+potentials in `capacity_flow.rs`. It augments shortest residual paths with
 a binary heap, exact `i128` costs, and feasible reduced-cost potentials. Every
 augmentation sends the full path bottleneck. The benchmark compares this
 implementation (forced `csr` for A and `csr_C` for C) with conventional
@@ -265,8 +265,10 @@ at the recorded revision, not checks rerun by editing these reports.
 
 ## Scalar-capacity selection
 
-The specialized network has one vertex per distinct endpoint, capacity-`k`
-zero-cost forward timeline edges, and capacity-one job edges of cost `-weight`.
+Constant capacity runs the [shared flow engine](../crates/intervals-core/src/capacity_flow.rs)
+as one capacity segment. The network has one vertex per distinct endpoint plus
+a source and sink, capacity-`k` zero-cost forward timeline edges, and capacity-one
+job edges of cost `-weight`.
 Sending exactly `k` integral units enforces the overlap limit: at every cut,
 selected interval flow plus unused timeline flow equals `k`. Conversely, any
 feasible selection can be partitioned into `k` non-overlapping schedules, each
@@ -290,15 +292,16 @@ to the existing weighted scheduler. A concurrency sweep bypasses flow when all
 useful jobs fit. Components separate at `next_start >= max_end`, and their
 optimum objectives add. Each component also checks its own concurrency.
 Production uses up to eight scoped workers with at least eight components and
-`positive_nonempty_rows * capacity >= 64,000`. Each worker owns local masks for
-disjoint batches; results return to original row order without a shared network.
+`positive_nonempty_rows * capacity >= 64,000`. Each worker returns the selected
+row indices of its disjoint batch, and results return to original row order
+without a shared network.
 The threshold reflects these measurements, not a universal optimum.
 
 Worst-case work is `O(n log n + sum(k * n_c * log(n_c + 1)))` over constrained
 components, with `O(n)` extra space including output. Sufficient-capacity cases
 cost `O(n log n)`; capacity zero is linear and capacity one uses the existing
 `O(n log n)` scheduler. Serial decomposition retains one network at a time;
-parallel batches add row and mask storage. Arithmetic widens integer weights to
+parallel batches add selected-index storage. Arithmetic widens integer weights to
 `i128`, checks objective/cost overflow, and uses unsigned reduced distances for
 large non-shortest detours. No floating-point objective approximation is used.
 
@@ -311,6 +314,17 @@ from 437,664 to 406,414; whole-flow requested heap fell by 8,000,000 bytes.
 All objectives matched. The unchanged generic engine also showed substantial
 timing variation, so no cleanup speedup is claimed. Original and cleanup source
 hashes remain separate in the [metadata](results/capacity-environment.json).
+
+Revision `a0d5912` moved this solver onto the shared flow engine. Masks did
+not change: a differential test against revision `8888e96` matched on more than
+300 million random problems, ties and errors included. The engine updates
+potentials with `min(distance, sink distance)` everywhere. On one segment that
+cap never binds, because every vertex stays reachable and reversing the previous
+path leaves no vertex farther than the sink. The remaining special case is the
+first path from the initial DAG pass. A [candidate without it](https://github.com/jplauri/polars-intervals/commit/a914f5828f95b57ae24e4e78c0215cc5b8d298ea)
+took 1.44× and 1.45× longer on capacity-2 flow workloads in two alternating pairs
+of runs, so it stays. See the [report](../docs/capacity-scheduling-benchmarks.md)
+and [raw samples](results/capacity-flow-core.csv).
 
 Before timing, each candidate is checked for feasibility and full objective
 agreement. Every workload also compares a ten-row restriction against exhaustive
