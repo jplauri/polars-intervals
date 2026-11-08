@@ -14,16 +14,16 @@ without Python or the plugin. The table generator only reads saved results.
 | Script | Role | Input → output | Report |
 | --- | --- | --- | --- |
 | [`coverage_stats.py`](coverage_stats.py) | End-to-end benchmark | Complete eager/lazy per-query statistics, native Polars sweep, payloads, separate query/source sizes and cold process RSS → raw samples and provenance | [Per-query coverage statistics](../docs/coverage-stats-benchmarks.md) |
-| [`coverage_stats_core.py`](coverage_stats_core.py) | Core comparison runner | Binary searches and offline boundary sweeps, including preparation and separate requested heap → raw samples and provenance | [Per-query coverage statistics](../docs/coverage-stats-benchmarks.md) |
+| [`coverage_stats_core.py`](coverage_stats_core.py) | Core runner | Complete public calls, including preparation, and separate requested heap → raw samples and provenance | [Per-query coverage statistics](../docs/coverage-stats-benchmarks.md) |
 | [`test_coverage_stats.py`](test_coverage_stats.py) | Baseline checks | Original-row cell oracle, exact wide arithmetic, payloads and full deferred validation → native competitor checks | [Per-query coverage statistics](../docs/coverage-stats-benchmarks.md) |
 | [`set_geometry.py`](set_geometry.py) | End-to-end benchmark | Two-input eager/lazy set operations against native Polars events, separate planning/collection and cold process RSS → raw samples and source provenance | [Subtraction and intersection](../docs/set-geometry-benchmarks.md) |
-| [`set_geometry_core.py`](set_geometry_core.py) | Core comparison runner | Canonical union scans, fused runs and tagged events with separate requested heap → raw samples and source provenance | [Subtraction and intersection](../docs/set-geometry-benchmarks.md) |
+| [`set_geometry_core.py`](set_geometry_core.py) | Core runner | Public canonical union scans with separate requested heap → raw samples and source provenance | [Subtraction and intersection](../docs/set-geometry-benchmarks.md) |
 | [`test_set_geometry.py`](test_set_geometry.py) | Baseline checks | Original-row cell oracle, null groups, deferred validation and exact temporal/UInt64 boundaries → native competitor checks | [Experiment notes](set-geometry-notes.md) |
 | [`interval_geometry.py`](interval_geometry.py) | End-to-end benchmark | Complete eager/lazy geometry against native prefix-max plans, separate planning/collection and optional process RSS → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
-| [`interval_geometry_core.py`](interval_geometry_core.py) | Core comparison runner | Packed and indexed frontier scans, fused/materialized gaps and separate requested heap → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
+| [`interval_geometry_core.py`](interval_geometry_core.py) | Core runner | Complete public cluster, merge and gap calls with separate requested heap → raw samples and source provenance | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`test_interval_geometry.py`](test_interval_geometry.py) | Baseline checks | Independent graph/cell oracles, deferred validation and typed grouped lazy outputs → native competitor checks | [Interval geometry](../docs/interval-geometry-benchmarks.md) |
 | [`coverage_profile.py`](coverage_profile.py) | End-to-end benchmark | Complete release calls against native Polars event sums/count aggregation, with optional lazy/streaming-engine collection, validation, groups and output assembly → raw samples and provenance | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
-| [`coverage_profile_core.py`](coverage_profile_core.py) | Core comparison runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
+| [`coverage_profile_core.py`](coverage_profile_core.py) | Core runner | Release Rust sweeps, independent small oracles and separate requested heap measurements → samples and metadata | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`test_coverage_profile.py`](test_coverage_profile.py) | Baseline checks | Direct membership oracle on small grouped, temporal and wide-load inputs → native Polars baseline validation | [Coverage/load profiles](../docs/coverage-profile-benchmarks.md) |
 | [`minimum_cost_dominating_set.py`](minimum_cost_dominating_set.py) | End-to-end benchmark | Integer/temporal, grouped and multichunk inputs → checked release collection samples and provenance | [Dominating set](../docs/domination-benchmarks.md) |
 | [`generate_interval_graphs.py`](generate_interval_graphs.py) | Offline corpus generator | Synthetic presets or exhaustive JAIST catalogs → validated interval instances in one gzip JSON Lines file | [Interval-graph corpora](#interval-graph-corpora) |
@@ -45,8 +45,10 @@ without Python or the plugin. The table generator only reads saved results.
 | [`test_plot.py`](test_plot.py) | Reporting checks | Small synthetic records → checks for units, repeats, invalid input and missing cases | [Table workflow](../docs/benchmarking.md#generate-plots) |
 
 Rust core runners live in [`crates/intervals-core/benches/`](../crates/intervals-core/benches/).
-Except for the geometry, set-geometry, coverage-statistics, dominating-set and coverage-profile comparisons, they time production
-only. Removed candidates and runners are preserved in the
+They time production only. The geometry, set-geometry, coverage-statistics,
+dominating-set and coverage-profile candidates remain at
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/tree/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches).
+Older candidates and runners remain in the
 [pre-cleanup snapshot at `d742de3`](https://github.com/jplauri/polars-intervals/tree/d742de3e57fdc523d1673e81106ca6d5109127bb/crates/intervals-core/benches).
 Runners refuse uncommitted changes and record the revision. Older runs that
 measured uncommitted changes keep their source archives at
@@ -94,8 +96,7 @@ revision, release hashes and thread settings.
 
 The coverage/load profile core runner times the public calls. Its A event,
 C active-end heap and weighted index-stream candidates remain at
-[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/coverage_profile_candidates.rs). Earlier flat-record
-experiments remain in the archived source snapshots.
+[`d6c3b01`](https://github.com/jplauri/polars-intervals/blob/d6c3b01321bd9a97f9d1cff486ea2a6a347174bc/crates/intervals-core/benches/support/coverage_profile_candidates.rs).
 See [correctness and design notes](coverage-profile-notes.md). List core
 runner options with `uv run --no-sync python benchmarks/coverage_profile_core.py --help`.
 Run complete Polars comparisons with:
@@ -116,7 +117,7 @@ aggregation is measured separately. Core memory measures requested live heap,
 not process RSS or complete Polars allocations. Cases are synthetic; see each
 run's metadata and full raw samples for measured coverage and omissions.
 
-Interval geometry compares complete cluster, union and bounded-gap calls.
+Interval geometry times complete cluster, union and bounded-gap calls.
 Run the scripts as modules from the repository root:
 
 ```sh
