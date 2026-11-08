@@ -322,10 +322,22 @@ method = "dtype"
 dimensions = ["groups", "family", "order", "candidate"]
 
 [sources.capacity_temporal]
-path = "benchmarks/results/capacity-temporal-windows.csv"
+path = "benchmarks/results/capacity-flow-polars.csv"
 x = "n"
 method = "dtype"
-dimensions = ["k"]
+dimensions = ["k", "run"]
+
+[sources.capacity_flow_core]
+path = "benchmarks/results/capacity-flow-core.csv"
+x = "n"
+method = "run"
+dimensions = ["family", "order", "weights", "k", "algorithm"]
+
+[sources.capacity_flow_polars]
+path = "benchmarks/results/capacity-flow-polars.csv"
+x = "n"
+method = "run"
+dimensions = ["k", "dtype"]
 
 [sources.profile]
 path = "benchmarks/results/capacity-profile-core.csv"
@@ -334,10 +346,22 @@ method = "algorithm"
 dimensions = ["family", "pattern", "order", "m", "k"]
 
 [sources.profile_temporal]
-path = "benchmarks/results/capacity-profile-temporal.csv"
+path = "benchmarks/results/capacity-flow-profile-polars.csv"
 x = "n"
 method = "dtype"
-dimensions = ["m", "pattern", "algorithm"]
+dimensions = ["m", "pattern", "algorithm", "run"]
+
+[sources.profile_flow_core]
+path = "benchmarks/results/capacity-flow-profile-core.csv"
+x = "n"
+method = "run"
+dimensions = ["family", "pattern", "order", "m", "k", "algorithm"]
+
+[sources.profile_flow_polars]
+path = "benchmarks/results/capacity-flow-profile-polars.csv"
+x = "n"
+method = "run"
+dimensions = ["m", "pattern", "dtype", "algorithm"]
 
 [sources.covering_temporal]
 path = "benchmarks/results/covering-temporal-windows.csv"
@@ -359,10 +383,10 @@ divisor = 1000000
 ylabel = "Polars query time (ms)"
 methods = { Int64 = "Integer", Date = "Date", "Datetime(time_unit='us', time_zone=None)" = "Datetime" }
 cases = [
-  {label = "32 overlapping per set, capacity 1", sizes = [1000000], filters = {k = 1}},
-  {label = "32 overlapping per set, capacity 2", sizes = [1000000], filters = {k = 2}},
-  {label = "32 overlapping per set, capacity 31", sizes = [1000000], filters = {k = 31}},
-  {label = "32 overlapping per set, capacity 32", sizes = [1000000], filters = {k = 32}},
+  {label = "32 overlapping per set, capacity 1", sizes = [1000000], filters = {k = 1, run = "shared"}},
+  {label = "32 overlapping per set, capacity 2", sizes = [1000000], filters = {k = 2, run = "shared"}},
+  {label = "32 overlapping per set, capacity 31", sizes = [1000000], filters = {k = 31, run = "shared"}},
+  {label = "32 overlapping per set, capacity 32", sizes = [1000000], filters = {k = 32, run = "shared"}},
 ]
 
 [[tables]]
@@ -389,10 +413,10 @@ divisor = 1000000
 ylabel = "Polars operation time (ms)"
 methods = { Int64 = "Integer", Date = "Date", "Datetime(time_unit='us', time_zone=None)" = "Datetime" }
 cases = [
-  {label = "Constant capacity 4", sizes = [1000000], filters = {m = 1, pattern = "constant", algorithm = "profile"}},
-  {label = "Enough capacity for all", sizes = [1000000], filters = {m = 1, pattern = "high", algorithm = "profile"}},
-  {label = "Capacity varies: 2, 4, 6, 8", sizes = [100000], filters = {m = 3125, pattern = "varying", algorithm = "profile"}},
-  {label = "Capacity varies: 2, 4, 6, 8 (larger input)", sizes = [1000000], filters = {m = 31250, pattern = "varying", algorithm = "profile"}},
+  {label = "Constant capacity 4", sizes = [1000000], filters = {m = 1, pattern = "constant", algorithm = "profile", run = "shared"}},
+  {label = "Enough capacity for all", sizes = [1000000], filters = {m = 1, pattern = "high", algorithm = "profile", run = "shared"}},
+  {label = "Capacity varies: 2, 4, 6, 8", sizes = [100000], filters = {m = 3125, pattern = "varying", algorithm = "profile", run = "shared"}},
+  {label = "Capacity varies: 2, 4, 6, 8 (larger input)", sizes = [1000000], filters = {m = 31250, pattern = "varying", algorithm = "profile", run = "shared"}},
 ]
 
 [[tables]]
@@ -416,6 +440,75 @@ ylabel = "Algorithm time (ms)"
 methods = { production = "Package algorithm", csr_components = "Always use one worker", csr_parallel = "Always use eight workers" }
 cases = [
   {label = "32 intervals per overlap set, 16 capacity segments", sizes = [1000, 10000, 1000000], filters = {family = "components", pattern = "small_changes", order = "sorted", m = 16, k = 4}},
+]
+
+[[tables]]
+id = "capacity-flow-core-table"
+source = "capacity_flow_core"
+value = "ns"
+divisor = 1000000
+ylabel = "Algorithm time (ms)"
+methods = { separate = "Separate engines", shared = "Shared engine" }
+cases = [
+  {label = "Independent overlap sets, capacity 2", sizes = [10000, 1000000], filters = {family = "components", order = "shuffled", weights = "positive", k = 2, algorithm = "production"}},
+  {label = "Independent overlap sets, capacity 8", sizes = [100000], filters = {family = "components", order = "shuffled", weights = "positive", k = 8, algorithm = "production"}},
+  {label = "Moderate overlap, capacity 2", sizes = [1000000], filters = {family = "moderate", order = "sorted", weights = "positive", k = 2, algorithm = "production"}},
+  {label = "Many overlaps, capacity 2", sizes = [1000000], filters = {family = "dense", order = "shuffled", weights = "positive", k = 2, algorithm = "production"}},
+  {label = "Identical intervals, capacity 2", sizes = [1000000], filters = {family = "identical", order = "shuffled", weights = "positive", k = 2, algorithm = "production"}},
+  {label = "Identical intervals, capacity 999", sizes = [1000], filters = {family = "identical", order = "sorted", weights = "equal", k = 999, algorithm = "production"}},
+]
+
+[[tables]]
+id = "capacity-flow-polars-table"
+source = "capacity_flow_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Polars query time (ms)"
+methods = { separate = "Separate engines", shared = "Shared engine" }
+cases = [
+  {label = "32 overlapping per set, capacity 2", sizes = [1000000], filters = {k = 2, dtype = "Int64"}},
+  {label = "32 overlapping per set, capacity 16", sizes = [1000000], filters = {k = 16, dtype = "Int64"}},
+  {label = "32 overlapping per set, capacity 31", sizes = [1000000], filters = {k = 31, dtype = "Int64"}},
+]
+
+[[tables]]
+id = "capacity-fast-path-table"
+source = "capacity_flow_core"
+value = "ns"
+divisor = 1000000
+ylabel = "Algorithm time (ms)"
+methods = { shortcut_a = "With shortcut", no_shortcut_a = "Without", no_shortcut_b = "Without (repeat)", shortcut_b = "With (repeat)" }
+cases = [
+  {label = "Independent overlap sets, capacity 2", sizes = [10000, 1000000], filters = {family = "components", order = "shuffled", weights = "positive", k = 2, algorithm = "production"}},
+  {label = "Moderate overlap, capacity 2", sizes = [1000000], filters = {family = "moderate", order = "sorted", weights = "positive", k = 2, algorithm = "production"}},
+  {label = "Three at once, capacity 2", sizes = [1000000], filters = {family = "sparse", order = "sorted", weights = "positive", k = 2, algorithm = "production"}},
+  {label = "Many overlaps, capacity 2", sizes = [1000000], filters = {family = "dense", order = "shuffled", weights = "positive", k = 2, algorithm = "production"}},
+  {label = "Moderate overlap, capacity 16", sizes = [100000], filters = {family = "moderate", order = "sorted", weights = "positive", k = 16, algorithm = "production"}},
+]
+
+[[tables]]
+id = "profile-flow-core-table"
+source = "profile_flow_core"
+value = "ns"
+divisor = 1000000
+ylabel = "Algorithm time (ms)"
+methods = { separate = "Separate engines", shared = "Shared engine" }
+cases = [
+  {label = "Moderate overlap, 1,000 capacity segments", sizes = [10000], filters = {family = "moderate", pattern = "small_changes", order = "sorted", m = 1000, k = 4, algorithm = "production"}},
+  {label = "Moderate overlap, 10,000 capacity segments", sizes = [10000], filters = {family = "moderate", pattern = "small_changes", order = "sorted", m = 10000, k = 4, algorithm = "production"}},
+  {label = "32 intervals per overlap set, 16 capacity segments", sizes = [10000, 1000000], filters = {family = "components", pattern = "small_changes", order = "sorted", m = 16, k = 4, algorithm = "production"}},
+]
+
+[[tables]]
+id = "profile-flow-polars-table"
+source = "profile_flow_polars"
+value = "ns"
+divisor = 1000000
+ylabel = "Polars operation time (ms)"
+methods = { separate = "Separate engines", shared = "Shared engine" }
+cases = [
+  {label = "Constant capacity 4", sizes = [1000000], filters = {m = 1, pattern = "constant", dtype = "Int64", algorithm = "profile"}},
+  {label = "Capacity varies: 2, 4, 6, 8", sizes = [1000000], filters = {m = 31250, pattern = "varying", dtype = "Int64", algorithm = "profile"}},
 ]
 
 [[tables]]
@@ -768,10 +861,10 @@ ylabel = "Times in milliseconds"
 methods = { Int64 = "polars-intervals (ms)" }
 xlabel = "Rows"
 cases = [
-  { label = "32 overlapping per set, capacity 1", sizes = [1000000], filters = { k = 1 } },
-  { label = "32 overlapping per set, capacity 2", sizes = [1000000], filters = { k = 2 } },
-  { label = "32 overlapping per set, capacity 31", sizes = [1000000], filters = { k = 31 } },
-  { label = "32 overlapping per set, capacity 32", sizes = [1000000], filters = { k = 32 } },
+  { label = "32 overlapping per set, capacity 1", sizes = [1000000], filters = { k = 1, run = "shared" } },
+  { label = "32 overlapping per set, capacity 2", sizes = [1000000], filters = { k = 2, run = "shared" } },
+  { label = "32 overlapping per set, capacity 31", sizes = [1000000], filters = { k = 31, run = "shared" } },
+  { label = "32 overlapping per set, capacity 32", sizes = [1000000], filters = { k = 32, run = "shared" } },
 ]
 
 [[tables]]
@@ -783,10 +876,10 @@ ylabel = "Times in milliseconds"
 methods = { Int64 = "polars-intervals (ms)" }
 xlabel = "Rows"
 cases = [
-  { label = "Constant capacity 4", sizes = [1000000], filters = { m = 1, pattern = "constant", algorithm = "profile" } },
-  { label = "Enough capacity for all", sizes = [1000000], filters = { m = 1, pattern = "high", algorithm = "profile" } },
-  { label = "Capacity varies: 2, 4, 6, 8", sizes = [100000], filters = { m = 3125, pattern = "varying", algorithm = "profile" } },
-  { label = "Capacity varies: 2, 4, 6, 8 (larger input)", sizes = [1000000], filters = { m = 31250, pattern = "varying", algorithm = "profile" } },
+  { label = "Constant capacity 4", sizes = [1000000], filters = { m = 1, pattern = "constant", algorithm = "profile", run = "shared" } },
+  { label = "Enough capacity for all", sizes = [1000000], filters = { m = 1, pattern = "high", algorithm = "profile", run = "shared" } },
+  { label = "Capacity varies: 2, 4, 6, 8", sizes = [100000], filters = { m = 3125, pattern = "varying", algorithm = "profile", run = "shared" } },
+  { label = "Capacity varies: 2, 4, 6, 8 (larger input)", sizes = [1000000], filters = { m = 31250, pattern = "varying", algorithm = "profile", run = "shared" } },
 ]
 
 [[tables]]

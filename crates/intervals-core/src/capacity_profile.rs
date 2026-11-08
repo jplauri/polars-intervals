@@ -1,7 +1,6 @@
 use crate::capacity::{Prepared, Row, check_objective, components, prepare};
+use crate::capacity_flow::{Network, Segment, Timeline, solve_components};
 use crate::{IntervalError, check_len, max_weight_with_capacity};
-use std::cmp::Reverse;
-use std::collections::BinaryHeap;
 
 /// Select a globally maximum-weight subset of fixed intervals subject to a
 /// piecewise-constant capacity profile.
@@ -106,7 +105,9 @@ where
                 } else {
                     1
                 };
-                solve_components(&rows, &profile, &ranges, &mut mask, workers)?;
+                solve_components(&rows, &ranges, &mut mask, workers, |component, emit| {
+                    solve_component(component, &profile, emit)
+                })?;
             }
         }
     }
@@ -117,63 +118,14 @@ where
 fn solve_component<T: Ord + Copy>(
     rows: &[Row<T>],
     profile: &[Segment<T>],
-) -> Result<Vec<usize>, IntervalError> {
+    emit: &mut dyn FnMut(usize),
+) -> Result<(), IntervalError> {
     let timeline = Timeline::new(rows, profile);
     if all_feasible(&timeline) {
-        return Ok(rows.iter().map(|row| row.index).collect());
-    }
-    let mut network = Network::new(&timeline, rows);
-    network.solve()?;
-    Ok(rows
-        .iter()
-        .enumerate()
-        .filter_map(|(i, row)| network.selected(i).then_some(row.index))
-        .collect())
-}
-
-fn solve_components<T: Ord + Copy + Sync>(
-    rows: &[Row<T>],
-    profile: &[Segment<T>],
-    ranges: &[std::ops::Range<usize>],
-    mask: &mut [bool],
-    workers: usize,
-) -> Result<(), IntervalError> {
-    if workers <= 1 {
-        for range in ranges {
-            for index in solve_component(&rows[range.clone()], profile)? {
-                mask[index] = true;
-            }
-        }
+        rows.iter().for_each(|row| emit(row.index));
         return Ok(());
     }
-    std::thread::scope(|scope| {
-        let handles: Vec<_> = ranges
-            .chunks(ranges.len().div_ceil(workers))
-            .map(|batch| {
-                scope.spawn(move || {
-                    let mut selected = Vec::new();
-                    for range in batch {
-                        selected.extend(solve_component(&rows[range.clone()], profile)?);
-                    }
-                    Ok::<_, IntervalError>(selected)
-                })
-            })
-            .collect();
-        // Join and restore original row IDs in deterministic component order.
-        for handle in handles {
-            for index in handle.join().expect("capacity-profile worker panicked")? {
-                mask[index] = true;
-            }
-        }
-        Ok(())
-    })
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-struct Segment<T> {
-    start: T,
-    end: T,
-    capacity: usize,
+    Network::new(&timeline, rows).select(rows, emit)
 }
 
 /// Sort packed rows, reject ambiguous overlaps, insert zero gaps, and coalesce.
@@ -259,64 +211,6 @@ fn constant_capacity<T: Ord + Copy>(profile: &[Segment<T>], start: T, end: T) ->
     }
 }
 
-struct Timeline<T> {
-    endpoints: Vec<T>,
-    capacities: Vec<usize>,
-    jobs: Vec<(usize, usize)>,
-}
-
-impl<T: Ord + Copy> Timeline<T> {
-    fn new(rows: &[Row<T>], profile: &[Segment<T>]) -> Self {
-        if rows.is_empty() {
-            return Self {
-                endpoints: Vec::new(),
-                capacities: Vec::new(),
-                jobs: Vec::new(),
-            };
-        }
-        let start = rows.iter().map(|r| r.start).min().unwrap();
-        let end = rows.iter().map(|r| r.end).max().unwrap();
-        let begin = profile.partition_point(|segment| segment.end <= start);
-        let finish = profile.partition_point(|segment| segment.start < end);
-        let relevant = &profile[begin..finish];
-        let mut endpoints = Vec::with_capacity(2 * (rows.len() + relevant.len()));
-        for row in rows {
-            endpoints.extend([row.start, row.end]);
-        }
-        for segment in relevant {
-            endpoints.extend([segment.start.max(start), segment.end.min(end)]);
-        }
-        endpoints.sort_unstable();
-        endpoints.dedup();
-        let mut capacities = Vec::with_capacity(endpoints.len() - 1);
-        let mut i = 0;
-        for &point in &endpoints[..endpoints.len() - 1] {
-            while i < relevant.len() && relevant[i].end <= point {
-                i += 1;
-            }
-            capacities.push(if i < relevant.len() && relevant[i].start <= point {
-                relevant[i].capacity.min(rows.len())
-            } else {
-                0
-            });
-        }
-        let jobs = rows
-            .iter()
-            .map(|row| {
-                (
-                    endpoints.binary_search(&row.start).unwrap(),
-                    endpoints.binary_search(&row.end).unwrap(),
-                )
-            })
-            .collect();
-        Self {
-            endpoints,
-            capacities,
-            jobs,
-        }
-    }
-}
-
 fn filter_impossible<T>(rows: &mut Vec<Row<T>>, timeline: &mut Timeline<T>) {
     let mut zeros = Vec::with_capacity(timeline.capacities.len() + 1);
     zeros.push(0usize);
@@ -348,47 +242,6 @@ fn all_feasible<T>(timeline: &Timeline<T>) -> bool {
         }
     }
     true
-}
-
-struct Edge {
-    to: usize,
-    capacity: usize,
-    cost: i128,
-}
-
-/// Capacity-change transshipment, represented as source/sink min-cost flow.
-///
-/// Put supply delta_j = c_j - c_(j-1) at each timeline node, interpreting the
-/// capacity before/after the horizon as zero. Positive deltas receive a source
-/// arc; negative deltas receive a sink arc. Timeline arcs have capacity c_j,
-/// and each forward job arc has unit capacity and cost -weight.
-///
-/// CUT PROOF: sum flow conservation over timeline nodes 0..=j. The net supply
-/// telescopes to c_j. All original arcs go forwards, so exactly c_j units cross
-/// this cut: timeline flow plus chosen jobs spanning segment j. Nonnegative
-/// timeline flow therefore implies selected concurrency <= c_j. Conversely,
-/// for any feasible selected set put c_j - concurrency_j on timeline arc j;
-/// those nonnegative flows satisfy all node supplies and bounds. Thus feasible
-/// subsets and feasible integral flows correspond, with cost = -objective.
-/// Integral capacities and bottleneck augmentation preserve integrality.
-///
-/// CIRCULATION MODEL: reverse every timeline arc, with capacity c_j. A chosen
-/// forward job must return one unit across every backward cut it spans; summing
-/// conservation over a prefix proves backward flow equals selected concurrency.
-/// Start by saturating every negative-cost job arc. The residual network then
-/// has only zero-cost backward timeline arcs and positive-cost job rejection
-/// arcs. Restore conservation by sending excess at ends to deficits at starts.
-/// Rejecting all jobs proves feasibility. SSP minimizes rejection weight, hence
-/// maximizes retained weight; the omitted initial saturated cost is constant.
-/// This avoids negative-cycle cancellation and shares the same exact SSP.
-struct Network {
-    edges: Vec<Edge>,
-    offsets: Vec<usize>,
-    adjacent: Vec<usize>,
-    interval_start: usize,
-    job_count: usize,
-    required: usize,
-    circulation: bool,
 }
 
 impl Network {
@@ -443,185 +296,6 @@ impl Network {
         }
         Self::build(timeline, rows, &timeline.capacities, Some(balances))
     }
-
-    fn build<T>(
-        timeline: &Timeline<T>,
-        rows: &[Row<T>],
-        capacities: &[usize],
-        balances: Option<Vec<i128>>,
-    ) -> Self {
-        let vertices = timeline.endpoints.len() + 2;
-        let circulation = balances.is_some();
-        let mut network = Self {
-            edges: Vec::with_capacity(2 * (rows.len() + 2 * vertices)),
-            offsets: vec![0; vertices + 1],
-            adjacent: Vec::new(),
-            interval_start: 2 * timeline.capacities.len(),
-            job_count: rows.len(),
-            required: 0,
-            circulation,
-        };
-        for (j, &capacity) in capacities.iter().enumerate() {
-            if circulation {
-                network.add_edge(j + 2, j + 1, capacity, 0);
-            } else {
-                network.add_edge(j + 1, j + 2, capacity, 0);
-            }
-        }
-        for (&(start, end), row) in timeline.jobs.iter().zip(rows) {
-            if circulation {
-                network.add_edge(end + 1, start + 1, 1, row.weight);
-            } else {
-                network.add_edge(start + 1, end + 1, 1, -row.weight);
-            }
-        }
-        if let Some(balances) = balances {
-            for (j, balance) in balances.into_iter().enumerate() {
-                if balance > 0 {
-                    network.add_edge(0, j + 1, balance as usize, 0);
-                    network.required += balance as usize;
-                } else if balance < 0 {
-                    network.add_edge(j + 1, vertices - 1, (-balance) as usize, 0);
-                }
-            }
-        } else {
-            let mut previous = 0;
-            for (j, capacity) in capacities.iter().copied().chain([0]).enumerate() {
-                if capacity > previous {
-                    network.add_edge(0, j + 1, capacity - previous, 0);
-                    network.required += capacity - previous;
-                } else if capacity < previous {
-                    network.add_edge(j + 1, vertices - 1, previous - capacity, 0);
-                }
-                previous = capacity;
-            }
-        }
-        for v in 1..=vertices {
-            network.offsets[v] += network.offsets[v - 1];
-        }
-        network.adjacent.resize(network.edges.len(), 0);
-        let mut cursor = network.offsets[..vertices].to_vec();
-        for e in 0..network.edges.len() {
-            let from = network.edges[e ^ 1].to;
-            network.adjacent[cursor[from]] = e;
-            cursor[from] += 1;
-        }
-        network
-    }
-
-    fn add_edge(&mut self, from: usize, to: usize, capacity: usize, cost: i128) {
-        self.edges.push(Edge { to, capacity, cost });
-        self.edges.push(Edge {
-            to: from,
-            capacity: 0,
-            cost: -cost,
-        });
-        self.offsets[from + 1] += 1;
-        self.offsets[to + 1] += 1;
-    }
-
-    fn vertices(&self) -> usize {
-        self.offsets.len() - 1
-    }
-
-    fn solve(&mut self) -> Result<usize, IntervalError> {
-        let n = self.vertices();
-        let sink = n - 1;
-        let mut potential = vec![0i128; n];
-        // A initially has only forward live edges. One DAG pass from a virtual
-        // source to ALL vertices gives feasible potentials even across zero
-        // capacity stretches. C starts with nonnegative costs, so the same pass
-        // simply leaves its initially valid zero potentials unchanged.
-        for v in 0..n {
-            for &e in &self.adjacent[self.offsets[v]..self.offsets[v + 1]] {
-                let edge = &self.edges[e];
-                if edge.capacity > 0 {
-                    let next = add(potential[v], edge.cost)?;
-                    potential[edge.to] = potential[edge.to].min(next);
-                }
-            }
-        }
-        let mut distance = vec![u128::MAX; n];
-        let mut previous = vec![usize::MAX; n];
-        let mut queue = BinaryHeap::new();
-        let (mut sent, mut augmentations) = (0, 0);
-        while sent < self.required {
-            distance.fill(u128::MAX);
-            previous.fill(usize::MAX);
-            distance[0] = 0;
-            queue.push(Reverse((0u128, 0usize)));
-            while let Some(Reverse((d, v))) = queue.pop() {
-                if d != distance[v] {
-                    continue;
-                }
-                for &e in &self.adjacent[self.offsets[v]..self.offsets[v + 1]] {
-                    let edge = &self.edges[e];
-                    if edge.capacity == 0 {
-                        continue;
-                    }
-                    let reduced = reduced_cost(potential[v], potential[edge.to], edge.cost);
-                    let next = d.saturating_add(reduced);
-                    if next < distance[edge.to] {
-                        distance[edge.to] = next;
-                        previous[edge.to] = e;
-                        queue.push(Reverse((next, edge.to)));
-                    }
-                }
-            }
-            // A's all-unused flow, or C's rejection of all jobs, proves that
-            // every requested corrective flow exists.
-            assert_ne!(previous[sink], usize::MAX, "transshipment must be feasible");
-            let cap = distance[sink];
-            for (p, &d) in potential.iter_mut().zip(&distance) {
-                // Source reachability only shrinks: new reverse arcs join
-                // vertices already reachable along the augmentation. Freeze
-                // unreachable labels to avoid accumulating irrelevant offsets.
-                // Reduced costs stay nonnegative throughout the reachable set.
-                if d != u128::MAX {
-                    *p = p
-                        .checked_add_unsigned(d.min(cap))
-                        .ok_or(IntervalError::WeightOverflow)?;
-                }
-            }
-            let mut amount = self.required - sent;
-            let mut v = sink;
-            while v != 0 {
-                let e = previous[v];
-                amount = amount.min(self.edges[e].capacity);
-                v = self.edges[e ^ 1].to;
-            }
-            v = sink;
-            while v != 0 {
-                let e = previous[v];
-                self.edges[e].capacity -= amount;
-                self.edges[e ^ 1].capacity += amount;
-                v = self.edges[e ^ 1].to;
-            }
-            sent += amount;
-            augmentations += 1;
-        }
-        Ok(augmentations)
-    }
-
-    fn reconstruct<T>(&self, rows: &[Row<T>], mask: &mut [bool]) {
-        debug_assert_eq!(rows.len(), self.job_count);
-        for (i, row) in rows.iter().enumerate() {
-            mask[row.index] = self.selected(i);
-        }
-    }
-
-    fn selected(&self, row: usize) -> bool {
-        let e = self.interval_start + 2 * row;
-        if self.circulation {
-            self.edges[e].capacity == 1
-        } else {
-            self.edges[e ^ 1].capacity == 1
-        }
-    }
-}
-
-fn add(a: i128, b: i128) -> Result<i128, IntervalError> {
-    a.checked_add(b).ok_or(IntervalError::WeightOverflow)
 }
 
 fn capacity_supply(capacities: &[usize]) -> u128 {
@@ -656,30 +330,10 @@ fn tighten_capacities(capacities: &[usize], counts: &[(usize, usize)]) -> Vec<us
     tightened
 }
 
-fn reduced_cost(from: i128, to: i128, cost: i128) -> u128 {
-    // A non-shortest residual detour may exceed i128::MAX even when the
-    // optimum fits. Subtract labels by unsigned magnitude before adding cost.
-    // Values beyond u128::MAX can safely saturate just like Dijkstra distances.
-    if from >= to {
-        let difference = from.abs_diff(to);
-        if cost >= 0 {
-            difference.saturating_add(cost as u128)
-        } else {
-            difference
-                .checked_sub(cost.unsigned_abs())
-                .expect("negative reduced cost")
-        }
-    } else {
-        assert!(cost >= 0, "negative reduced cost");
-        (cost as u128)
-            .checked_sub(from.abs_diff(to))
-            .expect("negative reduced cost")
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::capacity_flow::reduced_cost;
     use proptest::prelude::*;
 
     fn segments(capacities: &[u8]) -> Vec<Segment<i32>> {
@@ -952,7 +606,14 @@ mod tests {
         let expected: Vec<_> = weights.iter().map(|&w| w >= 31).collect();
         for workers in [1, 8] {
             let mut mask = prepared.mask.clone();
-            solve_components(&prepared.rows, &profile, &ranges, &mut mask, workers).unwrap();
+            solve_components(
+                &prepared.rows,
+                &ranges,
+                &mut mask,
+                workers,
+                |component, emit| solve_component(component, &profile, emit),
+            )
+            .unwrap();
             assert_eq!(mask, expected);
         }
         for _ in 0..2 {
@@ -1001,6 +662,33 @@ mod tests {
     }
 
     proptest! {
+        #[test]
+        fn one_segment_network_is_the_adaptive_choice(
+            rows in prop::collection::vec((-4i32..=4, 1i32..=6), 1..=20),
+            capacity in 1usize..=8,
+        ) {
+            let starts: Vec<_> = rows.iter().map(|r| r.0).collect();
+            let ends: Vec<_> = rows.iter().map(|r| r.0 + r.1).collect();
+            let prepared = prepare(&starts, &ends, &vec![1i64; rows.len()], capacity).unwrap();
+            let rows = &prepared.rows;
+            let segment = Segment {
+                start: rows[0].start,
+                end: rows.iter().map(|r| r.end).max().unwrap(),
+                capacity,
+            };
+            let timeline = Timeline::new(rows, &[segment]);
+            if !all_feasible(&timeline) {
+                let arcs = |network: &Network| {
+                    network.edges.iter().map(|e| (e.to, e.capacity, e.cost)).collect::<Vec<_>>()
+                };
+                let adaptive = Network::new(&timeline, rows);
+                let direct = Network::one_segment(rows, capacity);
+                prop_assert!(!adaptive.circulation);
+                prop_assert_eq!(adaptive.required, direct.required);
+                prop_assert_eq!(arcs(&adaptive), arcs(&direct));
+            }
+        }
+
         #[test]
         fn capacity_tightening_preserves_every_feasible_subset(
             jobs in prop::collection::vec((0usize..=6, 0usize..=6), 0..=8),

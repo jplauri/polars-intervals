@@ -7,7 +7,7 @@
 [`max_weight_with_capacity_profile`](api.md#polars_intervals.max_weight_with_capacity_profile)
 selects the highest-weight set of intervals when the allowed number of overlaps
 changes over time. In synthetic examples with small, independent overlap groups,
-full Polars queries took **under 170 ms for one million intervals**, with the
+full Polars queries took **under 180 ms for one million intervals**, with the
 overlap limit varying between 2, 4, 6 and 8. The result is exact. Polars has no
 built-in solver for this optimization problem.
 Larger, interconnected groups can take much longer.
@@ -50,7 +50,7 @@ solver, with some additional time to read and check the profile.
 See the [measurement guide](benchmarking.md) and [shared hardware](benchmarks.md#hardware).
 
 **Complete Polars operation · solver uses up to 8 workers · median of 3 samples ·
-Polars thread count unrecorded · [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
+Polars' default 24-thread pool · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-flow.metadata.json)**
 
 Small cases are checked by trying every subset. Full-sized outputs are checked
 against the capacity profile and compared across exact implementations. The
@@ -86,24 +86,46 @@ retain memory comparisons, earlier experiments and validation details.
 **Reproduce**
 
 ```sh
-cargo bench -p intervals-core --bench max_weight_with_capacity_profile --locked > benchmarks/results/capacity-profile-local.csv
-python -I /path/to/checkout/benchmarks/capacity_profile_temporal.py > capacity-profile-temporal-local.csv
+cargo bench -p intervals-core --bench max_weight_with_capacity_profile --locked > target/capacity-profile-local.csv
+uv run --no-sync python benchmarks/capacity_profile_temporal.py > target/capacity-profile-temporal-local.csv
 ```
 
 `PROFILE_BENCH_MAX_N`, `PROFILE_BENCH_MIN_N`, `PROFILE_BENCH_MIN_M`,
-`PROFILE_BENCH_SAMPLES` and `PROFILE_BENCH_FAMILY` restrict the core run. Run the
-temporal command with the installed release wheel's Python from outside the
-checkout, following the shared setup.
+`PROFILE_BENCH_SAMPLES` and `PROFILE_BENCH_FAMILY` restrict the core run. Run both
+on a clean, committed tree after the [release rebuild](benchmarking.md#setup).
 
 [Setup, metrics and publishing](benchmarking.md) ·
-[Final core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-core.csv) ·
-[Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-temporal.csv) ·
-[Metadata and historical run inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json) ·
+[Rust samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-flow-profile-core.csv) ·
+[Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-flow-profile-polars.csv) ·
+[Run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-flow.metadata.json) ·
+[Earlier core samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-core.csv) ·
+[Earlier Polars samples](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-temporal.csv) ·
+[Earlier metadata and run inventory](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json) ·
 [Design notes](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/selection-notes.md#variable-capacity-selection)
 
 <span id="underlying-algorithm-comparisons"></span>
 
 **History**
+
+*Shared flow engine.* Changing-capacity selection now shares its flow code with
+[constant capacity](capacity-scheduling-benchmarks.md). Results and ties did not
+change: an exact comparison with the previous code, revision `8888e96`, matched
+on more than 300 million random problems, including every error. The measured
+shared-engine build is revision `a0d5912`.
+
+**Rust algorithm only · median of 3 samples · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-flow.metadata.json)**
+
+--8<-- "docs/assets/benchmarks/profile-flow-core-table.md"
+
+**Complete Polars operation · median of 3 samples · [run metadata](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-flow.metadata.json)**
+
+--8<-- "docs/assets/benchmarks/profile-flow-polars-table.md"
+
+Across 60 Rust workloads of at least 1 ms, the shared engine took 1.00× the
+separate engine's time, both as a geometric mean and as a median. Complete
+operations took 0.98× across 52 workloads of at least 1 ms, which is within
+run-to-run variation. Peak requested heap stayed at or below the old code, and
+fell by up to 14% where the old network reserved more edge storage than it used.
 
 **Rust algorithm only · one thread · median of 3 samples ·
 [measurement settings](https://github.com/jplauri/polars-intervals/blob/master/benchmarks/results/capacity-profile-environment.json)**
