@@ -1,6 +1,5 @@
+use crate::capacity_flow::{Network, add, solve_components};
 use crate::{IntervalError, check_len, max_weight_non_overlapping, validate_lengths};
-use std::cmp::Reverse;
-use std::collections::BinaryHeap;
 
 /// Select a globally maximum-weight subset subject to maximum simultaneous capacity.
 ///
@@ -10,8 +9,8 @@ use std::collections::BinaryHeap;
 /// input, but the particular optimal mask is not a stable contract.
 ///
 /// Capacity zero selects only positive empty intervals. Capacity one delegates
-/// to [`max_weight_non_overlapping`]. Other capacities use an exact specialized
-/// min-cost flow solver, after filtering irrelevant rows, detecting sufficient
+/// to [`max_weight_non_overlapping`]. Other capacities use exact min-cost flow
+/// on one capacity segment, after filtering irrelevant rows, detecting sufficient
 /// capacity, and separating independent overlap components. Substantial component
 /// workloads use at most eight scoped workers; small instances stay serial.
 /// No conflict graph is constructed. Endpoints require ordering and `Sync`,
@@ -70,13 +69,9 @@ where
         } else {
             1
         };
-        if workers > 1 {
-            solve_parallel(&rows, &ranges, capacity, &mut mask, workers)?;
-        } else {
-            for component in ranges {
-                solve_component(&rows[component], capacity, &mut mask)?;
-            }
-        }
+        solve_components(&rows, &ranges, &mut mask, workers, |component, emit| {
+            solve_component(component, capacity, emit)
+        })?;
     }
     check_objective(weights, &mask)?;
     Ok(mask)
@@ -85,63 +80,14 @@ where
 fn solve_component<T: Ord + Copy>(
     rows: &[Row<T>],
     capacity: usize,
-    mask: &mut [bool],
+    emit: &mut dyn FnMut(usize),
 ) -> Result<(), IntervalError> {
     if concurrency(rows) <= capacity {
-        for row in rows {
-            mask[row.index] = true;
-        }
-    } else {
-        let mut network = Network::new(rows, capacity);
-        network.solve(capacity)?;
-        network.reconstruct(rows, mask);
-    }
-    Ok(())
-}
-
-fn solve_parallel<T: Ord + Copy + Sync>(
-    rows: &[Row<T>],
-    ranges: &[std::ops::Range<usize>],
-    capacity: usize,
-    mask: &mut [bool],
-    workers: usize,
-) -> Result<(), IntervalError> {
-    std::thread::scope(|scope| {
-        let handles: Vec<_> = ranges
-            .chunks(ranges.len().div_ceil(workers))
-            .map(|batch| {
-                scope.spawn(move || {
-                    let start = batch[0].start;
-                    let end = batch.last().unwrap().end;
-                    // Each worker owns a disjoint contiguous batch and local mask.
-                    // Original indices are restored after joining in batch order.
-                    let mut local = rows[start..end].to_vec();
-                    for (i, row) in local.iter_mut().enumerate() {
-                        row.index = i;
-                    }
-                    let mut selected = vec![false; local.len()];
-                    for range in batch {
-                        solve_component(
-                            &local[range.start - start..range.end - start],
-                            capacity,
-                            &mut selected,
-                        )?;
-                    }
-                    Ok(selected
-                        .into_iter()
-                        .enumerate()
-                        .filter_map(|(i, v)| v.then_some(rows[start + i].index))
-                        .collect::<Vec<_>>())
-                })
-            })
-            .collect();
-        for handle in handles {
-            for index in handle.join().expect("capacity worker panicked")? {
-                mask[index] = true;
-            }
-        }
+        rows.iter().for_each(|row| emit(row.index));
         Ok(())
-    })
+    } else {
+        Network::one_segment(rows, capacity).select(rows, emit)
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -233,179 +179,33 @@ fn concurrency<T: Ord + Copy>(rows: &[Row<T>]) -> usize {
     peak
 }
 
-fn add(a: i128, b: i128) -> Result<i128, IntervalError> {
-    a.checked_add(b).ok_or(IntervalError::WeightOverflow)
-}
-
-struct Edge {
-    to: usize,
-    capacity: usize,
-    cost: i128,
-}
-
-struct Network {
-    // Paired residual edges: the reverse of edge e is e ^ 1. CSR adjacency
-    // stores edge indices, keeping both edge and adjacency buffers contiguous.
-    edges: Vec<Edge>,
-    offsets: Vec<usize>,
-    adjacent: Vec<usize>,
-    // Interval edge pairs follow timeline pairs, in input-row order.
-    interval_start: usize,
-}
-
-impl Network {
-    fn new<T: Ord + Copy>(rows: &[Row<T>], capacity: usize) -> Self {
-        let mut endpoints = Vec::with_capacity(2 * rows.len());
-        for row in rows {
-            endpoints.extend([row.start, row.end]);
-        }
-        endpoints.sort_unstable();
-        endpoints.dedup();
-        let n = endpoints.len();
-        assert!(n >= 2);
-        let mut net = Self {
-            edges: Vec::with_capacity(2 * (n - 1 + rows.len())),
-            offsets: vec![0; n + 1],
-            adjacent: Vec::new(),
-            interval_start: 2 * (n - 1),
-        };
-        for v in 0..n - 1 {
-            net.add_edge(v, v + 1, capacity, 0);
-        }
-        for row in rows {
-            let from = endpoints.binary_search(&row.start).unwrap();
-            let to = endpoints.binary_search(&row.end).unwrap();
-            net.add_edge(from, to, 1, -row.weight);
-        }
-        for i in 1..=n {
-            net.offsets[i] += net.offsets[i - 1];
-        }
-        net.adjacent.resize(net.edges.len(), 0);
-        let mut cursor = net.offsets[..n].to_vec();
-        for e in 0..net.edges.len() {
-            let from = net.edges[e ^ 1].to;
-            net.adjacent[cursor[from]] = e;
-            cursor[from] += 1;
-        }
-        net
-    }
-
-    fn add_edge(&mut self, from: usize, to: usize, capacity: usize, cost: i128) {
-        self.edges.push(Edge { to, capacity, cost });
-        self.edges.push(Edge {
-            to: from,
-            capacity: 0,
-            cost: -cost,
-        });
-        self.offsets[from + 1] += 1;
-        self.offsets[to + 1] += 1;
-    }
-
-    fn solve(&mut self, capacity: usize) -> Result<(), IntervalError> {
-        let n = self.offsets.len() - 1;
-        let mut potential = vec![0i128; n];
-        let mut previous = vec![usize::MAX; n];
-        // The initial residual graph is a DAG. Timeline edges make all vertices
-        // reachable. This computes initial potentials AND the first path.
-        for v in 0..n {
-            for &e in &self.adjacent[self.offsets[v]..self.offsets[v + 1]] {
-                let edge = &self.edges[e];
-                if edge.capacity > 0 {
-                    let d = add(potential[v], edge.cost)?;
-                    if previous[edge.to] == usize::MAX || d < potential[edge.to] {
-                        potential[edge.to] = d;
-                        previous[edge.to] = e;
-                    }
-                }
-            }
-        }
-        let mut sent = 0;
-        let mut distance = vec![u128::MAX; n];
-        let mut queue = BinaryHeap::new();
-        loop {
-            let mut amount = capacity - sent;
-            let mut v = n - 1;
-            while v != 0 {
-                let e = previous[v];
-                amount = amount.min(self.edges[e].capacity);
-                v = self.edges[e ^ 1].to;
-            }
-            assert!(amount > 0);
-            v = n - 1;
-            while v != 0 {
-                let e = previous[v];
-                self.edges[e].capacity -= amount;
-                self.edges[e ^ 1].capacity += amount;
-                v = self.edges[e ^ 1].to;
-            }
-            sent += amount;
-            if sent == capacity {
-                break;
-            }
-            distance.fill(u128::MAX);
-            previous.fill(usize::MAX);
-            distance[0] = 0;
-            queue.push(Reverse((0u128, 0usize)));
-            // Strict relaxation plus (distance, vertex) ordering resolves ties
-            // deterministically and prevents predecessor cycles on zero costs.
-            while let Some(Reverse((d, v))) = queue.pop() {
-                if d != distance[v] {
-                    continue;
-                }
-                for &e in &self.adjacent[self.offsets[v]..self.offsets[v + 1]] {
-                    let edge = &self.edges[e];
-                    if edge.capacity == 0 {
-                        continue;
-                    }
-                    let reduced = add(potential[v], edge.cost)?
-                        .checked_sub(potential[edge.to])
-                        .ok_or(IntervalError::WeightOverflow)?;
-                    debug_assert!(reduced >= 0);
-                    // Unsigned distances also represent non-shortest detours
-                    // above i128::MAX without overflowing a signed accumulator.
-                    let candidate = d.saturating_add(reduced as u128);
-                    if candidate < distance[edge.to] {
-                        distance[edge.to] = candidate;
-                        previous[edge.to] = e;
-                        queue.push(Reverse((candidate, edge.to)));
-                    }
-                }
-            }
-            for (p, d) in potential.iter_mut().zip(&distance) {
-                // Before k units are sent, every timeline edge has residual
-                // capacity, so all vertices are reachable and potentials <= 0.
-                *p = add(
-                    *p,
-                    i128::try_from(*d).map_err(|_| IntervalError::WeightOverflow)?,
-                )?;
-            }
-        }
-        Ok(())
-    }
-
-    fn reconstruct<T>(&self, rows: &[Row<T>], mask: &mut [bool]) {
-        for (row, edge) in rows
-            .iter()
-            .zip(self.edges[self.interval_start..].iter().step_by(2))
-        {
-            mask[row.index] = edge.capacity == 0;
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use proptest::prelude::*;
+
+    fn solve_parallel(
+        rows: &[Row<i32>],
+        ranges: &[std::ops::Range<usize>],
+        capacity: usize,
+        mask: &mut [bool],
+        workers: usize,
+    ) -> Result<(), IntervalError> {
+        solve_components(rows, ranges, mask, workers, |component, emit| {
+            solve_component(component, capacity, emit)
+        })
+    }
 
     fn invariants(s: &[i32], e: &[i32], w: &[i64], k: usize) {
         let prepared = prepare(s, e, w, k).unwrap();
         if prepared.rows.is_empty() {
             return;
         }
-        let mut net = Network::new(&prepared.rows, k);
+        // Timelines clamp capacity to the row count, for profiles and one segment.
+        let k = k.min(prepared.rows.len());
+        let mut net = Network::one_segment(&prepared.rows, k);
         let initial: Vec<_> = net.edges.iter().map(|e| e.capacity).collect();
-        net.solve(k).unwrap();
+        net.solve().unwrap();
         let n = net.offsets.len() - 1;
         let mut balance = vec![0i128; n];
         let mut cost = 0;
@@ -438,8 +238,8 @@ mod tests {
         {
             assert_eq!(mask[row.index], reverse.capacity == 1);
         }
-        let mut again = Network::new(&prepared.rows, k);
-        again.solve(k).unwrap();
+        let mut again = Network::one_segment(&prepared.rows, k);
+        again.solve().unwrap();
         assert_eq!(
             net.edges.iter().map(|e| e.capacity).collect::<Vec<_>>(),
             again.edges.iter().map(|e| e.capacity).collect::<Vec<_>>()
@@ -463,7 +263,7 @@ mod tests {
         let ranges = components(&prepared.rows);
         let mut serial = prepared.mask.clone();
         for range in &ranges {
-            solve_component(&prepared.rows[range.clone()], 2, &mut serial).unwrap();
+            solve_component(&prepared.rows[range.clone()], 2, &mut |i| serial[i] = true).unwrap();
         }
         for workers in [1, 2, 8] {
             let mut parallel = prepared.mask.clone();
