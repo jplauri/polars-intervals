@@ -1,4 +1,4 @@
-"""Run complete core set-geometry comparisons and preserve raw samples and provenance."""
+"""Measure complete core set-geometry calls and record their provenance."""
 
 from benchmarks.provenance import run_core
 

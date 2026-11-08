@@ -1,4 +1,4 @@
-"""Run complete core geometry comparisons and preserve raw samples and provenance."""
+"""Measure complete core geometry calls and record their provenance."""
 
 from benchmarks.provenance import DTYPES, run_core
 

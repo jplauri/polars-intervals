@@ -1,4 +1,4 @@
-"""Run complete Rust coverage-profile comparisons and preserve source evidence.
+"""Measure complete Rust coverage-profile calls and record their provenance.
 
 Run sequentially on an idle machine. This does not build or measure the Python
 extension.
