@@ -251,7 +251,7 @@ impl Network {
         // One segment leaves every timeline edge residual until the last unit,
         // so the source reaches all vertices and the DAG pass already holds the
         // first shortest path. Other networks need a real first search.
-        let mut search = true;
+        let mut search = !self.one_segment;
         while sent < self.required {
             if search {
                 distance.fill(u128::MAX);
