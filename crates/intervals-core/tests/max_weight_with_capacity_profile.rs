@@ -277,6 +277,65 @@ fn integer_extremes_generic_endpoints_and_checked_objective() {
     );
 }
 
+#[test]
+fn overflowing_optimum_reports_an_error_when_the_last_path_exhausts_u128() {
+    assert_eq!(
+        solve(
+            &[1, 1, 3, 4],
+            &[2, 4, 5, 5],
+            &[1, i128::MAX, i128::MAX, 1],
+            &[1, 2, 4],
+            &[2, 4, 5],
+            &[2, 1, 2],
+        ),
+        Err(IntervalError::WeightOverflow)
+    );
+}
+
+// Near-limit weights, each paired with an i64 that ranks every subset the same
+// way. BASE stands for 2^126, so the oracle needs none of the solver's labels.
+const BASE: i64 = 1 << 20;
+const NEAR_LIMIT: [(i128, i64); 7] = [
+    (i128::MAX, 2 * BASE - 1),
+    (i128::MAX - 1, 2 * BASE - 2),
+    (i128::MAX - 2, 2 * BASE - 3),
+    ((1 << 126) + 1, BASE + 1),
+    ((1 << 126) - 1, BASE - 1),
+    (1, 1),
+    (-1, -1),
+];
+
+/// Jobs carry an index into `NEAR_LIMIT` instead of a weight.
+fn check_near_limit(jobs: &[(i64, i64, usize)], segments: &[reference::Segment]) {
+    let (s, e): (Vec<_>, Vec<_>) = jobs.iter().map(|j| (j.0, j.1)).unzip();
+    let weights: Vec<_> = jobs.iter().map(|j| NEAR_LIMIT[j.2].0).collect();
+    let encoded: Vec<_> = jobs.iter().map(|j| (j.0, j.1, NEAR_LIMIT[j.2].1)).collect();
+    let (ps, pe): (Vec<_>, Vec<_>) = segments.iter().map(|r| (r.0, r.1)).unzip();
+    let capacities: Vec<_> = segments.iter().map(|r| r.2 as i64).collect();
+    let optimum = reference::brute_force(&encoded, segments);
+    let result = solve(&s, &e, &weights, &ps, &pe, &capacities);
+    // Encoded objectives order like real ones, so i128::MAX maps to 2 * BASE - 1.
+    if optimum < 2 * i128::from(BASE) {
+        assert_eq!(
+            reference::verify(&encoded, segments, &result.unwrap()),
+            optimum
+        );
+    } else {
+        assert_eq!(result, Err(IntervalError::WeightOverflow));
+    }
+}
+
+#[test]
+fn optimum_at_the_i128_boundary_matches_the_reference_oracle() {
+    // With the two light jobs, heavy weight i128::MAX - 2 reaches exactly i128::MAX.
+    for heavy in 0..3 {
+        check_near_limit(
+            &[(1, 2, 5), (1, 4, heavy), (3, 5, heavy), (4, 5, 5)],
+            &[(1, 2, 2), (2, 4, 1), (4, 5, 2)],
+        );
+    }
+}
+
 fn jobs() -> impl Strategy<Value = Vec<Row>> {
     prop::collection::vec((-6i64..=10, -6i64..=10, -10i64..=20), 0..=10).prop_map(|v| {
         v.into_iter()
@@ -344,6 +403,19 @@ proptest! {
             reference::verify(&rows, &segment, &max_weight_with_capacity(&s, &e, &w, k).unwrap()),
             reference::brute_force(&rows, &segment)
         );
+    }
+
+    #[test]
+    fn near_limit_weights_match_the_reference_oracle(
+        rows in prop::collection::vec((0i64..5, 0i64..=5, 0..NEAR_LIMIT.len()), 0..=7),
+        caps in prop::collection::vec(0usize..=2, 5),
+        k in 0usize..=3,
+    ) {
+        let jobs: Vec<_> = rows.iter().map(|&(s, len, w)| (s, (s + len).min(5), w)).collect();
+        let segments: Vec<_> = caps.iter().enumerate().map(|(t, &c)| (t as i64, t as i64 + 1, c)).collect();
+        check_near_limit(&jobs, &segments);
+        // A constant profile dispatches to the scalar solver and its flow engine.
+        check_near_limit(&jobs, &[(0, 5, k)]);
     }
 
     #[test]

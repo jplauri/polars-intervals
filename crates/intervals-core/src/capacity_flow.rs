@@ -102,6 +102,16 @@ pub(crate) struct Edge {
 /// Rejecting all jobs proves feasibility. SSP minimizes rejection weight, hence
 /// maximizes retained weight; the omitted initial saturated cost is constant.
 /// This avoids negative-cycle cancellation and shares the same exact SSP.
+///
+/// SINK BOUND: the sink label is always the latest path cost, so a search's
+/// sink distance is the rise from that cost. A's initial labels are compatible
+/// job chains and C's are zero, so labels start at -OPT or above. SSP path
+/// costs never decrease, so the last path is the most expensive. Dropping the
+/// last flow unit raises capacity by at most one, and only where it is
+/// positive, so that selection has concurrency at most 2c_j. Interval matrices
+/// are totally unimodular, so it splits into two feasible sets and weighs at
+/// most 2OPT. The last path therefore costs at most OPT, and a sink distance
+/// is at most 2OPT. Reaching u128::MAX proves OPT > i128::MAX.
 pub(crate) struct Network {
     // Paired residual edges: the reverse of edge e is e ^ 1. CSR adjacency
     // stores edge indices, keeping both edge and adjacency buffers contiguous.
@@ -281,14 +291,20 @@ impl Network {
                     }
                 }
                 // A's all-unused flow, or C's rejection of all jobs, proves that
-                // every requested corrective flow exists.
-                assert_ne!(previous[sink], usize::MAX, "transshipment must be feasible");
+                // every requested corrective flow exists. An unlabelled sink is
+                // therefore at least u128::MAX away, and the SINK BOUND above
+                // rules that out for every optimum that fits i128.
+                if previous[sink] == usize::MAX {
+                    return Err(IntervalError::WeightOverflow);
+                }
                 let cap = distance[sink];
                 for (p, &d) in potential.iter_mut().zip(&distance) {
                     // Source reachability only shrinks: new reverse arcs join
                     // vertices already reachable along the augmentation. Freeze
                     // unreachable labels to avoid accumulating irrelevant offsets.
                     // Reduced costs stay nonnegative throughout the reachable set.
+                    // Saturated vertices freeze too. True distances never fall, so
+                    // they stay saturated and no later search expands them.
                     if d != u128::MAX {
                         *p = p
                             .checked_add_unsigned(d.min(cap))

@@ -572,6 +572,51 @@ mod tests {
     }
 
     #[test]
+    fn sink_distances_past_the_u128_range_report_overflow_in_both_models() {
+        let solve = |jobs: &[(i32, i32, i128)], capacities: &[u8], circulation| {
+            let starts: Vec<_> = jobs.iter().map(|j| j.0).collect();
+            let ends: Vec<_> = jobs.iter().map(|j| j.1).collect();
+            let weights: Vec<_> = jobs.iter().map(|j| j.2).collect();
+            let prepared = prepare(&starts, &ends, &weights, usize::MAX).unwrap();
+            let points: Vec<_> = (0..capacities.len() as i32).collect();
+            let after: Vec<_> = points.iter().map(|p| p + 1).collect();
+            let profile = normalize(&points, &after, capacities, jobs.len()).unwrap();
+            let timeline = Timeline::new(&prepared.rows, &profile);
+            if circulation {
+                Network::new_circulation(&timeline, &prepared.rows).solve()
+            } else {
+                Network::new_transshipment(&timeline, &prepared.rows).solve()
+            }
+        };
+        let max = i128::MAX;
+        // The last transshipment path needs more than u128::MAX of reduced cost.
+        assert_eq!(
+            solve(
+                &[(2, 3, max), (3, 6, 1), (3, 4, 1), (0, 3, max)],
+                &[2, 2, 1, 1, 2, 2],
+                false
+            ),
+            Err(IntervalError::WeightOverflow)
+        );
+        // Circulation saturates on its rejection chain before reaching the sink.
+        assert_eq!(
+            solve(
+                &[
+                    (0, 1, max),
+                    (0, 1, max - 1),
+                    (1, 2, max),
+                    (2, 3, max),
+                    (1, 2, max),
+                    (2, 3, max - 1)
+                ],
+                &[1, 1, 1],
+                true
+            ),
+            Err(IntervalError::WeightOverflow)
+        );
+    }
+
+    #[test]
     fn adaptive_circulation_handles_frequent_small_capacity_changes() {
         let starts: Vec<_> = (0..512).collect();
         let ends: Vec<_> = starts.iter().map(|&s| s + 32).collect();
