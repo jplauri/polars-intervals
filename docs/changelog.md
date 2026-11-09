@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 0.3.1 — November 9, 2026
+
+A maintenance release. Python signatures and results are unchanged.
+
+```sh
+pip install polars-intervals==0.3.1
+```
+
+Requires Python 3.12+ and Polars `>=1.44.1,<1.45`.
+
+- [`max_weight_with_capacity`](usage.md#select-with-a-simultaneous-capacity) and
+  [`max_weight_with_capacity_profile`](usage.md#select-with-a-capacity-profile)
+  now share one flow engine. Results and ties are unchanged, and
+  [timings](capacity-scheduling-benchmarks.md) show no overall change. Peak
+  requested heap rises by at most 2% and falls on some workloads.
+
+- **Rust only:** `intervals-core` capacity selection now returns `WeightOverflow`
+  instead of panicking when the optimum does not fit `i128`. Python weights are
+  at most 64 bits, so Python callers cannot reach this case.
+
 - **Breaking Rust API change:** The unpublished `polars-intervals` crate no
   longer exposes a Rust API. It builds only the Python extension.
 
