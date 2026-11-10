@@ -42,6 +42,14 @@ cargo clippy --workspace --all-targets --locked -- -D warnings
 Use `uv run --locked ruff format .` to format Python code.
 CI also verifies built distributions when code or build inputs change.
 
+The package allows Polars releases from an exact minimum up to the next major
+version, such as `polars>=2.0.0,<3`. CI uses the locked release, and release
+builds also test the declared minimum. The **Newest Polars** workflow tests the
+newest allowed release every week. Keep the `plots` group requirement identical
+to the package requirement. The release checks enforce these rules. To skip a
+broken Polars release until it is fixed, lower the upper bound or add a `!=`
+exclusion.
+
 On Windows, point PyO3 at the project interpreter before running Cargo. In
 PowerShell, prepare the shell after `uv sync --locked`:
 
