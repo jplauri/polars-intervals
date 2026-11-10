@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+Support Polars 2. Python signatures and results are unchanged.
+
+- **Breaking:** Require Polars `>=2.0.0,<2.2` instead of `>=1.44.1,<1.45`.
+  Stay on 0.3.1 if you need Polars 1.
+
+- Polars 2 runs `collect()` on the streaming engine by default. Expressions
+  still solve their whole collection or group across all chunks. Frame
+  operations still need their complete inputs in memory.
+
+- Published [benchmark timings](benchmarks.md#polars-version) used Polars 1.44.
+  They have not been repeated with Polars 2.
+
 ## 0.3.1 — November 9, 2026
 
 A maintenance release. Python signatures and results are unchanged.
