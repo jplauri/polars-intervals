@@ -11,7 +11,7 @@ from .test_coverage_stats import assert_stats, frame, oracle
 @pytest.mark.parametrize(
     "qlazy,slazy", [(False, False), (True, False), (False, True), (True, True)]
 )
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_all_frame_kinds_defer_both_inputs(qlazy, slazy, engine):
     q, s = frame([(0, 10), (5, 10), (7, 7)]), frame([(1, 7), (4, 9)])
     seen = [[], []]
@@ -53,7 +53,7 @@ TRANSFORMS = {
 }
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("transform", TRANSFORMS.values(), ids=TRANSFORMS)
 def test_downstream_transforms_retain_complete_sources(engine, transform):
     q = frame([(0, 10), (5, 10), (7, 7), (20, 21), (0, 10)]).with_columns(
@@ -70,7 +70,7 @@ def test_downstream_transforms_retain_complete_sources(engine, transform):
     )
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_slice_and_query_predicate_do_not_leak_into_sources(engine):
     q, s = frame([(0, 10)]), frame([(6, 8), (0, 4)])
     out = pi.coverage_stats(q.lazy(), s.lazy()).head(1).collect(engine=engine)
@@ -85,7 +85,7 @@ def test_slice_and_query_predicate_do_not_leak_into_sources(engine):
     assert_frame_equal(before, out)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_arbitrary_chunks_and_both_parquet_scans(engine, tmp_path):
     q = frame([(0, 10), (3, 3), (2, 8), (0, 10), (20, 25), (1, 9)]).with_columns(
         pl.Series("key", ["a", None, "b", "a", "missing", "b"]),
@@ -116,7 +116,7 @@ def test_arbitrary_chunks_and_both_parquet_scans(engine, tmp_path):
     assert_stats(pi.coverage_stats(*scans, by="key").collect(engine=engine), expected)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_shared_lazy_source_and_independently_filtered_branches(engine):
     df = frame([(0, 10), (2, 4), (6, 8), (3, 3)])
     lazy = df.lazy()
@@ -158,7 +158,7 @@ def test_literal_names_custom_endpoint_keys_and_frozen_options():
 
 
 @pytest.mark.parametrize("side", ["queries", "intervals"])
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize(
     "transform",
     [

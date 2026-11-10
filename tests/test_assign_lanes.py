@@ -67,7 +67,7 @@ def test_semantics(starts, ends, lazy):
 
 
 @pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_supported_dtypes_chunks_slices_and_shuffled_rows(dtype, engine):
     intervals = [(i // 4, i // 4 + i % 5) for i in range(80)]
     Random(42).shuffle(intervals)

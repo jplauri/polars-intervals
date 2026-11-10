@@ -71,7 +71,7 @@ def test_actual_dates_and_datetimes():
         assert frame.select(pi.nesting_depth("start", "end")).to_series().to_list() == [0, 1, 2, 1]
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_different_chunk_boundaries_and_slices(engine):
     starts = pl.concat([pl.Series([99, 2, 0]), pl.Series([3, 1, 99])], rechunk=False).slice(1, 4)
     ends = pl.concat(

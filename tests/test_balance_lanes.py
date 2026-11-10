@@ -99,7 +99,7 @@ def test_semantics_nonregression_and_determinism(starts, ends, method, lazy):
 
 @pytest.mark.parametrize("method", ["construct", "repair"])
 @pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_supported_endpoints_unequal_chunks_slices_and_expressions(method, dtype, engine):
     intervals = [(i // 4, i // 4 + i % 5) for i in range(80)]
     Random(42).shuffle(intervals)
@@ -136,7 +136,7 @@ def test_supported_endpoints_unequal_chunks_slices_and_expressions(method, dtype
 
 @pytest.mark.parametrize("method", ["construct", "repair"])
 @pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_window_and_grouped_list_aggregation(method, dtype, engine):
     frame = pl.DataFrame({"start": [0, 20, 0, 22, 1, 24, 1], "end": [10, 23, 9, 25, 1, 26, 1]})
     frame = frame.with_columns(

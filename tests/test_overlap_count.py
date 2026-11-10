@@ -116,7 +116,7 @@ def test_empty_single_and_touching_collections(starts, ends, counts):
     assert_series_equal(query.collect()["count"], pl.Series("count", counts, dtype=pl.UInt64))
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_counts_across_chunks_and_streaming_batches(engine):
     frame = pl.concat(
         [pl.DataFrame({"start": [1, 1], "end": [5, 5]}) for _ in range(4)],

@@ -9,7 +9,7 @@ from .dtypes import ENDPOINT_DTYPES
 from .test_coverage_profile import frame, oracle
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_construction_and_schema_do_not_execute_input(engine):
     source = frame([(0, 4, 2), (2, 5, 3), (5, 7, 3)])
     observed = []
@@ -32,7 +32,7 @@ def test_construction_and_schema_do_not_execute_input(engine):
 
 
 @pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_lazy_schema_preserves_endpoint_and_key_metadata_even_when_empty(dtype, engine):
     key_dtype = pl.Datetime("ns", "Europe/Helsinki")
     source = pl.DataFrame(
@@ -55,7 +55,7 @@ def test_lazy_schema_preserves_endpoint_and_key_metadata_even_when_empty(dtype, 
         assert_frame_equal(query.collect(engine=engine), expected)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("weight", [None, "q"])
 def test_empty_lazy_inputs_and_observed_empty_groups_with_explicit_domain(engine, weight):
     source = frame([(1, 1, 0), (2, 2, 4)]).with_columns(
@@ -80,7 +80,7 @@ def test_empty_lazy_inputs_and_observed_empty_groups_with_explicit_domain(engine
                     assert actual.is_empty()
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("weight", [None, "q"])
 @pytest.mark.parametrize("domain", [None, (-3, 8), (2, 2)])
 @pytest.mark.parametrize("include_zero", [False, True])
@@ -130,7 +130,7 @@ TRANSFORMS = {
 }
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("transform", TRANSFORMS.values(), ids=TRANSFORMS)
 def test_downstream_operations_apply_to_complete_profile(engine, transform):
     source = frame([(0, 10, 1), (2, 4, 2), (4, 7, 2), (6, 8, 0)])
@@ -141,7 +141,7 @@ def test_downstream_operations_apply_to_complete_profile(engine, transform):
     assert_frame_equal(transform(query).collect(engine=engine), transform(expected))
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("transform", TRANSFORMS.values(), ids=TRANSFORMS)
 @pytest.mark.parametrize(
     "bad_row,match",
@@ -156,7 +156,7 @@ def test_downstream_operations_cannot_hide_invalid_input_rows(engine, transform,
         transform(query).collect(engine=engine)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_upstream_filter_intentionally_changes_the_instance(engine):
     source = frame([(0, 4, 2), (1, 5, 3), (100, 99, -1)])
     query = pi.coverage_profile(source.lazy().filter(pl.col("start") < 10), weight="q")
@@ -164,7 +164,7 @@ def test_upstream_filter_intentionally_changes_the_instance(engine):
     assert_frame_equal(query.collect(engine=engine), expected)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_aliases_and_group_keys_sharing_source_columns(engine):
     source = pl.DataFrame({"s": [0, 0, 2], "e": [4, 3, 5], "q": [1, 2, 3]})
     prepared = source.lazy().with_columns((pl.col("e") + 1).alias("finish"))
@@ -196,7 +196,7 @@ def test_aliases_and_group_keys_sharing_source_columns(engine):
     )
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_deferred_arguments_are_snapshots_of_mutable_inputs(engine):
     source = frame([(0, 4, 2), (2, 6, 3)]).with_columns(
         pl.Series("resource", ["a", "b"]), pl.Series("other", [1, 2])
@@ -221,7 +221,7 @@ def test_deferred_arguments_are_snapshots_of_mutable_inputs(engine):
     assert_frame_equal(query.collect(engine=engine), expected)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("format_name", ["parquet", "ipc"])
 @pytest.mark.parametrize("weight", [None, "q"])
 def test_partitioned_lazy_scans_solve_whole_groups(tmp_path, engine, format_name, weight):
@@ -253,7 +253,7 @@ def test_partitioned_lazy_scans_solve_whole_groups(tmp_path, engine, format_name
     assert actual.rows() == expected
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_deferred_temporal_bounds_and_exact_int128_loads(engine):
     dtype = pl.Datetime("ns", "Europe/Helsinki")
     t = 1729990800000000001
