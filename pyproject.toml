@@ -7,7 +7,7 @@ name = "polars-intervals"
 description = "Interval algorithms for Polars"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["polars>=1.44.1,<1.45"]
+dependencies = ["polars>=2.0.0,<2.2"]
 license = "MIT"
 license-files = ["LICENSE"]
 keywords = ["polars", "intervals", "overlap", "rust"]
@@ -36,7 +36,7 @@ docs = [
     "mkdocstrings[python]>=1,<2",
     "ruff==0.16.8", # Format API signatures, using the same formatter as development.
 ]
-plots = ["polars>=1.44.1,<1.45"]
+plots = ["polars>=2.0.0,<2.2"]
 
 [tool.maturin]
 manifest-path = "crates/polars-intervals/Cargo.toml"
