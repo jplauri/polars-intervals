@@ -12,6 +12,55 @@ spec = importlib.util.spec_from_file_location(
 checks = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(checks)
 SHA = "a" * 40
+POLARS = ("polars>=2.0.0,<3",)
+
+
+def write_pyproject(root, dependencies=POLARS, plots=POLARS):
+    # JSON string arrays are valid TOML arrays.
+    (root / "pyproject.toml").write_text(
+        f"[project]\ndependencies = {json.dumps(dependencies)}\n"
+        f"[dependency-groups]\nplots = {json.dumps(plots)}\n"
+    )
+
+
+@pytest.mark.parametrize(
+    ("dependencies", "plots", "expected"),
+    [
+        (POLARS, POLARS, "2.0.0"),
+        (["polars >= 2.1.4, < 3"], ["polars>=2.1.4,<3"], "2.1.4"),
+        (["polars-xdt>=0.1", "polars>=10.0.0,<11"], ["polars>=10.0.0,<11"], "10.0.0"),
+        # A lower cap or an exclusion can skip a broken release.
+        (["polars>=2.0.0,<2.2"], ["polars>=2.0.0,<2.2"], "2.0.0"),
+        (["polars>=2.0.0,<3,!=2.1.0"], ["polars>=2.0.0,<3,!=2.1.0"], "2.0.0"),
+    ],
+)
+def test_minimum_polars(tmp_path, dependencies, plots, expected):
+    write_pyproject(tmp_path, dependencies, plots)
+    assert checks.minimum_polars(tmp_path) == expected
+
+
+@pytest.mark.parametrize(
+    ("dependencies", "plots", "error"),
+    [
+        ([], [], "one Polars requirement"),
+        (["polars>=2.0.0,<3", "polars<2.5"], POLARS, "one Polars requirement"),
+        (["polars>=2.0,<3"], ["polars>=2.0,<3"], "exact X.Y.Z"),
+        (["polars>=2.0.0rc1,<3"], ["polars>=2.0.0rc1,<3"], "exact X.Y.Z"),
+        (["polars<3"], ["polars<3"], "exact X.Y.Z"),
+        (["polars>=2.0.0"], ["polars>=2.0.0"], "next major"),
+        (["polars>=2.0.0,<4"], ["polars>=2.0.0,<4"], "next major"),
+        (["polars>=2.0.0,<3.0.1"], ["polars>=2.0.0,<3.0.1"], "next major"),
+        (["polars>=2.0.0,<2.0.0"], ["polars>=2.0.0,<2.0.0"], "next major"),
+        (["polars>=2.0.0,<=2.5"], ["polars>=2.0.0,<=2.5"], "next major"),
+        (["polars>=2.0.0,<3,~=2.1"], ["polars>=2.0.0,<3,~=2.1"], "exclusions"),
+        (POLARS, ["polars>=2.1.0,<3"], "plots group"),
+        (POLARS, [], "plots group"),
+    ],
+)
+def test_minimum_polars_rejects_unsupported_ranges(tmp_path, dependencies, plots, error):
+    write_pyproject(tmp_path, dependencies, plots)
+    with pytest.raises(SystemExit, match=error):
+        checks.minimum_polars(tmp_path)
 
 
 @pytest.mark.parametrize(
@@ -29,11 +78,16 @@ def test_versions(tmp_path, core, plugin, error):
         directory.mkdir(parents=True)
         (directory / "Cargo.toml").write_text(f'[package]\nversion = "{version}"\n')
     (tmp_path / "rust-toolchain.toml").write_text('[toolchain]\nchannel = "1.95.0"\n')
+    write_pyproject(tmp_path)
     if error:
         with pytest.raises(SystemExit, match=error):
             checks.versions(tmp_path)
     else:
-        assert checks.versions(tmp_path) == {"version": "1.2.3", "rust_toolchain": "1.95.0"}
+        assert checks.versions(tmp_path) == {
+            "version": "1.2.3",
+            "rust_toolchain": "1.95.0",
+            "minimum_polars": "2.0.0",
+        }
 
 
 @pytest.fixture
