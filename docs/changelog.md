@@ -4,8 +4,9 @@
 
 Support Polars 2. Python signatures and results are unchanged.
 
-- **Breaking:** Require Polars `>=2.0.0,<2.2` instead of `>=1.44.1,<1.45`.
-  Stay on 0.3.1 if you need Polars 1.
+- **Breaking:** Require Polars `>=2.0.0,<3` instead of `>=1.44.1,<1.45`.
+  New Polars 2 releases no longer need a polars-intervals release. Stay on
+  0.3.1 if you need Polars 1.
 
 - Polars 2 runs `collect()` on the streaming engine by default. Expressions
   still solve their whole collection or group across all chunks. Frame
