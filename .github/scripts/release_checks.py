@@ -31,6 +31,51 @@ def require(condition, message):
         raise SystemExit(message)
 
 
+def minimum_polars(root=ROOT):
+    """Return the exact minimum Polars release after checking the supported range.
+
+    The range starts at one exact release and stops by the next major version.
+    A lower cap or != exclusions can skip a broken release until it is fixed.
+    """
+    pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
+
+    def polars(requirements):
+        # Other distributions, such as polars-xdt, have names that only start with polars.
+        return [
+            "".join(requirement.split())
+            for requirement in requirements
+            if re.match(r"polars\s*[<>=!~]", requirement)
+        ]
+
+    def parse_version(text):
+        if re.fullmatch(r"(0|[1-9]\d*)(\.(0|[1-9]\d*))*", text):
+            return tuple(map(int, text.split(".")))
+        return None
+
+    package = polars(pyproject["project"]["dependencies"])
+    require(len(package) == 1, "Declare one Polars requirement in the package dependencies.")
+    clauses = package[0].removeprefix("polars").split(",")
+    lower = [parse_version(clause[2:]) for clause in clauses if clause.startswith(">=")]
+    upper = [parse_version(clause[1:]) for clause in clauses if clause.startswith("<")]
+    require(
+        len(lower) == 1 and lower[0] is not None and len(lower[0]) == 3,
+        "The Polars requirement must start at one exact X.Y.Z release.",
+    )
+    require(
+        len(upper) == 1 and upper[0] is not None and lower[0] < upper[0] <= (lower[0][0] + 1,),
+        "The Polars requirement must stop by the next major version.",
+    )
+    require(
+        all(clause.startswith((">=", "<", "!=")) for clause in clauses),
+        "The Polars requirement can only add != exclusions to its range.",
+    )
+    require(
+        polars(pyproject.get("dependency-groups", {}).get("plots", [])) == package,
+        "The plots group must use the package's Polars requirement.",
+    )
+    return ".".join(map(str, lower[0]))
+
+
 def versions(root=ROOT):
     manifests = [
         tomllib.loads((root / "crates" / crate / "Cargo.toml").read_text(encoding="utf-8"))
@@ -46,7 +91,11 @@ def versions(root=ROOT):
         "Both crates must have the same version for this release process.",
     )
     toolchain = tomllib.loads((root / "rust-toolchain.toml").read_text(encoding="utf-8"))
-    return {"version": version, "rust_toolchain": toolchain["toolchain"]["channel"]}
+    return {
+        "version": version,
+        "rust_toolchain": toolchain["toolchain"]["channel"],
+        "minimum_polars": minimum_polars(root),
+    }
 
 
 def api(path):

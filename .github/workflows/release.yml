@@ -27,6 +27,7 @@ jobs:
     outputs:
       build_required: ${{ steps.changes.outputs.build_required }}
       rust_toolchain: ${{ steps.versions.outputs.rust_toolchain }}
+      minimum_polars: ${{ steps.versions.outputs.minimum_polars }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -114,11 +115,13 @@ jobs:
           "$TEST_PYTHON" -I "$GITHUB_WORKSPACE/.github/scripts/release_checks.py" installed --checkout "$GITHUB_WORKSPACE"
       - name: Test the declared minimum Polars version
         if: matrix.platform.name == 'linux-x86_64' && matrix.python == '3.12'
+        env:
+          MINIMUM_POLARS: ${{ needs.prepare.outputs.minimum_polars }}
         run: |
           uv venv --python 3.12 "$RUNNER_TEMP/minimum-env"
           test_python=$(uv python find "$RUNNER_TEMP/minimum-env")
           cd "$RUNNER_TEMP"
-          uv pip install --python "$test_python" --requirement "$RUNNER_TEMP/test-requirements.txt" "polars==1.44.1" "$GITHUB_WORKSPACE"/dist/*.whl
+          uv pip install --python "$test_python" --requirement "$RUNNER_TEMP/test-requirements.txt" "polars==$MINIMUM_POLARS" "$GITHUB_WORKSPACE"/dist/*.whl
           "$test_python" -I "$GITHUB_WORKSPACE/.github/scripts/release_checks.py" installed --checkout "$GITHUB_WORKSPACE"
       - name: Upload tested wheel
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

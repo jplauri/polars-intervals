@@ -1,0 +1,48 @@
+name: Newest Polars
+
+# The package allows every Polars release below the next major version, while
+# the lockfile pins one. Test the newest allowed release weekly, so a breaking
+# Polars release fails here before users report it.
+on:
+  schedule:
+    - cron: "23 5 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    name: Tests with the newest allowed Polars
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: "3.14"
+          enable-cache: false
+      - name: Install Rust
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: newest-polars
+      # Upgrading polars also moves its exactly pinned runtime package.
+      - name: Lock the newest Polars that pyproject.toml allows
+        run: uv lock --upgrade-package polars
+      - name: Install project
+        run: uv sync --locked
+      - name: Show the tested Polars version
+        run: uv run --locked python -c "import polars; print(polars.__version__)"
+      - name: Run Python tests and API examples
+        run: uv run --locked pytest --doctest-modules python/polars_intervals tests
+      # python -m pytest puts the repository root on sys.path for the shared imports.
+      - name: Run benchmark runner tests
+        run: uv run --locked python -m pytest benchmarks/test_provenance.py benchmarks/test_coverage_profile.py benchmarks/test_coverage_stats.py benchmarks/test_interval_geometry.py benchmarks/test_set_geometry.py

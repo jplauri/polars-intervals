@@ -197,7 +197,7 @@ def test_arbitrary_payloads_are_preserved_outside_native_import(lazy):
     assert_frame_equal(s.drop("unsupported-source"), snapshots[1].drop("unsupported-source"))
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_object_payload_bypasses_native_series_import(engine):
     objects = [object(), None, object()]
     q = (
@@ -273,7 +273,7 @@ def test_mismatched_empty_types_and_key_metadata(lazy):
         pi.coverage_stats(q.lazy() if lazy else q, s, by="key")
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_random_independent_cell_and_bitmap_oracles(engine):
     rng = random.Random(412)
     for _ in range(50):

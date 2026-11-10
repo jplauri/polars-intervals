@@ -8,7 +8,7 @@ from polars.testing import assert_frame_equal
 from .test_coverage_stats import STATS, assert_stats, frame, oracle
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_payload_and_geometry_share_the_same_query_evaluation(engine):
     queries = frame([(0, 100), (2, 5), (4, 4)]).with_columns(
         pl.Series("id", [1, 1, 1]),
@@ -52,7 +52,7 @@ def test_payload_and_geometry_share_the_same_query_evaluation(engine):
         assert result["payload"].to_list() == [[0], None, []]
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_repeated_collect_reads_the_current_source_evaluation(engine):
     queries = frame([(0, 10), (5, 10), (7, 7)])
     initial = frame([(1, 4)])
@@ -111,7 +111,7 @@ def test_payload_order_empty_schema_and_irrelevant_weight_columns(qlazy, slazy, 
     assert_stats(result, oracle(queries, sources))
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("side", ["queries", "intervals"])
 def test_explicit_upstream_transforms_define_validation_rows(side, engine):
     good = frame([(0, 10)])

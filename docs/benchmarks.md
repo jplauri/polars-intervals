@@ -47,6 +47,13 @@ Published runs use a fixed machine: **AMD Ryzen 9 3900X,
 running Windows 11 x86-64. The original hardware records remain in each run's
 metadata for provenance.
 
+## Polars version
+
+Published runs used Polars 1.44.1 or 1.44.2, as recorded in each run's metadata.
+They have not been repeated with Polars 2, which the package now requires.
+Polars 1.44 collected `auto` queries on the in-memory engine by default.
+Polars 2 uses the streaming engine, so new runs can give different timings.
+
 <span id="reading-and-reproducing-results"></span>
 
 [Benchmark setup and reporting](benchmarking.md#reading-and-reproducing-results)

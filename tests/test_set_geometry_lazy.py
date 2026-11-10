@@ -12,7 +12,7 @@ from .test_set_geometry import OPERATIONS, frame, grouped_oracle
 @pytest.mark.parametrize(
     "left_lazy,right_lazy", [(False, False), (True, False), (False, True), (True, True)]
 )
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_all_frame_modes_defer_both_sources_and_preserve_inputs(
     operation, left_lazy, right_lazy, engine
 ):
@@ -61,7 +61,7 @@ TRANSFORMS = {
 
 
 @pytest.mark.parametrize("operation", OPERATIONS)
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("transform", TRANSFORMS.values(), ids=TRANSFORMS)
 def test_downstream_transforms_keep_both_full_operands(operation, engine, transform):
     left = frame([(0, 2), (1, 10), (12, 15), (0, 0)]).with_columns(
@@ -76,7 +76,7 @@ def test_downstream_transforms_keep_both_full_operands(operation, engine, transf
     )
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_explicit_filter_and_slice_regressions(engine):
     left, right = frame([(0, 10)]).lazy(), frame([(2, 4)]).lazy()
     assert pi.subtract_intervals(left, right).filter(pl.col("start") >= 4).collect(
@@ -99,7 +99,7 @@ def test_explicit_filter_and_slice_regressions(engine):
 
 
 @pytest.mark.parametrize("operation", OPERATIONS)
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_multichunk_and_scan_sources_do_not_pair_partitions(operation, engine, tmp_path):
     left = frame([(0, 0), (2, 8), (0, 10), (12, 20), (0, 30), (21, 25)]).with_columns(
         pl.Series("key", ["early", None, "a", "a", "early", None])
@@ -130,7 +130,7 @@ def test_multichunk_and_scan_sources_do_not_pair_partitions(operation, engine, t
 
 
 @pytest.mark.parametrize("operation", OPERATIONS)
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_shared_source_different_branches_and_same_input(operation, engine):
     source = frame([(0, 10), (2, 4), (6, 8)])
     lazy = source.lazy()
@@ -160,7 +160,7 @@ def test_freeze_keys_and_temporary_name_collisions(operation):
 
 @pytest.mark.parametrize("operation", OPERATIONS)
 @pytest.mark.parametrize("side", ["left", "right"])
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_late_invalid_scan_rows_cannot_be_sliced_away(operation, side, engine, tmp_path):
     good = frame([(0, 10)])
     bad = frame([(1, 2), (4, 5), (8, 7)])

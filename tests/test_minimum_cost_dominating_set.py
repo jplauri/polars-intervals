@@ -148,7 +148,7 @@ def test_cost_types_include_zeros(dtype):
 
 
 @pytest.mark.parametrize("cost", [None, "price"])
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_mismatched_chunk_boundaries_and_global_reconstruction(cost, engine):
     frame = frame_from_rows([(1, 2, 10), (4, 5, 10), (0, 10, 1), (7, 8, 10), (7, 7, 0), (7, 7, 1)])
     chunked = pl.DataFrame(
@@ -190,7 +190,7 @@ def test_streaming_parquet_row_groups_form_one_domination_instance(tmp_path, cos
     "dtype", [pl.Int64, pl.Date, pl.Datetime("ns", "Europe/Helsinki")], ids=str
 )
 @pytest.mark.parametrize("cost", [None, "price"])
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_interleaved_whole_groups_and_aggregation(dtype, cost, engine):
     frame = frame_from_rows(
         [

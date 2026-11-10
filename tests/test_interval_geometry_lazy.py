@@ -15,7 +15,7 @@ def geometry(source, gap=False, **options):
     return pi.merge_intervals(source, **options)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("gap", [False, True])
 def test_lazy_construction_explain_schema_and_repeated_collection(engine, gap):
     source = frame([(0, 4), (3, 7), (6, 10)])
@@ -53,7 +53,7 @@ TRANSFORMS = {
 }
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("gap", [False, True])
 @pytest.mark.parametrize("transform", TRANSFORMS.values(), ids=TRANSFORMS)
 def test_downstream_operations_cannot_change_interval_instance(engine, gap, transform):
@@ -68,7 +68,7 @@ def test_downstream_operations_cannot_change_interval_instance(engine, gap, tran
     )
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_union_filter_pushdown_regression(engine):
     source = frame([(0, 3), (2, 5)])
     result = pi.merge_intervals(source.lazy()).filter(pl.col("start") >= 1).collect(engine=engine)
@@ -79,7 +79,7 @@ def test_union_filter_pushdown_regression(engine):
     assert changed_instance.rows() == [(2, 5)]
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("over", [False, True])
 def test_cluster_bridge_survives_downstream_metadata_filter_and_slice(engine, over):
     source = frame([(0, 4), (3, 7), (6, 10)]).with_columns(
@@ -99,7 +99,7 @@ def test_cluster_bridge_survives_downstream_metadata_filter_and_slice(engine, ov
     ].to_list() == [0, 0]
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("gap", [False, True])
 @pytest.mark.parametrize("transform", TRANSFORMS.values(), ids=TRANSFORMS)
 @pytest.mark.parametrize("bad", [(100, 99), (None, 99)])
@@ -111,7 +111,7 @@ def test_later_invalid_rows_not_hidden_by_optimizer(engine, gap, transform, bad)
         query.collect(engine=engine)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_lazy_cluster_does_not_execute_at_construction_and_validates_late_rows(engine):
     source = frame([(0, 3), (2, 5), (100, 99)]).with_columns(pl.Series("keep", [True, True, False]))
     seen = []
@@ -133,7 +133,7 @@ def test_lazy_cluster_does_not_execute_at_construction_and_validates_late_rows(e
             narrowed.collect(engine=engine)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 @pytest.mark.parametrize("dtype", ENDPOINT_DTYPES, ids=str)
 def test_lazy_endpoint_metadata_and_zero_rows(engine, dtype):
     source = frame([(0, 2), (2, 4)], dtype).with_columns(
@@ -157,7 +157,7 @@ def test_lazy_endpoint_metadata_and_zero_rows(engine, dtype):
                 assert_frame_equal(query.collect(engine=engine), expected)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_multichunk_columns_windows_and_group_aggregation(engine):
     rows = [(0, 4), (2, 3), (3, 7), (9, 9), (6, 10), (10, 12)]
     source = frame(rows).with_columns(pl.Series("g", ["a", None, "a", "a", "a", None]))
@@ -189,7 +189,7 @@ def test_multichunk_columns_windows_and_group_aggregation(engine):
             )
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_parquet_files_and_row_groups_form_one_instance(tmp_path, engine):
     rows = [(i, i + 2) for i in range(257)] + [(0, 258)]
     source = frame(rows).with_columns(
@@ -234,7 +234,7 @@ def test_parquet_files_and_row_groups_form_one_instance(tmp_path, engine):
             assert result.rows() == expected
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_domain_and_group_arguments_are_frozen_when_plan_is_built(engine):
     source = frame([(0, 3), (5, 6)]).with_columns(
         pl.Series("g", ["a", "b"]), pl.lit(1).alias("other")
@@ -248,7 +248,7 @@ def test_domain_and_group_arguments_are_frozen_when_plan_is_built(engine):
     assert_frame_equal(query.collect(engine=engine), expected)
 
 
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_scan_validation_errors_use_evaluated_original_indices(tmp_path, engine):
     source = frame([(0, 2), (3, 5), (9, 8)]).with_columns(pl.Series("g", [None, "a", None]))
     path = tmp_path / "invalid.parquet"

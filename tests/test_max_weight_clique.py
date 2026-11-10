@@ -143,7 +143,7 @@ def test_weight_types(dtype):
 
 
 @pytest.mark.parametrize("weight", [None, "value"])
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_different_column_chunk_boundaries_and_global_reconstruction(weight, engine):
     frame = frame_from_rows([(8, 9, 1), (0, 5, 4), (12, 13, 2), (1, 4, 5), (2, 3, 6), (7, 7, 9)])
     chunked = pl.DataFrame(
@@ -171,7 +171,7 @@ def test_different_column_chunk_boundaries_and_global_reconstruction(weight, eng
     "dtype", [pl.Int64, pl.Date, pl.Datetime("ns", "Europe/Helsinki")], ids=str
 )
 @pytest.mark.parametrize("weight", [None, "value"])
-@pytest.mark.parametrize("engine", ["auto", "streaming"])
+@pytest.mark.parametrize("engine", ["in-memory", "streaming"])
 def test_interleaved_whole_groups_and_aggregation(dtype, weight, engine):
     frame = frame_from_rows(
         [(0, 3, 4), (5, 5, 7), (0, 4, 0), (1, 2, 5), (5, 5, 8), (1, 3, -2), (8, 9, 1), (6, 6, 8)]

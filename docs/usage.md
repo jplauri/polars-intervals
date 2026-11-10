@@ -116,8 +116,9 @@ Groups appear in first-appearance order, with segments sorted by start within
 each group. Only groups present in the input can produce output. A grouped
 empty frame has no output groups.
 
-All frame operations above need their complete inputs in memory, even with
-`.collect(engine="streaming")`. All chunks participate in the same operation.
+All frame operations above need their complete inputs in memory, even on the
+streaming engine that `collect()` uses by default. All chunks participate in
+the same operation.
 Schema checks happen when the query is built. Every input row is validated when
 it runs, including empty or clipped-away intervals.
 
